@@ -51,7 +51,9 @@ namespace CleanC.Core.Services
             "Microsoft.WindowsAlarms",
             "Microsoft.WindowsSoundRecorder",
             "Microsoft.WindowsMaps",
-            "Microsoft.StorePurchaseApp"
+            "Microsoft.StorePurchaseApp",
+            "Microsoft.ZuneVideo",
+            "Microsoft.ZuneMusic"
         };
 
         // Vendor / Hardware / System signatures that must NEVER be flagged as bloatware
@@ -93,7 +95,6 @@ namespace CleanC.Core.Services
             { "Microsoft.MixedReality.Portal", ("Mixed Reality Portal", "پورتال واقعیت ترکیبی ویندوز") },
             { "Microsoft.Microsoft3DViewer", ("3D Viewer", "نمایشگر فایل‌های سه‌بعدی ویندوز") },
             { "Microsoft.People", ("People (مخاطبین)", "برنامه مخاطبین قدیمی ویندوز") },
-            { "Microsoft.ZuneVideo", ("Movies & TV (فیلم و تلویزیون)", "پخش‌کننده مدیا قدیمی ویندوز") },
             { "Microsoft.BingSports", ("MSN Sports (ورزش)", "برنامه اخبار ورزشی مایکروسافت") },
             { "Microsoft.BingFinance", ("MSN Money (اقتصاد)", "برنامه اخبار مالی مایکروسافت") }
         };
