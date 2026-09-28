@@ -517,10 +517,17 @@ namespace CleanC.UI
                 int winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
                 await Task.Delay(200);
 
-                // 8. Hardware & Display Diagnostics
+                // 8. GPU Graphics Preference Optimization
+                LiveCleanProgressBar.Value = 98;
+                LiveCleanStatusTitle.Text = "در حال تخصیص هوشمند کارت گرافیک...";
+                LiveCleanPhaseSubtitle.Text = "هدایت برنامه‌های سنگین و بازی‌ها به پردازنده گرافیکی قدرتمند";
+                var gpuResult = await GpuOptimizerService.OptimizeGpuPreferencesAsync();
+                await Task.Delay(150);
+
+                // 9. Hardware, Display & Power Diagnostics
                 LiveCleanProgressBar.Value = 99;
-                LiveCleanStatusTitle.Text = "در حال بررسی وضعیت مانیتور و سخت‌افزار...";
-                LiveCleanPhaseSubtitle.Text = "سنجش نرخ نوسازی تصویر و سازگاری سیستم";
+                LiveCleanStatusTitle.Text = "در حال بررسی وضعیت مانیتور و توان سیستم...";
+                LiveCleanPhaseSubtitle.Text = "سنجش نرخ نوسازی تصویر و پلن مصرف انرژی";
                 var attentionList = await HardwareDiagnosticService.RunDiagnosticsAsync();
                 await Task.Delay(150);
 
@@ -580,13 +587,27 @@ namespace CleanC.UI
                     });
                 }
 
+                if (gpuResult.ConfiguredAppsCount > 0)
+                {
+                    systemBoostGroup.Items.Add(new CleanupReportItem
+                    {
+                        GroupId = "system_boost",
+                        Id = "gpu_opt",
+                        Title = $"تخصیص کارت گرافیک مجزا ({gpuResult.DedicatedGpuName})",
+                        IconGlyph = "\uE790",
+                        FreedBytes = 0,
+                        WasEmpty = false,
+                        StatusSummary = $"{gpuResult.ConfiguredAppsCount} برنامه بهینه‌سازی شد ✓"
+                    });
+                }
+
                 if (winTweaks > 0)
                 {
                     systemBoostGroup.Items.Add(new CleanupReportItem
                     {
                         GroupId = "system_boost",
                         Id = "win_tweaks",
-                        Title = "کاهش مصرف پردازنده و توقف تبلیغات ویندوز",
+                        Title = "افزایش سرعت اکسپلورر، سرچ و توقف تبلیغات ویندوز",
                         IconGlyph = "\uE770",
                         FreedBytes = 0,
                         WasEmpty = false,
@@ -712,6 +733,20 @@ namespace CleanC.UI
                             else
                             {
                                 ShowInfoBar("خطا", "امکان تغییر نرخ نوسازی مانیتور در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
+                            }
+                        }
+                        else if (capturedAtt.Id == "power_plan")
+                        {
+                            bool success = PowerPlanService.ApplyHighPerformancePlan();
+                            if (success)
+                            {
+                                actionBtn.Content = "فعال شد ✓";
+                                actionBtn.IsEnabled = false;
+                                ShowInfoBar("مدیریت مصرف انرژی", "پلن High Performance با حداکثر توان پردازشی فعال گردید.", InfoBarSeverity.Success);
+                            }
+                            else
+                            {
+                                ShowInfoBar("خطا", "امکان تغییر پلن برق در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
                             }
                         }
                     };

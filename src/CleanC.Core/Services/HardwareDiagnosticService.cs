@@ -34,6 +34,14 @@ namespace CleanC.Core.Services
                 }
                 catch { }
 
+                // 2. Power Plan Optimization Check
+                try
+                {
+                    var powerItem = PowerPlanService.CheckPowerPlanAttention();
+                    if (powerItem != null) list.Add(powerItem);
+                }
+                catch { }
+
                 return list;
             });
         }

@@ -88,6 +88,8 @@ namespace CleanC.Core.Models
         public int DisabledStartupAppsCount { get; set; }
         public int BrowserTweaksCount { get; set; }
         public int WindowsTweaksCount { get; set; }
+        public int GpuOptimizedCount { get; set; }
+        public string DedicatedGpuName { get; set; } = string.Empty;
         public List<Services.AttentionDecisionItem> AttentionItems { get; set; } = new List<Services.AttentionDecisionItem>();
     }
 

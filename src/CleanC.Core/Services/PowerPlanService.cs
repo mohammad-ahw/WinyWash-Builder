@@ -1,0 +1,196 @@
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
+
+namespace CleanC.Core.Services
+{
+    public class PowerStatusInfo
+    {
+        public bool IsLaptop { get; set; }
+        public bool IsOnAcPower { get; set; }
+        public int BatteryPercent { get; set; }
+        public string ActiveSchemeName { get; set; } = string.Empty;
+        public string ActiveSchemeGuid { get; set; } = string.Empty;
+        public bool IsHighPerformanceOrUltimate { get; set; }
+    }
+
+    public class PowerPlanService
+    {
+        [DllImport("kernel32.dll")]
+        private static extern bool GetSystemPowerStatus(out SystemPowerStatus lpSystemPowerStatus);
+
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SystemPowerStatus
+        {
+            public byte ACLineStatus; // 0 = Offline, 1 = Online, 255 = Unknown
+            public byte BatteryFlag;  // 128 = No system battery, 255 = Unknown
+            public byte BatteryLifePercent;
+            public byte SystemStatusFlag;
+            public int BatteryLifeTime;
+            public int BatteryFullLifeTime;
+        }
+
+        public static PowerStatusInfo GetPowerStatus()
+        {
+            var info = new PowerStatusInfo();
+
+            try
+            {
+                if (GetSystemPowerStatus(out var status))
+                {
+                    // BatteryFlag: 128 means no system battery (Desktop PC)
+                    info.IsLaptop = (status.BatteryFlag != 128 && status.BatteryFlag != 255);
+                    info.IsOnAcPower = (status.ACLineStatus == 1 || !info.IsLaptop);
+                    info.BatteryPercent = status.BatteryLifePercent <= 100 ? status.BatteryLifePercent : 100;
+                }
+            }
+            catch { }
+
+            try
+            {
+                var (guid, name) = GetActiveScheme();
+                info.ActiveSchemeGuid = guid;
+                info.ActiveSchemeName = name;
+
+                if (name.Contains("High performance", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("Ultimate Performance", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("حداکثر کارایی", StringComparison.OrdinalIgnoreCase) ||
+                    guid.Equals("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", StringComparison.OrdinalIgnoreCase) ||
+                    guid.Equals("e9a42b02-d5df-448d-aa00-03f14749eb61", StringComparison.OrdinalIgnoreCase))
+                {
+                    info.IsHighPerformanceOrUltimate = true;
+                }
+            }
+            catch { }
+
+            return info;
+        }
+
+        public static (string Guid, string Name) GetActiveScheme()
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("powercfg", "/getactivescheme")
+                {
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+
+                using var p = Process.Start(psi);
+                if (p != null)
+                {
+                    string output = p.StandardOutput.ReadToEnd();
+                    p.WaitForExit(3000);
+
+                    var match = Regex.Match(output, @"Power Scheme GUID:\s*([a-fA-F0-9\-]+)\s*\((.*?)\)");
+                    if (match.Success)
+                    {
+                        return (match.Groups[1].Value.Trim(), match.Groups[2].Value.Trim());
+                    }
+                }
+            }
+            catch { }
+
+            return (string.Empty, "Balanced");
+        }
+
+        public static AttentionDecisionItem? CheckPowerPlanAttention()
+        {
+            try
+            {
+                var status = GetPowerStatus();
+
+                // If currently connected to AC power and not already in High/Ultimate performance
+                if (status.IsOnAcPower && !status.IsHighPerformanceOrUltimate)
+                {
+                    string deviceType = status.IsLaptop ? "لپ‌تاپ شما به شارژر متصل است" : "سیستم دسکتاپ شما با برق مستقیم کار می‌کند";
+
+                    return new AttentionDecisionItem
+                    {
+                        Id = "power_plan",
+                        Title = "فعال‌سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)",
+                        Description = $"{deviceType}. برای حذف تأخیر کلاک پردازنده و پایدار ماندن حداکثر توان پردازشی، پلن High Performance فعال شود؟",
+                        Category = "انرژی و پردازنده",
+                        ActionText = "فعال‌سازی High Performance",
+                        IconGlyph = "\uE945"
+                    };
+                }
+            }
+            catch { }
+
+            return null;
+        }
+
+        public static bool ApplyHighPerformancePlan()
+        {
+            try
+            {
+                // Standard High Performance GUID
+                string highPerfGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
+
+                // Try setting directly
+                if (SetActiveScheme(highPerfGuid)) return true;
+
+                // If scheme not yet present in schemes list, duplicate it
+                string? duplicatedGuid = DuplicateScheme(highPerfGuid);
+                if (!string.IsNullOrEmpty(duplicatedGuid))
+                {
+                    return SetActiveScheme(duplicatedGuid);
+                }
+            }
+            catch { }
+
+            return false;
+        }
+
+        private static bool SetActiveScheme(string guid)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("powercfg", $"/setactive {guid}")
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var p = Process.Start(psi);
+                p?.WaitForExit(3000);
+                return p?.ExitCode == 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static string? DuplicateScheme(string sourceGuid)
+        {
+            try
+            {
+                var psi = new ProcessStartInfo("powercfg", $"/duplicatescheme {sourceGuid}")
+                {
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var p = Process.Start(psi);
+                if (p != null)
+                {
+                    string output = p.StandardOutput.ReadToEnd();
+                    p.WaitForExit(3000);
+
+                    var match = Regex.Match(output, @"Power Scheme GUID:\s*([a-fA-F0-9\-]+)");
+                    if (match.Success)
+                    {
+                        return match.Groups[1].Value.Trim();
+                    }
+                }
+            }
+            catch { }
+
+            return null;
+        }
+    }
+}

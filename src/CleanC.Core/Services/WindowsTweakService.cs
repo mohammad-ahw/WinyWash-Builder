@@ -39,6 +39,28 @@ namespace CleanC.Core.Services
                             appliedCount++;
                         }
                     }
+
+                    // 3. Disable Bing Web Search in Start Menu (makes local file & app search instantaneous)
+                    using (var winSearch = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Search"))
+                    {
+                        if (winSearch != null)
+                        {
+                            winSearch.SetValue("BingSearchEnabled", 0, RegistryValueKind.DWord);
+                            winSearch.SetValue("CortanaConsent", 0, RegistryValueKind.DWord);
+                            appliedCount += 2;
+                        }
+                    }
+
+                    // 4. File Explorer Optimization (Launch to 'This PC' for faster opening, Show File Extensions for security)
+                    using (var explorerAdv = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"))
+                    {
+                        if (explorerAdv != null)
+                        {
+                            explorerAdv.SetValue("LaunchTo", 1, RegistryValueKind.DWord); // 1 = This PC
+                            explorerAdv.SetValue("HideFileExt", 0, RegistryValueKind.DWord); // 0 = Always show file extensions
+                            appliedCount += 2;
+                        }
+                    }
                 }
                 catch
                 {

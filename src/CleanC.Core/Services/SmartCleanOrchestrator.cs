@@ -219,14 +219,30 @@ namespace CleanC.Core.Services
             await Task.Delay(250);
 
             // =================================================================
-            // PHASE 7: Hardware & Display Diagnostics
+            // PHASE 7: GPU Graphics Preference Optimization
+            // =================================================================
+            progress?.Report(new CleanupStepResult
+            {
+                StepId = "gpu_opt",
+                Phase = "boost",
+                Title = "بهینه‌سازی تخصیص پردازنده گرافیکی (GPU)...",
+                Description = "هدایت بازی‌ها و نرم‌افزارهای سنگین به کارت گرافیک مجزا",
+                CumulativeFreedBytes = cumulativeFreed,
+                ProgressPercent = 98
+            });
+
+            var gpuResult = await GpuOptimizerService.OptimizeGpuPreferencesAsync();
+            await Task.Delay(200);
+
+            // =================================================================
+            // PHASE 8: Hardware, Display & Power Diagnostics
             // =================================================================
             progress?.Report(new CleanupStepResult
             {
                 StepId = "hardware_diag",
                 Phase = "boost",
-                Title = "بررسی مانیتور و سخت‌افزار...",
-                Description = "ارزیابی نرخ نوسازی مانیتور و وضعیت توان سیستم",
+                Title = "بررسی نمایشگر و وضعیت توان سیستم...",
+                Description = "ارزیابی رفرش‌ریت مانیتور و پلن مصرف انرژی",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 99
             });
@@ -235,11 +251,12 @@ namespace CleanC.Core.Services
             await Task.Delay(200);
 
             // =================================================================
-            // PHASE 8: Completion Summary
+            // PHASE 9: Completion Summary
             // =================================================================
             var descParts = new List<string>();
             descParts.Add($"مجموعاً {SystemStats.FormatBytes(cumulativeFreed)} از حافظه رم و دیسک آزاد شد.");
             if (disabledStartups > 0) descParts.Add($"{disabledStartups} برنامه استارتاپ بهینه‌سازی شد.");
+            if (gpuResult.ConfiguredAppsCount > 0) descParts.Add($"{gpuResult.ConfiguredAppsCount} برنامه به کارت گرافیک قدرتمند تخصیص یافت.");
             if (browserTweaks > 0) descParts.Add("پردازه‌های پس‌زمینه مرورگرها متوقف شدند.");
 
             var finalResult = new CleanupStepResult
@@ -254,6 +271,8 @@ namespace CleanC.Core.Services
                 DisabledStartupAppsCount = disabledStartups,
                 BrowserTweaksCount = browserTweaks,
                 WindowsTweaksCount = winTweaks,
+                GpuOptimizedCount = gpuResult.ConfiguredAppsCount,
+                DedicatedGpuName = gpuResult.DedicatedGpuName,
                 AttentionItems = attentionList
             };
 
