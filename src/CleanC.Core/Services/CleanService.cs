@@ -80,6 +80,18 @@ namespace CleanC.Core.Services
                 if (Directory.Exists(path))
                 {
                     freed += SafeCleanFolder(path);
+
+                    if (item.GroupId == "leftovers")
+                    {
+                        try
+                        {
+                            if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
+                            {
+                                Directory.Delete(path, false);
+                            }
+                        }
+                        catch { }
+                    }
                 }
                 else if (File.Exists(path))
                 {
