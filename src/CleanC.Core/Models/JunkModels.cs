@@ -85,6 +85,10 @@ namespace CleanC.Core.Models
         public bool IsComplete { get; set; }
         public JunkCategory? TargetItem { get; set; }
         public List<JunkCategory>? InitialItems { get; set; }
+        public int DisabledStartupAppsCount { get; set; }
+        public int BrowserTweaksCount { get; set; }
+        public int WindowsTweaksCount { get; set; }
+        public List<Services.AttentionDecisionItem> AttentionItems { get; set; } = new List<Services.AttentionDecisionItem>();
     }
 
     public class CleanupReportItem

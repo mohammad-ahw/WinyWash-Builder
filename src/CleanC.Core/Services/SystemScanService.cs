@@ -142,6 +142,52 @@ namespace CleanC.Core.Services
                     }
                 }
 
+                // Delivery Optimization Cache
+                var doPaths = new List<string>
+                {
+                    @"C:\Windows\SoftwareDistribution\DeliveryOptimization",
+                    Path.Combine(programData, @"Microsoft\Network\Downloader")
+                };
+                long doBytes = SafeGetPathsSize(doPaths);
+                if (doBytes > 0)
+                {
+                    grpRec.Items.Add(new JunkCategory
+                    {
+                        Id = "deliveryOpt",
+                        GroupId = "recommended",
+                        Title = "کش توزیع دانلود ویندوز (Delivery Optimization)",
+                        Description = "فایل‌های موقت بسته‌های دانلود آپدیت‌ها و استور مایکروسافت",
+                        Path = doPaths[0],
+                        TargetPaths = doPaths,
+                        Bytes = doBytes,
+                        RequiresElevation = true,
+                        IconGlyph = "\uE896"
+                    });
+                }
+
+                // Explorer Thumbnail Cache
+                string explorerCacheDir = Path.Combine(localApp, @"Microsoft\Windows\Explorer");
+                if (Directory.Exists(explorerCacheDir))
+                {
+                    var thumbFiles = Directory.GetFiles(explorerCacheDir, "thumbcache_*.db").ToList();
+                    long thumbBytes = 0;
+                    foreach (var f in thumbFiles) { try { thumbBytes += new FileInfo(f).Length; } catch { } }
+                    if (thumbBytes > 0)
+                    {
+                        grpRec.Items.Add(new JunkCategory
+                        {
+                            Id = "thumbnailCache",
+                            GroupId = "recommended",
+                            Title = "حافظه کش بندانگشتی‌ها (Thumbnail Cache)",
+                            Description = "پیش‌نمایش ذخیره‌شده فایل‌ها و تصاویر در فایل اکسپلورر",
+                            Path = explorerCacheDir,
+                            TargetPaths = thumbFiles,
+                            Bytes = thumbBytes,
+                            IconGlyph = "\uEB9F"
+                        });
+                    }
+                }
+
                 result.Groups.Add(grpRec);
 
                 // -------------------------------------------------------------

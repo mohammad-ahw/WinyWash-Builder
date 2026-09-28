@@ -496,8 +496,33 @@ namespace CleanC.UI
                 OptimizerService.FlushDns();
                 ProcessManagerService.CleanBackgroundHelpers();
 
-                LiveCleanProgressBar.Value = 96;
-                await Task.Delay(250);
+                // 5. Browser Background Tasks Suppression
+                LiveCleanProgressBar.Value = 92;
+                LiveCleanStatusTitle.Text = "در حال خاموش‌سازی تسک‌های پس‌زمینه مرورگرها...";
+                LiveCleanPhaseSubtitle.Text = "توقف Startup Boost و فعالیت پنهان Edge و Chrome";
+                int browserTweaks = await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
+                await Task.Delay(200);
+
+                // 6. Startup Apps & Launchers Optimization
+                LiveCleanProgressBar.Value = 95;
+                LiveCleanStatusTitle.Text = "در حال بهینه‌سازی استارتاپ ویندوز...";
+                LiveCleanPhaseSubtitle.Text = "غیرفعال‌سازی برنامه‌ها و لانچرهای سنگین شروع خودکار";
+                int disabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
+                await Task.Delay(200);
+
+                // 7. Windows Performance & Privacy Tweaks
+                LiveCleanProgressBar.Value = 97;
+                LiveCleanStatusTitle.Text = "در حال اعمال تنظیمات بهینه‌سازی ویندوز...";
+                LiveCleanPhaseSubtitle.Text = "غیرفعال‌سازی پیشنهادات و سرویس‌های درگیرکننده پردازنده";
+                int winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
+                await Task.Delay(200);
+
+                // 8. Hardware & Display Diagnostics
+                LiveCleanProgressBar.Value = 99;
+                LiveCleanStatusTitle.Text = "در حال بررسی وضعیت مانیتور و سخت‌افزار...";
+                LiveCleanPhaseSubtitle.Text = "سنجش نرخ نوسازی تصویر و سازگاری سیستم";
+                var attentionList = await HardwareDiagnosticService.RunDiagnosticsAsync();
+                await Task.Delay(150);
 
                 // Add Live System Boost group to report
                 var systemBoostGroup = new CleanupReportGroup
@@ -526,13 +551,56 @@ namespace CleanC.UI
                     WasEmpty = false,
                     StatusSummary = "با موفقیت نوسازی شد ✓"
                 });
+
+                if (browserTweaks > 0)
+                {
+                    systemBoostGroup.Items.Add(new CleanupReportItem
+                    {
+                        GroupId = "system_boost",
+                        Id = "browser_opt",
+                        Title = "توقف تسک‌های پس‌زمینه و Startup Boost مرورگرها",
+                        IconGlyph = "\uE774",
+                        FreedBytes = 0,
+                        WasEmpty = false,
+                        StatusSummary = "بهینه‌سازی شد ✓"
+                    });
+                }
+
+                if (disabledStartups > 0)
+                {
+                    systemBoostGroup.Items.Add(new CleanupReportItem
+                    {
+                        GroupId = "system_boost",
+                        Id = "startup_opt",
+                        Title = $"بهینه‌سازی استارتاپ ({disabledStartups} برنامه غیرضروری)",
+                        IconGlyph = "\uE7B5",
+                        FreedBytes = 0,
+                        WasEmpty = false,
+                        StatusSummary = "غیرفعال شد ✓"
+                    });
+                }
+
+                if (winTweaks > 0)
+                {
+                    systemBoostGroup.Items.Add(new CleanupReportItem
+                    {
+                        GroupId = "system_boost",
+                        Id = "win_tweaks",
+                        Title = "کاهش مصرف پردازنده و توقف تبلیغات ویندوز",
+                        IconGlyph = "\uE770",
+                        FreedBytes = 0,
+                        WasEmpty = false,
+                        StatusSummary = "اعمال شد ✓"
+                    });
+                }
+
                 reportGroups.Add(systemBoostGroup);
 
-                // 5. Celebration & Transition to Hierarchical Report Card
+                // 9. Celebration & Transition to Hierarchical Report Card
                 LiveCleanProgressBar.Value = 100;
                 LiveCleanSpinner.Visibility = Visibility.Collapsed;
                 LiveCleanDoneIcon.Visibility = Visibility.Visible;
-                LiveCleanStatusTitle.Text = "عملیات پاکسازی با موفقیت تکمیل شد!";
+                LiveCleanStatusTitle.Text = "بهینه‌سازی خودکار سیستم با موفقیت به پایان رسید!";
                 LiveCleanPhaseSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(totalFreedBytes)} آزاد گردید.";
                 _displayedFreedBytes = totalFreedBytes;
                 LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(totalFreedBytes)} آزاد شد";
@@ -541,7 +609,7 @@ namespace CleanC.UI
 
                 // Hide Live card, show Hierarchical Report Card
                 LiveCleanupCard.Visibility = Visibility.Collapsed;
-                RenderHierarchicalReport(reportGroups, totalFreedBytes);
+                RenderHierarchicalReport(reportGroups, totalFreedBytes, attentionList);
                 CleanupReportCard.Visibility = Visibility.Visible;
 
                 HeroHealthTitle.Text = "سیستم در وضعیت بهینه و پرسرعت قرار دارد";
@@ -568,7 +636,7 @@ namespace CleanC.UI
             }
         }
 
-        private void RenderHierarchicalReport(List<CleanupReportGroup> groups, long totalFreed)
+        private void RenderHierarchicalReport(List<CleanupReportGroup> groups, long totalFreed, List<AttentionDecisionItem>? attentionItems = null)
         {
             ReportTotalFreedText.Text = $"+ {SystemStats.FormatBytes(totalFreed)} آزاد شد";
             ReportGroupsContainer.Children.Clear();
@@ -580,6 +648,80 @@ namespace CleanC.UI
             var accentFg = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
             var cardBg = GetThemeBrush("AppCardSecondaryBrush");
             var borderBrush = GetThemeBrush("AppCardBorderBrush");
+
+            // Attention / Decision items (e.g. 144Hz monitor refresh rate)
+            if (attentionItems != null && attentionItems.Count > 0)
+            {
+                foreach (var att in attentionItems)
+                {
+                    var attBorder = new Border
+                    {
+                        Background = new SolidColorBrush(Windows.UI.Color.FromArgb(32, 245, 158, 11)), // warm amber
+                        BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(150, 245, 158, 11)),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(8),
+                        Padding = new Thickness(14, 12, 14, 12),
+                        Margin = new Thickness(0, 0, 0, 10),
+                        HorizontalAlignment = HorizontalAlignment.Stretch
+                    };
+
+                    var attGrid = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch };
+                    attGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    attGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    attGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                    var attIcon = new FontIcon
+                    {
+                        Glyph = att.IconGlyph,
+                        FontSize = 18,
+                        Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 245, 158, 11)),
+                        Margin = new Thickness(0, 0, 12, 0),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    Grid.SetColumn(attIcon, 0);
+                    attGrid.Children.Add(attIcon);
+
+                    var textStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 2 };
+                    var titleText = new TextBlock { Text = att.Title, FontSize = 13, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
+                    var descText = new TextBlock { Text = att.Description, FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextWrapping = TextWrapping.Wrap };
+                    textStack.Children.Add(titleText);
+                    textStack.Children.Add(descText);
+                    Grid.SetColumn(textStack, 1);
+                    attGrid.Children.Add(textStack);
+
+                    var actionBtn = new Button
+                    {
+                        Content = att.ActionText,
+                        Style = (Style)Application.Current.Resources["AccentButtonStyle"],
+                        Padding = new Thickness(14, 6, 14, 6),
+                        CornerRadius = new CornerRadius(6),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    var capturedAtt = att;
+                    actionBtn.Click += (s, ev) =>
+                    {
+                        if (capturedAtt.Id == "refresh_rate")
+                        {
+                            bool success = HardwareDiagnosticService.ApplyRefreshRate(capturedAtt.IntParameter);
+                            if (success)
+                            {
+                                actionBtn.Content = "اعمال شد ✓";
+                                actionBtn.IsEnabled = false;
+                                ShowInfoBar("تنظیمات مانیتور", $"نرخ نوسازی با موفقیت به {capturedAtt.IntParameter}Hz ارتقا یافت.", InfoBarSeverity.Success);
+                            }
+                            else
+                            {
+                                ShowInfoBar("خطا", "امکان تغییر نرخ نوسازی مانیتور در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
+                            }
+                        }
+                    };
+                    Grid.SetColumn(actionBtn, 2);
+                    attGrid.Children.Add(actionBtn);
+
+                    attBorder.Child = attGrid;
+                    ReportGroupsContainer.Children.Add(attBorder);
+                }
+            }
 
             foreach (var group in groups)
             {

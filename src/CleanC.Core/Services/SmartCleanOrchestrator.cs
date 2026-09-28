@@ -160,7 +160,7 @@ namespace CleanC.Core.Services
                 Title = "در حال آزادسازی حافظه رم و نوسازی شبکه...",
                 Description = "تخلیه Working Set پردازه‌ها و رفرش کش DNS",
                 CumulativeFreedBytes = cumulativeFreed,
-                ProgressPercent = 88
+                ProgressPercent = 86
             });
 
             var boostResult = await OptimizerService.BoostRamAsync();
@@ -170,33 +170,91 @@ namespace CleanC.Core.Services
             await Task.Delay(250);
 
             // =================================================================
-            // PHASE 4: Background Helpers Optimization
+            // PHASE 4: Browser Background Preloading Suppression
             // =================================================================
             progress?.Report(new CleanupStepResult
             {
-                StepId = "processes",
+                StepId = "browser_opt",
                 Phase = "boost",
-                Title = "بهینه‌سازی پردازه‌های پس‌زمینه...",
-                Description = "بستن سرویس‌ها و آپدیترهای بیکار",
+                Title = "بهینه‌سازی پردازه‌های مخفی مرورگرها...",
+                Description = "توقف Startup Boost و تسک‌های پس‌زمینه Edge و Chrome",
                 CumulativeFreedBytes = cumulativeFreed,
-                ProgressPercent = 95
+                ProgressPercent = 90
             });
 
+            int browserTweaks = await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
             ProcessManagerService.CleanBackgroundHelpers();
             await Task.Delay(250);
 
             // =================================================================
-            // PHASE 5: Completion Celebration
+            // PHASE 5: Startup Apps & Launchers Optimization
             // =================================================================
+            progress?.Report(new CleanupStepResult
+            {
+                StepId = "startup_opt",
+                Phase = "boost",
+                Title = "بهینه‌سازی استارتاپ ویندوز...",
+                Description = "غیرفعال‌سازی برنامه‌ها و لانچرهای سنگین استارتاپ",
+                CumulativeFreedBytes = cumulativeFreed,
+                ProgressPercent = 94
+            });
+
+            int disabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
+            await Task.Delay(250);
+
+            // =================================================================
+            // PHASE 6: Windows Low-Risk Performance Tweaks
+            // =================================================================
+            progress?.Report(new CleanupStepResult
+            {
+                StepId = "windows_tweaks",
+                Phase = "boost",
+                Title = "بهینه‌سازی تنظیمات کارایی ویندوز...",
+                Description = "غیرفعال‌سازی پیام‌های تبلیغاتی و پایش‌های غیرضروری",
+                CumulativeFreedBytes = cumulativeFreed,
+                ProgressPercent = 97
+            });
+
+            int winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
+            await Task.Delay(250);
+
+            // =================================================================
+            // PHASE 7: Hardware & Display Diagnostics
+            // =================================================================
+            progress?.Report(new CleanupStepResult
+            {
+                StepId = "hardware_diag",
+                Phase = "boost",
+                Title = "بررسی مانیتور و سخت‌افزار...",
+                Description = "ارزیابی نرخ نوسازی مانیتور و وضعیت توان سیستم",
+                CumulativeFreedBytes = cumulativeFreed,
+                ProgressPercent = 99
+            });
+
+            var attentionList = await HardwareDiagnosticService.RunDiagnosticsAsync();
+            await Task.Delay(200);
+
+            // =================================================================
+            // PHASE 8: Completion Summary
+            // =================================================================
+            var descParts = new List<string>();
+            descParts.Add($"مجموعاً {SystemStats.FormatBytes(cumulativeFreed)} از حافظه رم و دیسک آزاد شد.");
+            if (disabledStartups > 0) descParts.Add($"{disabledStartups} برنامه استارتاپ بهینه‌سازی شد.");
+            if (browserTweaks > 0) descParts.Add("پردازه‌های پس‌زمینه مرورگرها متوقف شدند.");
+
             var finalResult = new CleanupStepResult
             {
                 StepId = "complete",
                 Phase = "complete",
-                Title = "سیستم با موفقیت پاکسازی و بهینه‌سازی شد!",
-                Description = $"مجموعاً {SystemStats.FormatBytes(cumulativeFreed)} از حافظه رم و فضای دیسک آزاد گردید.",
+                Title = "بهینه‌سازی جامع سیستم با موفقیت به پایان رسید!",
+                Description = string.Join(" | ", descParts),
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 100,
-                IsComplete = true
+                IsComplete = true,
+                DisabledStartupAppsCount = disabledStartups,
+                BrowserTweaksCount = browserTweaks,
+                WindowsTweaksCount = winTweaks,
+                AttentionItems = attentionList
             };
 
             progress?.Report(finalResult);
