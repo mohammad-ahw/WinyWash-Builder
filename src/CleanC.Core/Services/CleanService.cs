@@ -56,6 +56,19 @@ namespace CleanC.Core.Services
                 }
             }
 
+            if (item.Id == "orphanedRegistry")
+            {
+                try
+                {
+                    int cleanedCount = RegistryCleanerService.CleanOrphanedRegistry();
+                    return Math.Max(cleanedCount * 1024, item.Bytes);
+                }
+                catch
+                {
+                    return 0;
+                }
+            }
+
             var paths = item.TargetPaths != null && item.TargetPaths.Count > 0
                 ? item.TargetPaths
                 : (!string.IsNullOrEmpty(item.Path) ? new List<string> { item.Path } : new List<string>());

@@ -266,6 +266,27 @@ namespace CleanC.Core.Services
                     IconGlyph = "\uE839"
                 });
 
+                // Orphaned Registry entries
+                try
+                {
+                    var (deadMui, _) = RegistryCleanerService.ScanOrphanedRegistry();
+                    if (deadMui > 0)
+                    {
+                        grpSys.Items.Add(new JunkCategory
+                        {
+                            Id = "orphanedRegistry",
+                            GroupId = "system",
+                            Title = "مسیرها و کلیدهای نامعتبر رجیستری (Orphaned Registry)",
+                            Description = $"{deadMui} مسیر نامعتبر از برنامه‌های حذف‌شده در MuiCache رجیستری",
+                            Path = "Registry",
+                            TargetPaths = new List<string>(),
+                            Bytes = deadMui * 1024,
+                            IconGlyph = "\uE770"
+                        });
+                    }
+                }
+                catch { }
+
                 result.Groups.Add(grpSys);
 
                 // -------------------------------------------------------------
@@ -494,6 +515,146 @@ namespace CleanC.Core.Services
                 });
 
                 result.Groups.Add(grpTraces);
+
+                // -------------------------------------------------------------
+                // Group 5: Download Managers & Incomplete Files
+                // -------------------------------------------------------------
+                progressCallback?.Invoke("در حال ارزیابی دانلود منیجرها و فایل‌های ناقص...");
+                var grpDownloads = new JunkGroup
+                {
+                    Id = "downloads",
+                    Title = "دانلود منیجرها و فایل‌های ناتمام (Download Managers)",
+                    Description = "چانک‌های موقت، تکه‌های دانلود ناقص و فایل‌های رهاشده",
+                    IconGlyph = "\uE896"
+                };
+
+                // IDM Incomplete download chunks
+                string idmDataDir = Path.Combine(appData, @"IDM\DwnlData");
+                if (Directory.Exists(idmDataDir))
+                {
+                    long idmBytes = SafeGetDirectorySize(idmDataDir);
+                    if (idmBytes > 0)
+                    {
+                        grpDownloads.Items.Add(new JunkCategory
+                        {
+                            Id = "idmChunks",
+                            GroupId = "downloads",
+                            Title = "فایل‌های موقت و چانک‌های ناتمام IDM",
+                            Description = "قطعات موقت دانلودهای متوقف‌شده، لغوشده و رهاشده در اینترنت دانلود منیجر",
+                            Path = idmDataDir,
+                            TargetPaths = new List<string> { idmDataDir },
+                            Bytes = idmBytes,
+                            IconGlyph = "\uE896"
+                        });
+                    }
+                }
+
+                // Free Download Manager (FDM) temp
+                var fdmPaths = new List<string>
+                {
+                    Path.Combine(localApp, @"Softdeluxe\Free Download Manager"),
+                    Path.Combine(appData, @"Free Download Manager")
+                };
+                long fdmBytes = SafeGetPathsSize(fdmPaths);
+                if (fdmBytes > 0)
+                {
+                    grpDownloads.Items.Add(new JunkCategory
+                    {
+                        Id = "fdmTemp",
+                        GroupId = "downloads",
+                        Title = "فایل‌های موقت Free Download Manager (FDM)",
+                        Description = "کش و قطعات موقت دانلودهای ناتمام FDM",
+                        Path = fdmPaths[0],
+                        TargetPaths = fdmPaths,
+                        Bytes = fdmBytes,
+                        IconGlyph = "\uE896"
+                    });
+                }
+
+                // Abandoned Browser Downloads (*.crdownload, *.part older than 3 days)
+                string userDownloads = Path.Combine(userProfile, "Downloads");
+                if (Directory.Exists(userDownloads))
+                {
+                    try
+                    {
+                        var abandonedFiles = new List<string>();
+                        long abandonedBytes = 0;
+                        var dir = new DirectoryInfo(userDownloads);
+                        var cutoff = DateTime.Now.AddDays(-3);
+
+                        foreach (var fi in dir.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+                        {
+                            if (fi.Extension.Equals(".crdownload", StringComparison.OrdinalIgnoreCase) ||
+                                fi.Extension.Equals(".part", StringComparison.OrdinalIgnoreCase) ||
+                                fi.Extension.Equals(".download", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (fi.LastWriteTime < cutoff)
+                                {
+                                    abandonedFiles.Add(fi.FullName);
+                                    abandonedBytes += fi.Length;
+                                }
+                            }
+                        }
+
+                        if (abandonedFiles.Count > 0)
+                        {
+                            grpDownloads.Items.Add(new JunkCategory
+                            {
+                                Id = "abandonedDownloads",
+                                GroupId = "downloads",
+                                Title = "دانلودهای ناتمام و ناقص قدیمی مرورگرها",
+                                Description = $"{abandonedFiles.Count} فایل ناقص رهاشده در پوشه Downloads (.crdownload / .part)",
+                                Path = userDownloads,
+                                TargetPaths = abandonedFiles,
+                                Bytes = abandonedBytes,
+                                IconGlyph = "\uE896"
+                            });
+                        }
+                    }
+                    catch { }
+                }
+
+                if (grpDownloads.Items.Count > 0)
+                {
+                    result.Groups.Add(grpDownloads);
+                }
+
+                // -------------------------------------------------------------
+                // Group 6: Leftover Folders of Uninstalled Apps
+                // -------------------------------------------------------------
+                progressCallback?.Invoke("در حال پویش پوشه‌های باقیمانده نرم‌افزارهای حذف‌شده...");
+                try
+                {
+                    var leftovers = LeftoverCleanerService.ScanLeftoverFolders();
+                    if (leftovers.Count > 0)
+                    {
+                        var grpLeftovers = new JunkGroup
+                        {
+                            Id = "leftovers",
+                            Title = "پوشه‌های باقیمانده نرم‌افزارهای حذف‌شده (Leftovers)",
+                            Description = "پوشه‌های حجیم برنامه‌هایی که از سیستم حذف شده‌اند ولی داده‌هایشان باقی مانده است",
+                            IconGlyph = "\uE74D"
+                        };
+
+                        foreach (var lo in leftovers)
+                        {
+                            grpLeftovers.Items.Add(new JunkCategory
+                            {
+                                Id = $"leftover_{lo.FolderName}",
+                                GroupId = "leftovers",
+                                Title = $"پوشه رهاشده: {lo.FolderName} ({lo.LocationType})",
+                                Description = $"مسیر: {lo.FullPath}",
+                                Path = lo.FullPath,
+                                TargetPaths = new List<string> { lo.FullPath },
+                                Bytes = lo.SizeBytes,
+                                IconGlyph = "\uE74D"
+                            });
+                        }
+
+                        result.Groups.Add(grpLeftovers);
+                    }
+                }
+                catch { }
 
                 return result;
             });

@@ -22,21 +22,60 @@ namespace CleanC.Core.Services
     {
         private const string CleanCBackupKey = @"Software\CleanC\DisabledStartup";
 
-        // Signatures of non-essential launchers, social apps, updaters
+        // Signatures of non-essential launchers, cloud sync, VPN auto-starts, and updaters
         private static readonly string[] NonEssentialSignatures = new[]
         {
-            "discord", "spotify", "steam", "epicgames", "telegram", "whatsapp",
-            "zoom", "adobe", "creative cloud", "googledrive", "skype", "battle.net",
-            "riotclient", "viber", "teams", "ituneshelper", "ccleaner", "torrent",
-            "utorrent", "bittorrent", "anydesk", "teamviewer", "vlc", "origin", "ea desktop"
+            // Cloud & Sync
+            "onedrive", "dropbox", "icloud", "mega", "megasync", "nextcloud", "googledrive", "google drive",
+
+            // VPN & Proxy Clients (Disable auto-start on boot)
+            "x-vpn", "xvpn", "nordvpn", "expressvpn", "protonvpn", "psiphon", "v2rayn", "clash",
+            "hiddify", "sing-box", "singbox", "outline", "nekoray", "nekobox", "windscribe", "surfshark", "hotspot shield",
+
+            // Software Updaters & Background Schedulers
+            "googleupdate", "google update", "edgeupdate", "edge update", "jusched", "java update",
+            "adobearm", "adobe updater", "acrotray", "creative cloud", "ccleaner", "driver booster",
+            "driverbooster", "iobit", "advanced systemcare", "ituneshelper",
+
+            // Social, Chat & Communication
+            "discord", "spotify", "telegram", "whatsapp", "zoom", "skype", "viber", "slack", "teams", "msteams",
+
+            // Browsers
+            "operagx", "opera gx", "brave", "yandex",
+
+            // Gaming Launchers & Clients
+            "steam", "epicgames", "epic games", "battle.net", "battlenet", "origin", "ea app",
+            "eadestktop", "ubisoft connect", "uplay", "gog galaxy", "riotclient", "riot client", "xboxapp",
+
+            // Torrent & Remote desktop auto-starts
+            "utorrent", "bittorrent", "qbittorrent", "anydesk", "teamviewer",
+
+            // Unnecessary OEM Support Bloat
+            "hp support assistant", "hpsupportassistant", "dell supportassist", "supportassist",
+            "acer care center", "acer care", "lenovosystemupdate"
         };
 
-        // Whitelist signatures (drivers, audio, touchpad, security) - NEVER TOUCH
+        // Whitelist signatures (hardware drivers, keyboard lighting, audio, touchpad, security) - NEVER TOUCH
         private static readonly string[] WhitelistSignatures = new[]
         {
-            "security", "defender", "realtek", "synaptics", "elan", "conexant",
-            "waves", "nvidia", "amd", "intel", "logitech", "corsair", "razer",
-            "bluetooth", "audio", "touchpad", "driver", "antivirus", "smartaudio", "vpn"
+            // Core Security
+            "security", "defender", "securityhealth", "antivirus",
+
+            // Audio Drivers
+            "realtek", "conexant", "waves", "smartaudio", "audio", "sound", "nahimic",
+
+            // Touchpad, Input & Keyboard
+            "synaptics", "elan", "alps", "touchpad", "trackpoint",
+
+            // Hardware Lighting & Performance Controllers (MSI Dragon Center, Mystic Light, Fan Control, etc.)
+            "dragon center", "msi center", "mystic light", "alienware", "armoury crate",
+            "legion space", "backlight", "keyboard", "fan control",
+
+            // Graphics & Display
+            "nvidia", "nvbackend", "nvdisplay", "amd", "radeon", "intel", "igfx",
+
+            // Network Hardware
+            "bluetooth", "wireless", "wlan", "wifi", "ethernet"
         };
 
         public static List<StartupItem> GetStartupItems()
