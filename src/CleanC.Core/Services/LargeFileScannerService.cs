@@ -1,0 +1,95 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
+using CleanC.Core.Models;
+using CleanC.Core.Native;
+
+namespace CleanC.Core.Services
+{
+    public class LargeFileScannerService
+    {
+        public static async Task<List<LargeFileInfo>> ScanUserLargeFilesAsync(long minSizeBytes = 500L * 1024 * 1024, Action<string>? progress = null)
+        {
+            return await Task.Run(() =>
+            {
+                var results = new List<LargeFileInfo>();
+
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var scanFolders = new List<string>
+                {
+                    Path.Combine(userProfile, "Downloads"),
+                    Path.Combine(userProfile, "Desktop"),
+                    Path.Combine(userProfile, "Documents"),
+                    Path.Combine(userProfile, "Videos"),
+                    Path.Combine(userProfile, "Music"),
+                    Path.Combine(userProfile, "AppData", "Local", "Temp"),
+                    Path.Combine(userProfile, "AppData", "Roaming"),
+                    @"C:\Games",
+                    @"C:\Tools"
+                };
+
+                // Add existing folders to list
+                var activeFolders = scanFolders.Where(Directory.Exists).ToList();
+
+                var enumOptions = new EnumerationOptions
+                {
+                    IgnoreInaccessible = true,
+                    RecurseSubdirectories = true,
+                    AttributesToSkip = FileAttributes.ReparsePoint | FileAttributes.System
+                };
+
+                foreach (var folder in activeFolders)
+                {
+                    try
+                    {
+                        progress?.Invoke($"در حال اسکن پوشه: {Path.GetFileName(folder)}...");
+                        var dirInfo = new DirectoryInfo(folder);
+                        foreach (var file in dirInfo.EnumerateFiles("*", enumOptions))
+                        {
+                            try
+                            {
+                                if (file.Length >= minSizeBytes)
+                                {
+                                    results.Add(new LargeFileInfo
+                                    {
+                                        FilePath = file.FullName,
+                                        FileName = file.Name,
+                                        DirectoryPath = file.DirectoryName ?? string.Empty,
+                                        SizeBytes = file.Length,
+                                        LastModified = file.LastWriteTime
+                                    });
+                                }
+                            }
+                            catch { }
+                        }
+                    }
+                    catch { }
+                }
+
+                // Sort descending by size
+                return results.OrderByDescending(f => f.SizeBytes).Take(100).ToList();
+            });
+        }
+
+        public static bool DeleteLargeFile(string filePath)
+        {
+            try
+            {
+                if (File.Exists(filePath))
+                {
+                    var fi = new FileInfo(filePath);
+                    if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden)) != 0)
+                    {
+                        fi.Attributes = FileAttributes.Normal;
+                    }
+                    fi.Delete();
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+    }
+}

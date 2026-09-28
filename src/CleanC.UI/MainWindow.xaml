@@ -61,6 +61,9 @@
 
                 <!-- Quick Action Tools on Titlebar (Right, before caption buttons) - Pill shaped -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Spacing="8" Margin="0,0,12,0">
+                    <Button x:Name="UndoCenterBtn" Click="UndoCenterBtn_Click" ToolTipService.ToolTip="مرکز بازیابی و بازگشت تغییرات (Restore &amp; Undo Center)" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Width="32" Height="32" Padding="0" CornerRadius="16">
+                        <FontIcon Glyph="&#xE777;" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                    </Button>
                     <Button x:Name="RefreshStatsBtn" Click="RefreshStatsBtn_Click" ToolTipService.ToolTip="بروزرسانی وضعیت سیستم" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Width="32" Height="32" Padding="0" CornerRadius="16">
                         <FontIcon x:Name="RefreshStatsIcon" Glyph="&#xE72C;" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                     </Button>
@@ -302,7 +305,10 @@
                                         <TextBlock x:Name="CardDiskTypeBadge" Grid.Column="1" Text="NVMe SSD" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
                                     </Grid>
                                     <ProgressBar x:Name="CardDiskProgress" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
-                                    <Button x:Name="CardToggleCustomCleanBtn" Click="CardToggleCustomCleanBtn_Click" Content="سفارشی‌سازی موارد پاکسازی" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
+                                    <Grid ColumnDefinitions="*,*">
+                                        <Button x:Name="CardToggleCustomCleanBtn" Click="CardToggleCustomCleanBtn_Click" Content="سفارشی‌سازی" Margin="0,0,3,0" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
+                                        <Button x:Name="CardLargeFilesBtn" Grid.Column="1" Click="CardLargeFilesBtn_Click" Content="فایل‌های حجیم" Margin="3,0,0,0" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 

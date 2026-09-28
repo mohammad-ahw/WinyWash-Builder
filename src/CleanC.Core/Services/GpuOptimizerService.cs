@@ -271,5 +271,45 @@ namespace CleanC.Core.Services
                    name.Contains("Radeon(TM) Graphics", StringComparison.OrdinalIgnoreCase) ||
                    name.Contains("Vega", StringComparison.OrdinalIgnoreCase);
         }
+
+        public static bool IsHagsNeeded()
+        {
+            try
+            {
+                var gpu = DetectGpuConfiguration();
+                if (string.IsNullOrEmpty(gpu.DedicatedGpuName)) return false;
+
+                using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\GraphicsDrivers");
+                if (key != null)
+                {
+                    var val = key.GetValue("HwSchMode");
+                    if (val != null && Convert.ToInt32(val) == 2)
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static bool EnableHags()
+        {
+            try
+            {
+                using var key = Registry.LocalMachine.CreateSubKey(@"SYSTEM\CurrentControlSet\Control\GraphicsDrivers");
+                if (key != null)
+                {
+                    key.SetValue("HwSchMode", 2, RegistryValueKind.DWord);
+                    RegistryBackupService.MarkTweaksApplied();
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
     }
 }

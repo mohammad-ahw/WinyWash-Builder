@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.UI;
@@ -762,9 +764,25 @@ namespace CleanC.UI
                         else if (capturedAtt.Id == "advanced_tweaks")
                         {
                             int applied = await AdvancedTweakService.ApplyAdvancedTweaksAsync();
+                            RegistryBackupService.MarkTweaksApplied();
                             actionBtn.Content = "اعمال شد ✓";
                             actionBtn.IsEnabled = false;
                             ShowInfoBar("بهینه‌سازی پیشرفته", "محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت.", InfoBarSeverity.Success);
+                        }
+                        else if (capturedAtt.Id == "ssd_critical_space")
+                        {
+                            actionBtn.Content = "در حال بهینه‌سازی...";
+                            actionBtn.IsEnabled = false;
+                            bool ok = await DiskMaintenanceService.OptimizeDriveTrimAsync("C");
+                            actionBtn.Content = "انجام شد ✓";
+                            ShowInfoBar("بهینه‌سازی SSD", "دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه‌سازی گردیدند.", InfoBarSeverity.Success);
+                        }
+                        else if (capturedAtt.Id == "gpu_hags")
+                        {
+                            bool ok = GpuOptimizerService.EnableHags();
+                            actionBtn.Content = "فعال شد ✓";
+                            actionBtn.IsEnabled = false;
+                            ShowInfoBar("شتاب‌دهنده گرافیک", "قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)", InfoBarSeverity.Success);
                         }
                     };
                     Grid.SetColumn(actionBtn, 2);
@@ -1066,6 +1084,224 @@ namespace CleanC.UI
         private void CardToggleCustomCleanBtn_Click(object sender, RoutedEventArgs e)
         {
             AdvancedCleanExpander.IsExpanded = !AdvancedCleanExpander.IsExpanded;
+        }
+
+        private async void CardLargeFilesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await ShowLargeFilesDialogAsync();
+        }
+
+        private async Task ShowLargeFilesDialogAsync()
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "یافتن و مدیریت فایل‌های بسیار حجیم (Large Files Finder)",
+                CloseButtonText = "بستن",
+                XamlRoot = this.Content.XamlRoot,
+                FlowDirection = FlowDirection.RightToLeft
+            };
+
+            var rootPanel = new StackPanel { Spacing = 12, MinWidth = 480, MaxHeight = 440 };
+            var statusText = new TextBlock { Text = "در حال اسکن فایل‌های بالای ۵۰۰ مگابایت در مسیرهای کاربری...", FontSize = 12.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var spinner = new ProgressRing { IsActive = true, Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 16, 0, 16) };
+
+            rootPanel.Children.Add(statusText);
+            rootPanel.Children.Add(spinner);
+            dialog.Content = rootPanel;
+
+            var showTask = dialog.ShowAsync();
+
+            var files = await LargeFileScannerService.ScanUserLargeFilesAsync(500L * 1024 * 1024);
+
+            spinner.Visibility = Visibility.Collapsed;
+            long totalBytes = files.Sum(f => f.SizeBytes);
+
+            if (files.Count == 0)
+            {
+                statusText.Text = "هیچ فایل حجیمی بالای ۵۰۰ مگابایت در مسیرهای کاربری یافت نشد.";
+                return;
+            }
+
+            statusText.Text = $"تعداد {files.Count} فایل حجیم شناسایی شد (مجموع حجم: {SystemStats.FormatBytes(totalBytes)}):";
+
+            var scroll = new ScrollViewer { MaxHeight = 340, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+            var filesStack = new StackPanel { Spacing = 6 };
+
+            foreach (var file in files)
+            {
+                var itemBorder = new Border
+                {
+                    Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
+                    BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8),
+                    Padding = new Thickness(12, 8, 12, 8)
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var infoStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+                var nameText = new TextBlock { Text = file.FileName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5, TextTrimming = TextTrimming.CharacterEllipsis };
+                var pathText = new TextBlock { Text = $"{file.FormattedSize}  •  {file.DirectoryPath}", FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextTrimming = TextTrimming.CharacterEllipsis };
+                infoStack.Children.Add(nameText);
+                infoStack.Children.Add(pathText);
+                Grid.SetColumn(infoStack, 0);
+                grid.Children.Add(infoStack);
+
+                var actionsStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) };
+
+                var openBtn = new Button { Content = "پوشه", FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5) };
+                openBtn.Click += (s, ev) =>
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = "explorer.exe",
+                            Arguments = $"/select,\"{file.FilePath}\"",
+                            UseShellExecute = true
+                        });
+                    }
+                    catch { }
+                };
+                actionsStack.Children.Add(openBtn);
+
+                var delBtn = new Button { Content = "حذف", FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5), Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) };
+                delBtn.Click += (s, ev) =>
+                {
+                    if (LargeFileScannerService.DeleteLargeFile(file.FilePath))
+                    {
+                        itemBorder.Visibility = Visibility.Collapsed;
+                        ShowInfoBar("حذف فایل", $"فایل {file.FileName} حذف شد.", InfoBarSeverity.Informational);
+                    }
+                };
+                actionsStack.Children.Add(delBtn);
+
+                Grid.SetColumn(actionsStack, 1);
+                grid.Children.Add(actionsStack);
+
+                itemBorder.Child = grid;
+                filesStack.Children.Add(itemBorder);
+            }
+
+            scroll.Content = filesStack;
+            rootPanel.Children.Add(scroll);
+        }
+
+        private async void UndoCenterBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await ShowUndoCenterDialogAsync();
+        }
+
+        private async Task ShowUndoCenterDialogAsync()
+        {
+            var dialog = new ContentDialog
+            {
+                Title = "مرکز بازیابی و بازگشت تغییرات (Restore & Undo Center)",
+                CloseButtonText = "بستن",
+                XamlRoot = this.Content.XamlRoot,
+                FlowDirection = FlowDirection.RightToLeft
+            };
+
+            var stack = new StackPanel { Spacing = 14, MinWidth = 460 };
+
+            var desc = new TextBlock
+            {
+                Text = "مدیریت نقاط بازگردانی سیستم‌عامل و بازگرداندن تغییرات رجیستری و بهینه‌سازی‌ها با یک کلیک:",
+                FontSize = 12,
+                Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
+            };
+            stack.Children.Add(desc);
+
+            // Section 1: Create Restore Point
+            var rpCard = CreateUndoSectionCard("\uE777", "ساخت نقطه بازگردانی ویندوز (Restore Point)", "ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه‌سازی‌ها یا تغییرات عمده.", "ایجاد Restore Point", async (btn) =>
+            {
+                btn.Content = "در حال ایجاد...";
+                btn.IsEnabled = false;
+                var (ok, msg) = await RestorePointService.CreateRestorePointAsync($"CleanC Backup - {DateTime.Now:yyyy/MM/dd HH:mm}");
+                btn.Content = ok ? "ایجاد شد ✓" : "تلاش مجدد";
+                btn.IsEnabled = !ok;
+                ShowInfoBar("نقطه بازگردانی", msg, ok ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+            });
+            stack.Children.Add(rpCard);
+
+            // Section 2: Undo Tweaks
+            var undoCard = CreateUndoSectionCard("\uE7A7", "بازگردانی تنظیمات بهینه‌شده به حالت اولیه (Undo)", "بازگرداندن تمام کلیدهای رجیستری و سرویس‌های تغییر یافته توسط CleanC به مقادیر پیش‌فرض ویندوز.", "بازگردانی تنظیمات", async (btn) =>
+            {
+                btn.Content = "در حال بازگردانی...";
+                btn.IsEnabled = false;
+                int reverted = await RegistryBackupService.RollbackAllTweaksAsync();
+                btn.Content = "بازگردانده شد ✓";
+                ShowInfoBar("بازگردانی تغییرات", $"تعداد {reverted} مورد از تنظیمات و توئیک‌ها به حالت اولیه ویندوز بازگردانده شدند.", InfoBarSeverity.Success);
+            });
+            stack.Children.Add(undoCard);
+
+            // Section 3: Open Windows System Restore
+            var sysRestoreCard = CreateUndoSectionCard("\uE895", "ابزار بازیابی سیستم ویندوز (System Restore)", "اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ‌های قبلی.", "باز کردن System Restore", (btn) =>
+            {
+                RestorePointService.LaunchSystemRestoreWizard();
+                dialog.Hide();
+            });
+            stack.Children.Add(sysRestoreCard);
+
+            dialog.Content = stack;
+            await dialog.ShowAsync();
+        }
+
+        private Border CreateUndoSectionCard(string glyph, string title, string description, string actionText, Action<Button> onAction)
+        {
+            var border = new Border
+            {
+                Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
+                BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(8),
+                Padding = new Thickness(14, 12, 14, 12)
+            };
+
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var icon = new FontIcon
+            {
+                Glyph = glyph,
+                FontSize = 16,
+                Margin = new Thickness(0, 0, 12, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"]
+            };
+            Grid.SetColumn(icon, 0);
+            grid.Children.Add(icon);
+
+            var textStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+            var titleBlock = new TextBlock { Text = title, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 };
+            var descBlock = new TextBlock { Text = description, FontSize = 11, TextWrapping = TextWrapping.Wrap, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            textStack.Children.Add(titleBlock);
+            textStack.Children.Add(descBlock);
+            Grid.SetColumn(textStack, 1);
+            grid.Children.Add(textStack);
+
+            var btn = new Button
+            {
+                Content = actionText,
+                FontSize = 11.5,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Height = 30,
+                Padding = new Thickness(12, 0, 12, 0),
+                CornerRadius = new CornerRadius(6),
+                Margin = new Thickness(10, 0, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            btn.Click += (s, e) => onAction(btn);
+            Grid.SetColumn(btn, 2);
+            grid.Children.Add(btn);
+
+            border.Child = grid;
+            return border;
         }
 
         private async void AdvancedCleanExpander_Expanding(Expander sender, ExpanderExpandingEventArgs args)

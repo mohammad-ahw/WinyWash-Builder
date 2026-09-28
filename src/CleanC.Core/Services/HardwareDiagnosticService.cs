@@ -72,6 +72,48 @@ namespace CleanC.Core.Services
                 }
                 catch { }
 
+                // 5. SSD Critical Space Check
+                try
+                {
+                    var drive = new DriveInfo("C");
+                    if (drive.IsReady)
+                    {
+                        double freePercent = (double)drive.AvailableFreeSpace / drive.TotalSize * 100.0;
+                        long freeGb = drive.AvailableFreeSpace / (1024L * 1024L * 1024L);
+                        if (freePercent < 15.0 || freeGb < 20)
+                        {
+                            list.Add(new AttentionDecisionItem
+                            {
+                                Id = "ssd_critical_space",
+                                Title = $"کاهش بحرانی فضای درایو ویندوز ({freeGb} GB معادل {freePercent:0}% آزاد)",
+                                Description = "پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول‌های فلش می‌شود. توصیه می‌شود پاکسازی و دستور TRIM انجام شود.",
+                                Category = "حافظه و دیسک",
+                                ActionText = "بهینه‌سازی TRIM دیسک",
+                                IconGlyph = "\uEDA2"
+                            });
+                        }
+                    }
+                }
+                catch { }
+
+                // 6. HAGS (Hardware-Accelerated GPU Scheduling) Check
+                try
+                {
+                    if (GpuOptimizerService.IsHagsNeeded())
+                    {
+                        list.Add(new AttentionDecisionItem
+                        {
+                            Id = "gpu_hags",
+                            Title = "شتاب‌دهنده سخت‌افزاری گرافیک (HAGS) فعال نیست",
+                            Description = "با فعال‌سازی Hardware Accelerated GPU Scheduling، پردازش زمان‌بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم‌ها کاهش می‌یابد.",
+                            Category = "کارت گرافیک و گیمینگ",
+                            ActionText = "فعال‌سازی HAGS",
+                            IconGlyph = "\uE790"
+                        });
+                    }
+                }
+                catch { }
+
                 return list;
             });
         }
