@@ -13,6 +13,11 @@ namespace CleanC.Core.Models
         public long DiskFreeBytes { get; set; }
         public long DiskUsedBytes { get; set; }
         public double DiskPercent { get; set; }
+        public string DiskModel { get; set; } = string.Empty;
+        public string DiskType { get; set; } = "NVMe SSD";
+        public string DiskHealth { get; set; } = "سالم (Healthy)";
+        public string GpuSummary { get; set; } = string.Empty;
+        public string PowerSummary { get; set; } = "متصل به برق";
 
         public string TotalRamFormatted => FormatBytes(TotalRamBytes);
         public string UsedRamFormatted => FormatBytes(UsedRamBytes);

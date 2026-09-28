@@ -288,11 +288,19 @@
                             <!-- Drive C: Card -->
                             <Border x:Name="BentoDiskCard" Grid.Column="1" CornerRadius="10" Padding="16,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                 <StackPanel Spacing="9" HorizontalAlignment="Stretch">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xEDA2;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                        <TextBlock x:Name="CardDiskTitle" Text="فضای درایو C ویندوز" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="CardDiskText" Text="-- آزاد از --" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xEDA2;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                            <TextBlock x:Name="CardDiskTitle" Text="وضعیت درایو و دیسک (SSD)" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </StackPanel>
+                                        <Border x:Name="CardDiskHealthBadge" Grid.Column="1" Background="#1810B981" BorderBrush="#3510B981" BorderThickness="1" CornerRadius="4" Padding="5,1">
+                                            <TextBlock x:Name="CardDiskHealthText" Text="سالم (Healthy)" FontSize="10" FontWeight="SemiBold" Foreground="#10B981" />
+                                        </Border>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock x:Name="CardDiskText" Text="-- آزاد از --" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock x:Name="CardDiskTypeBadge" Grid.Column="1" Text="NVMe SSD" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                    </Grid>
                                     <ProgressBar x:Name="CardDiskProgress" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
                                     <Button x:Name="CardToggleCustomCleanBtn" Click="CardToggleCustomCleanBtn_Click" Content="سفارشی‌سازی موارد پاکسازی" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
                                 </StackPanel>
@@ -301,11 +309,19 @@
                             <!-- CPU & Network Card -->
                             <Border x:Name="BentoCpuCard" Grid.Column="2" CornerRadius="10" Padding="16,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                 <StackPanel Spacing="9" HorizontalAlignment="Stretch">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE774;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                        <TextBlock x:Name="CardCpuTitle" Text="وضعیت پردازنده و شبکه" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                    </StackPanel>
-                                    <TextBlock x:Name="CardCpuText" Text="مصرف CPU: 0%" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <FontIcon Glyph="&#xE774;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                            <TextBlock x:Name="CardCpuTitle" Text="وضعیت پردازنده و سخت‌افزار" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </StackPanel>
+                                        <Border x:Name="CardPowerBadge" Grid.Column="1" Background="{ThemeResource AppHeaderPillBrush}" CornerRadius="4" Padding="5,1">
+                                            <TextBlock x:Name="CardPowerText" Text="متصل به برق" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </Border>
+                                    </Grid>
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <TextBlock x:Name="CardCpuText" Text="مصرف CPU: 0%" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock x:Name="CardGpuSummaryText" Grid.Column="1" Text="گرافیک" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                    </Grid>
                                     <ProgressBar x:Name="CardCpuProgress" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
                                     <Button x:Name="CardFlushDnsBtn" Click="CardFlushDnsBtn_Click" Content="تخلیه کش DNS" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
                                 </StackPanel>

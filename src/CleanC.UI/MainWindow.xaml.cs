@@ -314,10 +314,14 @@ namespace CleanC.UI
                 // Bento Disk Card
                 CardDiskText.Text = $"{stats.DiskFreeFormatted} آزاد از {stats.DiskTotalFormatted}";
                 CardDiskProgress.Value = stats.DiskPercent;
+                if (!string.IsNullOrEmpty(stats.DiskType)) CardDiskTypeBadge.Text = stats.DiskType;
+                if (!string.IsNullOrEmpty(stats.DiskHealth)) CardDiskHealthText.Text = stats.DiskHealth;
 
                 // Bento CPU Card
                 CardCpuText.Text = $"مصرف CPU: {stats.CpuPercent:0}%";
                 CardCpuProgress.Value = stats.CpuPercent;
+                if (!string.IsNullOrEmpty(stats.PowerSummary)) CardPowerText.Text = stats.PowerSummary;
+                if (!string.IsNullOrEmpty(stats.GpuSummary)) CardGpuSummaryText.Text = stats.GpuSummary;
 
                 if (!_isBusy)
                 {
@@ -754,6 +758,13 @@ namespace CleanC.UI
                         else if (capturedAtt.Id == "bloatware_apps")
                         {
                             await ShowBloatwareManagementDialogAsync(actionBtn);
+                        }
+                        else if (capturedAtt.Id == "advanced_tweaks")
+                        {
+                            int applied = await AdvancedTweakService.ApplyAdvancedTweaksAsync();
+                            actionBtn.Content = "اعمال شد ✓";
+                            actionBtn.IsEnabled = false;
+                            ShowInfoBar("بهینه‌سازی پیشرفته", "محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت.", InfoBarSeverity.Success);
                         }
                     };
                     Grid.SetColumn(actionBtn, 2);

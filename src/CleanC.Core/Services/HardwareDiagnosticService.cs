@@ -64,6 +64,14 @@ namespace CleanC.Core.Services
                 }
                 catch { }
 
+                // 4. Advanced Network & Responsiveness Tweaks Check
+                try
+                {
+                    var advItem = AdvancedTweakService.CheckAdvancedTweaksAttention();
+                    if (advItem != null) list.Add(advItem);
+                }
+                catch { }
+
                 return list;
             });
         }
