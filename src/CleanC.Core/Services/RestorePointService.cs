@@ -61,7 +61,8 @@ namespace CleanC.Core.Services
                         int returnCode = Convert.ToInt32(outParams["ReturnValue"]);
                         if (returnCode == 0)
                         {
-                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد.");
+                            PruneOldRestorePoints(2);
+                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه‌های قدیمی‌تر به صورت خودکار پاکسازی شدند).");
                         }
                     }
                     catch { }
@@ -83,7 +84,8 @@ namespace CleanC.Core.Services
                         ps.WaitForExit(45000);
                         if (ps.ExitCode == 0)
                         {
-                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد.");
+                            PruneOldRestorePoints(2);
+                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه‌های قدیمی‌تر به صورت خودکار پاکسازی شدند).");
                         }
                         else
                         {
@@ -100,6 +102,59 @@ namespace CleanC.Core.Services
                     return (false, ex.Message);
                 }
             });
+        }
+
+        public static void PruneOldRestorePoints(int maxToKeep = 2)
+        {
+            try
+            {
+                // Method 1: Delete via WMI Win32_ShadowCopy (fast & native)
+                using var searcher = new ManagementObjectSearcher(@"root\cimv2", "SELECT * FROM Win32_ShadowCopy");
+                var copies = new System.Collections.Generic.List<(DateTime Date, ManagementObject Mo)>();
+                foreach (ManagementObject mo in searcher.Get())
+                {
+                    string dateStr = mo["InstallDate"]?.ToString() ?? "";
+                    try
+                    {
+                        var dt = ManagementDateTimeConverter.ToDateTime(dateStr);
+                        copies.Add((dt, mo));
+                    }
+                    catch
+                    {
+                        copies.Add((DateTime.MinValue, mo));
+                    }
+                }
+
+                if (copies.Count > maxToKeep)
+                {
+                    var oldestToDelete = System.Linq.Enumerable.Take(System.Linq.Enumerable.OrderBy(copies, c => c.Date), copies.Count - maxToKeep);
+                    foreach (var item in oldestToDelete)
+                    {
+                        try
+                        {
+                            item.Mo.Delete();
+                        }
+                        catch { }
+                    }
+                }
+            }
+            catch
+            {
+                // Fallback: PowerShell command to prune old shadow copies
+                try
+                {
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Get-CimInstance Win32_ShadowCopy -ErrorAction SilentlyContinue | Sort-Object InstallDate | Select-Object -SkipLast {maxToKeep} | Remove-CimInstance -ErrorAction SilentlyContinue\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var ps = Process.Start(psi);
+                    ps?.WaitForExit(10000);
+                }
+                catch { }
+            }
         }
     }
 }
