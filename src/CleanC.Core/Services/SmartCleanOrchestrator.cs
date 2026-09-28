@@ -216,6 +216,8 @@ namespace CleanC.Core.Services
             });
 
             int winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
+            int telemetryTweaks = await TelemetryOptimizerService.DisableTelemetryAndDiagTrackAsync();
+            winTweaks += telemetryTweaks;
             await Task.Delay(250);
 
             // =================================================================

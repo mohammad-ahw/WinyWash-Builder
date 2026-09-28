@@ -515,6 +515,8 @@ namespace CleanC.UI
                 LiveCleanStatusTitle.Text = "در حال اعمال تنظیمات بهینه‌سازی ویندوز...";
                 LiveCleanPhaseSubtitle.Text = "غیرفعال‌سازی پیشنهادات و سرویس‌های درگیرکننده پردازنده";
                 int winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
+                int telemetryTweaks = await TelemetryOptimizerService.DisableTelemetryAndDiagTrackAsync();
+                winTweaks += telemetryTweaks;
                 await Task.Delay(200);
 
                 // 8. GPU Graphics Preference Optimization
@@ -607,7 +609,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "win_tweaks",
-                        Title = "افزایش سرعت اکسپلورر، سرچ و توقف تبلیغات ویندوز",
+                        Title = "توقف تله‌متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز",
                         IconGlyph = "\uE770",
                         FreedBytes = 0,
                         WasEmpty = false,
@@ -719,7 +721,7 @@ namespace CleanC.UI
                         VerticalAlignment = VerticalAlignment.Center
                     };
                     var capturedAtt = att;
-                    actionBtn.Click += (s, ev) =>
+                    actionBtn.Click += async (s, ev) =>
                     {
                         if (capturedAtt.Id == "refresh_rate")
                         {
@@ -748,6 +750,10 @@ namespace CleanC.UI
                             {
                                 ShowInfoBar("خطا", "امکان تغییر پلن برق در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
                             }
+                        }
+                        else if (capturedAtt.Id == "bloatware_apps")
+                        {
+                            await ShowBloatwareManagementDialogAsync(actionBtn);
                         }
                     };
                     Grid.SetColumn(actionBtn, 2);
@@ -890,6 +896,125 @@ namespace CleanC.UI
                 mainStack.Children.Add(itemsStack);
                 groupCard.Child = mainStack;
                 ReportGroupsContainer.Children.Add(groupCard);
+            }
+        }
+
+        private async Task ShowBloatwareManagementDialogAsync(Button actionBtn)
+        {
+            try
+            {
+                var candidates = await BloatwareService.ScanCandidateAppsAsync();
+                if (candidates.Count == 0)
+                {
+                    ShowInfoBar("برنامه‌ها", "هیچ برنامه غیرضروری یا کم‌استفاده‌ای یافت نشد.", InfoBarSeverity.Informational);
+                    actionBtn.Content = "بررسی شد ✓";
+                    actionBtn.IsEnabled = false;
+                    return;
+                }
+
+                var dialog = new ContentDialog
+                {
+                    Title = "مدیریت و حذف برنامه‌های غیرضروری و کم‌استفاده",
+                    PrimaryButtonText = "حذف موارد انتخاب‌شده",
+                    CloseButtonText = "نگه‌داشتن همه",
+                    DefaultButton = ContentDialogButton.Close,
+                    XamlRoot = this.Content.XamlRoot
+                };
+
+                var scrollViewer = new ScrollViewer { MaxHeight = 380, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
+                var stack = new StackPanel { Spacing = 8, Margin = new Thickness(0, 8, 0, 8), FlowDirection = FlowDirection.RightToLeft };
+
+                var headerText = new TextBlock
+                {
+                    Text = "برنامه‌های زیر می‌توانند برای آزادسازی منابع سیستم حذف شوند. موارد دلخواه را علامت بزنید:",
+                    FontSize = 12,
+                    Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+                    TextWrapping = TextWrapping.Wrap,
+                    Margin = new Thickness(0, 0, 0, 6)
+                };
+                stack.Children.Add(headerText);
+
+                var checkBoxes = new List<(CheckBox Box, CandidateAppItem App)>();
+
+                foreach (var app in candidates)
+                {
+                    var itemBorder = new Border
+                    {
+                        Background = GetThemeBrush("AppCardSecondaryBrush"),
+                        BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(6),
+                        Padding = new Thickness(10, 8, 10, 8)
+                    };
+
+                    var itemGrid = new Grid();
+                    itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                    var chk = new CheckBox
+                    {
+                        IsChecked = app.IsSelected,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 0, 8, 0)
+                    };
+                    Grid.SetColumn(chk, 0);
+                    itemGrid.Children.Add(chk);
+
+                    var infoStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 2 };
+                    var nameBlock = new TextBlock { Text = app.DisplayName, FontSize = 12.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
+                    var descBlock = new TextBlock { Text = $"{app.CategoryLabel} • {app.Description}", FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextWrapping = TextWrapping.Wrap };
+                    infoStack.Children.Add(nameBlock);
+                    infoStack.Children.Add(descBlock);
+                    Grid.SetColumn(infoStack, 1);
+                    itemGrid.Children.Add(infoStack);
+
+                    var sizeBlock = new TextBlock
+                    {
+                        Text = app.FormattedSize,
+                        FontSize = 11,
+                        Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(8, 0, 0, 0)
+                    };
+                    Grid.SetColumn(sizeBlock, 2);
+                    itemGrid.Children.Add(sizeBlock);
+
+                    itemBorder.Child = itemGrid;
+                    stack.Children.Add(itemBorder);
+                    checkBoxes.Add((chk, app));
+                }
+
+                scrollViewer.Content = stack;
+                dialog.Content = scrollViewer;
+
+                var result = await dialog.ShowAsync();
+                if (result == ContentDialogResult.Primary)
+                {
+                    var selected = checkBoxes.Where(c => c.Box.IsChecked == true).Select(c => c.App).ToList();
+                    if (selected.Count > 0)
+                    {
+                        int removed = 0;
+                        long freedBytes = 0;
+                        foreach (var app in selected)
+                        {
+                            bool success = await BloatwareService.RemoveAppAsync(app);
+                            if (success)
+                            {
+                                removed++;
+                                freedBytes += app.SizeBytes;
+                            }
+                        }
+
+                        actionBtn.Content = "بررسی شد ✓";
+                        actionBtn.IsEnabled = false;
+                        ShowInfoBar("پاکسازی نرم‌افزارها", $"{removed} برنامه با موفقیت حذف گردید ({SystemStats.FormatBytes(freedBytes)} فضا آزاد شد).", InfoBarSeverity.Success);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowInfoBar("خطا", ex.Message, InfoBarSeverity.Error);
             }
         }
 

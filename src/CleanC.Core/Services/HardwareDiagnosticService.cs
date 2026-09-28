@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using CleanC.Core.Models;
 using CleanC.Core.Native;
 
 namespace CleanC.Core.Services
@@ -39,6 +40,27 @@ namespace CleanC.Core.Services
                 {
                     var powerItem = PowerPlanService.CheckPowerPlanAttention();
                     if (powerItem != null) list.Add(powerItem);
+                }
+                catch { }
+
+                // 3. Bloatware & Unused Apps Check
+                try
+                {
+                    var bloatCandidates = BloatwareService.ScanCandidateAppsAsync().GetAwaiter().GetResult();
+                    if (bloatCandidates.Count > 0)
+                    {
+                        long totalBloatBytes = bloatCandidates.Sum(b => b.SizeBytes);
+                        list.Add(new AttentionDecisionItem
+                        {
+                            Id = "bloatware_apps",
+                            Title = $"{bloatCandidates.Count} برنامه غیرضروری، تبلیغاتی یا کم‌استفاده شناسایی شد",
+                            Description = $"برنامه‌های تبلیغاتی و بلااستفاده پیش‌فرض که حدود {SystemStats.FormatBytes(totalBloatBytes)} از فضای دیسک و منابع سیستم را درگیر کرده‌اند.",
+                            Category = "مدیریت نرم‌افزارها",
+                            ActionText = "بررسی و حذف",
+                            IconGlyph = "\uE74D",
+                            IntParameter = bloatCandidates.Count
+                        });
+                    }
                 }
                 catch { }
 
