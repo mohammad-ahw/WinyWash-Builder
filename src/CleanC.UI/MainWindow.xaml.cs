@@ -1892,8 +1892,8 @@ namespace CleanC.UI
         {
             var border = new Border
             {
-                Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(10),
                 Padding = new Thickness(18, 14, 18, 14)
@@ -1928,9 +1928,9 @@ namespace CleanC.UI
             grid.Children.Add(iconBg);
 
             var textStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-            var catText = new TextBlock { Text = category, FontSize = 12, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
-            var valText = new TextBlock { Text = value, FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 15.5 };
-            var extraText = new TextBlock { Text = extra, FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var catText = new TextBlock { Text = category, FontSize = 12, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
+            var valText = new TextBlock { Text = value, FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 15.5, Foreground = GetThemeBrush("TextFillColorPrimaryBrush") };
+            var extraText = new TextBlock { Text = extra, FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
 
             textStack.Children.Add(catText);
             textStack.Children.Add(valText);
@@ -1978,7 +1978,10 @@ namespace CleanC.UI
 
         private void FilterAndRenderApps()
         {
-            UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
+            if (UninstallerAppsStack == null || UninstallerSearchBox == null || UninstallerSortBox == null || _allInstalledApps == null)
+                return;
+
+            if (UninstallerLoadingSpinner != null) UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
             UninstallerAppsStack.Visibility = Visibility.Visible;
             UninstallerAppsStack.Children.Clear();
 
@@ -2005,8 +2008,8 @@ namespace CleanC.UI
             {
                 var itemBorder = new Border
                 {
-                    Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                    BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(10),
                     Padding = new Thickness(16, 12, 16, 12)
@@ -2024,7 +2027,7 @@ namespace CleanC.UI
                 string pubStr = !string.IsNullOrEmpty(app.Publisher) ? $"{app.Publisher}  •  " : "";
                 string verStr = !string.IsNullOrEmpty(app.DisplayVersion) ? $"نسخه {app.DisplayVersion}  •  " : "";
                 string dateStr = !string.IsNullOrEmpty(app.InstalledDateFormatted) ? $"تاریخ نصب: {app.InstalledDateFormatted}" : "";
-                var subText = new TextBlock { Text = $"{pubStr}{verStr}{dateStr}".TrimEnd(' ', '•'), FontSize = 11.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextTrimming = TextTrimming.CharacterEllipsis };
+                var subText = new TextBlock { Text = $"{pubStr}{verStr}{dateStr}".TrimEnd(' ', '•'), FontSize = 11.5, Foreground = GetThemeBrush("TextFillColorSecondaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis };
 
                 infoStack.Children.Add(nameText);
                 infoStack.Children.Add(subText);
@@ -2034,13 +2037,13 @@ namespace CleanC.UI
                 // Middle: Size Badge
                 var sizeBadge = new Border
                 {
-                    Background = (Brush)Application.Current.Resources["AppHeaderPillBrush"],
+                    Background = GetThemeBrush("AppHeaderPillBrush"),
                     CornerRadius = new CornerRadius(12),
                     Padding = new Thickness(10, 4, 10, 4),
                     VerticalAlignment = VerticalAlignment.Center,
                     Margin = new Thickness(12, 0, 12, 0)
                 };
-                sizeBadge.Child = new TextBlock { Text = app.FormattedSize, FontSize = 11.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+                sizeBadge.Child = new TextBlock { Text = app.FormattedSize, FontSize = 11.5, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
                 Grid.SetColumn(sizeBadge, 1);
                 grid.Children.Add(sizeBadge);
 
@@ -2082,11 +2085,15 @@ namespace CleanC.UI
 
         private void UninstallerSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
+            if (UninstallerSearchBox == null || UninstallerAppsStack == null || UninstallerSortBox == null || _allInstalledApps == null)
+                return;
             FilterAndRenderApps();
         }
 
         private void UninstallerSortBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            if (UninstallerSearchBox == null || UninstallerAppsStack == null || UninstallerSortBox == null || _allInstalledApps == null)
+                return;
             FilterAndRenderApps();
         }
 
@@ -2216,8 +2223,8 @@ namespace CleanC.UI
         {
             var border = new Border
             {
-                Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(10),
                 Padding = new Thickness(16, 14, 16, 14)
@@ -2254,7 +2261,7 @@ namespace CleanC.UI
 
             var textStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
             var tBlock = new TextBlock { Text = title, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13 };
-            var dBlock = new TextBlock { Text = description, FontSize = 11, TextWrapping = TextWrapping.Wrap, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var dBlock = new TextBlock { Text = description, FontSize = 11, TextWrapping = TextWrapping.Wrap, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
             textStack.Children.Add(tBlock);
             textStack.Children.Add(dBlock);
             Grid.SetColumn(textStack, 1);
@@ -2291,7 +2298,7 @@ namespace CleanC.UI
                 {
                     Text = "هیچ برنامه‌ای در استارتاپ ویندوز یافت نشد.",
                     FontSize = 13,
-                    Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
                     HorizontalAlignment = HorizontalAlignment.Center,
                     Margin = new Thickness(0, 24, 0, 0)
                 });
@@ -2302,8 +2309,8 @@ namespace CleanC.UI
             {
                 var card = new Border
                 {
-                    Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                    BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(10),
                     Padding = new Thickness(16, 12, 16, 12)
@@ -2315,7 +2322,7 @@ namespace CleanC.UI
 
                 var textStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
                 var nameText = new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13 };
-                var cmdText = new TextBlock { Text = $"{item.Category}  •  موقعیت: {item.Location}  •  {item.Command}", FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextTrimming = TextTrimming.CharacterEllipsis };
+                var cmdText = new TextBlock { Text = $"{item.Category}  •  موقعیت: {item.Location}  •  {item.Command}", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis };
                 textStack.Children.Add(nameText);
                 textStack.Children.Add(cmdText);
                 Grid.SetColumn(textStack, 0);
