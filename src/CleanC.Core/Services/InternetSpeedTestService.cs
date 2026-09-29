@@ -67,34 +67,51 @@ namespace CleanC.Core.Services
         {
             var result = new SpeedTestResult();
 
-            // 1. Fetch IP, ISP, and Location metadata
+            // 1. Fetch IP, ISP, and Location metadata fast
             try
             {
-                using var ipCts = new CancellationTokenSource(TimeSpan.FromSeconds(3));
+                using var ipCts = new CancellationTokenSource(TimeSpan.FromSeconds(2.5));
                 using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, ipCts.Token);
-                
-                string json = await _httpClient.GetStringAsync("http://ip-api.com/json", linkedCts.Token);
+
+                string json = await _httpClient.GetStringAsync("https://ipwho.is/", linkedCts.Token);
                 using var doc = JsonDocument.Parse(json);
                 var root = doc.RootElement;
-                if (root.TryGetProperty("query", out var q)) result.ClientIp = q.GetString() ?? "";
-                if (root.TryGetProperty("isp", out var isp)) result.IspName = isp.GetString() ?? "";
+                if (root.TryGetProperty("ip", out var q)) result.ClientIp = q.GetString() ?? "";
                 if (root.TryGetProperty("country", out var cnt)) result.Country = cnt.GetString() ?? "";
                 if (root.TryGetProperty("city", out var city)) result.City = city.GetString() ?? "";
+                if (root.TryGetProperty("connection", out var conn) && conn.TryGetProperty("isp", out var isp))
+                {
+                    result.IspName = isp.GetString() ?? "";
+                }
             }
             catch
             {
-                // Fallback to ipify if ip-api timed out
+                // Fallback 1: Cloudflare __down headers
                 try
                 {
-                    using var ipifyCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
-                    result.ClientIp = await _httpClient.GetStringAsync("https://api.ipify.org", ipifyCts.Token);
-                    result.IspName = "شبکه اینترنت";
-                    result.Country = "جهانی";
+                    using var cfCts = new CancellationTokenSource(TimeSpan.FromSeconds(2));
+                    using var linkedCf = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cfCts.Token);
+                    using var headResp = await _httpClient.GetAsync("https://speed.cloudflare.com/__down?bytes=0", HttpCompletionOption.ResponseHeadersRead, linkedCf.Token);
+                    if (headResp.Headers.TryGetValues("cf-meta-ip", out var ips)) result.ClientIp = ips.FirstOrDefault() ?? "";
+                    if (headResp.Headers.TryGetValues("cf-meta-country", out var cnts)) result.Country = cnts.FirstOrDefault() ?? "";
+                    if (headResp.Headers.TryGetValues("cf-meta-city", out var cities)) result.City = cities.FirstOrDefault() ?? "";
+                    result.IspName = "Cloudflare CDN";
                 }
                 catch
                 {
-                    result.ClientIp = "نامشخص";
-                    result.IspName = "شبکه اینترنت";
+                    // Fallback 2: ipify
+                    try
+                    {
+                        using var ipifyCts = new CancellationTokenSource(TimeSpan.FromSeconds(1.5));
+                        result.ClientIp = await _httpClient.GetStringAsync("https://api.ipify.org", ipifyCts.Token);
+                        result.IspName = "شبکه اینترنت";
+                        result.Country = "جهانی";
+                    }
+                    catch
+                    {
+                        result.ClientIp = "اتصال فعال";
+                        result.IspName = "شبکه اینترنت";
+                    }
                 }
             }
 
@@ -123,7 +140,6 @@ namespace CleanC.Core.Services
                         if (pingResp.IsSuccessStatusCode)
                         {
                             pings.Add(sw.Elapsed.TotalMilliseconds);
-                            break;
                         }
                     }
                     catch { }
@@ -131,7 +147,7 @@ namespace CleanC.Core.Services
 
                 if (pings.Count > 0)
                 {
-                    result.PingMs = Math.Round(pings[0], 1);
+                    result.PingMs = Math.Round(pings.Min(), 1);
                     onProgress?.Invoke("ping", result.PingMs, 0, result);
                 }
             }
@@ -140,63 +156,110 @@ namespace CleanC.Core.Services
                 result.PingMs = 0;
             }
 
-            // 3. Measure Download Speed with robust multi-server cascade
-            var downloadCandidates = new (string url, long targetBytes)[]
+            // 3. Multi-Stream Concurrent Download Test (Ookla / IDM architecture)
+            // 4 parallel connections saturate available bandwidth without single-stream throttling
+            long totalBytesDownloaded = 0;
+            const int streamCount = 4;
+            const int testDurationSec = 6;
+            using var downloadCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+            downloadCts.CancelAfter(TimeSpan.FromSeconds(testDurationSec + 1));
+
+            var downloadUrls = new[]
             {
-                ("https://speed.cloudflare.com/__down?bytes=10000000", 10_000_000L),
-                ("https://cachefly.cachefly.net/10mb.test", 10_485_760L),
-                ("https://proof.ovh.net/files/10Mb.dat", 10_485_760L)
+                "https://speed.cloudflare.com/__down?bytes=15000000",
+                "https://cachefly.cachefly.net/10mb.test",
+                "https://speed.cloudflare.com/__down?bytes=20000000",
+                "https://speed.cloudflare.com/__down?bytes=10000000"
             };
 
-            bool downloadSucceeded = false;
+            var downloadTasks = new List<Task>();
+            var streamStopwatch = Stopwatch.StartNew();
 
-            foreach (var (url, targetBytes) in downloadCandidates)
+            for (int i = 0; i < streamCount; i++)
             {
-                if (cancellationToken.IsCancellationRequested) break;
-
-                try
+                string url = downloadUrls[i % downloadUrls.Length];
+                downloadTasks.Add(Task.Run(async () =>
                 {
-                    using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                    if (!response.IsSuccessStatusCode) continue;
-
-                    using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
                     byte[] buffer = new byte[64 * 1024]; // 64 KB buffer
-
-                    var sw = Stopwatch.StartNew();
-                    long totalRead = 0;
-                    int bytesRead;
-
-                    while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
+                    while (!downloadCts.Token.IsCancellationRequested)
                     {
-                        totalRead += bytesRead;
-                        double elapsedSec = sw.Elapsed.TotalSeconds;
-
-                        if (elapsedSec > 0.08)
+                        try
                         {
-                            double currentMbps = (totalRead * 8.0) / (elapsedSec * 1_000_000.0);
-                            int progressPct = (int)Math.Clamp((totalRead * 100) / targetBytes, 1, 99);
-                            onProgress?.Invoke("download", Math.Round(currentMbps, 2), progressPct, result);
+                            using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, downloadCts.Token);
+                            if (!response.IsSuccessStatusCode) break;
+
+                            using var stream = await response.Content.ReadAsStreamAsync(downloadCts.Token);
+                            int read;
+                            while (!downloadCts.Token.IsCancellationRequested && (read = await stream.ReadAsync(buffer, 0, buffer.Length, downloadCts.Token)) > 0)
+                            {
+                                Interlocked.Add(ref totalBytesDownloaded, read);
+                            }
+                        }
+                        catch
+                        {
+                            // If stream times out or was cancelled, exit stream loop
+                            break;
                         }
                     }
+                }));
+            }
 
-                    sw.Stop();
-                    result.BytesDownloaded = totalRead;
+            // Progress reporting loop with smoothed moving speed (eliminated initial TCP burst)
+            double smoothedMbps = 0;
+            long lastSampleBytes = 0;
+            var lastSampleTime = streamStopwatch.Elapsed;
+            var recordedSpeeds = new List<double>();
 
-                    if (sw.Elapsed.TotalSeconds > 0.1 && totalRead > 0)
-                    {
-                        result.DownloadSpeedMbps = Math.Round((totalRead * 8.0) / (sw.Elapsed.TotalSeconds * 1_000_000.0), 2);
-                        onProgress?.Invoke("download", result.DownloadSpeedMbps, 100, result);
-                        downloadSucceeded = true;
-                        break;
-                    }
-                }
-                catch (Exception) when (!cancellationToken.IsCancellationRequested)
+            while (streamStopwatch.Elapsed.TotalSeconds < testDurationSec && !cancellationToken.IsCancellationRequested)
+            {
+                await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+
+                var curTime = streamStopwatch.Elapsed;
+                double deltaSec = (curTime - lastSampleTime).TotalSeconds;
+                long curBytes = Interlocked.Read(ref totalBytesDownloaded);
+                long deltaBytes = curBytes - lastSampleBytes;
+
+                if (deltaSec > 0.05 && deltaBytes >= 0)
                 {
-                    // Try next candidate
+                    double instantMbps = (deltaBytes * 8.0) / (deltaSec * 1_000_000.0);
+                    // Exponential smoothing for realistic gauge feel
+                    smoothedMbps = smoothedMbps == 0 ? instantMbps : (0.35 * instantMbps + 0.65 * smoothedMbps);
+
+                    // Ignore initial 0.5s ramp-up for final average calculation
+                    if (curTime.TotalSeconds > 0.5 && instantMbps > 0)
+                    {
+                        recordedSpeeds.Add(instantMbps);
+                    }
+
+                    int progressPct = (int)Math.Clamp((curTime.TotalSeconds / testDurationSec) * 100.0, 1, 98);
+                    onProgress?.Invoke("download", Math.Round(smoothedMbps, 2), progressPct, result);
+
+                    lastSampleBytes = curBytes;
+                    lastSampleTime = curTime;
                 }
             }
 
-            if (!downloadSucceeded)
+            // Cancel any remaining download workers and await
+            try
+            {
+                downloadCts.Cancel();
+                await Task.WhenAll(downloadTasks).ConfigureAwait(false);
+            }
+            catch { }
+
+            streamStopwatch.Stop();
+            result.BytesDownloaded = Interlocked.Read(ref totalBytesDownloaded);
+
+            if (result.BytesDownloaded > 0)
+            {
+                double finalAvg = recordedSpeeds.Count > 0 
+                    ? recordedSpeeds.Average() 
+                    : (result.BytesDownloaded * 8.0) / (Math.Max(streamStopwatch.Elapsed.TotalSeconds, 0.5) * 1_000_000.0);
+
+                result.DownloadSpeedMbps = Math.Round(finalAvg, 2);
+                onProgress?.Invoke("download", result.DownloadSpeedMbps, 100, result);
+            }
+            else
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
@@ -207,27 +270,70 @@ namespace CleanC.Core.Services
                 return result;
             }
 
-            // 4. Measure Upload Speed (POST 2.5 MB to Cloudflare __up)
+            // 4. Parallel Multi-Stream Upload Speed Test
             try
             {
                 if (!cancellationToken.IsCancellationRequested && result.DownloadSpeedMbps > 0)
                 {
-                    int uploadBytesCount = 2_500_000; // 2.5 MB payload
-                    byte[] uploadPayload = new byte[uploadBytesCount];
-                    Random.Shared.NextBytes(uploadPayload);
-
                     onProgress?.Invoke("upload", 0, 5, result);
 
-                    using var upContent = new ByteArrayContent(uploadPayload);
-                    var upSw = Stopwatch.StartNew();
-                    using var upResp = await _httpClient.PostAsync("https://speed.cloudflare.com/__up", upContent, cancellationToken);
-                    upSw.Stop();
+                    long totalBytesUploaded = 0;
+                    using var uploadCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                    uploadCts.CancelAfter(TimeSpan.FromSeconds(3.5));
 
-                    if (upResp.IsSuccessStatusCode && upSw.Elapsed.TotalSeconds > 0.1)
+                    byte[] uploadChunk = new byte[1_500_000]; // 1.5 MB chunk
+                    Random.Shared.NextBytes(uploadChunk);
+
+                    var upSw = Stopwatch.StartNew();
+                    var uploadTasks = new List<Task>();
+
+                    for (int u = 0; u < 2; u++)
                     {
-                        double upMbps = (uploadBytesCount * 8.0) / (upSw.Elapsed.TotalSeconds * 1_000_000.0);
-                        result.UploadSpeedMbps = Math.Round(upMbps, 2);
-                        result.BytesUploaded = uploadBytesCount;
+                        uploadTasks.Add(Task.Run(async () =>
+                        {
+                            while (!uploadCts.Token.IsCancellationRequested)
+                            {
+                                try
+                                {
+                                    using var content = new ByteArrayContent(uploadChunk);
+                                    using var upResp = await _httpClient.PostAsync("https://speed.cloudflare.com/__up", content, uploadCts.Token);
+                                    if (upResp.IsSuccessStatusCode)
+                                    {
+                                        Interlocked.Add(ref totalBytesUploaded, uploadChunk.Length);
+                                    }
+                                    else break;
+                                }
+                                catch { break; }
+                            }
+                        }));
+                    }
+
+                    while (upSw.Elapsed.TotalSeconds < 3.0 && !cancellationToken.IsCancellationRequested)
+                    {
+                        await Task.Delay(100, cancellationToken).ConfigureAwait(false);
+                        long curUpBytes = Interlocked.Read(ref totalBytesUploaded);
+                        double elapsed = upSw.Elapsed.TotalSeconds;
+                        if (elapsed > 0.1 && curUpBytes > 0)
+                        {
+                            double curUpMbps = (curUpBytes * 8.0) / (elapsed * 1_000_000.0);
+                            int upPct = (int)Math.Clamp((elapsed / 3.0) * 100.0, 5, 95);
+                            onProgress?.Invoke("upload", Math.Round(curUpMbps, 2), upPct, result);
+                        }
+                    }
+
+                    try
+                    {
+                        uploadCts.Cancel();
+                        await Task.WhenAll(uploadTasks).ConfigureAwait(false);
+                    }
+                    catch { }
+
+                    upSw.Stop();
+                    result.BytesUploaded = Interlocked.Read(ref totalBytesUploaded);
+                    if (result.BytesUploaded > 0 && upSw.Elapsed.TotalSeconds > 0.2)
+                    {
+                        double finalUpMbps = (result.BytesUploaded * 8.0) / (upSw.Elapsed.TotalSeconds * 1_000_000.0);
+                        result.UploadSpeedMbps = Math.Round(finalUpMbps, 2);
                         onProgress?.Invoke("upload", result.UploadSpeedMbps, 100, result);
                     }
                 }

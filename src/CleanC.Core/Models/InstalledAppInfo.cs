@@ -21,5 +21,6 @@ namespace CleanC.Core.Models
         public string DisplayIcon { get; set; } = string.Empty;
         public bool IsStoreApp { get; set; }
         public string PackageFullName { get; set; } = string.Empty;
+        public bool IsSelected { get; set; }
     }
 }

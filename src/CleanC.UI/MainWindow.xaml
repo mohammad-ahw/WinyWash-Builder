@@ -620,6 +620,20 @@
                                     </StackPanel>
                                 </Grid>
 
+                                <!-- Batch Action Bar -->
+                                <Border x:Name="UninstallerBatchBar" Visibility="Collapsed" CornerRadius="10" Padding="14,10" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                                        <CheckBox x:Name="UninstallerSelectAllCheck" Content="انتخاب همه" FontSize="12" VerticalAlignment="Center" Checked="UninstallerSelectAll_Checked" Unchecked="UninstallerSelectAll_Unchecked" />
+                                        <TextBlock x:Name="UninstallerSelectedCountText" Grid.Column="1" Text="۰ برنامه انتخاب شده" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                                        <Button x:Name="UninstallerBatchDeleteBtn" Grid.Column="2" Click="UninstallerBatchDeleteBtn_Click" Height="34" Padding="16,0" CornerRadius="6" Style="{ThemeResource AccentButtonStyle}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE74D;" FontSize="13" />
+                                                <TextBlock x:Name="UninstallerBatchDeleteBtnText" Text="حذف برنامه‌های انتخاب‌شده" FontSize="11.5" FontWeight="SemiBold" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
                                 <ProgressRing x:Name="UninstallerLoadingSpinner" IsActive="True" Width="36" Height="36" HorizontalAlignment="Center" Margin="0,32,0,0" />
                                 <StackPanel x:Name="UninstallerAppsStack" Spacing="8" Visibility="Collapsed" />
                             </StackPanel>

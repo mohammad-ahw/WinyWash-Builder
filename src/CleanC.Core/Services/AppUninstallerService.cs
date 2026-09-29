@@ -252,6 +252,85 @@ namespace CleanC.Core.Services
             }
         }
 
+        public static async Task<bool> LaunchUninstallAsync(InstalledAppInfo app)
+        {
+            try
+            {
+                if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
+                {
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{app.PackageFullName}'\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var proc = Process.Start(psi);
+                    if (proc != null)
+                    {
+                        await proc.WaitForExitAsync();
+                        return proc.ExitCode == 0;
+                    }
+                    return false;
+                }
+
+                string cmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
+                if (string.IsNullOrWhiteSpace(cmd)) return false;
+
+                cmd = cmd.Trim();
+                ProcessStartInfo? psiToRun = null;
+
+                if (cmd.StartsWith("MsiExec.exe", StringComparison.OrdinalIgnoreCase) || cmd.StartsWith("msiexec", StringComparison.OrdinalIgnoreCase))
+                {
+                    string args = cmd.Length > 11 ? cmd.Substring(11).Trim() : "";
+                    psiToRun = new ProcessStartInfo
+                    {
+                        FileName = "msiexec.exe",
+                        Arguments = args,
+                        UseShellExecute = true
+                    };
+                }
+                else if (cmd.StartsWith("\""))
+                {
+                    int endQuote = cmd.IndexOf('"', 1);
+                    if (endQuote > 1)
+                    {
+                        string exe = cmd.Substring(1, endQuote - 1);
+                        string args = endQuote + 1 < cmd.Length ? cmd.Substring(endQuote + 1).Trim() : "";
+                        psiToRun = new ProcessStartInfo
+                        {
+                            FileName = exe,
+                            Arguments = args,
+                            UseShellExecute = true
+                        };
+                    }
+                }
+
+                if (psiToRun == null)
+                {
+                    var parts = cmd.Split(' ', 2);
+                    psiToRun = new ProcessStartInfo
+                    {
+                        FileName = parts[0],
+                        Arguments = parts.Length > 1 ? parts[1] : "",
+                        UseShellExecute = true
+                    };
+                }
+
+                using var process = Process.Start(psiToRun);
+                if (process != null)
+                {
+                    await process.WaitForExitAsync();
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         private static bool IsSystemOrDriverPackage(string displayName, string publisher)
         {
             if (string.IsNullOrWhiteSpace(displayName)) return true;

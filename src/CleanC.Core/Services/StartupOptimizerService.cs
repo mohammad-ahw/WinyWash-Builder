@@ -108,7 +108,7 @@ namespace CleanC.Core.Services
 
                 foreach (var item in items)
                 {
-                    if (item.IsNonEssential && !item.IsDisabled)
+                    if (item.IsNonEssential && !item.IsDisabled && IsNonEssentialApp(item.Name, item.Command))
                     {
                         if (DisableStartupItem(item))
                         {
@@ -224,7 +224,8 @@ namespace CleanC.Core.Services
                     if (string.IsNullOrWhiteSpace(cmd)) continue;
 
                     bool isProtected = IsWhitelisted(valName, cmd);
-                    bool isNonEssential = !isProtected && IsNonEssentialApp(valName, cmd);
+                    bool isNonEssential = !isProtected;
+                    string cat = ResolveStartupCategory(valName, cmd, isProtected);
 
                     list.Add(new StartupItem
                     {
@@ -234,7 +235,7 @@ namespace CleanC.Core.Services
                         Location = locationName,
                         IsNonEssential = isNonEssential,
                         IsDisabled = false,
-                        Category = isNonEssential ? "لانچر / بهینه‌سازی شده" : "ضروری سیستمی"
+                        Category = cat
                     });
                 }
             }
@@ -254,7 +255,8 @@ namespace CleanC.Core.Services
                     string cleanName = isDisabled ? fname.Substring(0, fname.Length - 9) : fname;
 
                     bool isProtected = IsWhitelisted(cleanName, file);
-                    bool isNonEssential = !isProtected && IsNonEssentialApp(cleanName, file);
+                    bool isNonEssential = !isProtected;
+                    string cat = ResolveStartupCategory(cleanName, file, isProtected);
 
                     list.Add(new StartupItem
                     {
@@ -264,11 +266,36 @@ namespace CleanC.Core.Services
                         Location = locationName,
                         IsNonEssential = isNonEssential,
                         IsDisabled = isDisabled,
-                        Category = isNonEssential ? "میانبر استارتاپ" : "ضروری سیستمی"
+                        Category = cat
                     });
                 }
             }
             catch { }
+        }
+
+        public static string ResolveStartupCategory(string name, string cmd, bool isProtected)
+        {
+            if (isProtected) return "سخت‌افزار و سیستم (ضروری)";
+
+            string lower = $"{name} {cmd}".ToLowerInvariant();
+
+            if (lower.Contains("telegram") || lower.Contains("discord") || lower.Contains("whatsapp") ||
+                lower.Contains("skype") || lower.Contains("slack") || lower.Contains("teams") || lower.Contains("viber"))
+                return "پیام‌رسان و چت (اختیاری)";
+
+            if (lower.Contains("idm") || lower.Contains("idman") || lower.Contains("download") ||
+                lower.Contains("torrent") || lower.Contains("utorrent") || lower.Contains("qbittorrent") ||
+                lower.Contains("onedrive") || lower.Contains("dropbox") || lower.Contains("mega"))
+                return "دانلود و ابزار ابری (اختیاری)";
+
+            if (lower.Contains("steam") || lower.Contains("epic") || lower.Contains("riot") ||
+                lower.Contains("origin") || lower.Contains("battle.net") || lower.Contains("uplay") || lower.Contains("galaxy"))
+                return "لانچر بازی و گیمینگ (اختیاری)";
+
+            if (lower.Contains("update") || lower.Contains("updater") || lower.Contains("helper") || lower.Contains("jusched"))
+                return "آپدیتر پس‌زمینه (غیرضروری)";
+
+            return "برنامه کاربردی (اختیاری)";
         }
 
         private static bool IsWhitelisted(string name, string cmd)
@@ -277,7 +304,7 @@ namespace CleanC.Core.Services
             return WhitelistSignatures.Any(w => combined.Contains(w));
         }
 
-        private static bool IsNonEssentialApp(string name, string cmd)
+        public static bool IsNonEssentialApp(string name, string cmd)
         {
             string combined = $"{name} {cmd}".ToLowerInvariant();
             return NonEssentialSignatures.Any(s => combined.Contains(s));

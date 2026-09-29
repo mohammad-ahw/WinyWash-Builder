@@ -29,6 +29,7 @@ namespace CleanC.UI
         private ScanResult? _cachedScanResult;
         private bool _isBusy = false;
         private long _displayedFreedBytes = 0;
+        private long _currentReportTotalFreed = 0;
         private DesktopAcrylicController? _acrylicController;
         private SystemBackdropConfiguration? _configurationSource;
         private DetailedSystemSpecs? _cachedSpecs;
@@ -698,6 +699,7 @@ namespace CleanC.UI
 
         private void RenderHierarchicalReport(List<CleanupReportGroup> groups, long totalFreed, List<AttentionDecisionItem>? attentionItems = null)
         {
+            _currentReportTotalFreed = totalFreed;
             ReportTotalFreedText.Text = $"+ {SystemStats.FormatBytes(totalFreed)} آزاد شد";
             ReportGroupsContainer.Children.Clear();
 
@@ -709,7 +711,106 @@ namespace CleanC.UI
             var cardBg = GetThemeBrush("AppCardSecondaryBrush");
             var borderBrush = GetThemeBrush("AppCardBorderBrush");
 
-            // Attention / Decision items (e.g. 144Hz monitor refresh rate)
+            // 1. Prominent Achievements & System Boost Summary Banner
+            var boostGroup = groups.FirstOrDefault(g => g.GroupId == "system_boost");
+            long ramFreed = boostGroup?.Items.FirstOrDefault(i => i.Id == "ram_boost")?.FreedBytes ?? 0;
+            var startupItem = boostGroup?.Items.FirstOrDefault(i => i.Id == "startup_opt");
+            var browserItem = boostGroup?.Items.FirstOrDefault(i => i.Id == "browser_opt");
+            var gpuItem = boostGroup?.Items.FirstOrDefault(i => i.Id == "gpu_opt");
+            var winTweaksItem = boostGroup?.Items.FirstOrDefault(i => i.Id == "win_tweaks");
+            long junkDiskFreed = groups.Where(g => g.GroupId != "system_boost").Sum(g => g.TotalFreedBytes);
+
+            var achievementsCard = new Border
+            {
+                Background = new SolidColorBrush(Windows.UI.Color.FromArgb(24, 59, 130, 246)),
+                BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(110, 59, 130, 246)),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(16, 14, 16, 14),
+                Margin = new Thickness(0, 0, 0, 10),
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+
+            var achStack = new StackPanel { Spacing = 10 };
+            var achHeader = new Grid();
+            achHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            achHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var achIcon = new FontIcon
+            {
+                Glyph = "\uE777",
+                FontSize = 18,
+                Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 59, 130, 246)),
+                Margin = new Thickness(0, 0, 10, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            Grid.SetColumn(achIcon, 0);
+            achHeader.Children.Add(achIcon);
+
+            var achTitleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 2 };
+            achTitleStack.Children.Add(new TextBlock { Text = "خلاصه دستاوردهای ارتقای سرعت و آزادسازی سیستم", FontSize = 13.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            achTitleStack.Children.Add(new TextBlock { Text = "نتایج بهینه‌سازی زنده پردازنده، حافظه رم، استارتاپ و اتصالات شبکه", FontSize = 11, Foreground = neutralFg });
+            Grid.SetColumn(achTitleStack, 1);
+            achHeader.Children.Add(achTitleStack);
+            achStack.Children.Add(achHeader);
+
+            var chipsWrap = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(2, 2, 2, 2) };
+
+            void AddAchievementChip(string glyph, string text, Windows.UI.Color color)
+            {
+                var chip = new Border
+                {
+                    Background = new SolidColorBrush(Windows.UI.Color.FromArgb(28, color.R, color.G, color.B)),
+                    BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(100, color.R, color.G, color.B)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10, 5, 10, 5)
+                };
+                var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6 };
+                sp.Children.Add(new FontIcon { Glyph = glyph, FontSize = 12, Foreground = new SolidColorBrush(color), VerticalAlignment = VerticalAlignment.Center });
+                sp.Children.Add(new TextBlock { Text = text, FontSize = 11.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = new SolidColorBrush(color), VerticalAlignment = VerticalAlignment.Center });
+                chip.Child = sp;
+                chipsWrap.Children.Add(chip);
+            }
+
+            if (ramFreed > 0)
+            {
+                AddAchievementChip("\uE9D2", $"+ {SystemStats.FormatBytes(ramFreed)} آزادسازی رم", Windows.UI.Color.FromArgb(255, 16, 185, 129));
+            }
+
+            if (junkDiskFreed > 0)
+            {
+                AddAchievementChip("\uEDA2", $"+ {SystemStats.FormatBytes(junkDiskFreed)} پاکسازی دیسک", Windows.UI.Color.FromArgb(255, 59, 130, 246));
+            }
+
+            if (startupItem != null)
+            {
+                AddAchievementChip("\uE7B5", startupItem.Title, Windows.UI.Color.FromArgb(255, 245, 158, 11));
+            }
+
+            AddAchievementChip("\uE774", "نوسازی کش DNS و سوکت‌های شبکه", Windows.UI.Color.FromArgb(255, 6, 182, 212));
+
+            if (browserItem != null)
+            {
+                AddAchievementChip("\uE774", "توقف تسک‌های پس‌زمینه Edge و Chrome", Windows.UI.Color.FromArgb(255, 139, 92, 246));
+            }
+
+            if (winTweaksItem != null)
+            {
+                AddAchievementChip("\uE770", "توقف تله‌متری و افزایش سرعت ویندوز", Windows.UI.Color.FromArgb(255, 236, 72, 153));
+            }
+
+            if (gpuItem != null)
+            {
+                AddAchievementChip("\uE790", gpuItem.Title, Windows.UI.Color.FromArgb(255, 16, 185, 129));
+            }
+
+            var scrollChips = new ScrollViewer { HorizontalScrollBarVisibility = ScrollBarVisibility.Auto, VerticalScrollBarVisibility = ScrollBarVisibility.Disabled, Content = chipsWrap };
+            achStack.Children.Add(scrollChips);
+            achievementsCard.Child = achStack;
+            ReportGroupsContainer.Children.Add(achievementsCard);
+
+            // 2. Attention / Decision items (e.g. 144Hz monitor refresh rate)
             if (attentionItems != null && attentionItems.Count > 0)
             {
                 foreach (var att in attentionItems)
@@ -758,6 +859,9 @@ namespace CleanC.UI
                         VerticalAlignment = VerticalAlignment.Center
                     };
                     var capturedAtt = att;
+                    var capturedCardBorder = attBorder;
+                    var capturedCardIcon = attIcon;
+
                     actionBtn.Click += async (s, ev) =>
                     {
                         if (capturedAtt.Id == "refresh_rate")
@@ -765,8 +869,7 @@ namespace CleanC.UI
                             bool success = HardwareDiagnosticService.ApplyRefreshRate(capturedAtt.IntParameter);
                             if (success)
                             {
-                                actionBtn.Content = "اعمال شد ✓";
-                                actionBtn.IsEnabled = false;
+                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "ارتقا یافت ✓");
                                 ShowInfoBar("تنظیمات مانیتور", $"نرخ نوسازی با موفقیت به {capturedAtt.IntParameter}Hz ارتقا یافت.", InfoBarSeverity.Success);
                             }
                             else
@@ -779,8 +882,7 @@ namespace CleanC.UI
                             bool success = PowerPlanService.ApplyHighPerformancePlan();
                             if (success)
                             {
-                                actionBtn.Content = "فعال شد ✓";
-                                actionBtn.IsEnabled = false;
+                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فعال شد ✓");
                                 ShowInfoBar("مدیریت مصرف انرژی", "پلن High Performance با حداکثر توان پردازشی فعال گردید.", InfoBarSeverity.Success);
                             }
                             else
@@ -790,14 +892,13 @@ namespace CleanC.UI
                         }
                         else if (capturedAtt.Id == "bloatware_apps")
                         {
-                            await ShowBloatwareManagementDialogAsync(actionBtn);
+                            await ShowBloatwareManagementDialogAsync(capturedCardBorder, capturedCardIcon, actionBtn);
                         }
                         else if (capturedAtt.Id == "advanced_tweaks")
                         {
                             int applied = await AdvancedTweakService.ApplyAdvancedTweaksAsync();
                             RegistryBackupService.MarkTweaksApplied();
-                            actionBtn.Content = "اعمال شد ✓";
-                            actionBtn.IsEnabled = false;
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "اعمال شد ✓");
                             ShowInfoBar("بهینه‌سازی پیشرفته", "محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت.", InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "ssd_critical_space")
@@ -805,14 +906,13 @@ namespace CleanC.UI
                             actionBtn.Content = "در حال بهینه‌سازی...";
                             actionBtn.IsEnabled = false;
                             bool ok = await DiskMaintenanceService.OptimizeDriveTrimAsync("C");
-                            actionBtn.Content = "انجام شد ✓";
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "انجام شد ✓");
                             ShowInfoBar("بهینه‌سازی SSD", "دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه‌سازی گردیدند.", InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "gpu_hags")
                         {
                             bool ok = GpuOptimizerService.EnableHags();
-                            actionBtn.Content = "فعال شد ✓";
-                            actionBtn.IsEnabled = false;
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فعال شد ✓");
                             ShowInfoBar("شتاب‌دهنده گرافیک", "قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)", InfoBarSeverity.Success);
                         }
                     };
@@ -959,7 +1059,20 @@ namespace CleanC.UI
             }
         }
 
-        private async Task ShowBloatwareManagementDialogAsync(Button actionBtn)
+        private void MarkAttentionCardSuccess(Border cardBorder, FontIcon cardIcon, Button btn, string successText = "اعمال شد ✓")
+        {
+            cardBorder.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(28, 16, 185, 129));
+            cardBorder.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(120, 16, 185, 129));
+            cardIcon.Glyph = "\uE73E";
+            cardIcon.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129));
+            btn.Content = successText;
+            btn.IsEnabled = false;
+            btn.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
+            btn.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(160, 16, 185, 129));
+            btn.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129));
+        }
+
+        private async Task ShowBloatwareManagementDialogAsync(Border attBorder, FontIcon attIcon, Button actionBtn)
         {
             try
             {
@@ -967,8 +1080,7 @@ namespace CleanC.UI
                 if (candidates.Count == 0)
                 {
                     ShowInfoBar("برنامه‌ها", "هیچ برنامه غیرضروری یا کم‌استفاده‌ای یافت نشد.", InfoBarSeverity.Informational);
-                    actionBtn.Content = "بررسی شد ✓";
-                    actionBtn.IsEnabled = false;
+                    MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, "بررسی شد ✓");
                     return;
                 }
 
@@ -977,7 +1089,7 @@ namespace CleanC.UI
                     Title = "مدیریت و حذف برنامه‌های غیرضروری و کم‌استفاده",
                     PrimaryButtonText = "حذف موارد انتخاب‌شده",
                     CloseButtonText = "نگه‌داشتن همه",
-                    DefaultButton = ContentDialogButton.Close,
+                    DefaultButton = ContentDialogButton.Primary,
                     XamlRoot = this.Content.XamlRoot
                 };
 
@@ -986,7 +1098,7 @@ namespace CleanC.UI
 
                 var headerText = new TextBlock
                 {
-                    Text = "برنامه‌های زیر می‌توانند برای آزادسازی منابع سیستم حذف شوند. موارد دلخواه را علامت بزنید:",
+                    Text = "برنامه‌های زیر می‌توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:",
                     FontSize = 12,
                     Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
                     TextWrapping = TextWrapping.Wrap,
@@ -996,6 +1108,24 @@ namespace CleanC.UI
 
                 var checkBoxes = new List<(CheckBox Box, CandidateAppItem App)>();
 
+                var selectAllCheck = new CheckBox
+                {
+                    Content = "انتخاب همه برنامه‌ها",
+                    IsChecked = true,
+                    FontSize = 12,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    Margin = new Thickness(0, 0, 0, 6)
+                };
+                selectAllCheck.Click += (s, e) =>
+                {
+                    bool isAll = selectAllCheck.IsChecked == true;
+                    foreach (var (box, _) in checkBoxes)
+                    {
+                        box.IsChecked = isAll;
+                    }
+                };
+                stack.Children.Add(selectAllCheck);
+
                 foreach (var app in candidates)
                 {
                     var itemBorder = new Border
@@ -1004,7 +1134,8 @@ namespace CleanC.UI
                         BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                         BorderThickness = new Thickness(1),
                         CornerRadius = new CornerRadius(6),
-                        Padding = new Thickness(10, 8, 10, 8)
+                        Padding = new Thickness(10, 8, 10, 8),
+                        IsHitTestVisible = true
                     };
 
                     var itemGrid = new Grid();
@@ -1020,6 +1151,12 @@ namespace CleanC.UI
                     };
                     Grid.SetColumn(chk, 0);
                     itemGrid.Children.Add(chk);
+
+                    var capturedChk = chk;
+                    itemBorder.PointerPressed += (s, e) =>
+                    {
+                        capturedChk.IsChecked = !(capturedChk.IsChecked == true);
+                    };
 
                     var infoStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 2 };
                     var nameBlock = new TextBlock { Text = app.DisplayName, FontSize = 12.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
@@ -1066,9 +1203,42 @@ namespace CleanC.UI
                             }
                         }
 
-                        actionBtn.Content = "بررسی شد ✓";
-                        actionBtn.IsEnabled = false;
-                        ShowInfoBar("پاکسازی نرم‌افزارها", $"{removed} برنامه با موفقیت حذف گردید ({SystemStats.FormatBytes(freedBytes)} فضا آزاد شد).", InfoBarSeverity.Success);
+                        if (removed > 0)
+                        {
+                            _currentReportTotalFreed += freedBytes;
+                            _displayedFreedBytes = _currentReportTotalFreed;
+                            ReportTotalFreedText.Text = $"+ {SystemStats.FormatBytes(_currentReportTotalFreed)} آزاد شد";
+                            LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(_currentReportTotalFreed)} آزاد شد";
+                            HeroHealthSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(_currentReportTotalFreed)} از حافظه رم و فضای دیسک آزاد شد.";
+
+                            MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, $"{removed} برنامه حذف شد ✓");
+
+                            var removedCard = new Border
+                            {
+                                Background = new SolidColorBrush(Windows.UI.Color.FromArgb(24, 16, 185, 129)),
+                                BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(100, 16, 185, 129)),
+                                BorderThickness = new Thickness(1),
+                                CornerRadius = new CornerRadius(8),
+                                Padding = new Thickness(14, 10, 14, 10),
+                                Margin = new Thickness(0, 0, 0, 6)
+                            };
+                            var rmGrid = new Grid();
+                            rmGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                            rmGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                            rmGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                            var rmIcon = new FontIcon { Glyph = "\uE73E", FontSize = 16, Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129)), Margin = new Thickness(0, 0, 10, 0), VerticalAlignment = VerticalAlignment.Center };
+                            var rmTitle = new TextBlock { Text = $"حذف {removed} برنامه غیرضروری و بلااستفاده", FontSize = 12.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center };
+                            var rmBadge = new Border { Background = new SolidColorBrush(Windows.UI.Color.FromArgb(30, 16, 185, 129)), CornerRadius = new CornerRadius(5), Padding = new Thickness(8, 3, 8, 3), VerticalAlignment = VerticalAlignment.Center };
+                            rmBadge.Child = new TextBlock { Text = $"+ {SystemStats.FormatBytes(freedBytes)} آزاد شد ✓", FontSize = 11, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129)) };
+                            Grid.SetColumn(rmIcon, 0); rmGrid.Children.Add(rmIcon);
+                            Grid.SetColumn(rmTitle, 1); rmGrid.Children.Add(rmTitle);
+                            Grid.SetColumn(rmBadge, 2); rmGrid.Children.Add(rmBadge);
+                            removedCard.Child = rmGrid;
+                            ReportGroupsContainer.Children.Insert(1, removedCard);
+
+                            RefreshSystemStats();
+                            ShowInfoBar("پاکسازی نرم‌افزارها", $"{removed} برنامه با موفقیت حذف گردید ({SystemStats.FormatBytes(freedBytes)} فضا آزاد شد).", InfoBarSeverity.Success);
+                        }
                     }
                 }
             }
@@ -1838,77 +2008,107 @@ namespace CleanC.UI
             SpecsCardsContainer.Visibility = Visibility.Visible;
             SpecsCardsContainer.Children.Clear();
 
+            var cards = new List<FrameworkElement>();
+
             // 1. CPU Card
-            string cpuExtra = $"{specs.CpuCores} هسته فیزیکی  •  {specs.CpuThreads} ترد منطقی  •  حداکثر فرکانس: {specs.CpuClockMhz} MHz";
-            if (specs.CpuL3CacheKb > 0) cpuExtra += $"  •  حافظه کش L3: {specs.CpuL3CacheKb} KB";
-            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE774", "پردازنده مرکزی (CPU)", specs.CpuName, cpuExtra, ColorHelper.FromArgb(255, 59, 130, 246)));
+            var cpuChips = new List<string> { $"{specs.CpuCores} هسته", $"{specs.CpuThreads} ترد", $"{specs.CpuClockMhz} MHz" };
+            if (specs.CpuL3CacheKb > 0) cpuChips.Add($"L3: {specs.CpuL3CacheKb / 1024} MB");
+            cards.Add(CreateSpecCard("\uE774", "پردازنده مرکزی (CPU)", specs.CpuName, cpuChips, ColorHelper.FromArgb(255, 59, 130, 246)));
 
             // 2. RAM Card
-            string ramExtra = $"{specs.RamSlotsUsed} اسلات فعال  •  سرعت باس: {specs.RamSpeedMhz} MHz";
-            if (!string.IsNullOrEmpty(specs.RamManufacturer)) ramExtra += $"  •  سازنده: {specs.RamManufacturer}";
-            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE9D2", "حافظه رم (RAM)", $"{specs.TotalRamFormatted} ({specs.RamType})", ramExtra, ColorHelper.FromArgb(255, 16, 185, 129)));
+            var ramChips = new List<string> { specs.TotalRamFormatted, specs.RamType, $"{specs.RamSpeedMhz} MHz", $"{specs.RamSlotsUsed} اسلات" };
+            if (!string.IsNullOrEmpty(specs.RamManufacturer)) ramChips.Add(specs.RamManufacturer);
+            cards.Add(CreateSpecCard("\uE9D2", "حافظه رم (RAM)", $"{specs.TotalRamFormatted} ({specs.RamType})", ramChips, ColorHelper.FromArgb(255, 16, 185, 129)));
 
-            // 3. Motherboard & BIOS Card
-            string mbExtra = !string.IsNullOrEmpty(specs.BiosVersion) ? $"نسخه بایوس: {specs.BiosVersion} (تاریخ: {specs.BiosReleaseDate})" : "گذرگاه‌های پرسرعت سیستم";
-            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE770", "مادربرد و بایوس (Motherboard & BIOS)", $"{specs.MotherboardManufacturer} {specs.MotherboardModel}", mbExtra, ColorHelper.FromArgb(255, 245, 158, 11)));
-
-            // 4. GPU Cards
+            // 3. GPU Cards
             if (specs.Gpus.Count > 0)
             {
                 foreach (var gpu in specs.Gpus)
                 {
-                    string gpuExtra = $"حافظه اختصاصی VRAM: {gpu.VramFormatted}  •  نسخه درایور: {gpu.DriverVersion}";
-                    SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gpu.Name, gpuExtra, ColorHelper.FromArgb(255, 6, 182, 212)));
+                    var gpuChips = new List<string> { gpu.VramFormatted };
+                    if (!string.IsNullOrEmpty(gpu.DriverVersion)) gpuChips.Add($"درایور: {gpu.DriverVersion}");
+                    cards.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gpu.Name, gpuChips, ColorHelper.FromArgb(255, 6, 182, 212)));
                 }
             }
             else if (specs.GpuNames.Count > 0)
             {
                 foreach (var gName in specs.GpuNames)
                 {
-                    SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gName, "رندرینگ گرافیکی و پردازش موازی", ColorHelper.FromArgb(255, 6, 182, 212)));
+                    cards.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gName, new List<string> { "رندرینگ گرافیکی" }, ColorHelper.FromArgb(255, 6, 182, 212)));
                 }
             }
 
-            // 5. Physical Disks & SSD Health
-            if (specs.Disks.Count > 0)
-            {
-                foreach (var disk in specs.Disks)
-                {
-                    string diskExtra = $"وضعیت: {disk.HealthStatus}  •  دمای لحظه‌ای: {disk.TemperatureFormatted}  •  ساعت کارکرد: {disk.PowerOnHoursFormatted}  •  استهلاک: {disk.WearFormatted}";
-                    SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7FC", $"حافظه ذخیره‌سازی ({disk.DiskType} {disk.BusType})", $"{disk.Model} - {disk.SizeFormatted}", diskExtra, ColorHelper.FromArgb(255, 236, 72, 153)));
-                }
-            }
-            else if (specs.HasSsdHealthData)
-            {
-                SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7FC", "سلامت حافظه ذخیره‌سازی (SSD)", $"{100 - specs.SsdWearPercent}% سلامت باقیمانده", $"دمای فعلی: {specs.SsdTemperatureCelsius}°C  •  میزان کارکرد: {specs.SsdOperatingHours} ساعت", ColorHelper.FromArgb(255, 236, 72, 153)));
-            }
+            // 4. Motherboard & BIOS Card
+            var mbChips = new List<string>();
+            if (!string.IsNullOrEmpty(specs.BiosVersion)) mbChips.Add($"بایوس: {specs.BiosVersion}");
+            if (!string.IsNullOrEmpty(specs.BiosReleaseDate)) mbChips.Add(specs.BiosReleaseDate);
+            cards.Add(CreateSpecCard("\uE770", "مادربرد و بایوس (Motherboard)", $"{specs.MotherboardManufacturer} {specs.MotherboardModel}", mbChips, ColorHelper.FromArgb(255, 245, 158, 11)));
 
-            // 6. Battery Card (Laptop only)
-            if (specs.HasBattery)
-            {
-                string batDetails = $"ظرفیت طراحی اولیه: {specs.BatteryDesignCapacityMWh} mWh  •  ظرفیت فعلی شارژ کامل: {specs.BatteryFullChargeCapacityMWh} mWh  •  سیکل شارژ: {specs.BatteryCycleCount}";
-                SpecsCardsContainer.Children.Add(CreateSpecCard("\uEBB5", "سلامت باتری لپ‌تاپ (Battery Health)", $"{specs.BatteryHealthPercent}% سلامت باتری", batDetails, ColorHelper.FromArgb(255, 239, 68, 68)));
-            }
+            // 5. Windows OS Card
+            var osChips = new List<string> { specs.OsArchitecture, $"Build {specs.OsBuild}" };
+            if (!string.IsNullOrEmpty(specs.OsUptimeFormatted)) osChips.Add($"روشن: {specs.OsUptimeFormatted}");
+            cards.Add(CreateSpecCard("\uE8A9", "سیستم‌عامل (Windows)", $"{specs.OsName}", osChips, ColorHelper.FromArgb(255, 139, 92, 246)));
 
-            // 7. Windows OS Card
-            string osExtra = $"شماره ساخت: Build {specs.OsBuild}";
-            if (!string.IsNullOrEmpty(specs.OsInstallDate)) osExtra += $"  •  تاریخ نصب: {specs.OsInstallDate}";
-            if (!string.IsNullOrEmpty(specs.OsUptimeFormatted)) osExtra += $"  •  زمان روشن بودن: {specs.OsUptimeFormatted}";
-            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE8A9", "سیستم‌عامل (Windows)", $"{specs.OsName} ({specs.OsArchitecture})", osExtra, ColorHelper.FromArgb(255, 139, 92, 246)));
-
-            // 8. Windows Activation Status Card
+            // 6. Windows Activation Status Card
             if (specs.Activation != null)
             {
-                string actStatus = specs.Activation.StatusText;
-                string actDesc = !string.IsNullOrEmpty(specs.Activation.Description) ? specs.Activation.Description : "کانال لایسنس و اصالت سیستم‌عامل";
                 var actColor = specs.Activation.IsActivated 
                     ? ColorHelper.FromArgb(255, 16, 185, 129) // Emerald
                     : ColorHelper.FromArgb(255, 239, 68, 68); // Red
                 string actGlyph = specs.Activation.IsActivated ? "\uE73E" : "\uE783";
-                SpecsCardsContainer.Children.Add(CreateSpecCard(actGlyph, "وضعیت فعال‌سازی و لایسنس (Windows Activation)", actStatus, actDesc, actColor));
+                var actChips = new List<string> { specs.Activation.StatusText };
+                if (!string.IsNullOrEmpty(specs.Activation.Description)) actChips.Add(specs.Activation.Description);
+                cards.Add(CreateSpecCard(actGlyph, "لایسنس و اصالت ویندوز", specs.Activation.StatusText, actChips, actColor));
             }
 
-            // 9. Logical Drives Management (This PC Drives)
+            // 7. Battery Card (Laptop only)
+            if (specs.HasBattery)
+            {
+                var batChips = new List<string>
+                {
+                    $"{specs.BatteryHealthPercent}% سلامت",
+                    $"{specs.BatteryFullChargeCapacityMWh} mWh",
+                    $"سیکل: {specs.BatteryCycleCount}"
+                };
+                cards.Add(CreateSpecCard("\uEBB5", "سلامت باتری (Battery Health)", $"{specs.BatteryHealthPercent}% سلامت باتری", batChips, ColorHelper.FromArgb(255, 239, 68, 68)));
+            }
+
+            // Layout in 2-Column Responsive Grid
+            var grid = new Grid
+            {
+                ColumnSpacing = 12,
+                RowSpacing = 12,
+                HorizontalAlignment = HorizontalAlignment.Stretch
+            };
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            int row = 0;
+            for (int i = 0; i < cards.Count; i += 2)
+            {
+                grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+                var leftCard = cards[i];
+                Grid.SetRow(leftCard, row);
+                Grid.SetColumn(leftCard, 0);
+                grid.Children.Add(leftCard);
+
+                if (i + 1 < cards.Count)
+                {
+                    var rightCard = cards[i + 1];
+                    Grid.SetRow(rightCard, row);
+                    Grid.SetColumn(rightCard, 1);
+                    grid.Children.Add(rightCard);
+                }
+                else
+                {
+                    Grid.SetColumnSpan(leftCard, 2);
+                }
+                row++;
+            }
+
+            SpecsCardsContainer.Children.Add(grid);
+
+            // 8. Logical Drives Management (This PC Drives - Full Width)
             if (specs.LogicalDrives != null && specs.LogicalDrives.Count > 0)
             {
                 SpecsCardsContainer.Children.Add(CreateLogicalDrivesSection(specs.LogicalDrives));
@@ -1931,7 +2131,7 @@ namespace CleanC.UI
             ShowInfoBar("بروزرسانی مشخصات", "مشخصات سخت‌افزار و سنسورهای سیستم بروزرسانی شدند.", InfoBarSeverity.Informational);
         }
 
-        private Border CreateSpecCard(string glyph, string category, string value, string extra, Windows.UI.Color iconBgColor)
+        private Border CreateSpecCard(string glyph, string category, string value, List<string>? chips, Windows.UI.Color iconBgColor, string extra = "")
         {
             var border = new Border
             {
@@ -1939,7 +2139,7 @@ namespace CleanC.UI
                 BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(10),
-                Padding = new Thickness(18, 14, 18, 14)
+                Padding = new Thickness(16, 14, 16, 14)
             };
 
             var grid = new Grid();
@@ -1948,11 +2148,11 @@ namespace CleanC.UI
 
             var iconBg = new Border
             {
-                Width = 44,
-                Height = 44,
-                CornerRadius = new CornerRadius(22),
+                Width = 42,
+                Height = 42,
+                CornerRadius = new CornerRadius(21),
                 Background = new SolidColorBrush(iconBgColor),
-                Margin = new Thickness(0, 0, 16, 0),
+                Margin = new Thickness(0, 0, 14, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
@@ -1960,7 +2160,7 @@ namespace CleanC.UI
             var icon = new FontIcon
             {
                 Glyph = glyph,
-                FontSize = 20,
+                FontSize = 19,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Foreground = new SolidColorBrush(Microsoft.UI.Colors.White)
@@ -1971,14 +2171,39 @@ namespace CleanC.UI
             grid.Children.Add(iconBg);
 
             var textStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-            var catText = new TextBlock { Text = category, FontSize = 12, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
-            var valText = new TextBlock { Text = value, FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 15.5, Foreground = GetThemeBrush("TextFillColorPrimaryBrush") };
-            var extraText = new TextBlock { Text = extra, FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
+            var catText = new TextBlock { Text = category, FontSize = 11.5, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
+            var valText = new TextBlock { Text = value, FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 14.5, Foreground = GetThemeBrush("TextFillColorPrimaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis };
 
             textStack.Children.Add(catText);
             textStack.Children.Add(valText);
+
+            if (chips != null && chips.Count > 0)
+            {
+                var chipsRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, Margin = new Thickness(0, 3, 0, 0) };
+                foreach (var chip in chips)
+                {
+                    if (string.IsNullOrWhiteSpace(chip)) continue;
+                    var pill = new Border
+                    {
+                        Background = GetThemeBrush("AppHeaderPillBrush"),
+                        CornerRadius = new CornerRadius(6),
+                        Padding = new Thickness(7, 2, 7, 2)
+                    };
+                    pill.Child = new TextBlock
+                    {
+                        Text = chip,
+                        FontSize = 10.5,
+                        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                        Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+                    };
+                    chipsRow.Children.Add(pill);
+                }
+                textStack.Children.Add(chipsRow);
+            }
+
             if (!string.IsNullOrEmpty(extra))
             {
+                var extraText = new TextBlock { Text = extra, FontSize = 11, TextWrapping = TextWrapping.Wrap, Foreground = GetThemeBrush("TextFillColorSecondaryBrush"), Margin = new Thickness(0, 2, 0, 0) };
                 textStack.Children.Add(extraText);
             }
 
@@ -2323,18 +2548,37 @@ namespace CleanC.UI
                 var itemBorder = new Border
                 {
                     Background = GetThemeBrush("AppCardSecondaryBrush"),
-                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                    BorderBrush = app.IsSelected ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("AppCardBorderBrush"),
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(10),
-                    Padding = new Thickness(16, 12, 16, 12)
+                    Padding = new Thickness(14, 12, 16, 12)
                 };
 
                 var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-                // Left: Info
+                // Col 0: CheckBox
+                var chk = new CheckBox
+                {
+                    IsChecked = app.IsSelected,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 10, 0)
+                };
+                var capturedApp = app;
+                var capturedBorder = itemBorder;
+                chk.Click += (s, e) =>
+                {
+                    capturedApp.IsSelected = chk.IsChecked == true;
+                    capturedBorder.BorderBrush = capturedApp.IsSelected ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("AppCardBorderBrush");
+                    UpdateBatchUninstallerBar();
+                };
+                Grid.SetColumn(chk, 0);
+                grid.Children.Add(chk);
+
+                // Col 1: App Info
                 var infoStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
                 var nameText = new TextBlock { Text = app.DisplayName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13.5, TextTrimming = TextTrimming.CharacterEllipsis };
                 
@@ -2345,23 +2589,26 @@ namespace CleanC.UI
 
                 infoStack.Children.Add(nameText);
                 infoStack.Children.Add(subText);
-                Grid.SetColumn(infoStack, 0);
+                Grid.SetColumn(infoStack, 1);
                 grid.Children.Add(infoStack);
 
-                // Middle: Size Badge
-                var sizeBadge = new Border
+                // Col 2: Size Badge (Only visible if size is resolved)
+                if (app.EstimatedSizeBytes > 0 && !string.IsNullOrEmpty(app.FormattedSize))
                 {
-                    Background = GetThemeBrush("AppHeaderPillBrush"),
-                    CornerRadius = new CornerRadius(12),
-                    Padding = new Thickness(10, 4, 10, 4),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(12, 0, 12, 0)
-                };
-                sizeBadge.Child = new TextBlock { Text = app.FormattedSize, FontSize = 11.5, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
-                Grid.SetColumn(sizeBadge, 1);
-                grid.Children.Add(sizeBadge);
+                    var sizeBadge = new Border
+                    {
+                        Background = GetThemeBrush("AppHeaderPillBrush"),
+                        CornerRadius = new CornerRadius(12),
+                        Padding = new Thickness(10, 4, 10, 4),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(12, 0, 12, 0)
+                    };
+                    sizeBadge.Child = new TextBlock { Text = app.FormattedSize, FontSize = 11.5, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
+                    Grid.SetColumn(sizeBadge, 2);
+                    grid.Children.Add(sizeBadge);
+                }
 
-                // Right: Uninstall Button (Fixed MinWidth 105, height 34, no text wrapping)
+                // Col 3: Single Uninstall Button
                 var uninstBtn = new Button
                 {
                     Content = "حذف نرم‌افزار",
@@ -2382,19 +2629,101 @@ namespace CleanC.UI
                     bool launched = AppUninstallerService.LaunchUninstall(app);
                     if (launched)
                     {
-                        ShowInfoBar("حذف نرم‌افزار", $"آنیستالر رسمی {app.DisplayName} اجرا گردید.", InfoBarSeverity.Informational);
+                        ShowInfoBar("حذف نرم‌افزار", $"آنیستالر رسمی {app.DisplayName} با موفقیت اجرا گردید.", InfoBarSeverity.Informational);
                     }
                     else
                     {
                         ShowInfoBar("خطا در حذف", $"امکان اجرای آنیستالر برای {app.DisplayName} وجود ندارد.", InfoBarSeverity.Warning);
                     }
                 };
-                Grid.SetColumn(uninstBtn, 2);
+                Grid.SetColumn(uninstBtn, 3);
                 grid.Children.Add(uninstBtn);
 
                 itemBorder.Child = grid;
                 UninstallerAppsStack.Children.Add(itemBorder);
             }
+
+            UpdateBatchUninstallerBar();
+        }
+
+        private void UpdateBatchUninstallerBar()
+        {
+            if (_allInstalledApps == null || UninstallerBatchBar == null) return;
+            var selected = _allInstalledApps.Where(a => a.IsSelected).ToList();
+            if (selected.Count > 0)
+            {
+                UninstallerBatchBar.Visibility = Visibility.Visible;
+                long totalBytes = selected.Sum(a => a.EstimatedSizeBytes);
+                string sizeStr = totalBytes > 0 ? $" ({SystemStats.FormatBytes(totalBytes)})" : "";
+                UninstallerSelectedCountText.Text = $"{selected.Count} نرم‌افزار انتخاب گردیده{sizeStr}";
+                UninstallerBatchDeleteBtnText.Text = $"حذف {selected.Count} برنامه انتخاب‌شده";
+            }
+            else
+            {
+                UninstallerBatchBar.Visibility = Visibility.Collapsed;
+            }
+        }
+
+        private void UninstallerSelectAll_Checked(object sender, RoutedEventArgs e)
+        {
+            if (_allInstalledApps == null) return;
+            string query = UninstallerSearchBox?.Text?.Trim() ?? string.Empty;
+            var targetList = string.IsNullOrEmpty(query) 
+                ? _allInstalledApps 
+                : _allInstalledApps.Where(a => a.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            foreach (var app in targetList) app.IsSelected = true;
+            FilterAndRenderApps();
+        }
+
+        private void UninstallerSelectAll_Unchecked(object sender, RoutedEventArgs e)
+        {
+            if (_allInstalledApps == null) return;
+            foreach (var app in _allInstalledApps) app.IsSelected = false;
+            FilterAndRenderApps();
+        }
+
+        private async void UninstallerBatchDeleteBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_allInstalledApps == null) return;
+            var selected = _allInstalledApps.Where(a => a.IsSelected).ToList();
+            if (selected.Count == 0) return;
+
+            var confirmDialog = new ContentDialog
+            {
+                Title = "تأیید حذف گروهی نرم‌افزارها",
+                Content = new TextBlock
+                {
+                    Text = $"آیا از حذف {selected.Count} برنامه انتخاب‌شده اطمینان دارید؟ به منظور جلوگیری از تداخل فرآیندهای ویندوز، حذف هر برنامه به ترتیب (FIFO) و با باز شدن ایمن آنیستالر انجام خواهد شد.",
+                    FontSize = 13,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 20
+                },
+                PrimaryButtonText = "شروع حذف گروهی",
+                CloseButtonText = "انصراف",
+                DefaultButton = ContentDialogButton.Primary,
+                XamlRoot = this.Content.XamlRoot,
+                FlowDirection = FlowDirection.RightToLeft
+            };
+
+            var dialogResult = await confirmDialog.ShowAsync();
+            if (dialogResult != ContentDialogResult.Primary) return;
+
+            UninstallerBatchDeleteBtn.IsEnabled = false;
+            int total = selected.Count;
+            int current = 0;
+
+            foreach (var app in selected)
+            {
+                current++;
+                ShowInfoBar("فرآیند حذف گروهی", $"در حال اجرای آنیستالر {app.DisplayName} ({current} از {total})...", InfoBarSeverity.Informational);
+                bool ok = await AppUninstallerService.LaunchUninstallAsync(app);
+                await Task.Delay(500);
+            }
+
+            UninstallerBatchDeleteBtn.IsEnabled = true;
+            ShowInfoBar("پایان عملیات حذف", $"تمام برنامه‌های انتخاب‌شده ({total} مورد) در صف آنیستال قرار گرفتند.", InfoBarSeverity.Success);
+            await LoadAppUninstallerPageAsync();
         }
 
         private void UninstallerSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -2853,16 +3182,16 @@ namespace CleanC.UI
                         Width = 42,
                         Height = 42,
                         CornerRadius = new CornerRadius(10),
-                        Background = new SolidColorBrush(item.IsNonEssential ? ColorHelper.FromArgb(30, 245, 158, 11) : ColorHelper.FromArgb(30, 59, 130, 246)),
+                        Background = new SolidColorBrush(item.IsNonEssential ? ColorHelper.FromArgb(28, 59, 130, 246) : ColorHelper.FromArgb(28, 245, 158, 11)),
                         Margin = new Thickness(0, 0, 14, 0),
                         VerticalAlignment = VerticalAlignment.Center,
                         HorizontalAlignment = HorizontalAlignment.Center
                     };
                     var fIcon = new FontIcon
                     {
-                        Glyph = item.IsNonEssential ? "\uE7B5" : "\uE770",
+                        Glyph = item.IsNonEssential ? "\uE71D" : "\uEA18",
                         FontSize = 18,
-                        Foreground = new SolidColorBrush(item.IsNonEssential ? ColorHelper.FromArgb(255, 245, 158, 11) : ColorHelper.FromArgb(255, 59, 130, 246)),
+                        Foreground = new SolidColorBrush(item.IsNonEssential ? ColorHelper.FromArgb(255, 59, 130, 246) : ColorHelper.FromArgb(255, 245, 158, 11)),
                         VerticalAlignment = VerticalAlignment.Center,
                         HorizontalAlignment = HorizontalAlignment.Center
                     };
@@ -2898,12 +3227,37 @@ namespace CleanC.UI
                 };
                 locBadge.Child = new TextBlock { Text = locPersian, FontSize = 10, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
                 topRow.Children.Add(locBadge);
+
+                var catBadge = new Border
+                {
+                    Background = item.IsNonEssential 
+                        ? new SolidColorBrush(ColorHelper.FromArgb(24, 16, 185, 129)) 
+                        : new SolidColorBrush(ColorHelper.FromArgb(24, 245, 158, 11)),
+                    BorderBrush = item.IsNonEssential
+                        ? new SolidColorBrush(ColorHelper.FromArgb(80, 16, 185, 129))
+                        : new SolidColorBrush(ColorHelper.FromArgb(80, 245, 158, 11)),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(6, 2, 6, 2),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                catBadge.Child = new TextBlock
+                {
+                    Text = item.Category,
+                    FontSize = 10,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    Foreground = item.IsNonEssential
+                        ? new SolidColorBrush(ColorHelper.FromArgb(255, 16, 185, 129))
+                        : new SolidColorBrush(ColorHelper.FromArgb(255, 245, 158, 11))
+                };
+                topRow.Children.Add(catBadge);
+
                 textStack.Children.Add(topRow);
 
                 string cleanCmd = ExtractCleanExePath(item.Command);
                 var cmdText = new TextBlock
                 {
-                    Text = $"{item.Category}  •  مسیر: {cleanCmd}",
+                    Text = $"مسیر: {cleanCmd}",
                     FontSize = 11,
                     Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
                     TextTrimming = TextTrimming.CharacterEllipsis
