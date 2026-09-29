@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
 using System.Management;
 using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace CleanC.Core.Services
 {
@@ -36,6 +33,15 @@ namespace CleanC.Core.Services
         public long BatteryDesignCapacityMWh { get; set; }
         public long BatteryFullChargeCapacityMWh { get; set; }
         public int BatteryCycleCount { get; set; }
+
+        // GPU
+        public List<string> GpuNames { get; set; } = new List<string>();
+
+        // SSD Health
+        public bool HasSsdHealthData { get; set; }
+        public int SsdTemperatureCelsius { get; set; }
+        public int SsdWearPercent { get; set; }
+        public long SsdOperatingHours { get; set; }
     }
 
     public class SystemSpecsService
@@ -120,6 +126,51 @@ namespace CleanC.Core.Services
                 }
                 catch { }
 
+                // 6. GPU Info
+                try
+                {
+                    using var searcher = new ManagementObjectSearcher("SELECT Name FROM Win32_VideoController");
+                    foreach (var mo in searcher.Get())
+                    {
+                        var name = mo["Name"]?.ToString()?.Trim();
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            specs.GpuNames.Add(name);
+                        }
+                    }
+                }
+                catch { }
+
+                // 7. SSD Health
+                try
+                {
+                    using var diskSearcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\Storage", "SELECT DeviceId FROM MSFT_PhysicalDisk WHERE MediaType=4");
+                    string? ssdDeviceId = null;
+                    foreach (var disk in diskSearcher.Get())
+                    {
+                        ssdDeviceId = disk["DeviceId"]?.ToString();
+                        break; // Just take the first SSD for now
+                    }
+
+                    if (!string.IsNullOrEmpty(ssdDeviceId))
+                    {
+                        using var healthSearcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\Storage", $"SELECT Temperature, Wear, PowerOnHours FROM MSFT_StorageReliabilityCounter WHERE DeviceId='{ssdDeviceId}'");
+                        foreach (var health in healthSearcher.Get())
+                        {
+                            if (health["Temperature"] != null)
+                                specs.SsdTemperatureCelsius = Convert.ToInt32(health["Temperature"]);
+                            if (health["Wear"] != null)
+                                specs.SsdWearPercent = Convert.ToInt32(health["Wear"]);
+                            if (health["PowerOnHours"] != null)
+                                specs.SsdOperatingHours = Convert.ToInt64(health["PowerOnHours"]);
+                            
+                            specs.HasSsdHealthData = true;
+                            break;
+                        }
+                    }
+                }
+                catch { }
+
                 return specs;
             });
         }
@@ -138,53 +189,60 @@ namespace CleanC.Core.Services
                 }
                 specs.HasBattery = true;
 
-                // Run powercfg /batteryreport /xml to get precise design vs full charge capacity
-                string tempXml = Path.Combine(Path.GetTempPath(), $"cleanc_bat_{Guid.NewGuid():N}.xml");
-                var psi = new ProcessStartInfo
-                {
-                    FileName = Path.Combine(Environment.SystemDirectory, "powercfg.exe"),
-                    Arguments = $"/batteryreport /xml /output \"{tempXml}\"",
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
+                long design = 0;
+                long full = 0;
+                int cycles = 0;
 
-                using (var p = Process.Start(psi))
+                try
                 {
-                    p?.WaitForExit(5000);
-                }
-
-                if (File.Exists(tempXml))
-                {
-                    try
+                    using var wmiSearcher = new ManagementObjectSearcher(@"root\WMI", "SELECT DesignedCapacity FROM BatteryStaticData");
+                    foreach (var mo in wmiSearcher.Get())
                     {
-                        var doc = XDocument.Load(tempXml);
-                        var batteryNode = doc.Descendants("Battery").FirstOrDefault();
-                        if (batteryNode != null)
+                        if (mo["DesignedCapacity"] != null)
                         {
-                            long design = 0;
-                            long full = 0;
-                            int cycles = 0;
-
-                            long.TryParse(batteryNode.Element("DesignCapacity")?.Value, out design);
-                            long.TryParse(batteryNode.Element("FullChargeCapacity")?.Value, out full);
-                            int.TryParse(batteryNode.Element("CycleCount")?.Value, out cycles);
-
-                            specs.BatteryDesignCapacityMWh = design;
-                            specs.BatteryFullChargeCapacityMWh = full;
-                            specs.BatteryCycleCount = cycles;
-
-                            if (design > 0 && full > 0)
-                            {
-                                double pct = ((double)full / design) * 100.0;
-                                specs.BatteryHealthPercent = Math.Clamp((int)Math.Round(pct), 1, 100);
-                            }
+                            design = Convert.ToInt64(mo["DesignedCapacity"]);
+                            break;
                         }
                     }
-                    catch { }
-                    finally
+                }
+                catch { }
+
+                try
+                {
+                    using var wmiSearcher = new ManagementObjectSearcher(@"root\WMI", "SELECT FullChargedCapacity FROM BatteryFullChargedCapacity");
+                    foreach (var mo in wmiSearcher.Get())
                     {
-                        try { File.Delete(tempXml); } catch { }
+                        if (mo["FullChargedCapacity"] != null)
+                        {
+                            full = Convert.ToInt64(mo["FullChargedCapacity"]);
+                            break;
+                        }
                     }
+                }
+                catch { }
+
+                try
+                {
+                    using var wmiSearcher = new ManagementObjectSearcher(@"root\WMI", "SELECT CycleCount FROM BatteryCycleCount");
+                    foreach (var mo in wmiSearcher.Get())
+                    {
+                        if (mo["CycleCount"] != null)
+                        {
+                            cycles = Convert.ToInt32(mo["CycleCount"]);
+                            break;
+                        }
+                    }
+                }
+                catch { }
+
+                specs.BatteryDesignCapacityMWh = design;
+                specs.BatteryFullChargeCapacityMWh = full;
+                specs.BatteryCycleCount = cycles;
+
+                if (design > 0 && full > 0)
+                {
+                    double pct = ((double)full / (double)design) * 100.0;
+                    specs.BatteryHealthPercent = Math.Clamp((int)Math.Round(pct), 1, 100);
                 }
             }
             catch { }
