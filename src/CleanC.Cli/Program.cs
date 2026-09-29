@@ -25,6 +25,21 @@ namespace CleanC.Cli
                 return await RunCliMenuAsync();
             }
 
+            if (mode == "--specs-json" || mode == "specs-json")
+            {
+                try
+                {
+                    var specs = await SystemSpecsService.GetDetailedSpecsWmiAsync();
+                    Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(specs));
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("ERR: " + ex.Message);
+                    return 1;
+                }
+            }
+
             if (mode == "--specs" || mode == "specs")
             {
                 try

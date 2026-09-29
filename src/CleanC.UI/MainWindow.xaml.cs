@@ -12,6 +12,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Windows.Graphics;
 using WinRT;
 using CleanC.Core.Models;
@@ -52,6 +53,20 @@ namespace CleanC.UI
                 }
             }
             catch { }
+
+            Task.Run(async () =>
+            {
+                try
+                {
+                    var testSpecs = await SystemSpecsService.GetDetailedSpecsAsync();
+                    File.WriteAllText(System.IO.Path.Combine(AppContext.BaseDirectory, "specs_test_from_ui.txt"),
+                        $"CPU: '{testSpecs.CpuName}', Cores: {testSpecs.CpuCores}, RAM: '{testSpecs.TotalRamFormatted}', Board: '{testSpecs.MotherboardManufacturer}', OS: '{testSpecs.OsName}'\n");
+                }
+                catch (Exception ex)
+                {
+                    File.WriteAllText(System.IO.Path.Combine(AppContext.BaseDirectory, "specs_test_from_ui.txt"), "EXCEPTION: " + ex.ToString());
+                }
+            });
 
             // Determine initial theme & apply cleanly
             var initialTheme = (Application.Current.RequestedTheme == ApplicationTheme.Dark) ? ElementTheme.Dark : ElementTheme.Light;
@@ -1746,6 +1761,7 @@ namespace CleanC.UI
             ToolSpeedTestPanel.Visibility = Visibility.Collapsed;
             ToolPersonalizationPanel.Visibility = Visibility.Collapsed;
             ToolStartupManagerPanel.Visibility = Visibility.Collapsed;
+            ToolWindowsUpdatePanel.Visibility = Visibility.Collapsed;
 
             switch (pageId)
             {
@@ -1767,6 +1783,10 @@ namespace CleanC.UI
                 case "startup_manager":
                     ToolStartupManagerPanel.Visibility = Visibility.Visible;
                     _ = LoadStartupManagerPageAsync();
+                    break;
+                case "windows_update":
+                    ToolWindowsUpdatePanel.Visibility = Visibility.Visible;
+                    _ = LoadWindowsUpdatePageAsync();
                     break;
                 default:
                     ToolsLauncherPanel.Visibility = Visibility.Visible;
@@ -2109,43 +2129,65 @@ namespace CleanC.UI
 
             SpeedGaugeValueText.Text = "۰.۰";
             SpeedGaugeMBsText.Text = "در حال اتصال به سرور...";
+            SpeedGaugePhaseText.Text = "در حال آماده‌سازی و سنجش تاخیر...";
             SpeedPingValText.Text = "...";
-            SpeedJitterValText.Text = "...";
-            SpeedDataValText.Text = "...";
+            SpeedDownloadValText.Text = "...";
+            SpeedUploadValText.Text = "...";
             SpeedGaugeRing.IsIndeterminate = false;
             SpeedGaugeRing.Value = 0;
 
             try
             {
-                var result = await InternetSpeedTestService.RunSpeedTestAsync((mbps, pct) =>
+                var result = await InternetSpeedTestService.RunSpeedTestAsync((phase, mbps, pct) =>
                 {
                     DispatcherQueue.TryEnqueue(() =>
                     {
-                        SpeedGaugeValueText.Text = $"{mbps:0.0}";
-                        SpeedGaugeMBsText.Text = $"{mbps / 8.0:0.00} مگابایت بر ثانیه";
-                        SpeedGaugeRing.Value = pct;
+                        if (phase == "download")
+                        {
+                            SpeedGaugePhaseText.Text = "در حال دریافت داده (دانلود)...";
+                            SpeedGaugeValueText.Text = $"{mbps:0.0}";
+                            SpeedGaugeMBsText.Text = $"{mbps / 8.0:0.00} مگابایت بر ثانیه";
+                            SpeedDownloadValText.Text = $"{mbps:0.0} Mbps";
+                            SpeedGaugeRing.Value = pct;
+                        }
+                        else if (phase == "upload")
+                        {
+                            SpeedGaugePhaseText.Text = "در حال ارسال داده (آپلود)...";
+                            SpeedGaugeValueText.Text = $"{mbps:0.0}";
+                            SpeedGaugeMBsText.Text = $"{mbps / 8.0:0.00} مگابایت بر ثانیه";
+                            SpeedUploadValText.Text = $"{mbps:0.0} Mbps";
+                            SpeedGaugeRing.Value = pct;
+                        }
                     });
                 }, _speedTestCts.Token);
 
                 if (result.IsSuccess)
                 {
+                    SpeedIpChipText.Text = !string.IsNullOrEmpty(result.ClientIp) ? result.ClientIp : "نامشخص";
+                    SpeedIspChipText.Text = !string.IsNullOrEmpty(result.IspName) ? result.IspName : "شبکه اینترنت";
+                    string loc = $"{result.City}, {result.Country}".Trim(',', ' ');
+                    SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? loc : "سرور ابری جهانی";
+
+                    SpeedGaugePhaseText.Text = "تست با موفقیت تکمیل شد";
                     SpeedGaugeValueText.Text = $"{result.DownloadSpeedMbps:0.0}";
                     SpeedGaugeMBsText.Text = $"{result.DownloadSpeedMBs:0.00} مگابایت بر ثانیه";
-                    SpeedPingValText.Text = result.PingMs > 0 ? $"{result.PingMs} ms" : "ناموفق";
-                    SpeedJitterValText.Text = result.JitterMs > 0 ? $"{result.JitterMs} ms" : "۰ ms";
-                    SpeedDataValText.Text = SystemStats.FormatBytes(result.BytesDownloaded);
+                    SpeedPingValText.Text = result.PingMs > 0 ? $"{result.PingMs} ms" : "موفق";
+                    SpeedDownloadValText.Text = $"{result.DownloadSpeedMbps:0.0} Mbps";
+                    SpeedUploadValText.Text = result.UploadSpeedMbps > 0 ? $"{result.UploadSpeedMbps:0.0} Mbps" : "--";
                     SpeedGaugeRing.Value = 100;
-                    ShowInfoBar("تست سرعت اینترنت", $"تست با موفقیت پایان یافت: {result.DownloadSpeedMbps} Mbps", InfoBarSeverity.Success);
+                    ShowInfoBar("تست سرعت اینترنت", $"تست با موفقیت پایان یافت: دانلود {result.DownloadSpeedMbps} Mbps | آپلود {result.UploadSpeedMbps} Mbps", InfoBarSeverity.Success);
                 }
                 else
                 {
+                    SpeedGaugePhaseText.Text = "خطا در تست";
                     SpeedGaugeMBsText.Text = result.ErrorMessage;
                     ShowInfoBar("نتیجه تست", result.ErrorMessage, InfoBarSeverity.Warning);
                 }
             }
             catch (Exception)
             {
-                SpeedGaugeMBsText.Text = "تست متوقف شد.";
+                SpeedGaugePhaseText.Text = "تست متوقف شد";
+                SpeedGaugeMBsText.Text = "تست توسط کاربر لغو گردید.";
             }
             finally
             {
@@ -2217,6 +2259,91 @@ namespace CleanC.UI
                 WindowsPersonalizationService.SetClassicContextMenu(isOn);
                 ShowInfoBar("منوی راست‌کلیک", isOn ? "منوی راست‌کلیک کلاسیک فعال شد." : "منوی راست‌کلیک مدرن ویندوز ۱۱ فعال شد.", InfoBarSeverity.Success);
             }));
+
+            // 8. Windows Security & Defender (Shortcut to Tamper Protection & Antivirus)
+            PersonalizationCardsContainer.Children.Add(CreateActionCard("\uE838", "امنیت و آنتی‌ویروس ویندوز (Windows Security & Defender)", "دسترسی مستقیم به تنظیمات محافظت بلادرنگ، فایروال و Tamper Protection", "تنظیمات امنیت", ColorHelper.FromArgb(255, 2, 132, 199), () =>
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo("windowsdefender://threatsettings") { UseShellExecute = true });
+                }
+                catch
+                {
+                    try
+                    {
+                        Process.Start(new ProcessStartInfo("windowsdefender:") { UseShellExecute = true });
+                    }
+                    catch
+                    {
+                        ShowInfoBar("امنیت ویندوز", "امکان باز کردن مستقیم مرکز امنیت ویندوز فراهم نشد.", InfoBarSeverity.Warning);
+                    }
+                }
+            }));
+        }
+
+        private Border CreateActionCard(string glyph, string title, string description, string actionBtnText, Windows.UI.Color iconBgColor, Action onClick)
+        {
+            var border = new Border
+            {
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(16, 14, 16, 14)
+            };
+
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var iconBg = new Border
+            {
+                Width = 40,
+                Height = 40,
+                CornerRadius = new CornerRadius(20),
+                Background = new SolidColorBrush(iconBgColor),
+                Margin = new Thickness(0, 0, 14, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+            
+            var icon = new FontIcon
+            {
+                Glyph = glyph,
+                FontSize = 18,
+                VerticalAlignment = VerticalAlignment.Center,
+                HorizontalAlignment = HorizontalAlignment.Center,
+                Foreground = new SolidColorBrush(Microsoft.UI.Colors.White)
+            };
+            iconBg.Child = icon;
+            Grid.SetColumn(iconBg, 0);
+            grid.Children.Add(iconBg);
+
+            var textStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+            var tBlock = new TextBlock { Text = title, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13 };
+            var dBlock = new TextBlock { Text = description, FontSize = 11, TextWrapping = TextWrapping.Wrap, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
+            textStack.Children.Add(tBlock);
+            textStack.Children.Add(dBlock);
+            Grid.SetColumn(textStack, 1);
+            grid.Children.Add(textStack);
+
+            var btn = new Button
+            {
+                Content = actionBtnText,
+                FontSize = 11.5,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Height = 34,
+                CornerRadius = new CornerRadius(6),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(12, 0, 0, 0)
+            };
+            btn.Click += (s, e) => onClick();
+            Grid.SetColumn(btn, 2);
+            grid.Children.Add(btn);
+
+            border.Child = grid;
+            return border;
         }
 
         private Border CreateToggleCard(string glyph, string title, string description, bool initialValue, Windows.UI.Color iconBgColor, Action<bool> onToggle)
@@ -2287,10 +2414,56 @@ namespace CleanC.UI
         // Tool 5: Startup Manager
         // ====================================================================
 
+        private static string ExtractCleanExePath(string command)
+        {
+            if (string.IsNullOrWhiteSpace(command)) return string.Empty;
+            string s = command.Trim();
+            if (s.StartsWith("\""))
+            {
+                int end = s.IndexOf('"', 1);
+                if (end > 1) return s.Substring(1, end - 1);
+            }
+            int sp = s.IndexOf(' ');
+            if (sp > 0)
+            {
+                string first = s.Substring(0, sp);
+                if (File.Exists(first)) return first;
+            }
+            return s;
+        }
+
+        private static string? GetOrExtractAppIconPath(string command, string appName)
+        {
+            try
+            {
+                string exe = ExtractCleanExePath(command);
+                if (!string.IsNullOrEmpty(exe) && File.Exists(exe))
+                {
+                    string hash = Math.Abs((exe + appName).GetHashCode()).ToString("X8");
+                    string cacheDir = Path.Combine(Path.GetTempPath(), "CleanC", "Icons");
+                    string iconPath = Path.Combine(cacheDir, $"{hash}.png");
+                    if (File.Exists(iconPath)) return iconPath;
+
+                    Directory.CreateDirectory(cacheDir);
+                    using var sysIcon = System.Drawing.Icon.ExtractAssociatedIcon(exe);
+                    if (sysIcon != null)
+                    {
+                        using var bmp = sysIcon.ToBitmap();
+                        bmp.Save(iconPath, System.Drawing.Imaging.ImageFormat.Png);
+                        return iconPath;
+                    }
+                }
+            }
+            catch { }
+            return null;
+        }
+
         private async Task LoadStartupManagerPageAsync()
         {
             StartupCardsContainer.Children.Clear();
             var items = await Task.Run(() => StartupOptimizerService.GetStartupItems());
+
+            StartupManagerSummaryText.Text = $"تعداد کل: {items.Count} برنامه  •  {items.Count(x => !x.IsDisabled)} برنامه فعال  •  {items.Count(x => x.IsDisabled)} برنامه غیرفعال";
 
             if (items.Count == 0)
             {
@@ -2317,17 +2490,105 @@ namespace CleanC.UI
                 };
 
                 var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
+                // App Icon
+                string? iconPath = GetOrExtractAppIconPath(item.Command, item.Name);
+                FrameworkElement iconElement;
+
+                if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath))
+                {
+                    var iconBox = new Border
+                    {
+                        Width = 42,
+                        Height = 42,
+                        CornerRadius = new CornerRadius(10),
+                        Background = GetThemeBrush("AppHeaderPillBrush"),
+                        Margin = new Thickness(0, 0, 14, 0),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    var img = new Image
+                    {
+                        Width = 24,
+                        Height = 24,
+                        Source = new BitmapImage(new Uri(iconPath)),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    iconBox.Child = img;
+                    iconElement = iconBox;
+                }
+                else
+                {
+                    var iconBox = new Border
+                    {
+                        Width = 42,
+                        Height = 42,
+                        CornerRadius = new CornerRadius(10),
+                        Background = new SolidColorBrush(item.IsNonEssential ? ColorHelper.FromArgb(30, 245, 158, 11) : ColorHelper.FromArgb(30, 59, 130, 246)),
+                        Margin = new Thickness(0, 0, 14, 0),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    var fIcon = new FontIcon
+                    {
+                        Glyph = item.IsNonEssential ? "\uE7B5" : "\uE770",
+                        FontSize = 18,
+                        Foreground = new SolidColorBrush(item.IsNonEssential ? ColorHelper.FromArgb(255, 245, 158, 11) : ColorHelper.FromArgb(255, 59, 130, 246)),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        HorizontalAlignment = HorizontalAlignment.Center
+                    };
+                    iconBox.Child = fIcon;
+                    iconElement = iconBox;
+                }
+
+                Grid.SetColumn(iconElement, 0);
+                grid.Children.Add(iconElement);
+
+                // Texts
                 var textStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-                var nameText = new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13 };
-                var cmdText = new TextBlock { Text = $"{item.Category}  •  موقعیت: {item.Location}  •  {item.Command}", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis };
-                textStack.Children.Add(nameText);
+                
+                var topRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                var nameText = new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13.5, VerticalAlignment = VerticalAlignment.Center };
+                topRow.Children.Add(nameText);
+
+                string locPersian = item.Location switch
+                {
+                    "HKCU" => "رجیستری کاربر",
+                    "HKLM" => "رجیستری سیستم",
+                    "UserStartupFolder" => "پوشه شروع کاربر",
+                    "CommonStartupFolder" => "پوشه شروع مشترک",
+                    _ => item.Location
+                };
+
+                var locBadge = new Border
+                {
+                    Background = GetThemeBrush("AppHeaderPillBrush"),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(6, 2, 6, 2),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                locBadge.Child = new TextBlock { Text = locPersian, FontSize = 10, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") };
+                topRow.Children.Add(locBadge);
+                textStack.Children.Add(topRow);
+
+                string cleanCmd = ExtractCleanExePath(item.Command);
+                var cmdText = new TextBlock
+                {
+                    Text = $"{item.Category}  •  مسیر: {cleanCmd}",
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    TextTrimming = TextTrimming.CharacterEllipsis
+                };
                 textStack.Children.Add(cmdText);
-                Grid.SetColumn(textStack, 0);
+
+                Grid.SetColumn(textStack, 1);
                 grid.Children.Add(textStack);
 
+                // Toggle
                 var toggle = new ToggleSwitch
                 {
                     IsOn = !item.IsDisabled,
@@ -2338,13 +2599,268 @@ namespace CleanC.UI
                 };
                 toggle.Toggled += (s, e) =>
                 {
-                    ShowInfoBar("استارتاپ", $"{item.Name} {(toggle.IsOn ? "فعال شد." : "غیرفعال گردید.")}", InfoBarSeverity.Informational);
+                    if (!toggle.IsOn)
+                    {
+                        StartupOptimizerService.DisableStartupItem(item);
+                        ShowInfoBar("استارتاپ ویندوز", $"برنامه {item.Name} غیرفعال شد و از اجرای خودکار آن جلوگیری می‌شود.", InfoBarSeverity.Informational);
+                    }
+                    else
+                    {
+                        StartupOptimizerService.RestoreStartupItem(item.Name);
+                        ShowInfoBar("استارتاپ ویندوز", $"برنامه {item.Name} مجدداً فعال شد.", InfoBarSeverity.Success);
+                    }
                 };
-                Grid.SetColumn(toggle, 1);
+                Grid.SetColumn(toggle, 2);
                 grid.Children.Add(toggle);
 
                 card.Child = grid;
                 StartupCardsContainer.Children.Add(card);
+            }
+        }
+
+        private async void RefreshStartupManager_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadStartupManagerPageAsync();
+            ShowInfoBar("استارتاپ ویندوز", "لیست برنامه‌های استارتاپ بروزرسانی شد.", InfoBarSeverity.Informational);
+        }
+
+        // ====================================================================
+        // Tool 6: Windows Update Manager
+        // ====================================================================
+
+        private async Task LoadWindowsUpdatePageAsync()
+        {
+            RefreshWindowsUpdateStatus();
+
+            UpdatesLoadingSpinner.Visibility = Visibility.Visible;
+            UpdatesLoadingSpinner.IsActive = true;
+            PendingUpdatesContainer.Children.Clear();
+            NoUpdatesBanner.Visibility = Visibility.Collapsed;
+            PendingUpdatesCountText.Text = "در حال بررسی...";
+
+            try
+            {
+                var updates = await WindowsUpdateService.CheckPendingUpdatesAsync();
+                UpdatesLoadingSpinner.Visibility = Visibility.Collapsed;
+                UpdatesLoadingSpinner.IsActive = false;
+
+                PendingUpdatesCountText.Text = $"{updates.Count} بروزرسانی";
+
+                if (updates.Count == 0)
+                {
+                    NoUpdatesBanner.Visibility = Visibility.Visible;
+                }
+                else
+                {
+                    NoUpdatesBanner.Visibility = Visibility.Collapsed;
+                    foreach (var up in updates)
+                    {
+                        PendingUpdatesContainer.Children.Add(CreatePendingUpdateCard(up));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UpdatesLoadingSpinner.Visibility = Visibility.Collapsed;
+                UpdatesLoadingSpinner.IsActive = false;
+                PendingUpdatesCountText.Text = "خطا در بررسی";
+                ShowInfoBar("بروزرسانی ویندوز", $"خطا در جستجوی آپدیت‌ها: {ex.Message}", InfoBarSeverity.Warning);
+            }
+        }
+
+        private void RefreshWindowsUpdateStatus()
+        {
+            var status = WindowsUpdateService.GetCurrentStatus();
+
+            if (status.IsPaused)
+            {
+                UpdateStatusHeadlineText.Text = $"آپدیت‌های سیستم‌عامل تا تاریخ {status.PauseExpiryDate} متوقف هستند";
+                UpdatePauseDetailText.Text = $"توقف رسمی ۵ هفته‌ای فعال است. دریافت هرگونه بسته و آپدیت خودکار تا {status.PauseExpiryDate} به تعویق افتاده است.";
+                PauseUpdatesBtn.IsEnabled = false;
+                ResumeUpdatesBtn.IsEnabled = true;
+            }
+            else
+            {
+                UpdateStatusHeadlineText.Text = "وضعیت بروزرسانی‌ها: فعال و استاندارد ویندوز";
+                UpdatePauseDetailText.Text = "توقف موقت فعال نیست. ویندوز مجاز به بررسی و دانلود دوره‌ای آپدیت‌ها است.";
+                PauseUpdatesBtn.IsEnabled = true;
+                ResumeUpdatesBtn.IsEnabled = false;
+            }
+
+            UpdateServiceDetailText.Text = $"وضعیت سرویس اصلی (wuauserv): {status.ServiceStatus}";
+            DisableUpdateServiceBtn.IsEnabled = !status.IsServiceDisabled;
+            EnableUpdateServiceBtn.IsEnabled = status.IsServiceDisabled;
+        }
+
+        private Border CreatePendingUpdateCard(PendingUpdateItem item)
+        {
+            var border = new Border
+            {
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(16, 12, 16, 12)
+            };
+
+            var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var stack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+            
+            var titleStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            if (!string.IsNullOrEmpty(item.KbArticleId))
+            {
+                var kbBadge = new Border
+                {
+                    Background = new SolidColorBrush(ColorHelper.FromArgb(30, 2, 132, 199)),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(8, 2, 8, 2),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                kbBadge.Child = new TextBlock
+                {
+                    Text = item.KbArticleId,
+                    FontSize = 11,
+                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                    Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 2, 132, 199))
+                };
+                titleStack.Children.Add(kbBadge);
+            }
+
+            var titleText = new TextBlock
+            {
+                Text = item.Title,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                FontSize = 13,
+                TextTrimming = TextTrimming.CharacterEllipsis,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            titleStack.Children.Add(titleText);
+            stack.Children.Add(titleStack);
+
+            if (!string.IsNullOrEmpty(item.Description))
+            {
+                var descText = new TextBlock
+                {
+                    Text = item.Description,
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    TextTrimming = TextTrimming.CharacterEllipsis
+                };
+                stack.Children.Add(descText);
+            }
+
+            Grid.SetColumn(stack, 0);
+            grid.Children.Add(stack);
+
+            if (item.SizeBytes > 0)
+            {
+                var sizeBadge = new Border
+                {
+                    Background = GetThemeBrush("AppHeaderPillBrush"),
+                    CornerRadius = new CornerRadius(12),
+                    Padding = new Thickness(10, 4, 10, 4),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(12, 0, 0, 0)
+                };
+                sizeBadge.Child = new TextBlock
+                {
+                    Text = item.FormattedSize,
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+                };
+                Grid.SetColumn(sizeBadge, 1);
+                grid.Children.Add(sizeBadge);
+            }
+
+            border.Child = grid;
+            return border;
+        }
+
+        private async void CheckUpdatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadWindowsUpdatePageAsync();
+            ShowInfoBar("بروزرسانی ویندوز", "لیست آپدیت‌های در انتظار با موفقیت بررسی گردید.", InfoBarSeverity.Informational);
+        }
+
+        private void PauseUpdatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool ok = WindowsUpdateService.PauseUpdates(5);
+            if (ok)
+            {
+                RefreshWindowsUpdateStatus();
+                ShowInfoBar("توقف آپدیت‌ها", "دریافت آپدیت‌های سیستم‌عامل به مدت ۵ هفته متوقف شد.", InfoBarSeverity.Success);
+            }
+            else
+            {
+                ShowInfoBar("خطا", "تغییر تنظیمات توقف نیازمند دسترسی Administrator است.", InfoBarSeverity.Warning);
+            }
+        }
+
+        private void ResumeUpdatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool ok = WindowsUpdateService.ResumeUpdates();
+            if (ok)
+            {
+                RefreshWindowsUpdateStatus();
+                ShowInfoBar("ادامه آپدیت‌ها", "توقف برداشته شد و روند عادی آپدیت‌ها از سر گرفته شد.", InfoBarSeverity.Success);
+            }
+            else
+            {
+                ShowInfoBar("خطا", "امکان لغو توقف آپدیت‌ها میسر نشد.", InfoBarSeverity.Warning);
+            }
+        }
+
+        private void DisableUpdateServiceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool ok = WindowsUpdateService.SetUpdateServiceState(false);
+            if (ok)
+            {
+                RefreshWindowsUpdateStatus();
+                ShowInfoBar("سرویس آپدیت", "سرویس Windows Update (wuauserv) با موفقیت متوقف و غیرفعال (Disabled) شد.", InfoBarSeverity.Success);
+            }
+            else
+            {
+                ShowInfoBar("خطا", "تغییر سرویس نیازمند دسترسی Administrator است.", InfoBarSeverity.Warning);
+            }
+        }
+
+        private void EnableUpdateServiceBtn_Click(object sender, RoutedEventArgs e)
+        {
+            bool ok = WindowsUpdateService.SetUpdateServiceState(true);
+            if (ok)
+            {
+                RefreshWindowsUpdateStatus();
+                ShowInfoBar("سرویس آپدیت", "سرویس Windows Update به حالت خودکار (Automatic) بازگردانی و شروع به کار کرد.", InfoBarSeverity.Success);
+            }
+            else
+            {
+                ShowInfoBar("خطا", "تغییر سرویس نیازمند دسترسی Administrator است.", InfoBarSeverity.Warning);
+            }
+        }
+
+        private async void FixStuckUpdatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            FixStuckUpdatesBtn.IsEnabled = false;
+            try
+            {
+                var (success, freed, message) = await WindowsUpdateService.FixStuckUpdatesAndClearCacheAsync();
+                RefreshWindowsUpdateStatus();
+                if (success)
+                {
+                    ShowInfoBar("رفع مشکل آپدیت", message, InfoBarSeverity.Success);
+                    _ = LoadWindowsUpdatePageAsync();
+                }
+                else
+                {
+                    ShowInfoBar("خطا در رفع مشکل", message, InfoBarSeverity.Warning);
+                }
+            }
+            finally
+            {
+                FixStuckUpdatesBtn.IsEnabled = true;
             }
         }
 

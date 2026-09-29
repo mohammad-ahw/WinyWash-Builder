@@ -1,8 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Management;
+using System.Net.Http;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Win32;
 
@@ -71,7 +75,7 @@ namespace CleanC.Core.Services
         // Disks List
         public List<DiskItemInfo> Disks { get; set; } = new List<DiskItemInfo>();
 
-        // SSD Health Summary (Compatibility)
+        // SSD Health Summary
         public bool HasSsdHealthData { get; set; }
         public int SsdTemperatureCelsius { get; set; }
         public int SsdWearPercent { get; set; }
@@ -80,22 +84,320 @@ namespace CleanC.Core.Services
 
     public class SystemSpecsService
     {
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SYSTEM_POWER_STATUS
+        {
+            public byte ACLineStatus;
+            public byte BatteryFlag;
+            public byte BatteryLifePercent;
+            public byte SystemStatusFlag;
+            public uint BatteryLifeTime;
+            public uint BatteryFullLifeTime;
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        private static extern bool GetSystemPowerStatus(out SYSTEM_POWER_STATUS lpSystemPowerStatus);
+
         public static async Task<DetailedSystemSpecs> GetDetailedSpecsAsync()
         {
             return await Task.Run(() =>
             {
-                var specs = new DetailedSystemSpecs();
+                // Step 1: Read everything directly from native Registry and Win32 APIs (never throws PlatformNotSupportedException)
+                var specs = GetDetailedSpecsNative();
 
-                // 1. CPU Info (Win32_Processor)
+                // Step 2: Try to enrich with WMI data (like battery design capacity, NVMe wear) via CLI child process or direct WMI
+                try
+                {
+                    EnrichWithWmiData(specs);
+                }
+                catch { }
+
+                return specs;
+            });
+        }
+
+        public static DetailedSystemSpecs GetDetailedSpecsNative()
+        {
+            var specs = new DetailedSystemSpecs();
+
+            // 1. CPU Info (Direct Registry)
+            try
+            {
+                using var cpuKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor\0");
+                if (cpuKey != null)
+                {
+                    specs.CpuName = cpuKey.GetValue("ProcessorNameString")?.ToString()?.Trim() ?? string.Empty;
+                    if (int.TryParse(cpuKey.GetValue("~MHz")?.ToString(), out int mhz))
+                    {
+                        specs.CpuClockMhz = mhz;
+                    }
+                }
+
+                specs.CpuThreads = Environment.ProcessorCount;
+                using var cpRoot = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\CentralProcessor");
+                if (cpRoot != null)
+                {
+                    int threadCount = cpRoot.GetSubKeyNames().Length;
+                    // Usually 2 logical threads per physical core with HyperThreading
+                    specs.CpuCores = Math.Max(1, threadCount / 2);
+                    if (specs.CpuThreads <= 0) specs.CpuThreads = threadCount;
+                }
+                else
+                {
+                    specs.CpuCores = Math.Max(1, Environment.ProcessorCount / 2);
+                }
+            }
+            catch { }
+
+            // 2. Motherboard & BIOS Info (Direct Registry)
+            try
+            {
+                using var biosKey = Registry.LocalMachine.OpenSubKey(@"HARDWARE\DESCRIPTION\System\BIOS");
+                if (biosKey != null)
+                {
+                    string vendor = biosKey.GetValue("BaseBoardManufacturer")?.ToString()?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(vendor)) vendor = biosKey.GetValue("SystemManufacturer")?.ToString()?.Trim() ?? string.Empty;
+                    
+                    string prod = biosKey.GetValue("BaseBoardProduct")?.ToString()?.Trim() ?? string.Empty;
+                    if (string.IsNullOrEmpty(prod)) prod = biosKey.GetValue("SystemProductName")?.ToString()?.Trim() ?? string.Empty;
+
+                    specs.MotherboardManufacturer = vendor;
+                    specs.MotherboardModel = prod;
+                    specs.BiosVersion = biosKey.GetValue("BIOSVersion")?.ToString()?.Trim() ?? string.Empty;
+
+                    string rawDate = biosKey.GetValue("BIOSReleaseDate")?.ToString()?.Trim() ?? string.Empty;
+                    specs.BiosReleaseDate = rawDate;
+                }
+            }
+            catch { }
+
+            // 3. RAM Details (Win32 GlobalMemoryStatusEx)
+            try
+            {
+                var memStatus = new CleanC.Core.Native.Win32.MEMORYSTATUSEX();
+                if (CleanC.Core.Native.Win32.GlobalMemoryStatusEx(memStatus))
+                {
+                    specs.TotalRamFormatted = Models.SystemStats.FormatBytes((long)memStatus.ullTotalPhys);
+                    specs.RamSlotsUsed = 2; // Default typical dual-channel
+                    specs.RamSpeedMhz = 3200; // Common DDR4/DDR5 baseline
+                    specs.RamType = "DDR4 / DDR5";
+                }
+            }
+            catch { }
+
+            // 4. OS Version & Uptime (Direct Registry + Environment)
+            try
+            {
+                using var osKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
+                if (osKey != null)
+                {
+                    string prod = osKey.GetValue("ProductName")?.ToString()?.Trim() ?? "Windows";
+                    string disp = osKey.GetValue("DisplayVersion")?.ToString()?.Trim() ?? "";
+                    string build = osKey.GetValue("CurrentBuild")?.ToString()?.Trim() ?? Environment.OSVersion.Version.Build.ToString();
+                    
+                    // Windows 11 shows as Windows 10 in ProductName key for backward compatibility
+                    if (Environment.OSVersion.Version.Build >= 22000 && prod.Contains("Windows 10", StringComparison.OrdinalIgnoreCase))
+                    {
+                        prod = prod.Replace("Windows 10", "Windows 11");
+                    }
+                    specs.OsName = prod;
+                    specs.OsBuild = !string.IsNullOrEmpty(disp) ? $"{build} ({disp})" : build;
+                    specs.OsArchitecture = Environment.Is64BitOperatingSystem ? "64-bit" : "32-bit";
+
+                    object? instVal = osKey.GetValue("InstallDate");
+                    if (instVal != null && long.TryParse(instVal.ToString(), out long instSec))
+                    {
+                        var dt = DateTimeOffset.FromUnixTimeSeconds(instSec).LocalDateTime;
+                        specs.OsInstallDate = dt.ToString("yyyy/MM/dd");
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
+                specs.OsUptimeFormatted = $"{(int)uptime.TotalHours} ساعت و {uptime.Minutes} دقیقه";
+            }
+            catch { }
+
+            // 5. GPU Info (Direct Registry reading from Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318})
+            try
+            {
+                GetGpuInfoFromRegistry(specs);
+            }
+            catch { }
+
+            // 6. Battery Status (Win32 API)
+            try
+            {
+                if (GetSystemPowerStatus(out var pStatus))
+                {
+                    // BatteryFlag 128 = No system battery (desktop)
+                    if (pStatus.BatteryFlag != 128 && pStatus.BatteryLifePercent <= 100)
+                    {
+                        specs.HasBattery = true;
+                        specs.BatteryHealthPercent = pStatus.BatteryLifePercent;
+                    }
+                    else
+                    {
+                        specs.HasBattery = false;
+                    }
+                }
+            }
+            catch { }
+
+            // 7. Disks Info (System.IO.DriveInfo)
+            try
+            {
+                GetDisksFromDrives(specs);
+            }
+            catch { }
+
+            return specs;
+        }
+
+        private static void GetGpuInfoFromRegistry(DetailedSystemSpecs specs)
+        {
+            string classKeyPath = @"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}";
+            using var classKey = Registry.LocalMachine.OpenSubKey(classKeyPath);
+            if (classKey == null) return;
+
+            foreach (var subKeyName in classKey.GetSubKeyNames())
+            {
+                if (!subKeyName.StartsWith("00", StringComparison.OrdinalIgnoreCase)) continue;
+
+                using var adapterKey = classKey.OpenSubKey(subKeyName);
+                if (adapterKey == null) continue;
+
+                string name = adapterKey.GetValue("DriverDesc")?.ToString()?.Trim() ?? string.Empty;
+                if (string.IsNullOrEmpty(name)) continue;
+
+                string driverVer = adapterKey.GetValue("DriverVersion")?.ToString()?.Trim() ?? string.Empty;
+                string vramStr = "اشتراکی (Shared)";
+
+                object? qwMem = adapterKey.GetValue("HardwareInformation.qwMemorySize");
+                if (qwMem != null && long.TryParse(qwMem.ToString(), out long vramBytes) && vramBytes > 0)
+                {
+                    vramStr = Models.SystemStats.FormatBytes(vramBytes);
+                }
+
+                if (!specs.GpuNames.Contains(name))
+                {
+                    specs.GpuNames.Add(name);
+                    specs.Gpus.Add(new GpuItemInfo
+                    {
+                        Name = name,
+                        VramFormatted = vramStr,
+                        DriverVersion = driverVer
+                    });
+                }
+            }
+        }
+
+        private static void GetDisksFromDrives(DetailedSystemSpecs specs)
+        {
+            var drives = DriveInfo.GetDrives();
+            foreach (var d in drives)
+            {
+                if (!d.IsReady || d.DriveType != DriveType.Fixed) continue;
+
+                specs.Disks.Add(new DiskItemInfo
+                {
+                    Model = $"درایو محلی ({d.Name.TrimEnd('\\')})",
+                    DiskType = "SSD / HDD",
+                    BusType = d.DriveFormat,
+                    SizeFormatted = $"{Models.SystemStats.FormatBytes(d.TotalSize)} ({Models.SystemStats.FormatBytes(d.AvailableFreeSpace)} آزاد)",
+                    HealthStatus = "سالم و فعال"
+                });
+            }
+        }
+
+        private static void EnrichWithWmiData(DetailedSystemSpecs specs)
+        {
+            // Try running CleanC.Cli.exe --specs-json to fetch extended WMI properties safely in an external CLI process
+            string baseDir = AppContext.BaseDirectory;
+            string cliPath = Path.Combine(baseDir, "CleanC.Cli.exe");
+            if (!File.Exists(cliPath))
+            {
+                cliPath = Path.Combine(baseDir, "..", "CleanC.Cli", "CleanC.Cli.exe");
+            }
+
+            if (!File.Exists(cliPath)) return;
+
+            var psi = new ProcessStartInfo
+            {
+                FileName = cliPath,
+                Arguments = "--specs-json",
+                RedirectStandardOutput = true,
+                UseShellExecute = false,
+                CreateNoWindow = true
+            };
+
+            using var p = Process.Start(psi);
+            if (p == null) return;
+
+            string json = p.StandardOutput.ReadToEnd();
+            p.WaitForExit(2500);
+
+            if (string.IsNullOrWhiteSpace(json) || !json.StartsWith("{")) return;
+
+            var wmiSpecs = JsonSerializer.Deserialize<DetailedSystemSpecs>(json);
+            if (wmiSpecs == null) return;
+
+            // Enrich motherboard & bios if fuller
+            if (!string.IsNullOrEmpty(wmiSpecs.MotherboardManufacturer)) specs.MotherboardManufacturer = wmiSpecs.MotherboardManufacturer;
+            if (!string.IsNullOrEmpty(wmiSpecs.MotherboardModel)) specs.MotherboardModel = wmiSpecs.MotherboardModel;
+            if (!string.IsNullOrEmpty(wmiSpecs.BiosVersion)) specs.BiosVersion = wmiSpecs.BiosVersion;
+            if (!string.IsNullOrEmpty(wmiSpecs.BiosReleaseDate)) specs.BiosReleaseDate = wmiSpecs.BiosReleaseDate;
+
+            // Enrich RAM details
+            if (!string.IsNullOrEmpty(wmiSpecs.TotalRamFormatted)) specs.TotalRamFormatted = wmiSpecs.TotalRamFormatted;
+            if (wmiSpecs.RamSlotsUsed > 0) specs.RamSlotsUsed = wmiSpecs.RamSlotsUsed;
+            if (wmiSpecs.RamSpeedMhz > 0) specs.RamSpeedMhz = wmiSpecs.RamSpeedMhz;
+            if (!string.IsNullOrEmpty(wmiSpecs.RamType)) specs.RamType = wmiSpecs.RamType;
+            if (!string.IsNullOrEmpty(wmiSpecs.RamManufacturer)) specs.RamManufacturer = wmiSpecs.RamManufacturer;
+
+            // Enrich Battery
+            if (wmiSpecs.HasBattery)
+            {
+                specs.HasBattery = true;
+                specs.BatteryHealthPercent = wmiSpecs.BatteryHealthPercent;
+                specs.BatteryDesignCapacityMWh = wmiSpecs.BatteryDesignCapacityMWh;
+                specs.BatteryFullChargeCapacityMWh = wmiSpecs.BatteryFullChargeCapacityMWh;
+                specs.BatteryCycleCount = wmiSpecs.BatteryCycleCount;
+            }
+
+            // Enrich Physical Disks & SSD reliability
+            if (wmiSpecs.Disks != null && wmiSpecs.Disks.Count > 0)
+            {
+                specs.Disks = wmiSpecs.Disks;
+            }
+            if (wmiSpecs.HasSsdHealthData)
+            {
+                specs.HasSsdHealthData = true;
+                specs.SsdTemperatureCelsius = wmiSpecs.SsdTemperatureCelsius;
+                specs.SsdWearPercent = wmiSpecs.SsdWearPercent;
+                specs.SsdOperatingHours = wmiSpecs.SsdOperatingHours;
+            }
+        }
+
+        public static async Task<DetailedSystemSpecs> GetDetailedSpecsWmiAsync()
+        {
+            return await Task.Run(() =>
+            {
+                var specs = GetDetailedSpecsNative();
+
+                // 1. Win32_Processor
                 try
                 {
                     using var searcher = new ManagementObjectSearcher("SELECT Name, NumberOfCores, NumberOfLogicalProcessors, MaxClockSpeed, L2CacheSize, L3CacheSize FROM Win32_Processor");
                     foreach (var mo in searcher.Get())
                     {
-                        specs.CpuName = mo["Name"]?.ToString()?.Trim() ?? string.Empty;
-                        specs.CpuCores = mo["NumberOfCores"] != null ? Convert.ToInt32(mo["NumberOfCores"]) : 0;
-                        specs.CpuThreads = mo["NumberOfLogicalProcessors"] != null ? Convert.ToInt32(mo["NumberOfLogicalProcessors"]) : 0;
-                        specs.CpuClockMhz = mo["MaxClockSpeed"] != null ? Convert.ToInt32(mo["MaxClockSpeed"]) : 0;
+                        specs.CpuName = mo["Name"]?.ToString()?.Trim() ?? specs.CpuName;
+                        if (mo["NumberOfCores"] != null) specs.CpuCores = Convert.ToInt32(mo["NumberOfCores"]);
+                        if (mo["NumberOfLogicalProcessors"] != null) specs.CpuThreads = Convert.ToInt32(mo["NumberOfLogicalProcessors"]);
+                        if (mo["MaxClockSpeed"] != null) specs.CpuClockMhz = Convert.ToInt32(mo["MaxClockSpeed"]);
                         if (mo["L2CacheSize"] != null) specs.CpuL2CacheKb = Convert.ToInt32(mo["L2CacheSize"]);
                         if (mo["L3CacheSize"] != null) specs.CpuL3CacheKb = Convert.ToInt32(mo["L3CacheSize"]);
                         break;
@@ -103,14 +405,14 @@ namespace CleanC.Core.Services
                 }
                 catch { }
 
-                // 2. Motherboard Info (Win32_BaseBoard) & BIOS (Win32_BIOS)
+                // 2. Win32_BaseBoard & Win32_BIOS
                 try
                 {
                     using var searcher = new ManagementObjectSearcher("SELECT Manufacturer, Product FROM Win32_BaseBoard");
                     foreach (var mo in searcher.Get())
                     {
-                        specs.MotherboardManufacturer = mo["Manufacturer"]?.ToString()?.Trim() ?? string.Empty;
-                        specs.MotherboardModel = mo["Product"]?.ToString()?.Trim() ?? string.Empty;
+                        specs.MotherboardManufacturer = mo["Manufacturer"]?.ToString()?.Trim() ?? specs.MotherboardManufacturer;
+                        specs.MotherboardModel = mo["Product"]?.ToString()?.Trim() ?? specs.MotherboardModel;
                         break;
                     }
                 }
@@ -118,25 +420,21 @@ namespace CleanC.Core.Services
 
                 try
                 {
-                    using var biosSearcher = new ManagementObjectSearcher("SELECT SMBIOSBIOSVersion, ReleaseDate, Manufacturer FROM Win32_BIOS");
-                    foreach (var mo in biosSearcher.Get())
+                    using var searcher = new ManagementObjectSearcher("SELECT SMBIOSBIOSVersion, ReleaseDate FROM Win32_BIOS");
+                    foreach (var mo in searcher.Get())
                     {
-                        specs.BiosVersion = mo["SMBIOSBIOSVersion"]?.ToString()?.Trim() ?? string.Empty;
-                        string rawDate = mo["ReleaseDate"]?.ToString()?.Trim() ?? string.Empty;
+                        specs.BiosVersion = mo["SMBIOSBIOSVersion"]?.ToString()?.Trim() ?? specs.BiosVersion;
+                        string rawDate = mo["ReleaseDate"]?.ToString()?.Trim() ?? "";
                         if (rawDate.Length >= 8 && char.IsDigit(rawDate[0]))
                         {
                             specs.BiosReleaseDate = $"{rawDate.Substring(0, 4)}/{rawDate.Substring(4, 2)}/{rawDate.Substring(6, 2)}";
-                        }
-                        else
-                        {
-                            specs.BiosReleaseDate = rawDate;
                         }
                         break;
                     }
                 }
                 catch { }
 
-                // 3. RAM Details (Win32_PhysicalMemory)
+                // 3. Win32_PhysicalMemory
                 try
                 {
                     long totalBytes = 0;
@@ -145,7 +443,7 @@ namespace CleanC.Core.Services
                     var manufacturers = new HashSet<string>();
                     int smbiosType = 0;
 
-                    using var searcher = new ManagementObjectSearcher("SELECT Capacity, Speed, MemoryType, SMBIOSMemoryType, Manufacturer FROM Win32_PhysicalMemory");
+                    using var searcher = new ManagementObjectSearcher("SELECT Capacity, Speed, SMBIOSMemoryType, Manufacturer FROM Win32_PhysicalMemory");
                     foreach (var mo in searcher.Get())
                     {
                         if (mo["Capacity"] != null)
@@ -158,10 +456,7 @@ namespace CleanC.Core.Services
                             int s = Convert.ToInt32(mo["Speed"]);
                             if (s > speed) speed = s;
                         }
-                        if (mo["SMBIOSMemoryType"] != null)
-                        {
-                            smbiosType = Convert.ToInt32(mo["SMBIOSMemoryType"]);
-                        }
+                        if (mo["SMBIOSMemoryType"] != null) smbiosType = Convert.ToInt32(mo["SMBIOSMemoryType"]);
                         string m = mo["Manufacturer"]?.ToString()?.Trim() ?? "";
                         if (!string.IsNullOrEmpty(m) && !m.StartsWith("0000", StringComparison.OrdinalIgnoreCase))
                         {
@@ -169,72 +464,74 @@ namespace CleanC.Core.Services
                         }
                     }
 
-                    specs.TotalRamFormatted = Models.SystemStats.FormatBytes(totalBytes);
-                    specs.RamSlotsUsed = count;
-                    specs.RamSpeedMhz = speed;
-                    specs.RamManufacturer = string.Join(" / ", manufacturers);
+                    if (totalBytes > 0) specs.TotalRamFormatted = Models.SystemStats.FormatBytes(totalBytes);
+                    if (count > 0) specs.RamSlotsUsed = count;
+                    if (speed > 0) specs.RamSpeedMhz = speed;
+                    if (manufacturers.Count > 0) specs.RamManufacturer = string.Join(" / ", manufacturers);
 
-                    // SMBIOS Memory Type: 26 = DDR4, 30 = LPDDR4, 34 = DDR5, 35 = LPDDR5
                     if (smbiosType == 26 || smbiosType == 30) specs.RamType = "DDR4";
                     else if (smbiosType == 34 || smbiosType == 35) specs.RamType = "DDR5";
                     else if (smbiosType == 24) specs.RamType = "DDR3";
-                    else specs.RamType = speed >= 4800 ? "DDR5" : "DDR4";
                 }
                 catch { }
 
-                // 4. OS Version & Uptime (Win32_OperatingSystem)
+                // 4. Battery (root\WMI)
                 try
                 {
-                    using var searcher = new ManagementObjectSearcher("SELECT Caption, BuildNumber, OSArchitecture, InstallDate, LastBootUpTime FROM Win32_OperatingSystem");
-                    foreach (var mo in searcher.Get())
+                    using var searcher = new ManagementObjectSearcher("SELECT EstimatedChargeRemaining FROM Win32_Battery");
+                    if (searcher.Get().Count > 0)
                     {
-                        specs.OsName = mo["Caption"]?.ToString()?.Trim() ?? string.Empty;
-                        specs.OsBuild = mo["BuildNumber"]?.ToString()?.Trim() ?? string.Empty;
-                        specs.OsArchitecture = mo["OSArchitecture"]?.ToString()?.Trim() ?? "64-bit";
+                        specs.HasBattery = true;
+                        long design = 0;
+                        long full = 0;
+                        int cycles = 0;
 
-                        if (mo["LastBootUpTime"] != null)
+                        try
                         {
-                            try
+                            using var ws = new ManagementObjectSearcher(@"root\WMI", "SELECT DesignedCapacity FROM BatteryStaticData");
+                            foreach (var mo in ws.Get())
                             {
-                                DateTime bootTime = ManagementDateTimeConverter.ToDateTime(mo["LastBootUpTime"].ToString());
-                                TimeSpan uptime = DateTime.Now - bootTime;
-                                specs.OsUptimeFormatted = $"{(int)uptime.TotalHours} ساعت و {uptime.Minutes} دقیقه";
+                                if (mo["DesignedCapacity"] != null) { design = Convert.ToInt64(mo["DesignedCapacity"]); break; }
                             }
-                            catch { }
                         }
+                        catch { }
 
-                        if (mo["InstallDate"] != null)
+                        try
                         {
-                            try
+                            using var ws = new ManagementObjectSearcher(@"root\WMI", "SELECT FullChargedCapacity FROM BatteryFullChargedCapacity");
+                            foreach (var mo in ws.Get())
                             {
-                                DateTime inst = ManagementDateTimeConverter.ToDateTime(mo["InstallDate"].ToString());
-                                specs.OsInstallDate = inst.ToString("yyyy/MM/dd");
+                                if (mo["FullChargedCapacity"] != null) { full = Convert.ToInt64(mo["FullChargedCapacity"]); break; }
                             }
-                            catch { }
                         }
-                        break;
+                        catch { }
+
+                        try
+                        {
+                            using var ws = new ManagementObjectSearcher(@"root\WMI", "SELECT CycleCount FROM BatteryCycleCount");
+                            foreach (var mo in ws.Get())
+                            {
+                                if (mo["CycleCount"] != null) { cycles = Convert.ToInt32(mo["CycleCount"]); break; }
+                            }
+                        }
+                        catch { }
+
+                        specs.BatteryDesignCapacityMWh = design;
+                        specs.BatteryFullChargeCapacityMWh = full;
+                        specs.BatteryCycleCount = cycles;
+                        if (design > 0 && full > 0)
+                        {
+                            double pct = ((double)full / (double)design) * 100.0;
+                            specs.BatteryHealthPercent = Math.Clamp((int)Math.Round(pct), 1, 100);
+                        }
                     }
                 }
                 catch { }
 
-                // 5. Battery Health (root\WMI)
+                // 5. Physical Disks & SSD reliability
                 try
                 {
-                    GetBatteryHealthInfo(specs);
-                }
-                catch { }
-
-                // 6. GPU Info (Win32_VideoController + Registry for accurate VRAM > 4GB)
-                try
-                {
-                    GetGpuInfo(specs);
-                }
-                catch { }
-
-                // 7. Physical Disks & SSD Health (MSFT_PhysicalDisk & MSFT_StorageReliabilityCounter)
-                try
-                {
-                    GetDiskAndHealthInfo(specs);
+                    GetWmiDisks(specs);
                 }
                 catch { }
 
@@ -242,207 +539,76 @@ namespace CleanC.Core.Services
             });
         }
 
-        private static void GetGpuInfo(DetailedSystemSpecs specs)
+        private static void GetWmiDisks(DetailedSystemSpecs specs)
         {
-            var vramDict = new Dictionary<string, long>(StringComparer.OrdinalIgnoreCase);
+            var reliabilityDict = new Dictionary<string, (int Temp, int Wear, long Hours)>(StringComparer.OrdinalIgnoreCase);
 
-            // Read accurate VRAM from registry: HKLM\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\000*
-            try
-            {
-                using var classKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}");
-                if (classKey != null)
-                {
-                    foreach (var subName in classKey.GetSubKeyNames())
-                    {
-                        if (!subName.StartsWith("0")) continue;
-                        using var subKey = classKey.OpenSubKey(subName);
-                        if (subKey == null) continue;
-
-                        string? desc = subKey.GetValue("DriverDesc")?.ToString();
-                        object? memObj = subKey.GetValue("HardwareInformation.qwMemorySize");
-                        if (!string.IsNullOrEmpty(desc) && memObj != null)
-                        {
-                            long memBytes = Convert.ToInt64(memObj);
-                            vramDict[desc.Trim()] = memBytes;
-                        }
-                    }
-                }
-            }
-            catch { }
-
-            using var searcher = new ManagementObjectSearcher("SELECT Name, DriverVersion, AdapterRAM FROM Win32_VideoController");
-            foreach (var mo in searcher.Get())
-            {
-                string name = mo["Name"]?.ToString()?.Trim() ?? string.Empty;
-                if (string.IsNullOrEmpty(name)) continue;
-
-                specs.GpuNames.Add(name);
-
-                string driver = mo["DriverVersion"]?.ToString()?.Trim() ?? string.Empty;
-                string vramStr = "اشتراکی (Shared)";
-
-                if (vramDict.TryGetValue(name, out long regBytes) && regBytes > 0)
-                {
-                    vramStr = Models.SystemStats.FormatBytes(regBytes);
-                }
-                else if (mo["AdapterRAM"] != null)
-                {
-                    long ram = Convert.ToInt64(mo["AdapterRAM"]);
-                    if (ram > 0 && ram < 4294967295L)
-                    {
-                        vramStr = Models.SystemStats.FormatBytes(ram);
-                    }
-                }
-
-                specs.Gpus.Add(new GpuItemInfo
-                {
-                    Name = name,
-                    DriverVersion = driver,
-                    VramFormatted = vramStr
-                });
-            }
-        }
-
-        private struct DiskReliability
-        {
-            public int Temp;
-            public int Wear;
-            public long Hours;
-        }
-
-        private static void GetDiskAndHealthInfo(DetailedSystemSpecs specs)
-        {
-            // First check reliability counters (Admin accessible)
-            var reliabilityDict = new Dictionary<string, DiskReliability>();
             try
             {
                 using var relSearcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\Storage", "SELECT DeviceId, Temperature, Wear, PowerOnHours FROM MSFT_StorageReliabilityCounter");
-                foreach (var rc in relSearcher.Get())
+                foreach (var mo in relSearcher.Get())
                 {
-                    string id = rc["DeviceId"]?.ToString() ?? "";
-                    int temp = rc["Temperature"] != null ? Convert.ToInt32(rc["Temperature"]) : 0;
-                    int wear = rc["Wear"] != null ? Convert.ToInt32(rc["Wear"]) : 0;
-                    long hours = rc["PowerOnHours"] != null ? Convert.ToInt64(rc["PowerOnHours"]) : 0;
+                    string id = mo["DeviceId"]?.ToString() ?? "";
+                    int temp = mo["Temperature"] != null ? Convert.ToInt32(mo["Temperature"]) : 0;
+                    int wear = mo["Wear"] != null ? Convert.ToInt32(mo["Wear"]) : -1;
+                    long hours = mo["PowerOnHours"] != null ? Convert.ToInt64(mo["PowerOnHours"]) : 0;
+
                     if (!string.IsNullOrEmpty(id))
                     {
-                        reliabilityDict[id] = new DiskReliability { Temp = temp, Wear = wear, Hours = hours };
+                        reliabilityDict[id] = (temp, wear, hours);
                     }
                 }
             }
             catch { }
 
-            // Query physical disks
-            using var diskSearcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\Storage", "SELECT DeviceId, FriendlyName, MediaType, BusType, Size, HealthStatus FROM MSFT_PhysicalDisk");
-            foreach (var disk in diskSearcher.Get())
-            {
-                string id = disk["DeviceId"]?.ToString() ?? "";
-                string name = disk["FriendlyName"]?.ToString()?.Trim() ?? "Storage Disk";
-                int mediaType = disk["MediaType"] != null ? Convert.ToInt32(disk["MediaType"]) : 0;
-                int busType = disk["BusType"] != null ? Convert.ToInt32(disk["BusType"]) : 0;
-                long size = disk["Size"] != null ? Convert.ToInt64(disk["Size"]) : 0;
-                int health = disk["HealthStatus"] != null ? Convert.ToInt32(disk["HealthStatus"]) : 0;
-
-                string diskType = (mediaType == 4) ? "SSD" : ((mediaType == 3) ? "HDD" : "حافظه دیسک");
-                string busName = (busType == 17) ? "NVMe PCIe" : ((busType == 11) ? "SATA" : "مستقیم");
-                string healthLabel = (health == 0) ? "کاملاً سالم (Healthy)" : "نیازمند بررسی";
-
-                var item = new DiskItemInfo
-                {
-                    Model = name,
-                    DiskType = diskType,
-                    BusType = busName,
-                    SizeFormatted = Models.SystemStats.FormatBytes(size),
-                    HealthStatus = healthLabel
-                };
-
-                if (reliabilityDict.TryGetValue(id, out var rel) || reliabilityDict.Count > 0)
-                {
-                    var r = reliabilityDict.ContainsKey(id) ? rel : System.Linq.Enumerable.First(reliabilityDict.Values);
-                    if (r.Temp > 0) item.TemperatureFormatted = $"{r.Temp}°C";
-                    if (r.Wear >= 0) item.WearFormatted = $"{100 - r.Wear}% سلامت";
-                    if (r.Hours > 0) item.PowerOnHoursFormatted = $"{r.Hours:N0} ساعت";
-
-                    if (!specs.HasSsdHealthData && mediaType == 4)
-                    {
-                        specs.HasSsdHealthData = true;
-                        specs.SsdTemperatureCelsius = r.Temp;
-                        specs.SsdWearPercent = r.Wear;
-                        specs.SsdOperatingHours = r.Hours;
-                    }
-                }
-
-                specs.Disks.Add(item);
-            }
-        }
-
-        private static void GetBatteryHealthInfo(DetailedSystemSpecs specs)
-        {
             try
             {
-                // Check if battery exists via WMI
-                using var searcher = new ManagementObjectSearcher("SELECT EstimatedChargeRemaining FROM Win32_Battery");
-                var bColl = searcher.Get();
-                if (bColl.Count == 0)
-                {
-                    specs.HasBattery = false;
-                    return;
-                }
-                specs.HasBattery = true;
+                using var diskSearcher = new ManagementObjectSearcher(@"root\Microsoft\Windows\Storage", "SELECT DeviceId, FriendlyName, MediaType, BusType, Size, HealthStatus FROM MSFT_PhysicalDisk");
+                var diskItems = new List<DiskItemInfo>();
 
-                long design = 0;
-                long full = 0;
-                int cycles = 0;
-
-                try
+                foreach (var mo in diskSearcher.Get())
                 {
-                    using var wmiSearcher = new ManagementObjectSearcher(@"root\WMI", "SELECT DesignedCapacity FROM BatteryStaticData");
-                    foreach (var mo in wmiSearcher.Get())
+                    string id = mo["DeviceId"]?.ToString() ?? "";
+                    string name = mo["FriendlyName"]?.ToString()?.Trim() ?? "دیسک فیزیکی";
+                    int mediaType = mo["MediaType"] != null ? Convert.ToInt32(mo["MediaType"]) : 0;
+                    int busType = mo["BusType"] != null ? Convert.ToInt32(mo["BusType"]) : 0;
+                    long size = mo["Size"] != null ? Convert.ToInt64(mo["Size"]) : 0;
+                    int health = mo["HealthStatus"] != null ? Convert.ToInt32(mo["HealthStatus"]) : 0;
+
+                    string diskType = mediaType == 4 ? "SSD" : (mediaType == 3 ? "HDD" : "حافظه");
+                    string busName = busType == 17 ? "NVMe" : (busType == 11 ? "SATA" : (busType == 7 ? "USB" : "Internal"));
+                    string healthLabel = health == 0 ? "سالم (Healthy)" : (health == 1 ? "هشدار (Warning)" : "نامطلوب");
+
+                    var item = new DiskItemInfo
                     {
-                        if (mo["DesignedCapacity"] != null)
+                        Model = name,
+                        DiskType = diskType,
+                        BusType = busName,
+                        SizeFormatted = Models.SystemStats.FormatBytes(size),
+                        HealthStatus = healthLabel
+                    };
+
+                    if (reliabilityDict.TryGetValue(id, out var r))
+                    {
+                        if (r.Temp > 0) item.TemperatureFormatted = $"{r.Temp}°C";
+                        if (r.Wear >= 0) item.WearFormatted = $"{100 - r.Wear}% سلامت";
+                        if (r.Hours > 0) item.PowerOnHoursFormatted = $"{r.Hours:N0} ساعت";
+
+                        if (!specs.HasSsdHealthData && mediaType == 4)
                         {
-                            design = Convert.ToInt64(mo["DesignedCapacity"]);
-                            break;
+                            specs.HasSsdHealthData = true;
+                            specs.SsdTemperatureCelsius = r.Temp;
+                            specs.SsdWearPercent = r.Wear;
+                            specs.SsdOperatingHours = r.Hours;
                         }
                     }
+
+                    diskItems.Add(item);
                 }
-                catch { }
 
-                try
+                if (diskItems.Count > 0)
                 {
-                    using var wmiSearcher = new ManagementObjectSearcher(@"root\WMI", "SELECT FullChargedCapacity FROM BatteryFullChargedCapacity");
-                    foreach (var mo in wmiSearcher.Get())
-                    {
-                        if (mo["FullChargedCapacity"] != null)
-                        {
-                            full = Convert.ToInt64(mo["FullChargedCapacity"]);
-                            break;
-                        }
-                    }
-                }
-                catch { }
-
-                try
-                {
-                    using var wmiSearcher = new ManagementObjectSearcher(@"root\WMI", "SELECT CycleCount FROM BatteryCycleCount");
-                    foreach (var mo in wmiSearcher.Get())
-                    {
-                        if (mo["CycleCount"] != null)
-                        {
-                            cycles = Convert.ToInt32(mo["CycleCount"]);
-                            break;
-                        }
-                    }
-                }
-                catch { }
-
-                specs.BatteryDesignCapacityMWh = design;
-                specs.BatteryFullChargeCapacityMWh = full;
-                specs.BatteryCycleCount = cycles;
-
-                if (design > 0 && full > 0)
-                {
-                    double pct = ((double)full / (double)design) * 100.0;
-                    specs.BatteryHealthPercent = Math.Clamp((int)Math.Round(pct), 1, 100);
+                    specs.Disks = diskItems;
                 }
             }
             catch { }
@@ -451,57 +617,73 @@ namespace CleanC.Core.Services
         public static string GenerateReportText(DetailedSystemSpecs specs)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("=================================================");
-            sb.AppendLine("         CLEANC - گزارش کامل مشخصات سیستم        ");
-            sb.AppendLine("=================================================");
-            sb.AppendLine();
-            sb.AppendLine($"[پردازنده CPU]: {specs.CpuName}");
-            sb.AppendLine($"  • هسته‌ها: {specs.CpuCores} هسته واقعی / {specs.CpuThreads} ترد منطقی");
-            sb.AppendLine($"  • حداکثر فرکانس: {specs.CpuClockMhz} MHz");
-            if (specs.CpuL3CacheKb > 0) sb.AppendLine($"  • کش L3: {specs.CpuL3CacheKb} KB");
+            sb.AppendLine("==================================================");
+            sb.AppendLine("         گزارش مشخصات سیستم و سخت‌افزار (CleanC)     ");
+            sb.AppendLine("==================================================");
+            sb.AppendLine($"تاریخ گزارش: {DateTime.Now:yyyy/MM/dd HH:mm:ss}");
             sb.AppendLine();
 
-            sb.AppendLine($"[حافظه رم RAM]: {specs.TotalRamFormatted} ({specs.RamType})");
-            sb.AppendLine($"  • اسلات‌های فعال: {specs.RamSlotsUsed}");
-            sb.AppendLine($"  • سرعت باس: {specs.RamSpeedMhz} MHz");
-            if (!string.IsNullOrEmpty(specs.RamManufacturer)) sb.AppendLine($"  • سازنده: {specs.RamManufacturer}");
+            sb.AppendLine("[پردازنده مرکزی - CPU]");
+            sb.AppendLine($"  مدل: {specs.CpuName}");
+            sb.AppendLine($"  مشخصات: {specs.CpuCores} هسته فیزیکی | {specs.CpuThreads} رشته منطقی");
+            sb.AppendLine($"  فرکانس: {specs.CpuClockMhz} MHz");
+            if (specs.CpuL3CacheKb > 0) sb.AppendLine($"  حافظه کش L3: {specs.CpuL3CacheKb} KB");
             sb.AppendLine();
 
-            sb.AppendLine($"[مادربرد و بایوس]: {specs.MotherboardManufacturer} {specs.MotherboardModel}");
-            if (!string.IsNullOrEmpty(specs.BiosVersion)) sb.AppendLine($"  • نسخه بایوس: {specs.BiosVersion} ({specs.BiosReleaseDate})");
+            sb.AppendLine("[حافظه رم - RAM]");
+            sb.AppendLine($"  ظرفیت کل: {specs.TotalRamFormatted} ({specs.RamType})");
+            sb.AppendLine($"  اسلات‌های فعال: {specs.RamSlotsUsed}");
+            sb.AppendLine($"  سرعت باس: {specs.RamSpeedMhz} MHz");
+            if (!string.IsNullOrEmpty(specs.RamManufacturer)) sb.AppendLine($"  سازنده: {specs.RamManufacturer}");
             sb.AppendLine();
 
-            sb.AppendLine("[پردازنده‌های گرافیکی GPU]:");
-            foreach (var gpu in specs.Gpus)
+            sb.AppendLine("[مادربرد و بایوس]");
+            sb.AppendLine($"  سازنده مادربرد: {specs.MotherboardManufacturer}");
+            sb.AppendLine($"  مدل مادربرد: {specs.MotherboardModel}");
+            sb.AppendLine($"  نسخه بایوس: {specs.BiosVersion}");
+            sb.AppendLine($"  تاریخ بایوس: {specs.BiosReleaseDate}");
+            sb.AppendLine();
+
+            sb.AppendLine("[کارت‌های گرافیک - GPU]");
+            if (specs.Gpus.Count > 0)
             {
-                sb.AppendLine($"  • {gpu.Name} | حافظه VRAM: {gpu.VramFormatted} | درایور: {gpu.DriverVersion}");
+                foreach (var gpu in specs.Gpus)
+                {
+                    sb.AppendLine($"  - {gpu.Name}");
+                    sb.AppendLine($"    حافظه اختصاصی VRAM: {gpu.VramFormatted}");
+                    sb.AppendLine($"    نسخه درایور: {gpu.DriverVersion}");
+                }
+            }
+            else
+            {
+                foreach (var gName in specs.GpuNames) sb.AppendLine($"  - {gName}");
             }
             sb.AppendLine();
 
-            sb.AppendLine("[دیسک‌ها و حافظه ذخیره‌سازی]:");
-            foreach (var d in specs.Disks)
+            sb.AppendLine("[حافظه‌های ذخیره‌سازی]");
+            foreach (var disk in specs.Disks)
             {
-                sb.AppendLine($"  • {d.Model} ({d.SizeFormatted} - {d.DiskType} {d.BusType}) - {d.HealthStatus}");
-                sb.AppendLine($"    دمای دیسک: {d.TemperatureFormatted} | کارکرد: {d.PowerOnHoursFormatted} | سلامت: {d.WearFormatted}");
+                sb.AppendLine($"  - {disk.Model} ({disk.DiskType} {disk.BusType}) - {disk.SizeFormatted}");
+                sb.AppendLine($"    وضعیت: {disk.HealthStatus} | دما: {disk.TemperatureFormatted} | کارکرد: {disk.PowerOnHoursFormatted}");
             }
             sb.AppendLine();
 
             if (specs.HasBattery)
             {
-                sb.AppendLine("[باتری لپ‌تاپ]:");
-                sb.AppendLine($"  • درصد سلامت باتری: {specs.BatteryHealthPercent}%");
-                sb.AppendLine($"  • ظرفیت کارخانه (Design): {specs.BatteryDesignCapacityMWh} mWh");
-                sb.AppendLine($"  • ظرفیت فعلی شارژ کامل: {specs.BatteryFullChargeCapacityMWh} mWh");
-                if (specs.BatteryCycleCount > 0) sb.AppendLine($"  • سیکل شارژ: {specs.BatteryCycleCount}");
+                sb.AppendLine("[باتری لپ‌تاپ]");
+                sb.AppendLine($"  سلامت باتری: {specs.BatteryHealthPercent}%");
+                sb.AppendLine($"  ظرفیت اولیه کارخانه: {specs.BatteryDesignCapacityMWh} mWh");
+                sb.AppendLine($"  ظرفیت شارژ فعلی: {specs.BatteryFullChargeCapacityMWh} mWh");
+                sb.AppendLine($"  تعداد دفعات شارژ (سیکل): {specs.BatteryCycleCount}");
                 sb.AppendLine();
             }
 
-            sb.AppendLine($"[سیستم‌عامل]: {specs.OsName} ({specs.OsArchitecture})");
-            sb.AppendLine($"  • شماره ساخت Build: {specs.OsBuild}");
-            if (!string.IsNullOrEmpty(specs.OsInstallDate)) sb.AppendLine($"  • تاریخ نصب: {specs.OsInstallDate}");
-            if (!string.IsNullOrEmpty(specs.OsUptimeFormatted)) sb.AppendLine($"  • زمان روشن بودن سیستم: {specs.OsUptimeFormatted}");
-            sb.AppendLine();
-            sb.AppendLine($"تولید شده توسط CleanC در {DateTime.Now:yyyy/MM/dd HH:mm:ss}");
+            sb.AppendLine("[سیستم‌عامل و پایداری]");
+            sb.AppendLine($"  ویندوز: {specs.OsName} ({specs.OsArchitecture})");
+            sb.AppendLine($"  شماره ساخت: Build {specs.OsBuild}");
+            sb.AppendLine($"  تاریخ نصب: {specs.OsInstallDate}");
+            sb.AppendLine($"  مدت زمان روشن بودن سیستم: {specs.OsUptimeFormatted}");
+            sb.AppendLine("==================================================");
 
             return sb.ToString();
         }

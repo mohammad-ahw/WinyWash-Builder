@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net.Http;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,13 +12,21 @@ namespace CleanC.Core.Services
     public class SpeedTestResult
     {
         public double PingMs { get; set; }
-        public double JitterMs { get; set; }
         public double DownloadSpeedMbps { get; set; }
-        public double DownloadSpeedMBs => DownloadSpeedMbps / 8.0;
+        public double DownloadSpeedMBs => Math.Round(DownloadSpeedMbps / 8.0, 2);
+        public double UploadSpeedMbps { get; set; }
+        public double UploadSpeedMBs => Math.Round(UploadSpeedMbps / 8.0, 2);
+        
+        public string ClientIp { get; set; } = string.Empty;
+        public string IspName { get; set; } = string.Empty;
+        public string Country { get; set; } = string.Empty;
+        public string City { get; set; } = string.Empty;
+
         public long BytesDownloaded { get; set; }
+        public long BytesUploaded { get; set; }
         public bool IsSuccess { get; set; }
         public string ErrorMessage { get; set; } = string.Empty;
-        public DateTime Timestamp { get; set; } = DateTime.Now;
+        public DateTime TestedAt { get; set; } = DateTime.Now;
     }
 
     public class InternetSpeedTestService
@@ -28,116 +36,145 @@ namespace CleanC.Core.Services
             Timeout = TimeSpan.FromSeconds(25)
         };
 
-        private static readonly List<SpeedTestResult> _testHistory = new List<SpeedTestResult>();
-        public static IReadOnlyList<SpeedTestResult> History => _testHistory.AsReadOnly();
+        private static readonly List<SpeedTestResult> _testHistory = new();
 
-        public static async Task<SpeedTestResult> RunSpeedTestAsync(Action<double, int>? onProgress = null, CancellationToken cancellationToken = default)
+        public static IReadOnlyList<SpeedTestResult> GetHistory()
+        {
+            lock (_testHistory)
+            {
+                return new List<SpeedTestResult>(_testHistory);
+            }
+        }
+
+        public static async Task<SpeedTestResult> RunSpeedTestAsync(
+            Action<string, double, int>? onProgress = null, 
+            CancellationToken cancellationToken = default)
         {
             var result = new SpeedTestResult();
 
-            // 1. Measure Ping & Jitter (4 requests)
-            var pings = new List<double>();
+            // 1. Fetch IP, ISP, and Location metadata
             try
             {
-                for (int i = 0; i < 4; i++)
+                using var ipCts = new CancellationTokenSource(TimeSpan.FromSeconds(4));
+                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, ipCts.Token);
+                
+                string json = await _httpClient.GetStringAsync("http://ip-api.com/json", linkedCts.Token);
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+                if (root.TryGetProperty("query", out var q)) result.ClientIp = q.GetString() ?? "";
+                if (root.TryGetProperty("isp", out var isp)) result.IspName = isp.GetString() ?? "";
+                if (root.TryGetProperty("country", out var cnt)) result.Country = cnt.GetString() ?? "";
+                if (root.TryGetProperty("city", out var city)) result.City = city.GetString() ?? "";
+            }
+            catch
+            {
+                // Non-critical, continue testing
+                result.ClientIp = "نامشخص";
+                result.IspName = "شبکه محلی / اینترنت";
+            }
+
+            // 2. Measure Ping (Latency)
+            try
+            {
+                var pings = new List<double>();
+                for (int i = 0; i < 3; i++)
                 {
                     if (cancellationToken.IsCancellationRequested) break;
                     var sw = Stopwatch.StartNew();
-                    using var resp = await _httpClient.GetAsync("https://speed.cloudflare.com/__down?bytes=0", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                    using var pingResp = await _httpClient.GetAsync("https://speed.cloudflare.com/__down?bytes=0", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
                     sw.Stop();
-                    if (resp.IsSuccessStatusCode)
-                    {
-                        pings.Add(sw.Elapsed.TotalMilliseconds);
-                    }
-                    await Task.Delay(50, cancellationToken);
+                    pings.Add(sw.Elapsed.TotalMilliseconds);
+                    await Task.Delay(40, cancellationToken);
                 }
 
                 if (pings.Count > 0)
                 {
                     pings.Sort();
-                    result.PingMs = Math.Round(pings[pings.Count / 2], 1); // Median
-                    // Jitter = Mean absolute deviation between consecutive pings
-                    if (pings.Count >= 2)
-                    {
-                        double sumDiff = 0;
-                        for (int i = 1; i < pings.Count; i++) sumDiff += Math.Abs(pings[i] - pings[i - 1]);
-                        result.JitterMs = Math.Round(sumDiff / (pings.Count - 1), 1);
-                    }
+                    result.PingMs = Math.Round(pings[0], 1); // Best latency
                 }
             }
             catch (Exception) when (!cancellationToken.IsCancellationRequested)
             {
                 result.PingMs = 0;
-                result.ErrorMessage = "امکان برقراری ارتباط با سرور سنجش پینگ وجود ندارد.";
             }
 
-            // 2. Measure Download Speed with 4 parallel streams (12 MB each = 48 MB total)
+            // 3. Measure Download Speed (Single reliable Cloudflare stream - 15 MB)
             try
             {
-                int streamCount = 4;
-                long bytesPerStream = 12_000_000; // 12 MB
-                long totalTargetBytes = streamCount * bytesPerStream;
-                long sharedTotalRead = 0;
+                long targetBytes = 15_000_000; // 15 MB
+                string url = $"https://speed.cloudflare.com/__down?bytes={targetBytes}";
 
-                var overallSw = Stopwatch.StartNew();
-                var sampleTimes = new List<(double timeSec, long bytes)>();
+                using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                response.EnsureSuccessStatusCode();
 
-                var tasks = new Task[streamCount];
-                for (int i = 0; i < streamCount; i++)
+                using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
+                byte[] buffer = new byte[64 * 1024]; // 64 KB buffer
+
+                var sw = Stopwatch.StartNew();
+                long totalRead = 0;
+                int bytesRead;
+
+                while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
                 {
-                    tasks[i] = Task.Run(async () =>
+                    totalRead += bytesRead;
+                    double elapsedSec = sw.Elapsed.TotalSeconds;
+
+                    if (elapsedSec > 0.08)
                     {
-                        try
-                        {
-                            string url = $"https://speed.cloudflare.com/__down?bytes={bytesPerStream}";
-                            using var response = await _httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                            response.EnsureSuccessStatusCode();
-
-                            using var stream = await response.Content.ReadAsStreamAsync(cancellationToken);
-                            byte[] buffer = new byte[64 * 1024];
-                            int bytesRead;
-
-                            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, cancellationToken)) > 0)
-                            {
-                                long currentTotal = Interlocked.Add(ref sharedTotalRead, bytesRead);
-                                double elapsed = overallSw.Elapsed.TotalSeconds;
-
-                                if (elapsed > 0.1)
-                                {
-                                    double mbps = (currentTotal * 8.0) / (elapsed * 1_000_000.0);
-                                    int pct = (int)Math.Clamp((currentTotal * 100) / totalTargetBytes, 0, 99);
-                                    onProgress?.Invoke(Math.Round(mbps, 2), pct);
-                                }
-                            }
-                        }
-                        catch { }
-                    }, cancellationToken);
+                        double currentMbps = (totalRead * 8.0) / (elapsedSec * 1_000_000.0);
+                        int progressPct = (int)Math.Clamp((totalRead * 100) / targetBytes, 1, 99);
+                        onProgress?.Invoke("download", Math.Round(currentMbps, 2), progressPct);
+                    }
                 }
 
-                await Task.WhenAll(tasks);
-                overallSw.Stop();
-
-                double totalSec = overallSw.Elapsed.TotalSeconds;
-                result.BytesDownloaded = sharedTotalRead;
-
-                if (sharedTotalRead > 0 && totalSec > 0.2)
+                sw.Stop();
+                result.BytesDownloaded = totalRead;
+                if (sw.Elapsed.TotalSeconds > 0.1 && totalRead > 0)
                 {
-                    result.DownloadSpeedMbps = Math.Round((sharedTotalRead * 8.0) / (totalSec * 1_000_000.0), 2);
-                    result.IsSuccess = true;
-                    onProgress?.Invoke(result.DownloadSpeedMbps, 100);
-                }
-                else
-                {
-                    result.ErrorMessage = "پاسخی از سرور دانلود دریافت نشد.";
+                    result.DownloadSpeedMbps = Math.Round((totalRead * 8.0) / (sw.Elapsed.TotalSeconds * 1_000_000.0), 2);
+                    onProgress?.Invoke("download", result.DownloadSpeedMbps, 100);
                 }
             }
             catch (Exception)
             {
-                result.ErrorMessage = cancellationToken.IsCancellationRequested ? "تست توسط کاربر متوقف شد." : "خطا در اتصال به سرور.";
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    result.ErrorMessage = "تست توسط کاربر لغو گردید.";
+                    return result;
+                }
+                result.ErrorMessage = "خطا در اتصال به سرور دانلود اینترنت.";
             }
 
-            if (result.IsSuccess)
+            // 4. Measure Upload Speed (POST 3 MB to https://speed.cloudflare.com/__up)
+            try
             {
+                if (!cancellationToken.IsCancellationRequested && result.DownloadSpeedMbps > 0)
+                {
+                    int uploadBytesCount = 3_000_000; // 3 MB payload
+                    byte[] uploadPayload = new byte[uploadBytesCount];
+                    Random.Shared.NextBytes(uploadPayload);
+
+                    onProgress?.Invoke("upload", 0, 10);
+
+                    using var upContent = new ByteArrayContent(uploadPayload);
+                    var upSw = Stopwatch.StartNew();
+                    using var upResp = await _httpClient.PostAsync("https://speed.cloudflare.com/__up", upContent, cancellationToken);
+                    upSw.Stop();
+
+                    if (upResp.IsSuccessStatusCode && upSw.Elapsed.TotalSeconds > 0.1)
+                    {
+                        double upMbps = (uploadBytesCount * 8.0) / (upSw.Elapsed.TotalSeconds * 1_000_000.0);
+                        result.UploadSpeedMbps = Math.Round(upMbps, 2);
+                        result.BytesUploaded = uploadBytesCount;
+                        onProgress?.Invoke("upload", result.UploadSpeedMbps, 100);
+                    }
+                }
+            }
+            catch { }
+
+            if (result.DownloadSpeedMbps > 0)
+            {
+                result.IsSuccess = true;
                 lock (_testHistory)
                 {
                     _testHistory.Insert(0, result);
