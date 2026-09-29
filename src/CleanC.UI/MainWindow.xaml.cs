@@ -4,6 +4,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.UI;
 using Microsoft.UI.Composition.SystemBackdrops;
@@ -29,6 +30,9 @@ namespace CleanC.UI
         private long _displayedFreedBytes = 0;
         private DesktopAcrylicController? _acrylicController;
         private SystemBackdropConfiguration? _configurationSource;
+        private DetailedSystemSpecs? _cachedSpecs;
+        private List<InstalledAppInfo> _allInstalledApps = new();
+        private CancellationTokenSource? _speedTestCts;
 
         public MainWindow()
         {
@@ -71,6 +75,18 @@ namespace CleanC.UI
                 rootElement.SizeChanged += (s, e) =>
                 {
                     UpdateResponsiveLayout(e.NewSize.Width);
+                };
+
+                rootElement.KeyDown += (s, e) =>
+                {
+                    if (e.Key == Windows.System.VirtualKey.Escape)
+                    {
+                        if (ToolsView != null && ToolsView.Visibility == Visibility.Visible && ToolsLauncherPanel != null && ToolsLauncherPanel.Visibility != Visibility.Visible)
+                        {
+                            NavigateToToolPage(null);
+                            e.Handled = true;
+                        }
+                    }
                 };
             }
 
@@ -1706,72 +1722,170 @@ namespace CleanC.UI
         }
 
         // ====================================================================
+        // In-Tab Sub-Page Navigation System
+        // ====================================================================
+
+        private void LaunchToolPage_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement el && el.Tag is string tag)
+            {
+                NavigateToToolPage(tag);
+            }
+        }
+
+        private void BackToToolsLauncher_Click(object sender, RoutedEventArgs e)
+        {
+            NavigateToToolPage(null);
+        }
+
+        private void NavigateToToolPage(string? pageId)
+        {
+            ToolsLauncherPanel.Visibility = Visibility.Collapsed;
+            ToolSystemSpecsPanel.Visibility = Visibility.Collapsed;
+            ToolAppUninstallerPanel.Visibility = Visibility.Collapsed;
+            ToolSpeedTestPanel.Visibility = Visibility.Collapsed;
+            ToolPersonalizationPanel.Visibility = Visibility.Collapsed;
+            ToolStartupManagerPanel.Visibility = Visibility.Collapsed;
+
+            switch (pageId)
+            {
+                case "system_specs":
+                    ToolSystemSpecsPanel.Visibility = Visibility.Visible;
+                    _ = LoadSystemSpecsPageAsync();
+                    break;
+                case "app_uninstaller":
+                    ToolAppUninstallerPanel.Visibility = Visibility.Visible;
+                    _ = LoadAppUninstallerPageAsync();
+                    break;
+                case "speed_test":
+                    ToolSpeedTestPanel.Visibility = Visibility.Visible;
+                    break;
+                case "personalization":
+                    ToolPersonalizationPanel.Visibility = Visibility.Visible;
+                    LoadPersonalizationPage();
+                    break;
+                case "startup_manager":
+                    ToolStartupManagerPanel.Visibility = Visibility.Visible;
+                    _ = LoadStartupManagerPageAsync();
+                    break;
+                default:
+                    ToolsLauncherPanel.Visibility = Visibility.Visible;
+                    break;
+            }
+        }
+
+        // ====================================================================
         // Tool 1: System Specs & Battery Health
         // ====================================================================
 
-        private async void ToolSystemSpecs_Click(object sender, RoutedEventArgs e)
+        private async Task LoadSystemSpecsPageAsync(bool forceRefresh = false)
         {
-            await ShowSystemSpecsDialogAsync();
+            if (_cachedSpecs != null && !forceRefresh)
+            {
+                RenderSystemSpecs(_cachedSpecs);
+                return;
+            }
+
+            SpecsLoadingSpinner.Visibility = Visibility.Visible;
+            SpecsCardsContainer.Visibility = Visibility.Collapsed;
+
+            try
+            {
+                _cachedSpecs = await SystemSpecsService.GetDetailedSpecsAsync();
+                RenderSystemSpecs(_cachedSpecs);
+            }
+            catch (Exception ex)
+            {
+                SpecsLoadingSpinner.Visibility = Visibility.Collapsed;
+                SpecsCardsContainer.Visibility = Visibility.Visible;
+                SpecsCardsContainer.Children.Clear();
+                SpecsCardsContainer.Children.Add(new TextBlock
+                {
+                    Text = $"خطا در خواندن مشخصات سیستم: {ex.Message}",
+                    Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red)
+                });
+            }
         }
 
-        private async Task ShowSystemSpecsDialogAsync()
+        private void RenderSystemSpecs(DetailedSystemSpecs specs)
         {
-            var dialog = new ContentDialog
+            SpecsLoadingSpinner.Visibility = Visibility.Collapsed;
+            SpecsCardsContainer.Visibility = Visibility.Visible;
+            SpecsCardsContainer.Children.Clear();
+
+            // 1. CPU Card
+            string cpuExtra = $"{specs.CpuCores} هسته فیزیکی  •  {specs.CpuThreads} ترد منطقی  •  حداکثر فرکانس: {specs.CpuClockMhz} MHz";
+            if (specs.CpuL3CacheKb > 0) cpuExtra += $"  •  حافظه کش L3: {specs.CpuL3CacheKb} KB";
+            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE774", "پردازنده مرکزی (CPU)", specs.CpuName, cpuExtra, ColorHelper.FromArgb(255, 59, 130, 246)));
+
+            // 2. RAM Card
+            string ramExtra = $"{specs.RamSlotsUsed} اسلات فعال  •  سرعت باس: {specs.RamSpeedMhz} MHz";
+            if (!string.IsNullOrEmpty(specs.RamManufacturer)) ramExtra += $"  •  سازنده: {specs.RamManufacturer}";
+            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE9D2", "حافظه رم (RAM)", $"{specs.TotalRamFormatted} ({specs.RamType})", ramExtra, ColorHelper.FromArgb(255, 16, 185, 129)));
+
+            // 3. Motherboard & BIOS Card
+            string mbExtra = !string.IsNullOrEmpty(specs.BiosVersion) ? $"نسخه بایوس: {specs.BiosVersion} (تاریخ: {specs.BiosReleaseDate})" : "گذرگاه‌های پرسرعت سیستم";
+            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE770", "مادربرد و بایوس (Motherboard & BIOS)", $"{specs.MotherboardManufacturer} {specs.MotherboardModel}", mbExtra, ColorHelper.FromArgb(255, 245, 158, 11)));
+
+            // 4. GPU Cards
+            if (specs.Gpus.Count > 0)
             {
-                Title = "مشخصات جامع سخت‌افزار و سلامت سیستم",
-                CloseButtonText = "بستن",
-                XamlRoot = this.Content.XamlRoot,
-                FlowDirection = FlowDirection.RightToLeft
-            };
-
-            var root = new StackPanel { Spacing = 12, MinWidth = 540, MaxHeight = 460 };
-            var spinner = new ProgressRing { IsActive = true, Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 16, 0, 16) };
-            root.Children.Add(spinner);
-            dialog.Content = root;
-
-            var task = dialog.ShowAsync();
-
-            var specs = await SystemSpecsService.GetDetailedSpecsAsync();
-            spinner.Visibility = Visibility.Collapsed;
-
-            var scroll = new ScrollViewer { MaxHeight = 400, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-            var list = new StackPanel { Spacing = 10 };
-
-            // CPU Card
-            list.Children.Add(CreateSpecCard("\uE774", "پردازنده مرکزی (CPU)", $"{specs.CpuName}", $"{specs.CpuCores} هسته واقعی  •  {specs.CpuThreads} ترد پردازشی  •  حداکثر فرکانس: {specs.CpuClockMhz} MHz", ColorHelper.FromArgb(255, 59, 130, 246)));
-
-            // RAM Card
-            list.Children.Add(CreateSpecCard("\uE9D2", "حافظه رم (RAM)", $"{specs.TotalRamFormatted} ظرفیت کل", $"{specs.RamSlotsUsed} اسلات فعال  •  سرعت باس: {specs.RamSpeedMhz} MHz", ColorHelper.FromArgb(255, 16, 185, 129)));
-
-            // Motherboard Card
-            list.Children.Add(CreateSpecCard("\uE770", "مادربرد (Motherboard)", $"{specs.MotherboardManufacturer} {specs.MotherboardModel}", "گذرگاه‌های پرسرعت و بایوس سیستم", ColorHelper.FromArgb(255, 245, 158, 11)));
-
-            // GPU Card
-            if (specs.GpuNames != null && specs.GpuNames.Count > 0)
+                foreach (var gpu in specs.Gpus)
+                {
+                    string gpuExtra = $"حافظه اختصاصی VRAM: {gpu.VramFormatted}  •  نسخه درایور: {gpu.DriverVersion}";
+                    SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gpu.Name, gpuExtra, ColorHelper.FromArgb(255, 6, 182, 212)));
+                }
+            }
+            else if (specs.GpuNames.Count > 0)
             {
-                string gpuNames = string.Join(" | ", specs.GpuNames);
-                list.Children.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gpuNames, "رندرینگ گرافیکی و پردازش موازی", ColorHelper.FromArgb(255, 6, 182, 212)));
+                foreach (var gName in specs.GpuNames)
+                {
+                    SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7F4", "پردازنده گرافیکی (GPU)", gName, "رندرینگ گرافیکی و پردازش موازی", ColorHelper.FromArgb(255, 6, 182, 212)));
+                }
             }
 
-            // SSD Card
-            if (specs.HasSsdHealthData)
+            // 5. Physical Disks & SSD Health
+            if (specs.Disks.Count > 0)
             {
-                list.Children.Add(CreateSpecCard("\uE7FC", "سلامت حافظه ذخیره‌سازی (SSD)", $"{100 - specs.SsdWearPercent}% سلامت باقیمانده", $"دمای فعلی: {specs.SsdTemperatureCelsius}°C  •  میزان کارکرد: {specs.SsdOperatingHours} ساعت", ColorHelper.FromArgb(255, 236, 72, 153)));
+                foreach (var disk in specs.Disks)
+                {
+                    string diskExtra = $"وضعیت: {disk.HealthStatus}  •  دمای لحظه‌ای: {disk.TemperatureFormatted}  •  ساعت کارکرد: {disk.PowerOnHoursFormatted}  •  استهلاک: {disk.WearFormatted}";
+                    SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7FC", $"حافظه ذخیره‌سازی ({disk.DiskType} {disk.BusType})", $"{disk.Model} - {disk.SizeFormatted}", diskExtra, ColorHelper.FromArgb(255, 236, 72, 153)));
+                }
+            }
+            else if (specs.HasSsdHealthData)
+            {
+                SpecsCardsContainer.Children.Add(CreateSpecCard("\uE7FC", "سلامت حافظه ذخیره‌سازی (SSD)", $"{100 - specs.SsdWearPercent}% سلامت باقیمانده", $"دمای فعلی: {specs.SsdTemperatureCelsius}°C  •  میزان کارکرد: {specs.SsdOperatingHours} ساعت", ColorHelper.FromArgb(255, 236, 72, 153)));
             }
 
-            // OS Card
-            list.Children.Add(CreateSpecCard("\uE8A9", "سیستم‌عامل (Windows)", $"{specs.OsName}", $"شماره ساخت: Build {specs.OsBuild}", ColorHelper.FromArgb(255, 139, 92, 246)));
-
-            // Battery Card (If laptop)
+            // 6. Battery Card (Laptop only)
             if (specs.HasBattery)
             {
-                string batDetails = $"ظرفیت اسمی روز اول: {specs.BatteryDesignCapacityMWh} mWh  •  ظرفیت فعلی: {specs.BatteryFullChargeCapacityMWh} mWh  •  سیکل شارژ: {specs.BatteryCycleCount}";
-                list.Children.Add(CreateSpecCard("\uEBB5", "سلامت باتری لپ‌تاپ (Battery Health)", $"{specs.BatteryHealthPercent}% سلامت باتری", batDetails, ColorHelper.FromArgb(255, 239, 68, 68)));
+                string batDetails = $"ظرفیت طراحی اولیه: {specs.BatteryDesignCapacityMWh} mWh  •  ظرفیت فعلی شارژ کامل: {specs.BatteryFullChargeCapacityMWh} mWh  •  سیکل شارژ: {specs.BatteryCycleCount}";
+                SpecsCardsContainer.Children.Add(CreateSpecCard("\uEBB5", "سلامت باتری لپ‌تاپ (Battery Health)", $"{specs.BatteryHealthPercent}% سلامت باتری", batDetails, ColorHelper.FromArgb(255, 239, 68, 68)));
             }
 
-            scroll.Content = list;
-            root.Children.Add(scroll);
-            await task;
+            // 7. Windows OS Card
+            string osExtra = $"شماره ساخت: Build {specs.OsBuild}";
+            if (!string.IsNullOrEmpty(specs.OsInstallDate)) osExtra += $"  •  تاریخ نصب: {specs.OsInstallDate}";
+            if (!string.IsNullOrEmpty(specs.OsUptimeFormatted)) osExtra += $"  •  زمان روشن بودن: {specs.OsUptimeFormatted}";
+            SpecsCardsContainer.Children.Add(CreateSpecCard("\uE8A9", "سیستم‌عامل (Windows)", $"{specs.OsName} ({specs.OsArchitecture})", osExtra, ColorHelper.FromArgb(255, 139, 92, 246)));
+        }
+
+        private void CopySpecsReport_Click(object sender, RoutedEventArgs e)
+        {
+            if (_cachedSpecs == null) return;
+            string text = SystemSpecsService.GenerateReportText(_cachedSpecs);
+            var dp = new Windows.ApplicationModel.DataTransfer.DataPackage();
+            dp.SetText(text);
+            Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
+            ShowInfoBar("کپی گزارش مشخصات", "مشخصات جامع سیستم با فرمت استاندارد در کلیپ‌بورد کپی شد.", InfoBarSeverity.Success);
+        }
+
+        private async void RefreshSpecsPage_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadSystemSpecsPageAsync(forceRefresh: true);
+            ShowInfoBar("بروزرسانی مشخصات", "مشخصات سخت‌افزار و سنسورهای سیستم بروزرسانی شدند.", InfoBarSeverity.Informational);
         }
 
         private Border CreateSpecCard(string glyph, string category, string value, string extra, Windows.UI.Color iconBgColor)
@@ -1781,8 +1895,8 @@ namespace CleanC.UI
                 Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
                 BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(14, 10, 14, 10)
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(18, 14, 18, 14)
             };
 
             var grid = new Grid();
@@ -1791,11 +1905,11 @@ namespace CleanC.UI
 
             var iconBg = new Border
             {
-                Width = 40,
-                Height = 40,
-                CornerRadius = new CornerRadius(20),
+                Width = 44,
+                Height = 44,
+                CornerRadius = new CornerRadius(22),
                 Background = new SolidColorBrush(iconBgColor),
-                Margin = new Thickness(0, 0, 12, 0),
+                Margin = new Thickness(0, 0, 16, 0),
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center
             };
@@ -1803,7 +1917,7 @@ namespace CleanC.UI
             var icon = new FontIcon
             {
                 Glyph = glyph,
-                FontSize = 18,
+                FontSize = 20,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Foreground = new SolidColorBrush(Microsoft.UI.Colors.White)
@@ -1813,14 +1927,18 @@ namespace CleanC.UI
             Grid.SetColumn(iconBg, 0);
             grid.Children.Add(iconBg);
 
-            var textStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
-            var catText = new TextBlock { Text = category, FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
-            var valText = new TextBlock { Text = value, FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 15 };
-            var extraText = new TextBlock { Text = extra, FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var textStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+            var catText = new TextBlock { Text = category, FontSize = 12, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var valText = new TextBlock { Text = value, FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 15.5 };
+            var extraText = new TextBlock { Text = extra, FontSize = 11.5, TextWrapping = TextWrapping.Wrap, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
 
             textStack.Children.Add(catText);
             textStack.Children.Add(valText);
-            textStack.Children.Add(extraText);
+            if (!string.IsNullOrEmpty(extra))
+            {
+                textStack.Children.Add(extraText);
+            }
+
             Grid.SetColumn(textStack, 1);
             grid.Children.Add(textStack);
 
@@ -1829,304 +1947,269 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // Tool 2: Windows App Uninstaller
+        // Tool 2: App Uninstaller
         // ====================================================================
 
-        private async void ToolAppUninstaller_Click(object sender, RoutedEventArgs e)
+        private async Task LoadAppUninstallerPageAsync(bool forceReload = false)
         {
-            await ShowAppUninstallerDialogAsync();
-        }
-
-        private async Task ShowAppUninstallerDialogAsync()
-        {
-            var dialog = new ContentDialog
+            if (_allInstalledApps.Count > 0 && !forceReload)
             {
-                Title = "مدیریت و حذف نرم‌افزارهای نصب‌شده (App Uninstaller)",
-                CloseButtonText = "بستن",
-                XamlRoot = this.Content.XamlRoot,
-                FlowDirection = FlowDirection.RightToLeft
-            };
-
-            var root = new StackPanel { Spacing = 12, MinWidth = 520, MaxHeight = 480 };
-            
-            var headerStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 12, Margin = new Thickness(0, 0, 0, 4) };
-            var totalAppsText = new TextBlock { FontSize = 13, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold };
-            var totalSizeText = new TextBlock { FontSize = 13, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
-            headerStack.Children.Add(totalAppsText);
-            headerStack.Children.Add(totalSizeText);
-            
-            var searchBox = new AutoSuggestBox { PlaceholderText = "جستجوی نرم‌افزار...", QueryIcon = new SymbolIcon(Symbol.Find), Height = 32 };
-            var statusText = new TextBlock { Text = "در حال خواندن لیست نرم‌افزارها از ریجستری ویندوز...", FontSize = 11.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
-            var spinner = new ProgressRing { IsActive = true, Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 16, 0, 16) };
-
-            root.Children.Add(headerStack);
-            root.Children.Add(searchBox);
-            root.Children.Add(statusText);
-            root.Children.Add(spinner);
-            dialog.Content = root;
-
-            var showTask = dialog.ShowAsync();
-
-            var allApps = await AppUninstallerService.GetInstalledAppsAsync();
-            spinner.Visibility = Visibility.Collapsed;
-            
-            long totalSizeBytes = allApps.Sum(a => a.EstimatedSizeBytes);
-            totalAppsText.Text = $"تعداد کل: {allApps.Count} نرم‌افزار";
-            totalSizeText.Text = $"حجم کل: {SystemStats.FormatBytes(totalSizeBytes)}";
-
-            var scroll = new ScrollViewer { MaxHeight = 360, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
-            var appsStack = new StackPanel { Spacing = 6 };
-
-            void RenderApps(string query)
-            {
-                appsStack.Children.Clear();
-                var filtered = string.IsNullOrWhiteSpace(query)
-                    ? allApps
-                    : allApps.Where(a => a.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase) || a.Publisher.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
-
-                statusText.Text = $"تعداد {filtered.Count} نرم‌افزار برای نمایش";
-
-                foreach (var app in filtered)
-                {
-                    var itemBorder = new Border
-                    {
-                        Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                        BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
-                        BorderThickness = new Thickness(1),
-                        CornerRadius = new CornerRadius(8),
-                        Padding = new Thickness(12, 8, 12, 8)
-                    };
-
-                    var grid = new Grid();
-                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                    grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                    var infoStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
-                    var nameText = new TextBlock { Text = app.DisplayName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5, TextTrimming = TextTrimming.CharacterEllipsis };
-                    string pub = !string.IsNullOrEmpty(app.Publisher) ? $"{app.Publisher}  •  " : "";
-                    string ver = !string.IsNullOrEmpty(app.DisplayVersion) ? $"نسخه {app.DisplayVersion}" : "";
-                    var subText = new TextBlock { Text = $"{pub}{ver}", FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextTrimming = TextTrimming.CharacterEllipsis };
-                    infoStack.Children.Add(nameText);
-                    infoStack.Children.Add(subText);
-                    Grid.SetColumn(infoStack, 0);
-                    grid.Children.Add(infoStack);
-
-                    var sizeBadge = new Border
-                    {
-                        Background = (Brush)Application.Current.Resources["AppHeaderPillBrush"],
-                        CornerRadius = new CornerRadius(12),
-                        Padding = new Thickness(8, 2, 8, 2),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(8, 0, 0, 0)
-                    };
-                    sizeBadge.Child = new TextBlock { Text = app.FormattedSize, FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
-                    Grid.SetColumn(sizeBadge, 1);
-                    grid.Children.Add(sizeBadge);
-
-                    var uninstBtn = new Button
-                    {
-                        Content = "حذف",
-                        FontSize = 11,
-                        Padding = new Thickness(12, 4, 12, 4),
-                        Height = 28,
-                        CornerRadius = new CornerRadius(5),
-                        Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)),
-                        BorderBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)),
-                        BorderThickness = new Thickness(1),
-                        Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
-                        VerticalAlignment = VerticalAlignment.Center,
-                        Margin = new Thickness(12, 0, 0, 0)
-                    };
-                    uninstBtn.Click += (s, e) =>
-                    {
-                        bool launched = AppUninstallerService.LaunchUninstall(app);
-                        if (launched)
-                        {
-                            ShowInfoBar("حذف نرم‌افزار", $"آنیستالر رسمی {app.DisplayName} اجرا گردید.", InfoBarSeverity.Informational);
-                        }
-                    };
-                    Grid.SetColumn(uninstBtn, 2);
-                    grid.Children.Add(uninstBtn);
-
-                    itemBorder.Child = grid;
-                    appsStack.Children.Add(itemBorder);
-                }
+                FilterAndRenderApps();
+                return;
             }
 
-            searchBox.TextChanged += (s, e) => RenderApps(searchBox.Text);
-            RenderApps("");
+            UninstallerLoadingSpinner.Visibility = Visibility.Visible;
+            UninstallerAppsStack.Visibility = Visibility.Collapsed;
 
-            scroll.Content = appsStack;
-            root.Children.Add(scroll);
-            await showTask;
+            try
+            {
+                _allInstalledApps = await AppUninstallerService.GetInstalledAppsAsync();
+                long totalSize = _allInstalledApps.Sum(a => a.EstimatedSizeBytes);
+                UninstallerSummaryText.Text = $"تعداد کل: {_allInstalledApps.Count} نرم‌افزار  •  حجم کل: {SystemStats.FormatBytes(totalSize)}";
+                FilterAndRenderApps();
+            }
+            catch (Exception ex)
+            {
+                UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
+                UninstallerAppsStack.Visibility = Visibility.Visible;
+                UninstallerSummaryText.Text = $"خطا در بارگذاری برنامه‌ها: {ex.Message}";
+            }
+        }
+
+        private void FilterAndRenderApps()
+        {
+            UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
+            UninstallerAppsStack.Visibility = Visibility.Visible;
+            UninstallerAppsStack.Children.Clear();
+
+            string query = UninstallerSearchBox.Text?.Trim() ?? string.Empty;
+            int sortIndex = UninstallerSortBox.SelectedIndex;
+
+            var filtered = string.IsNullOrEmpty(query)
+                ? _allInstalledApps
+                : _allInstalledApps.Where(a => a.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
+                                              a.Publisher.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            // Sort
+            filtered = sortIndex switch
+            {
+                1 => filtered.OrderByDescending(a => a.EstimatedSizeBytes).ToList(),
+                2 => filtered.OrderBy(a => a.DisplayName).ToList(),
+                _ => filtered.OrderByDescending(a => a.ParsedInstallDate.HasValue)
+                             .ThenByDescending(a => a.ParsedInstallDate ?? DateTime.MinValue)
+                             .ThenBy(a => a.DisplayName)
+                             .ToList()
+            };
+
+            foreach (var app in filtered)
+            {
+                var itemBorder = new Border
+                {
+                    Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
+                    BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(10),
+                    Padding = new Thickness(16, 12, 16, 12)
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                // Left: Info
+                var infoStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+                var nameText = new TextBlock { Text = app.DisplayName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13.5, TextTrimming = TextTrimming.CharacterEllipsis };
+                
+                string pubStr = !string.IsNullOrEmpty(app.Publisher) ? $"{app.Publisher}  •  " : "";
+                string verStr = !string.IsNullOrEmpty(app.DisplayVersion) ? $"نسخه {app.DisplayVersion}  •  " : "";
+                string dateStr = !string.IsNullOrEmpty(app.InstalledDateFormatted) ? $"تاریخ نصب: {app.InstalledDateFormatted}" : "";
+                var subText = new TextBlock { Text = $"{pubStr}{verStr}{dateStr}".TrimEnd(' ', '•'), FontSize = 11.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextTrimming = TextTrimming.CharacterEllipsis };
+
+                infoStack.Children.Add(nameText);
+                infoStack.Children.Add(subText);
+                Grid.SetColumn(infoStack, 0);
+                grid.Children.Add(infoStack);
+
+                // Middle: Size Badge
+                var sizeBadge = new Border
+                {
+                    Background = (Brush)Application.Current.Resources["AppHeaderPillBrush"],
+                    CornerRadius = new CornerRadius(12),
+                    Padding = new Thickness(10, 4, 10, 4),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(12, 0, 12, 0)
+                };
+                sizeBadge.Child = new TextBlock { Text = app.FormattedSize, FontSize = 11.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+                Grid.SetColumn(sizeBadge, 1);
+                grid.Children.Add(sizeBadge);
+
+                // Right: Uninstall Button (Fixed MinWidth 105, height 34, no text wrapping)
+                var uninstBtn = new Button
+                {
+                    Content = "حذف نرم‌افزار",
+                    FontSize = 11.5,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    MinWidth = 105,
+                    Height = 34,
+                    CornerRadius = new CornerRadius(6),
+                    Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)),
+                    BorderBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)),
+                    BorderThickness = new Thickness(1),
+                    Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+
+                uninstBtn.Click += (s, e) =>
+                {
+                    bool launched = AppUninstallerService.LaunchUninstall(app);
+                    if (launched)
+                    {
+                        ShowInfoBar("حذف نرم‌افزار", $"آنیستالر رسمی {app.DisplayName} اجرا گردید.", InfoBarSeverity.Informational);
+                    }
+                    else
+                    {
+                        ShowInfoBar("خطا در حذف", $"امکان اجرای آنیستالر برای {app.DisplayName} وجود ندارد.", InfoBarSeverity.Warning);
+                    }
+                };
+                Grid.SetColumn(uninstBtn, 2);
+                grid.Children.Add(uninstBtn);
+
+                itemBorder.Child = grid;
+                UninstallerAppsStack.Children.Add(itemBorder);
+            }
+        }
+
+        private void UninstallerSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            FilterAndRenderApps();
+        }
+
+        private void UninstallerSortBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            FilterAndRenderApps();
         }
 
         // ====================================================================
         // Tool 3: Internet Speed Test
         // ====================================================================
 
-        private async void ToolSpeedTest_Click(object sender, RoutedEventArgs e)
+        private async void StartSpeedTestBtn_Click(object sender, RoutedEventArgs e)
         {
-            await ShowSpeedTestDialogAsync();
-        }
+            StartSpeedTestBtn.IsEnabled = false;
+            StopSpeedTestBtn.IsEnabled = true;
+            _speedTestCts = new CancellationTokenSource();
 
-        private async Task ShowSpeedTestDialogAsync()
-        {
-            var dialog = new ContentDialog
+            SpeedGaugeValueText.Text = "۰.۰";
+            SpeedGaugeMBsText.Text = "در حال اتصال به سرور...";
+            SpeedPingValText.Text = "...";
+            SpeedJitterValText.Text = "...";
+            SpeedDataValText.Text = "...";
+            SpeedGaugeRing.IsIndeterminate = false;
+            SpeedGaugeRing.Value = 0;
+
+            try
             {
-                Title = "تست پینگ و سرعت دانلود واقعی اینترنت",
-                CloseButtonText = "بستن",
-                XamlRoot = this.Content.XamlRoot,
-                FlowDirection = FlowDirection.RightToLeft
-            };
-
-            var root = new StackPanel { Spacing = 14, MinWidth = 440 };
-
-            var dashboardGrid = new Grid { Margin = new Thickness(0, 10, 0, 20) };
-            
-            var progressRing = new ProgressRing { Minimum = 0, Maximum = 100, Value = 0, Width = 180, Height = 180, IsIndeterminate = false };
-            var speedStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center };
-            var speedValText = new TextBlock { Text = "۰", FontSize = 36, FontWeight = Microsoft.UI.Text.FontWeights.Bold, HorizontalAlignment = HorizontalAlignment.Center };
-            var speedUnitText = new TextBlock { Text = "Mbps", FontSize = 14, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], HorizontalAlignment = HorizontalAlignment.Center };
-            speedStack.Children.Add(speedValText);
-            speedStack.Children.Add(speedUnitText);
-            
-            dashboardGrid.Children.Add(progressRing);
-            dashboardGrid.Children.Add(speedStack);
-            root.Children.Add(dashboardGrid);
-
-            var statsGrid = new Grid { ColumnSpacing = 12 };
-            statsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            statsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-
-            var pingCard = new Border
-            {
-                Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                BorderBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 245, 158, 11)), // Orange
-                BorderThickness = new Thickness(1, 1, 1, 4),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(14, 10, 14, 10)
-            };
-            var pingStack = new StackPanel { Spacing = 4, HorizontalAlignment = HorizontalAlignment.Center };
-            var pingTitle = new TextBlock { Text = "پینگ (Ping)", FontSize = 12, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], HorizontalAlignment = HorizontalAlignment.Center };
-            var pingVal = new TextBlock { Text = "-", FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 16, HorizontalAlignment = HorizontalAlignment.Center };
-            pingStack.Children.Add(pingTitle);
-            pingStack.Children.Add(pingVal);
-            pingCard.Child = pingStack;
-            Grid.SetColumn(pingCard, 0);
-            statsGrid.Children.Add(pingCard);
-
-            var dlCard = new Border
-            {
-                Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
-                BorderBrush = new SolidColorBrush(ColorHelper.FromArgb(255, 59, 130, 246)), // Blue
-                BorderThickness = new Thickness(1, 1, 1, 4),
-                CornerRadius = new CornerRadius(8),
-                Padding = new Thickness(14, 10, 14, 10)
-            };
-            var dlStack = new StackPanel { Spacing = 4, HorizontalAlignment = HorizontalAlignment.Center };
-            var dlTitle = new TextBlock { Text = "سرعت (MB/s)", FontSize = 12, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], HorizontalAlignment = HorizontalAlignment.Center };
-            var mbSecText = new TextBlock { Text = "-", FontWeight = Microsoft.UI.Text.FontWeights.Bold, FontSize = 16, HorizontalAlignment = HorizontalAlignment.Center };
-            dlStack.Children.Add(dlTitle);
-            dlStack.Children.Add(mbSecText);
-            dlCard.Child = dlStack;
-            Grid.SetColumn(dlCard, 1);
-            statsGrid.Children.Add(dlCard);
-
-            root.Children.Add(statsGrid);
-
-            var startBtn = new Button { Content = "شروع تست سرعت", Style = (Style)Application.Current.Resources["AccentButtonStyle"], HorizontalAlignment = HorizontalAlignment.Stretch, Height = 36, CornerRadius = new CornerRadius(6), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Margin = new Thickness(0, 10, 0, 0) };
-            root.Children.Add(startBtn);
-
-            dialog.Content = root;
-            var dialogTask = dialog.ShowAsync();
-
-            async Task RunTest()
-            {
-                startBtn.IsEnabled = false;
-                startBtn.Content = "در حال تست...";
-                progressRing.IsIndeterminate = false;
-                progressRing.Value = 0;
-                pingVal.Text = "...";
-                speedValText.Text = "۰";
-                mbSecText.Text = "-";
-
-                var res = await InternetSpeedTestService.RunSpeedTestAsync((mbps, pct) =>
+                var result = await InternetSpeedTestService.RunSpeedTestAsync((mbps, pct) =>
                 {
                     DispatcherQueue.TryEnqueue(() =>
                     {
-                        speedValText.Text = $"{mbps:0.0}";
-                        mbSecText.Text = $"{mbps / 8.0:0.00}";
-                        progressRing.Value = pct;
+                        SpeedGaugeValueText.Text = $"{mbps:0.0}";
+                        SpeedGaugeMBsText.Text = $"{mbps / 8.0:0.00} مگابایت بر ثانیه";
+                        SpeedGaugeRing.Value = pct;
                     });
-                });
+                }, _speedTestCts.Token);
 
-                pingVal.Text = res.PingMs > 0 ? $"{res.PingMs} ms" : "خطا";
-                speedValText.Text = $"{res.DownloadSpeedMbps:0.0}";
-                mbSecText.Text = $"{res.DownloadSpeedMBs:0.00}";
-                progressRing.Value = 100;
-                startBtn.IsEnabled = true;
-                startBtn.Content = "تست مجدد";
+                if (result.IsSuccess)
+                {
+                    SpeedGaugeValueText.Text = $"{result.DownloadSpeedMbps:0.0}";
+                    SpeedGaugeMBsText.Text = $"{result.DownloadSpeedMBs:0.00} مگابایت بر ثانیه";
+                    SpeedPingValText.Text = result.PingMs > 0 ? $"{result.PingMs} ms" : "ناموفق";
+                    SpeedJitterValText.Text = result.JitterMs > 0 ? $"{result.JitterMs} ms" : "۰ ms";
+                    SpeedDataValText.Text = SystemStats.FormatBytes(result.BytesDownloaded);
+                    SpeedGaugeRing.Value = 100;
+                    ShowInfoBar("تست سرعت اینترنت", $"تست با موفقیت پایان یافت: {result.DownloadSpeedMbps} Mbps", InfoBarSeverity.Success);
+                }
+                else
+                {
+                    SpeedGaugeMBsText.Text = result.ErrorMessage;
+                    ShowInfoBar("نتیجه تست", result.ErrorMessage, InfoBarSeverity.Warning);
+                }
             }
+            catch (Exception)
+            {
+                SpeedGaugeMBsText.Text = "تست متوقف شد.";
+            }
+            finally
+            {
+                StartSpeedTestBtn.IsEnabled = true;
+                StopSpeedTestBtn.IsEnabled = false;
+            }
+        }
 
-            startBtn.Click += async (s, e) => await RunTest();
-            _ = RunTest();
-            await dialogTask;
+        private void StopSpeedTestBtn_Click(object sender, RoutedEventArgs e)
+        {
+            _speedTestCts?.Cancel();
+            StopSpeedTestBtn.IsEnabled = false;
         }
 
         // ====================================================================
         // Tool 4: Windows Appearance & Personalization
         // ====================================================================
 
-        private async void ToolPersonalization_Click(object sender, RoutedEventArgs e)
+        private void LoadPersonalizationPage()
         {
-            await ShowPersonalizationDialogAsync();
-        }
-
-        private async Task ShowPersonalizationDialogAsync()
-        {
-            var dialog = new ContentDialog
-            {
-                Title = "استایل، تم و گرافیک ویندوز",
-                CloseButtonText = "بستن",
-                XamlRoot = this.Content.XamlRoot,
-                FlowDirection = FlowDirection.RightToLeft
-            };
-
-            var stack = new StackPanel { Spacing = 12, MinWidth = 460 };
+            PersonalizationCardsContainer.Children.Clear();
             var current = WindowsPersonalizationService.GetCurrentSettings();
 
-            // 1. Transparency Toggle
-            stack.Children.Add(CreateToggleCard("\uE2B1", "شفافیت شیشه‌ای ویندوز (Transparency)", "فعال‌سازی یا غیرفعال‌سازی افکت شیشه‌ای در تسک‌بار، استارت و پنجره‌های ویندوز", current.IsTransparencyEnabled, ColorHelper.FromArgb(255, 59, 130, 246), (isOn) =>
+            // 1. Transparency
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE2B1", "شفافیت شیشه‌ای ویندوز (Transparency)", "فعال‌سازی افکت شیشه‌ای در تسک‌بار، استارت و پنجره‌های ویندوز", current.IsTransparencyEnabled, ColorHelper.FromArgb(255, 59, 130, 246), (isOn) =>
             {
                 WindowsPersonalizationService.SetTransparency(isOn);
                 ShowInfoBar("شفافیت ویندوز", isOn ? "افکت شیشه‌ای فعال شد." : "افکت شیشه‌ای غیرفعال شد.", InfoBarSeverity.Success);
             }));
 
             // 2. Auto Accent Color
-            stack.Children.Add(CreateToggleCard("\uE790", "رنگ Accent هوشمند والپیپر", "استخراج و هماهنگ‌سازی خودکار رنگ اصلی ویندوز از روی تصویر پس‌زمینه دسکتاپ", current.IsAutoColorizationEnabled, ColorHelper.FromArgb(255, 245, 158, 11), (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE790", "رنگ Accent هوشمند والپیپر", "استخراج و هماهنگ‌سازی خودکار رنگ اصلی ویندوز از تصویر دسکتاپ", current.IsAutoColorizationEnabled, ColorHelper.FromArgb(255, 245, 158, 11), (isOn) =>
             {
                 WindowsPersonalizationService.SetAutoColorization(isOn);
-                ShowInfoBar("رنگ ویندوز", isOn ? "هماهنگی رنگ والپیپر فعال شد." : "هماهنگی رنگ والپیپر غیرفعال شد.", InfoBarSeverity.Success);
+                ShowInfoBar("رنگ ویندوز", isOn ? "هماهنگی خودکار رنگ با والپیپر فعال شد." : "هماهنگی خودکار غیرفعال شد.", InfoBarSeverity.Success);
             }));
 
             // 3. Dark Mode
-            stack.Children.Add(CreateToggleCard("\uE706", "تم تاریک ویندوز (Dark Mode)", "اعمال پوسته تیره روی محیط کلی ویندوز و نرم‌افزارهای سیستمی", current.IsDarkModeEnabled, ColorHelper.FromArgb(255, 139, 92, 246), (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE706", "تم تاریک ویندوز (Dark Mode)", "اعمال پوسته تیره روی محیط ویندوز و نرم‌افزارهای سیستمی", current.IsDarkModeEnabled, ColorHelper.FromArgb(255, 139, 92, 246), (isOn) =>
             {
                 WindowsPersonalizationService.SetWindowsDarkMode(isOn);
                 ShowInfoBar("تم ویندوز", isOn ? "حالت تاریک فعال شد." : "حالت روشن فعال شد.", InfoBarSeverity.Success);
             }));
 
             // 4. Performance Visual Effects
-            stack.Children.Add(CreateToggleCard("\uE9A1", "حالت عملکرد و چابکی بالا (Best Performance)", "کاهش انیمیشن‌های اضافی ویندوز برای افزایش سرعت پاسخ‌دهی سیستم", current.IsBestPerformanceFx, ColorHelper.FromArgb(255, 16, 185, 129), (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE9A1", "حالت عملکرد و چابکی بالا (Best Performance)", "کاهش انیمیشن‌های اضافی ویندوز برای افزایش سرعت پاسخ‌دهی سیستم", current.IsBestPerformanceFx, ColorHelper.FromArgb(255, 16, 185, 129), (isOn) =>
             {
                 WindowsPersonalizationService.SetVisualEffectsPerformance(isOn);
                 ShowInfoBar("افکت‌های بصری", isOn ? "تنظیمات روی حداکثر کارایی قرار گرفت." : "تنظیمات روی حالت پیش‌فرض قرار گرفت.", InfoBarSeverity.Success);
             }));
 
-            dialog.Content = stack;
-            await dialog.ShowAsync();
+            // 5. Show File Extensions
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8E5", "نمایش پسوند فایل‌ها در ویندوز", "نمایش پسوند نام فایل‌ها (مانند .exe, .pdf, .docx) در File Explorer", current.IsShowFileExtensionsEnabled, ColorHelper.FromArgb(255, 6, 182, 212), (isOn) =>
+            {
+                WindowsPersonalizationService.SetShowFileExtensions(isOn);
+                ShowInfoBar("نمایش پسوندها", isOn ? "نمایش پسوند فایل‌ها فعال شد." : "پسوند فایل‌ها پنهان شد.", InfoBarSeverity.Success);
+            }));
+
+            // 6. Show Hidden Files
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8B7", "نمایش فایل‌ها و پوشه‌های مخفی", "آشکارسازی فایل‌ها و پوشه‌های پنهان سیستمی در فایل اکسپلورر", current.IsShowHiddenFilesEnabled, ColorHelper.FromArgb(255, 236, 72, 153), (isOn) =>
+            {
+                WindowsPersonalizationService.SetShowHiddenFiles(isOn);
+                ShowInfoBar("فایل‌های مخفی", isOn ? "فایل‌های مخفی آشکار شدند." : "فایل‌های مخفی پنهان شدند.", InfoBarSeverity.Success);
+            }));
+
+            // 7. Classic Context Menu
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8BD", "منوی راست‌کلیک کلاسیک ویندوز ۱۱", "بازگشت منوی راست‌کلیک کامل و سنتی بدون نیاز به فشردن Show more options", current.IsClassicContextMenuEnabled, ColorHelper.FromArgb(255, 239, 68, 68), (isOn) =>
+            {
+                WindowsPersonalizationService.SetClassicContextMenu(isOn);
+                ShowInfoBar("منوی راست‌کلیک", isOn ? "منوی راست‌کلیک کلاسیک فعال شد." : "منوی راست‌کلیک مدرن ویندوز ۱۱ فعال شد.", InfoBarSeverity.Success);
+            }));
         }
 
         private Border CreateToggleCard(string glyph, string title, string description, bool initialValue, Windows.UI.Color iconBgColor, Action<bool> onToggle)
@@ -2136,7 +2219,7 @@ namespace CleanC.UI
                 Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
                 BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(8),
+                CornerRadius = new CornerRadius(10),
                 Padding = new Thickness(16, 14, 16, 14)
             };
 
@@ -2147,9 +2230,9 @@ namespace CleanC.UI
 
             var iconBg = new Border
             {
-                Width = 36,
-                Height = 36,
-                CornerRadius = new CornerRadius(18),
+                Width = 40,
+                Height = 40,
+                CornerRadius = new CornerRadius(20),
                 Background = new SolidColorBrush(iconBgColor),
                 Margin = new Thickness(0, 0, 14, 0),
                 VerticalAlignment = VerticalAlignment.Center,
@@ -2159,7 +2242,7 @@ namespace CleanC.UI
             var icon = new FontIcon
             {
                 Glyph = glyph,
-                FontSize = 16,
+                FontSize = 18,
                 VerticalAlignment = VerticalAlignment.Center,
                 HorizontalAlignment = HorizontalAlignment.Center,
                 Foreground = new SolidColorBrush(Microsoft.UI.Colors.White)
@@ -2180,8 +2263,8 @@ namespace CleanC.UI
             var toggle = new ToggleSwitch
             {
                 IsOn = initialValue,
-                OnContent = "روشن",
-                OffContent = "خاموش",
+                OnContent = "فعال",
+                OffContent = "غیرفعال",
                 VerticalAlignment = VerticalAlignment.Center,
                 Margin = new Thickness(12, 0, 0, 0)
             };
@@ -2191,6 +2274,71 @@ namespace CleanC.UI
 
             border.Child = grid;
             return border;
+        }
+
+        // ====================================================================
+        // Tool 5: Startup Manager
+        // ====================================================================
+
+        private async Task LoadStartupManagerPageAsync()
+        {
+            StartupCardsContainer.Children.Clear();
+            var items = await Task.Run(() => StartupOptimizerService.GetStartupItems());
+
+            if (items.Count == 0)
+            {
+                StartupCardsContainer.Children.Add(new TextBlock
+                {
+                    Text = "هیچ برنامه‌ای در استارتاپ ویندوز یافت نشد.",
+                    FontSize = 13,
+                    Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 24, 0, 0)
+                });
+                return;
+            }
+
+            foreach (var item in items)
+            {
+                var card = new Border
+                {
+                    Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
+                    BorderBrush = (Brush)Application.Current.Resources["AppCardBorderBrush"],
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(10),
+                    Padding = new Thickness(16, 12, 16, 12)
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var textStack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
+                var nameText = new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13 };
+                var cmdText = new TextBlock { Text = $"{item.Category}  •  موقعیت: {item.Location}  •  {item.Command}", FontSize = 11, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"], TextTrimming = TextTrimming.CharacterEllipsis };
+                textStack.Children.Add(nameText);
+                textStack.Children.Add(cmdText);
+                Grid.SetColumn(textStack, 0);
+                grid.Children.Add(textStack);
+
+                var toggle = new ToggleSwitch
+                {
+                    IsOn = !item.IsDisabled,
+                    OnContent = "فعال",
+                    OffContent = "غیرفعال",
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(12, 0, 0, 0)
+                };
+                toggle.Toggled += (s, e) =>
+                {
+                    ShowInfoBar("استارتاپ", $"{item.Name} {(toggle.IsOn ? "فعال شد." : "غیرفعال گردید.")}", InfoBarSeverity.Informational);
+                };
+                Grid.SetColumn(toggle, 1);
+                grid.Children.Add(toggle);
+
+                card.Child = grid;
+                StartupCardsContainer.Children.Add(card);
+            }
         }
 
         private void ShowInfoBar(string title, string message, InfoBarSeverity severity)

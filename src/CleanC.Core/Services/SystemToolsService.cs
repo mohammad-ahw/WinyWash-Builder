@@ -15,6 +15,7 @@ namespace CleanC.Core.Services
                     "cleanmgr" => "cleanmgr.exe",
                     "devmgmt" => "devmgmt.msc",
                     "services" => "services.msc",
+                    "diskmgmt" => "diskmgmt.msc",
                     "sysdm" => "sysdm.cpl",
                     "regedit" => "regedit.exe",
                     "resmon" => "resmon.exe",

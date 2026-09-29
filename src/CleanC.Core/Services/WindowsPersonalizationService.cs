@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -9,10 +10,29 @@ namespace CleanC.Core.Services
         public bool IsAutoColorizationEnabled { get; set; }
         public bool IsDarkModeEnabled { get; set; }
         public bool IsBestPerformanceFx { get; set; }
+        public bool IsShowFileExtensionsEnabled { get; set; }
+        public bool IsShowHiddenFilesEnabled { get; set; }
+        public bool IsClassicContextMenuEnabled { get; set; }
     }
 
     public class WindowsPersonalizationService
     {
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern IntPtr SendMessageTimeout(IntPtr hWnd, uint Msg, UIntPtr wParam, string lParam, uint fuFlags, uint uTimeout, out UIntPtr lpdwResult);
+
+        private const uint WM_SETTINGCHANGE = 0x001A;
+        private static readonly IntPtr HWND_BROADCAST = new IntPtr(0xffff);
+
+        public static void BroadcastSettingsChange()
+        {
+            try
+            {
+                SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, UIntPtr.Zero, "Environment", 2, 1000, out _);
+                SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, UIntPtr.Zero, "TraySettings", 2, 1000, out _);
+            }
+            catch { }
+        }
+
         public static PersonalizationSettings GetCurrentSettings()
         {
             var s = new PersonalizationSettings();
@@ -42,6 +62,19 @@ namespace CleanC.Core.Services
                     var fx = fxKey.GetValue("VisualFXSetting");
                     s.IsBestPerformanceFx = fx != null && Convert.ToInt32(fx) == 2;
                 }
+
+                using var advKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+                if (advKey != null)
+                {
+                    var ext = advKey.GetValue("HideFileExt");
+                    s.IsShowFileExtensionsEnabled = ext != null && Convert.ToInt32(ext) == 0; // 0 = show extensions
+
+                    var hidden = advKey.GetValue("Hidden");
+                    s.IsShowHiddenFilesEnabled = hidden != null && Convert.ToInt32(hidden) == 1; // 1 = show hidden
+                }
+
+                using var menuKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
+                s.IsClassicContextMenuEnabled = (menuKey != null);
             }
             catch { }
 
@@ -54,6 +87,7 @@ namespace CleanC.Core.Services
             {
                 using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Themes\Personalize");
                 key?.SetValue("EnableTransparency", enable ? 1 : 0, RegistryValueKind.DWord);
+                BroadcastSettingsChange();
             }
             catch { }
         }
@@ -64,6 +98,7 @@ namespace CleanC.Core.Services
             {
                 using var key = Registry.CurrentUser.CreateSubKey(@"Control Panel\Desktop");
                 key?.SetValue("AutoColorization", enable ? 1 : 0, RegistryValueKind.DWord);
+                BroadcastSettingsChange();
             }
             catch { }
         }
@@ -79,6 +114,7 @@ namespace CleanC.Core.Services
                     key.SetValue("AppsUseLightTheme", val, RegistryValueKind.DWord);
                     key.SetValue("SystemUsesLightTheme", val, RegistryValueKind.DWord);
                 }
+                BroadcastSettingsChange();
             }
             catch { }
         }
@@ -88,8 +124,49 @@ namespace CleanC.Core.Services
             try
             {
                 using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects");
-                // 2 = Best performance (minimal animation latency), 1 = Best appearance
                 key?.SetValue("VisualFXSetting", bestPerformance ? 2 : 1, RegistryValueKind.DWord);
+                BroadcastSettingsChange();
+            }
+            catch { }
+        }
+
+        public static void SetShowFileExtensions(bool show)
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+                key?.SetValue("HideFileExt", show ? 0 : 1, RegistryValueKind.DWord);
+                BroadcastSettingsChange();
+            }
+            catch { }
+        }
+
+        public static void SetShowHiddenFiles(bool show)
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced");
+                key?.SetValue("Hidden", show ? 1 : 2, RegistryValueKind.DWord);
+                BroadcastSettingsChange();
+            }
+            catch { }
+        }
+
+        public static void SetClassicContextMenu(bool enable)
+        {
+            try
+            {
+                string keyPath = @"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32";
+                if (enable)
+                {
+                    using var key = Registry.CurrentUser.CreateSubKey(keyPath);
+                    key?.SetValue("", "", RegistryValueKind.String);
+                }
+                else
+                {
+                    Registry.CurrentUser.DeleteSubKeyTree(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}", false);
+                }
+                BroadcastSettingsChange();
             }
             catch { }
         }

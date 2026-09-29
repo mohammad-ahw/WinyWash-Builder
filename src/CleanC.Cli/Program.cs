@@ -25,6 +25,28 @@ namespace CleanC.Cli
                 return await RunCliMenuAsync();
             }
 
+            if (mode == "--specs" || mode == "specs")
+            {
+                try
+                {
+                    Console.WriteLine("[DEBUG] Calling SystemSpecsService.GetDetailedSpecsAsync()...");
+                    var specs = await SystemSpecsService.GetDetailedSpecsAsync();
+                    Console.WriteLine($"[CPU] {specs.CpuName} ({specs.CpuCores}C/{specs.CpuThreads}T @ {specs.CpuClockMhz}MHz)");
+                    Console.WriteLine($"[Board] {specs.MotherboardManufacturer} {specs.MotherboardModel}");
+                    Console.WriteLine($"[RAM] {specs.TotalRamFormatted} ({specs.RamSlotsUsed} slots @ {specs.RamSpeedMhz}MHz)");
+                    Console.WriteLine($"[OS] {specs.OsName} Build {specs.OsBuild}");
+                    Console.WriteLine($"[Battery] HasBattery={specs.HasBattery}, Health={specs.BatteryHealthPercent}%, Design={specs.BatteryDesignCapacityMWh}, Full={specs.BatteryFullChargeCapacityMWh}, Cycles={specs.BatteryCycleCount}");
+                    Console.WriteLine($"[GPU] {string.Join(" | ", specs.GpuNames)}");
+                    Console.WriteLine($"[SSD] HasData={specs.HasSsdHealthData}, Temp={specs.SsdTemperatureCelsius}C, Wear={specs.SsdWearPercent}%, Hours={specs.SsdOperatingHours}");
+                    return 0;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"[ERROR] {ex}");
+                    return 1;
+                }
+            }
+
             // Default: Launch GUI application
             string baseDir = AppDomain.CurrentDomain.BaseDirectory;
             string guiExe = Path.Combine(baseDir, "CleanC.UI.exe");

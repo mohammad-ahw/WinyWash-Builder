@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,7 @@ namespace CleanC.Core.Services
             {
                 var apps = new Dictionary<string, InstalledAppInfo>(StringComparer.OrdinalIgnoreCase);
 
+                // 1. Scan Win32 Applications from Registry
                 var registryRoots = new[]
                 {
                     (Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
@@ -58,6 +60,23 @@ namespace CleanC.Core.Services
                                 string version = appKey.GetValue("DisplayVersion")?.ToString() ?? string.Empty;
                                 string publisher = appKey.GetValue("Publisher")?.ToString() ?? string.Empty;
                                 string installDate = appKey.GetValue("InstallDate")?.ToString() ?? string.Empty;
+                                string displayIcon = appKey.GetValue("DisplayIcon")?.ToString() ?? string.Empty;
+
+                                DateTime? parsedDate = null;
+                                if (!string.IsNullOrEmpty(installDate) && installDate.Length == 8 && int.TryParse(installDate, out _))
+                                {
+                                    if (DateTime.TryParseExact(installDate, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dt))
+                                    {
+                                        parsedDate = dt;
+                                    }
+                                }
+                                else if (!string.IsNullOrEmpty(installDate))
+                                {
+                                    if (DateTime.TryParse(installDate, out var dt))
+                                    {
+                                        parsedDate = dt;
+                                    }
+                                }
 
                                 long sizeBytes = 0;
                                 var sizeObj = appKey.GetValue("EstimatedSize");
@@ -74,9 +93,11 @@ namespace CleanC.Core.Services
                                         DisplayVersion = version,
                                         Publisher = publisher,
                                         InstallDate = installDate,
+                                        ParsedInstallDate = parsedDate,
                                         EstimatedSizeBytes = sizeBytes,
                                         UninstallString = uninstall ?? string.Empty,
                                         QuietUninstallString = quietUninstall ?? string.Empty,
+                                        DisplayIcon = displayIcon,
                                         IsStoreApp = false
                                     };
                                 }
@@ -87,7 +108,55 @@ namespace CleanC.Core.Services
                     catch { }
                 }
 
-                return apps.Values.OrderBy(a => a.DisplayName).ToList();
+                // 2. Scan Windows Store Apps (AppX / MSIX)
+                try
+                {
+                    var pkgMgr = new Windows.Management.Deployment.PackageManager();
+                    var packages = pkgMgr.FindPackagesForUser("");
+                    foreach (var pkg in packages)
+                    {
+                        try
+                        {
+                            if (pkg.IsFramework || pkg.IsResourcePackage) continue;
+                            if (pkg.SignatureKind == Windows.ApplicationModel.PackageSignatureKind.System) continue;
+
+                            string dName = pkg.DisplayName;
+                            if (string.IsNullOrWhiteSpace(dName) || apps.ContainsKey(dName)) continue;
+
+                            string fName = pkg.Id.FullName;
+                            if (fName.StartsWith("Microsoft.Windows.", StringComparison.OrdinalIgnoreCase) ||
+                                fName.StartsWith("Microsoft.DesktopAppInstaller", StringComparison.OrdinalIgnoreCase) ||
+                                fName.StartsWith("Microsoft.UI.Xaml", StringComparison.OrdinalIgnoreCase) ||
+                                fName.StartsWith("Microsoft.VCLibs", StringComparison.OrdinalIgnoreCase)) continue;
+
+                            DateTime? installed = null;
+                            try { installed = pkg.InstalledDate.DateTime; } catch { }
+
+                            apps[dName] = new InstalledAppInfo
+                            {
+                                DisplayName = dName,
+                                DisplayVersion = $"{pkg.Id.Version.Major}.{pkg.Id.Version.Minor}.{pkg.Id.Version.Build}",
+                                Publisher = pkg.PublisherDisplayName,
+                                InstallDate = installed.HasValue ? installed.Value.ToString("yyyyMMdd") : "",
+                                ParsedInstallDate = installed,
+                                EstimatedSizeBytes = 0,
+                                UninstallString = "",
+                                QuietUninstallString = "",
+                                IsStoreApp = true,
+                                PackageFullName = fName
+                            };
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+
+                // Default sorting: Most recently installed apps first, then alphabetically
+                return apps.Values
+                    .OrderByDescending(a => a.ParsedInstallDate.HasValue)
+                    .ThenByDescending(a => a.ParsedInstallDate ?? DateTime.MinValue)
+                    .ThenBy(a => a.DisplayName)
+                    .ToList();
             });
         }
 
@@ -95,6 +164,19 @@ namespace CleanC.Core.Services
         {
             try
             {
+                if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
+                {
+                    var psi = new ProcessStartInfo
+                    {
+                        FileName = "powershell.exe",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{app.PackageFullName}'\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    Process.Start(psi);
+                    return true;
+                }
+
                 string cmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
                 if (string.IsNullOrWhiteSpace(cmd)) return false;
 
