@@ -14,7 +14,7 @@ namespace CleanC.Core.Models
             : (!string.IsNullOrEmpty(InstallDate) ? InstallDate : "نامشخص");
 
         public long EstimatedSizeBytes { get; set; }
-        public string FormattedSize => EstimatedSizeBytes > 0 ? SystemStats.FormatBytes(EstimatedSizeBytes) : "نامشخص";
+        public string FormattedSize => EstimatedSizeBytes > 0 ? SystemStats.FormatBytes(EstimatedSizeBytes) : string.Empty;
 
         public string UninstallString { get; set; } = string.Empty;
         public string QuietUninstallString { get; set; } = string.Empty;

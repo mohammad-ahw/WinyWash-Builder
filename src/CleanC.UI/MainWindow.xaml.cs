@@ -1762,6 +1762,7 @@ namespace CleanC.UI
             ToolPersonalizationPanel.Visibility = Visibility.Collapsed;
             ToolStartupManagerPanel.Visibility = Visibility.Collapsed;
             ToolWindowsUpdatePanel.Visibility = Visibility.Collapsed;
+            ToolDriversPanel.Visibility = Visibility.Collapsed;
 
             switch (pageId)
             {
@@ -1787,6 +1788,10 @@ namespace CleanC.UI
                 case "windows_update":
                     ToolWindowsUpdatePanel.Visibility = Visibility.Visible;
                     _ = LoadWindowsUpdatePageAsync();
+                    break;
+                case "drivers":
+                    ToolDriversPanel.Visibility = Visibility.Visible;
+                    _ = LoadDriversPageAsync();
                     break;
                 default:
                     ToolsLauncherPanel.Visibility = Visibility.Visible;
@@ -1890,6 +1895,24 @@ namespace CleanC.UI
             if (!string.IsNullOrEmpty(specs.OsInstallDate)) osExtra += $"  •  تاریخ نصب: {specs.OsInstallDate}";
             if (!string.IsNullOrEmpty(specs.OsUptimeFormatted)) osExtra += $"  •  زمان روشن بودن: {specs.OsUptimeFormatted}";
             SpecsCardsContainer.Children.Add(CreateSpecCard("\uE8A9", "سیستم‌عامل (Windows)", $"{specs.OsName} ({specs.OsArchitecture})", osExtra, ColorHelper.FromArgb(255, 139, 92, 246)));
+
+            // 8. Windows Activation Status Card
+            if (specs.Activation != null)
+            {
+                string actStatus = specs.Activation.StatusText;
+                string actDesc = !string.IsNullOrEmpty(specs.Activation.Description) ? specs.Activation.Description : "کانال لایسنس و اصالت سیستم‌عامل";
+                var actColor = specs.Activation.IsActivated 
+                    ? ColorHelper.FromArgb(255, 16, 185, 129) // Emerald
+                    : ColorHelper.FromArgb(255, 239, 68, 68); // Red
+                string actGlyph = specs.Activation.IsActivated ? "\uE73E" : "\uE783";
+                SpecsCardsContainer.Children.Add(CreateSpecCard(actGlyph, "وضعیت فعال‌سازی و لایسنس (Windows Activation)", actStatus, actDesc, actColor));
+            }
+
+            // 9. Logical Drives Management (This PC Drives)
+            if (specs.LogicalDrives != null && specs.LogicalDrives.Count > 0)
+            {
+                SpecsCardsContainer.Children.Add(CreateLogicalDrivesSection(specs.LogicalDrives));
+            }
         }
 
         private void CopySpecsReport_Click(object sender, RoutedEventArgs e)
@@ -1964,6 +1987,277 @@ namespace CleanC.UI
 
             border.Child = grid;
             return border;
+        }
+
+        private Border CreateLogicalDrivesSection(List<LogicalDriveItem> drives)
+        {
+            var container = new Border
+            {
+                Background = GetThemeBrush("AppCardBackgroundBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(12),
+                Padding = new Thickness(20, 16, 20, 18),
+                Translation = new System.Numerics.Vector3(0, 0, 16)
+            };
+
+            var mainStack = new StackPanel { Spacing = 14 };
+
+            // Section Header
+            var headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var titleStack = new StackPanel { Spacing = 2 };
+            titleStack.Children.Add(new TextBlock
+            {
+                Text = "مدیریت درایوهای سیستم‌عامل (This PC Drives)",
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                FontSize = 14
+            });
+            titleStack.Children.Add(new TextBlock
+            {
+                Text = "مشاهده ظرفیت، تغییر نام برچسب درایوها و تغییر حرف درایو (Drive Letter) با ایمنی کامل",
+                FontSize = 11,
+                Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+            });
+            Grid.SetColumn(titleStack, 0);
+            headerGrid.Children.Add(titleStack);
+
+            mainStack.Children.Add(headerGrid);
+
+            // Drives List
+            var drivesList = new StackPanel { Spacing = 10 };
+            foreach (var drive in drives)
+            {
+                var driveCard = new Border
+                {
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8),
+                    Padding = new Thickness(16, 12, 16, 12)
+                };
+
+                var dGrid = new Grid();
+                dGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // Icon
+                dGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // Info & Bar
+                dGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // Actions
+
+                // Drive Icon
+                var iconBorder = new Border
+                {
+                    Width = 40,
+                    Height = 40,
+                    CornerRadius = new CornerRadius(8),
+                    Background = drive.IsSystemDrive ? new SolidColorBrush(ColorHelper.FromArgb(40, 59, 130, 246)) : new SolidColorBrush(ColorHelper.FromArgb(40, 16, 185, 129)),
+                    Margin = new Thickness(0, 0, 14, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                iconBorder.Child = new FontIcon
+                {
+                    Glyph = drive.IsSystemDrive ? "\uEDA2" : "\uE7FC",
+                    FontSize = 18,
+                    Foreground = drive.IsSystemDrive ? new SolidColorBrush(ColorHelper.FromArgb(255, 59, 130, 246)) : new SolidColorBrush(ColorHelper.FromArgb(255, 16, 185, 129)),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(iconBorder, 0);
+                dGrid.Children.Add(iconBorder);
+
+                // Middle Info & Progress
+                var infoStack = new StackPanel { Spacing = 5, VerticalAlignment = VerticalAlignment.Center };
+                var nameRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                nameRow.Children.Add(new TextBlock
+                {
+                    Text = $"{drive.Letter} {drive.VolumeLabel}",
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    FontSize = 13
+                });
+                nameRow.Children.Add(new TextBlock
+                {
+                    Text = $"({drive.FileSystem})",
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+                infoStack.Children.Add(nameRow);
+
+                // Progress Bar
+                var pBar = new ProgressBar
+                {
+                    Value = drive.UsedPercent,
+                    Maximum = 100,
+                    Height = 6,
+                    CornerRadius = new CornerRadius(3)
+                };
+                infoStack.Children.Add(pBar);
+
+                // Space detail
+                var spaceDetail = new TextBlock
+                {
+                    Text = $"{drive.FormattedUsed} مصرف‌شده از {drive.FormattedTotal} ({drive.FormattedFree} فضای آزاد باقیمانده - {drive.UsedPercent:0.0}%)",
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+                };
+                infoStack.Children.Add(spaceDetail);
+
+                Grid.SetColumn(infoStack, 1);
+                dGrid.Children.Add(infoStack);
+
+                // Actions (Rename, Change Letter)
+                var actionsStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
+
+                // Rename Button
+                var renameBtn = new Button
+                {
+                    Content = "تغییر نام",
+                    Height = 30,
+                    FontSize = 11,
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10, 0, 10, 0)
+                };
+                renameBtn.Click += async (s, e) =>
+                {
+                    await PromptRenameDriveAsync(drive);
+                };
+                actionsStack.Children.Add(renameBtn);
+
+                // Change Letter Button
+                var changeLetterBtn = new Button
+                {
+                    Content = "تغییر حرف",
+                    Height = 30,
+                    FontSize = 11,
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10, 0, 10, 0)
+                };
+                if (drive.IsSystemDrive)
+                {
+                    changeLetterBtn.IsEnabled = false;
+                    ToolTipService.SetToolTip(changeLetterBtn, "امکان تغییر حرف درایو ویندوز (C:) به دلیل حفظ پایداری سیستم وجود ندارد.");
+                }
+                else
+                {
+                    changeLetterBtn.Click += async (s, e) =>
+                    {
+                        await PromptChangeDriveLetterAsync(drive);
+                    };
+                }
+                actionsStack.Children.Add(changeLetterBtn);
+
+                Grid.SetColumn(actionsStack, 2);
+                dGrid.Children.Add(actionsStack);
+
+                driveCard.Child = dGrid;
+                drivesList.Children.Add(driveCard);
+            }
+
+            mainStack.Children.Add(drivesList);
+            container.Child = mainStack;
+            return container;
+        }
+
+        private async Task PromptRenameDriveAsync(LogicalDriveItem drive)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.Content.XamlRoot,
+                Title = $"تغییر نام درایو {drive.Letter}",
+                PrimaryButtonText = "ذخیره نام جدید",
+                CloseButtonText = "انصراف",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            var inputStack = new StackPanel { Spacing = 10, Margin = new Thickness(0, 12, 0, 0) };
+            inputStack.Children.Add(new TextBlock
+            {
+                Text = "نام یا برچسب (Volume Label) جدید را وارد نمایید:",
+                FontSize = 12
+            });
+
+            var textBox = new TextBox
+            {
+                Text = drive.VolumeLabel == "درایو محلی" ? "" : drive.VolumeLabel,
+                PlaceholderText = "مثال: Data, Games, Works",
+                MaxLength = 32
+            };
+            inputStack.Children.Add(textBox);
+            dialog.Content = inputStack;
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary)
+            {
+                string newLabel = textBox.Text.Trim();
+                bool ok = SystemSpecsService.SetDriveLabel(drive.Letter, newLabel);
+                if (ok)
+                {
+                    ShowInfoBar("تغییر نام درایو", $"نام درایو {drive.Letter} با موفقیت به '{newLabel}' تغییر یافت.", InfoBarSeverity.Success);
+                    await LoadSystemSpecsPageAsync(forceRefresh: true);
+                }
+                else
+                {
+                    ShowInfoBar("خطا", $"عدم موفقیت در تغییر نام درایو {drive.Letter}.", InfoBarSeverity.Error);
+                }
+            }
+        }
+
+        private async Task PromptChangeDriveLetterAsync(LogicalDriveItem drive)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.Content.XamlRoot,
+                Title = $"تغییر حرف درایو {drive.Letter}",
+                PrimaryButtonText = "تغییر و اعمال",
+                CloseButtonText = "انصراف",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            var stack = new StackPanel { Spacing = 12, Margin = new Thickness(0, 12, 0, 0) };
+            stack.Children.Add(new TextBlock
+            {
+                Text = $"توجه: تغییر حرف درایو {drive.Letter} ممکن است دسترسی میانبرهایی که به این درایو اشاره دارند را موقتاً تحت تاثیر قرار دهد.",
+                FontSize = 11.5,
+                Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 245, 158, 11)),
+                TextWrapping = TextWrapping.Wrap
+            });
+
+            stack.Children.Add(new TextBlock
+            {
+                Text = "حرف جدید مورد نظر را انتخاب کنید:",
+                FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold
+            });
+
+            var usedLetters = DriveInfo.GetDrives().Select(d => d.Name.Substring(0, 1).ToUpperInvariant()).ToHashSet();
+            var combo = new ComboBox { HorizontalAlignment = HorizontalAlignment.Stretch };
+            for (char c = 'D'; c <= 'Z'; c++)
+            {
+                string letterStr = c.ToString();
+                if (!usedLetters.Contains(letterStr) || letterStr == drive.Letter.Substring(0, 1).ToUpperInvariant())
+                {
+                    combo.Items.Add(new ComboBoxItem { Content = $"{letterStr}:" });
+                }
+            }
+            if (combo.Items.Count > 0) combo.SelectedIndex = 0;
+
+            stack.Children.Add(combo);
+            dialog.Content = stack;
+
+            var result = await dialog.ShowAsync();
+            if (result == ContentDialogResult.Primary && combo.SelectedItem is ComboBoxItem item && item.Content is string chosen)
+            {
+                string newLetter = chosen.TrimEnd(':');
+                var (success, msg) = await SystemSpecsService.ChangeDriveLetterAsync(drive.Letter, newLetter);
+                if (success)
+                {
+                    ShowInfoBar("تغییر حرف درایو", msg, InfoBarSeverity.Success);
+                    await LoadSystemSpecsPageAsync(forceRefresh: true);
+                }
+                else
+                {
+                    ShowInfoBar("خطا در تغییر حرف درایو", msg, InfoBarSeverity.Error);
+                }
+            }
         }
 
         // ====================================================================
@@ -2138,11 +2432,28 @@ namespace CleanC.UI
 
             try
             {
-                var result = await InternetSpeedTestService.RunSpeedTestAsync((phase, mbps, pct) =>
+                var result = await InternetSpeedTestService.RunSpeedTestAsync((phase, mbps, pct, curResult) =>
                 {
                     DispatcherQueue.TryEnqueue(() =>
                     {
-                        if (phase == "download")
+                        if (curResult != null && !string.IsNullOrEmpty(curResult.ClientIp))
+                        {
+                            SpeedIpChipText.Text = curResult.ClientIp;
+                            SpeedIspChipText.Text = !string.IsNullOrEmpty(curResult.IspName) ? curResult.IspName : "ارائه‌دهنده فعال";
+                            string loc = $"{curResult.City}, {curResult.Country}".Trim(',', ' ');
+                            SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? loc : "سرور ابری جهانی";
+                        }
+
+                        if (phase == "meta")
+                        {
+                            SpeedGaugePhaseText.Text = "اطلاعات شبکه دریافت شد. در حال سنجش تاخیر...";
+                        }
+                        else if (phase == "ping")
+                        {
+                            SpeedGaugePhaseText.Text = "در حال سنجش تاخیر پینگ...";
+                            SpeedPingValText.Text = $"{mbps:0} ms";
+                        }
+                        else if (phase == "download")
                         {
                             SpeedGaugePhaseText.Text = "در حال دریافت داده (دانلود)...";
                             SpeedGaugeValueText.Text = $"{mbps:0.0}";
@@ -2418,17 +2729,31 @@ namespace CleanC.UI
         {
             if (string.IsNullOrWhiteSpace(command)) return string.Empty;
             string s = command.Trim();
+
+            // 1. Quoted path: "C:\path to\app.exe" /args
             if (s.StartsWith("\""))
             {
                 int end = s.IndexOf('"', 1);
-                if (end > 1) return s.Substring(1, end - 1);
+                if (end > 1) return s.Substring(1, end - 1).Trim();
             }
+
+            // 2. Unquoted path ending in .exe followed by arguments: C:\Program Files\IDM\IDMan.exe /onboot
+            int exeIdx = s.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+            if (exeIdx > 0)
+            {
+                string candidate = s.Substring(0, exeIdx + 4).Trim();
+                if (File.Exists(candidate)) return candidate;
+            }
+
+            // 3. Fallback: try splitting on first space
             int sp = s.IndexOf(' ');
             if (sp > 0)
             {
-                string first = s.Substring(0, sp);
+                string first = s.Substring(0, sp).Trim();
                 if (File.Exists(first)) return first;
             }
+
+            if (File.Exists(s)) return s;
             return s;
         }
 
@@ -2861,6 +3186,328 @@ namespace CleanC.UI
             finally
             {
                 FixStuckUpdatesBtn.IsEnabled = true;
+            }
+        }
+
+        // ====================================================================
+        // Tool 7: Driver Manager
+        // ====================================================================
+
+        private List<DriverItem>? _cachedDrivers;
+        private DriverSummaryStats? _cachedDriverStats;
+
+        private async Task LoadDriversPageAsync(bool forceRefresh = false)
+        {
+            if (_cachedDrivers != null && !forceRefresh)
+            {
+                RenderDrivers(_cachedDrivers);
+                return;
+            }
+
+            DriversLoadingSpinner.Visibility = Visibility.Visible;
+            DriversCardsContainer.Visibility = Visibility.Collapsed;
+
+            try
+            {
+                var (drivers, stats) = await DriverManagerService.GetDriversAsync();
+                _cachedDrivers = drivers;
+                _cachedDriverStats = stats;
+
+                DriversTotalCountText.Text = $"{stats.TotalDrivers} بسته";
+                DriversErrorCountText.Text = $"{stats.ErrorCount} خطا";
+                DriversDuplicateCountText.Text = $"{stats.DuplicateOldCount} بسته";
+
+                DriversDuplicateBanner.Visibility = stats.DuplicateOldCount > 0 ? Visibility.Visible : Visibility.Collapsed;
+                if (stats.DuplicateOldCount > 0)
+                {
+                    DriversDuplicateBannerTitle.Text = $"شناسایی {stats.DuplicateOldCount} بسته تکراری و قدیمی در DriverStore ویندوز";
+                }
+
+                RenderDrivers(drivers);
+            }
+            catch (Exception ex)
+            {
+                DriversLoadingSpinner.Visibility = Visibility.Collapsed;
+                DriversCardsContainer.Visibility = Visibility.Visible;
+                DriversCardsContainer.Children.Clear();
+                DriversCardsContainer.Children.Add(new TextBlock
+                {
+                    Text = $"خطا در واکشی اطلاعات درایورها: {ex.Message}",
+                    Foreground = new SolidColorBrush(Microsoft.UI.Colors.Red)
+                });
+            }
+        }
+
+        private void RenderDrivers(List<DriverItem> drivers)
+        {
+            DriversLoadingSpinner.Visibility = Visibility.Collapsed;
+            DriversCardsContainer.Visibility = Visibility.Visible;
+            DriversCardsContainer.Children.Clear();
+
+            string q = DriversSearchBox?.Text?.Trim().ToLowerInvariant() ?? "";
+            var filtered = drivers;
+            if (!string.IsNullOrEmpty(q))
+            {
+                filtered = drivers.Where(d => 
+                    d.PublishedName.ToLowerInvariant().Contains(q) ||
+                    d.OriginalName.ToLowerInvariant().Contains(q) ||
+                    d.ProviderName.ToLowerInvariant().Contains(q) ||
+                    d.ClassName.ToLowerInvariant().Contains(q) ||
+                    d.DriverVersion.ToLowerInvariant().Contains(q)
+                ).ToList();
+            }
+
+            if (filtered.Count == 0)
+            {
+                DriversCardsContainer.Children.Add(new TextBlock
+                {
+                    Text = "هیچ درایوری با مشخصات جستجو شده یافت نشد.",
+                    FontSize = 12,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 16, 0, 0)
+                });
+                return;
+            }
+
+            foreach (var d in filtered.Take(120))
+            {
+                var card = new Border
+                {
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    BorderBrush = d.HasError 
+                        ? new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) 
+                        : (d.IsDuplicateOldVersion ? new SolidColorBrush(ColorHelper.FromArgb(255, 245, 158, 11)) : GetThemeBrush("AppCardBorderBrush")),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8),
+                    Padding = new Thickness(14, 10, 14, 10)
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                // Icon
+                var iconBorder = new Border
+                {
+                    Width = 36,
+                    Height = 36,
+                    CornerRadius = new CornerRadius(8),
+                    Background = d.HasError 
+                        ? new SolidColorBrush(ColorHelper.FromArgb(40, 239, 68, 68)) 
+                        : (d.IsDuplicateOldVersion ? new SolidColorBrush(ColorHelper.FromArgb(40, 245, 158, 11)) : new SolidColorBrush(ColorHelper.FromArgb(40, 13, 148, 136))),
+                    Margin = new Thickness(0, 0, 12, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                iconBorder.Child = new FontIcon
+                {
+                    Glyph = d.HasError ? "\uE783" : "\uE772",
+                    FontSize = 16,
+                    Foreground = d.HasError 
+                        ? new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) 
+                        : (d.IsDuplicateOldVersion ? new SolidColorBrush(ColorHelper.FromArgb(255, 245, 158, 11)) : new SolidColorBrush(ColorHelper.FromArgb(255, 13, 148, 136))),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(iconBorder, 0);
+                grid.Children.Add(iconBorder);
+
+                // Driver Info
+                var textStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+                var titleRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                titleRow.Children.Add(new TextBlock
+                {
+                    Text = !string.IsNullOrEmpty(d.OriginalName) ? d.OriginalName : d.PublishedName,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    FontSize = 12.5
+                });
+                titleRow.Children.Add(new TextBlock
+                {
+                    Text = $"({d.PublishedName})",
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+                textStack.Children.Add(titleRow);
+
+                string sub = $"{d.ProviderName}  •  دسته: {d.ClassName}  •  نسخه: {d.DriverVersion}";
+                if (!string.IsNullOrEmpty(d.DriverDate)) sub += $" ({d.DriverDate})";
+                textStack.Children.Add(new TextBlock
+                {
+                    Text = sub,
+                    FontSize = 11,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+                });
+
+                Grid.SetColumn(textStack, 1);
+                grid.Children.Add(textStack);
+
+                // Status Badge & Action
+                var rightStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
+                
+                var badge = new Border
+                {
+                    CornerRadius = new CornerRadius(4),
+                    Padding = new Thickness(8, 3, 8, 3),
+                    Background = d.HasError 
+                        ? new SolidColorBrush(ColorHelper.FromArgb(30, 239, 68, 68)) 
+                        : (d.IsDuplicateOldVersion ? new SolidColorBrush(ColorHelper.FromArgb(30, 245, 158, 11)) : new SolidColorBrush(ColorHelper.FromArgb(30, 16, 185, 129)))
+                };
+                badge.Child = new TextBlock
+                {
+                    Text = d.StatusDescription,
+                    FontSize = 10.5,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    Foreground = d.HasError 
+                        ? new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) 
+                        : (d.IsDuplicateOldVersion ? new SolidColorBrush(ColorHelper.FromArgb(255, 245, 158, 11)) : new SolidColorBrush(ColorHelper.FromArgb(255, 16, 185, 129)))
+                };
+                rightStack.Children.Add(badge);
+
+                if (d.IsDuplicateOldVersion)
+                {
+                    var delBtn = new Button
+                    {
+                        Content = "حذف بسته",
+                        Height = 28,
+                        FontSize = 10.5,
+                        CornerRadius = new CornerRadius(5),
+                        Padding = new Thickness(8, 0, 8, 0),
+                        Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68))
+                    };
+                    delBtn.Click += async (s, e) =>
+                    {
+                        await DeleteSingleDriverAsync(d);
+                    };
+                    rightStack.Children.Add(delBtn);
+                }
+
+                Grid.SetColumn(rightStack, 2);
+                grid.Children.Add(rightStack);
+
+                card.Child = grid;
+                DriversCardsContainer.Children.Add(card);
+            }
+        }
+
+        private async Task DeleteSingleDriverAsync(DriverItem driver)
+        {
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.Content.XamlRoot,
+                Title = $"حذف درایور قدیمی {driver.PublishedName}",
+                Content = $"آیا از حذف بسته درایور قدیمی '{driver.OriginalName}' ({driver.PublishedName}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.",
+                PrimaryButtonText = "حذف ایمن",
+                CloseButtonText = "انصراف",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            var res = await dialog.ShowAsync();
+            if (res == ContentDialogResult.Primary)
+            {
+                var (success, msg) = await DriverManagerService.DeleteDriverPackageAsync(driver.PublishedName);
+                if (success)
+                {
+                    ShowInfoBar("حذف درایور", msg, InfoBarSeverity.Success);
+                    await LoadDriversPageAsync(forceRefresh: true);
+                }
+                else
+                {
+                    ShowInfoBar("عدم امکان حذف", msg, InfoBarSeverity.Warning);
+                }
+            }
+        }
+
+        private async void CleanOldDriversBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_cachedDrivers == null) return;
+            var duplicates = _cachedDrivers.Where(d => d.IsDuplicateOldVersion).ToList();
+            if (duplicates.Count == 0) return;
+
+            var dialog = new ContentDialog
+            {
+                XamlRoot = this.Content.XamlRoot,
+                Title = "پاکسازی دسته‌جمعی درایورهای قدیمی DriverStore",
+                Content = $"تعداد {duplicates.Count} بسته درایور قدیمی و تکراری شناسایی شده است.\n\nپیش از شروع پاکسازی، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.\nآیا مایل به شروع فرآیند پاکسازی هستید؟",
+                PrimaryButtonText = "شروع پاکسازی ایمن",
+                CloseButtonText = "انصراف",
+                DefaultButton = ContentDialogButton.Primary
+            };
+
+            var res = await dialog.ShowAsync();
+            if (res != ContentDialogResult.Primary) return;
+
+            CleanOldDriversBtn.IsEnabled = false;
+            ShowInfoBar("ایجاد نقطه بازیابی", "در حال ایجاد Restore Point قبل از پاکسازی درایورها...", InfoBarSeverity.Informational);
+
+            try
+            {
+                await RestorePointService.CreateRestorePointAsync("قبل از پاکسازی درایورهای قدیمی DriverStore");
+            }
+            catch { }
+
+            int deleted = 0;
+            int skipped = 0;
+
+            foreach (var d in duplicates)
+            {
+                var (success, _) = await DriverManagerService.DeleteDriverPackageAsync(d.PublishedName);
+                if (success) deleted++;
+                else skipped++;
+            }
+
+            CleanOldDriversBtn.IsEnabled = true;
+            ShowInfoBar("نتیجه پاکسازی درایورها", $"پاکسازی تکمیل شد: {deleted} بسته با موفقیت حذف شد. ({skipped} بسته در حال استفاده فعال بودند و حفظ شدند)", InfoBarSeverity.Success);
+            await LoadDriversPageAsync(forceRefresh: true);
+        }
+
+        private async void CheckDriverUpdatesBtn_Click(object sender, RoutedEventArgs e)
+        {
+            CheckDriverUpdatesBtn.IsEnabled = false;
+            ShowInfoBar("بررسی درایورها", "در حال جستجوی آپدیت‌های درایور از سرور مایکروسافت...", InfoBarSeverity.Informational);
+
+            var updates = await DriverManagerService.CheckDriverUpdatesAsync();
+            CheckDriverUpdatesBtn.IsEnabled = true;
+
+            if (updates.Count > 0)
+            {
+                string msg = string.Join("\n", updates.Select(u => $"• {u}"));
+                var dialog = new ContentDialog
+                {
+                    XamlRoot = this.Content.XamlRoot,
+                    Title = $"تعداد {updates.Count} بروزرسانی درایور یافت شد",
+                    Content = new ScrollViewer
+                    {
+                        MaxHeight = 280,
+                        Content = new TextBlock
+                        {
+                            Text = $"{msg}\n\nجهت دریافت و نصب، به بخش 'آپدیت ویندوز' مراجعه فرمایید.",
+                            FontSize = 12,
+                            LineHeight = 20
+                        }
+                    },
+                    CloseButtonText = "متوجه شدم"
+                };
+                await dialog.ShowAsync();
+            }
+            else
+            {
+                ShowInfoBar("بروزرسانی درایورها", "تمامی درایورهای سخت‌افزاری شما بروز و آپدیت هستند.", InfoBarSeverity.Success);
+            }
+        }
+
+        private async void RefreshDrivers_Click(object sender, RoutedEventArgs e)
+        {
+            await LoadDriversPageAsync(forceRefresh: true);
+            ShowInfoBar("بروزرسانی درایورها", "لیست درایورها و بسته‌های سخت‌افزاری بروزرسانی شد.", InfoBarSeverity.Informational);
+        }
+
+        private void DriversSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (_cachedDrivers != null)
+            {
+                RenderDrivers(_cachedDrivers);
             }
         }
 

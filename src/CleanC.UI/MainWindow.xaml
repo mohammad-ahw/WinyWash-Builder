@@ -397,7 +397,7 @@
                                                 </Border>
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                                                     <TextBlock Text="مشخصات سیستم" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                    <TextBlock Text="CPU، رم، گرافیک، مادربرد و دیسک" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    <TextBlock Text="CPU، رم، گرافیک، مادربرد، لایسنس و دیسک" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 </StackPanel>
                                             </Grid>
                                         </Button>
@@ -415,7 +415,7 @@
                                                 </Border>
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
                                                     <TextBlock Text="تست سرعت اینترنت" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                    <TextBlock Text="سنجش دانلود واقعی، پینگ و Jitter" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    <TextBlock Text="سنجش دانلود واقعی، آپلود، پینگ و ISP" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 </StackPanel>
                                             </Grid>
                                         </Button>
@@ -440,8 +440,8 @@
                                     </Border>
                                 </Grid>
 
-                                <!-- Section 2: Management & Optimization -->
-                                <TextBlock Text="مدیریت، بهینه‌سازی و آپدیت سیستم" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,10,0,0" />
+                                <!-- Section 2: Management & Maintenance -->
+                                <TextBlock Text="مدیریت، نگهداری و بهینه‌سازی سیستم" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,10,0,0" />
                                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
                                     <!-- Card 4: App Uninstaller -->
                                     <Border Grid.Column="0" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
@@ -461,8 +461,26 @@
                                         </Button>
                                     </Border>
 
-                                    <!-- Card 5: Startup Manager -->
+                                    <!-- Card 5: Driver Manager -->
                                     <Border Grid.Column="1" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                        <Button Click="LaunchToolPage_Click" Tag="drivers" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#0D9488" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <FontIcon Glyph="&#xE772;" FontSize="18" Foreground="#0D9488" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                    <TextBlock Text="مدیریت درایورها" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                    <TextBlock Text="عیب‌یابی، پاکسازی DriverStore و آپدیت" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </Border>
+
+                                    <!-- Card 6: Startup Manager -->
+                                    <Border Grid.Column="2" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                         <Button Click="LaunchToolPage_Click" Tag="startup_manager" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
@@ -473,14 +491,18 @@
                                                 </Border>
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
                                                     <TextBlock Text="برنامه‌های استارتاپ" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                    <TextBlock Text="مدیریت برنامه‌های شروع خودکار و افزایش سرعت بوت" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                    <TextBlock Text="مدیریت برنامه‌های شروع خودکار و سرعت بوت" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 </StackPanel>
                                             </Grid>
                                         </Button>
                                     </Border>
+                                </Grid>
 
-                                    <!-- Card 6: Windows Update Manager -->
-                                    <Border Grid.Column="2" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                <!-- Section 3: Updates & System Tools -->
+                                <TextBlock Text="بروزرسانی و ابزارهای سیستمی ویندوز" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,10,0,0" />
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
+                                    <!-- Card 7: Windows Update Manager -->
+                                    <Border Grid.Column="0" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                         <Button Click="LaunchToolPage_Click" Tag="windows_update" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
                                             <Grid ColumnDefinitions="Auto,*">
                                                 <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
@@ -496,38 +518,42 @@
                                             </Grid>
                                         </Button>
                                     </Border>
-                                </Grid>
 
-                                <!-- Section 3: Windows Native Shortcuts (Pill Chips) -->
-                                <TextBlock Text="میانبرهای پرکاربرد سیستمی" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,8,0,0" />
-                                <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" HorizontalAlignment="Stretch">
-                                    <Button Click="LaunchTool_Click" Tag="taskmgr" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE9D2;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                            <TextBlock Text="Task Manager" FontWeight="SemiBold" FontSize="12" />
-                                        </StackPanel>
-                                    </Button>
+                                    <!-- Card 8: Task Manager Quick Launch -->
+                                    <Border Grid.Column="1" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                        <Button Click="LaunchTool_Click" Tag="taskmgr" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#EA580C" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <FontIcon Glyph="&#xE9D2;" FontSize="18" Foreground="#EA580C" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                    <TextBlock Text="Task Manager" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                    <TextBlock Text="پایش پردازش‌ها، رم، دیسک و بستن برنامه‌ها" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </Border>
 
-                                    <Button Click="LaunchTool_Click" Tag="devmgmt" Grid.Column="1" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE772;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                            <TextBlock Text="Device Manager" FontWeight="SemiBold" FontSize="12" />
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Click="LaunchTool_Click" Tag="services" Grid.Column="2" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE713;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                            <TextBlock Text="Services" FontWeight="SemiBold" FontSize="12" />
-                                        </StackPanel>
-                                    </Button>
-
-                                    <Button Click="LaunchTool_Click" Tag="diskmgmt" Grid.Column="3" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xEDA2;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                            <TextBlock Text="Disk Mgmt" FontWeight="SemiBold" FontSize="12" />
-                                        </StackPanel>
-                                    </Button>
+                                    <!-- Card 9: Device Manager Quick Launch -->
+                                    <Border Grid.Column="2" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                        <Button Click="LaunchTool_Click" Tag="devmgmt" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#6366F1" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <FontIcon Glyph="&#xE772;" FontSize="18" Foreground="#6366F1" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                    <TextBlock Text="Device Manager" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                    <TextBlock Text="مشاهده پورت‌ها و سخت‌افزارهای سیستم" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </Border>
                                 </Grid>
                             </StackPanel>
 
@@ -536,20 +562,18 @@
                             <!-- =================================================== -->
                             <StackPanel x:Name="ToolSystemSpecsPanel" Spacing="16" Visibility="Collapsed">
                                 <!-- Top Bar -->
-                                <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
-                                    <Button Click="BackToToolsLauncher_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                                            <TextBlock Text="بازگشت به ابزارها" FontSize="12.5" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="مشخصات جامع سخت‌افزار و سیستم‌عامل" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="اطلاعات لحظه‌ای پردازنده، رم، مادربرد، گرافیک، درایوها، لایسنس و باتری" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
                                         </StackPanel>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                                        <TextBlock Text="مشخصات جامع سخت‌افزار و سیستم‌عامل" FontSize="16" FontWeight="Bold" />
-                                        <TextBlock Text="اطلاعات لحظه‌ای پردازنده، رم، مادربرد، کارت‌های گرافیک، دیسک‌ها و باتری" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
 
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                                         <Button Click="CopySpecsReport_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <FontIcon Glyph="&#xE8C8;" FontSize="13" />
@@ -574,21 +598,19 @@
                             <!-- =================================================== -->
                             <StackPanel x:Name="ToolAppUninstallerPanel" Spacing="16" Visibility="Collapsed">
                                 <!-- Top Bar -->
-                                <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
-                                    <Button Click="BackToToolsLauncher_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                                            <TextBlock Text="بازگشت به ابزارها" FontSize="12.5" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="مدیریت و حذف نرم‌افزارهای نصب‌شده" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock x:Name="UninstallerSummaryText" Text="در حال بارگذاری لیست برنامه‌ها..." FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
                                         </StackPanel>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                                        <TextBlock Text="مدیریت و حذف نرم‌افزارهای نصب‌شده" FontSize="16" FontWeight="Bold" />
-                                        <TextBlock x:Name="UninstallerSummaryText" Text="در حال بارگذاری لیست برنامه‌ها..." FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
 
                                     <!-- Search & Sort Controls -->
-                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
                                         <AutoSuggestBox x:Name="UninstallerSearchBox" PlaceholderText="جستجوی نرم‌افزار..." QueryIcon="Find" Width="200" Height="34" TextChanged="UninstallerSearchBox_TextChanged" />
                                         <ComboBox x:Name="UninstallerSortBox" SelectionChanged="UninstallerSortBox_SelectionChanged" Height="34" CornerRadius="6">
                                             <ComboBoxItem Content="جدیدترین نصب" IsSelected="True" />
@@ -607,17 +629,15 @@
                             <!-- =================================================== -->
                             <StackPanel x:Name="ToolSpeedTestPanel" Spacing="16" Visibility="Collapsed">
                                 <!-- Top Bar -->
-                                <Grid ColumnDefinitions="Auto,*" HorizontalAlignment="Stretch">
-                                    <Button Click="BackToToolsLauncher_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                                            <TextBlock Text="بازگشت به ابزارها" FontSize="12.5" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="تست سرعت واقعی اینترنت و پینگ" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="سنجش دقیق پهنای باند دانلود، سرعت آپلود و تاخیر شبکه از سرورهای جهانی Cloudflare" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
                                         </StackPanel>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                                        <TextBlock Text="تست سرعت واقعی اینترنت و پینگ" FontSize="16" FontWeight="Bold" />
-                                        <TextBlock Text="سنجش دقیق پهنای باند دانلود، سرعت آپلود و تاخیر شبکه از سرورهای جهانی Cloudflare" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
                                 </Grid>
 
@@ -724,17 +744,15 @@
                             <!-- =================================================== -->
                             <StackPanel x:Name="ToolPersonalizationPanel" Spacing="16" Visibility="Collapsed">
                                 <!-- Top Bar -->
-                                <Grid ColumnDefinitions="Auto,*" HorizontalAlignment="Stretch">
-                                    <Button Click="BackToToolsLauncher_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                                            <TextBlock Text="بازگشت به ابزارها" FontSize="12.5" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="استایل، تم و گرافیک ویندوز" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="شخصی‌سازی ظاهر، تم و انیمیشن‌های ویندوز با اعمال آنی بدون نیاز به ریستارت" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
                                         </StackPanel>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                                        <TextBlock Text="استایل، تم و گرافیک ویندوز" FontSize="16" FontWeight="Bold" />
-                                        <TextBlock Text="شخصی‌سازی ظاهر، تم و انیمیشن‌های ویندوز با اعمال آنی بدون نیاز به ریستارت" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
                                 </Grid>
 
@@ -746,20 +764,18 @@
                             <!-- =================================================== -->
                             <StackPanel x:Name="ToolStartupManagerPanel" Spacing="16" Visibility="Collapsed">
                                 <!-- Top Bar -->
-                                <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
-                                    <Button Click="BackToToolsLauncher_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                                            <TextBlock Text="بازگشت به ابزارها" FontSize="12.5" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="مدیریت برنامه‌های شروع خودکار (Startup)" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock x:Name="StartupManagerSummaryText" Text="غیرفعال‌سازی ایمن و بازگشت‌پذیر برنامه‌هایی که هنگام روشن شدن ویندوز اجرا می‌شوند" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
                                         </StackPanel>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                                        <TextBlock Text="مدیریت برنامه‌های شروع خودکار (Startup)" FontSize="16" FontWeight="Bold" />
-                                        <TextBlock x:Name="StartupManagerSummaryText" Text="غیرفعال‌سازی ایمن و بازگشت‌پذیر برنامه‌هایی که هنگام روشن شدن ویندوز اجرا می‌شوند" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
 
-                                    <Button Grid.Column="2" Click="RefreshStartupManager_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
+                                    <Button Grid.Column="1" Click="RefreshStartupManager_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon Glyph="&#xE72C;" FontSize="13" />
                                             <TextBlock Text="بروزرسانی لیست" FontSize="12" FontWeight="SemiBold" />
@@ -775,20 +791,18 @@
                             <!-- =================================================== -->
                             <StackPanel x:Name="ToolWindowsUpdatePanel" Spacing="16" Visibility="Collapsed">
                                 <!-- Top Bar -->
-                                <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
-                                    <Button Click="BackToToolsLauncher_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                        <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE72B;" FontSize="13" />
-                                            <TextBlock Text="بازگشت به ابزارها" FontSize="12.5" FontWeight="SemiBold" />
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="مدیریت و کنترل بروزرسانی‌های ویندوز (Windows Update)" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="بررسی آپدیت‌های در انتظار، توقف ۵ هفته‌ای رسمی، تغییر وضعیت سرویس و رفع گیر کردن دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
                                         </StackPanel>
-                                    </Button>
-
-                                    <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="16,0,0,0">
-                                        <TextBlock Text="مدیریت و کنترل بروزرسانی‌های ویندوز (Windows Update)" FontSize="16" FontWeight="Bold" />
-                                        <TextBlock Text="بررسی آپدیت‌های در انتظار، توقف ۵ هفته‌ای رسمی، تغییر وضعیت سرویس و رفع گیر کردن دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
 
-                                    <Button Grid.Column="2" Click="CheckUpdatesBtn_Click" Height="36" Padding="16,0" CornerRadius="8" Style="{ThemeResource AccentButtonStyle}">
+                                    <Button Grid.Column="1" Click="CheckUpdatesBtn_Click" Height="36" Padding="16,0" CornerRadius="8" Style="{ThemeResource AccentButtonStyle}">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon Glyph="&#xE72C;" FontSize="13" />
                                             <TextBlock Text="بررسی آپدیت‌های جدید" FontSize="12" FontWeight="SemiBold" />
@@ -846,7 +860,7 @@
                                             </Grid>
                                             <TextBlock Text="تغییر نحوه اجرای سرویس در رجیستری و خاموش کردن کامل آن برای جلوگیری از هرگونه مصرف پس‌زمینه." FontSize="11" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Height="34" />
                                             <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
-                                                <Button x:Name="DisableUpdateServiceBtn" Click="DisableUpdateServiceBtn_Click" Content="غیرفعال‌سازی سرویس" Height="32" FontSize="10.5" FontWeight="SemiBold" HorizontalAlignment="Stretch" CornerRadius="6" Foreground="#EF4444" />
+                                                <Button x:Name="DisableUpdateServiceBtn" Click="DisableUpdateServiceBtn_Click" Content="غیرفعال‌سازی سرویس" Height="32" FontSize="10.5" FontWeight="SemiBold" HorizontalAlignment="Stretch" CornerRadius="6" />
                                                 <Button x:Name="EnableUpdateServiceBtn" Click="EnableUpdateServiceBtn_Click" Content="فعال‌سازی سرویس" Grid.Column="1" Height="32" FontSize="10.5" FontWeight="SemiBold" HorizontalAlignment="Stretch" CornerRadius="6" />
                                             </Grid>
                                         </StackPanel>
@@ -865,7 +879,7 @@
                                                 </StackPanel>
                                             </Grid>
                                             <TextBlock Text="توقف موقت سرویس‌ها، پاکسازی فایل‌های معیوب در SoftwareDistribution و شروع مجدد." FontSize="11" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Height="34" />
-                                            <Button x:Name="FixStuckUpdatesBtn" Click="FixStuckUpdatesBtn_Click" Content="رفع گیر کردن و پاکسازی کش" Height="32" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Stretch" CornerRadius="6" Style="{ThemeResource AccentButtonStyle}" />
+                                            <Button x:Name="FixStuckUpdatesBtn" Click="FixStuckUpdatesBtn_Click" Content="رفع گیر کردن و پاکسازی کش" Height="32" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Stretch" CornerRadius="6" Background="#10B981" Foreground="White" />
                                         </StackPanel>
                                     </Border>
                                 </Grid>
@@ -887,6 +901,81 @@
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
+                            </StackPanel>
+
+                            <!-- =================================================== -->
+                            <!-- Sub-View 7: Driver Manager Full Page                -->
+                            <!-- =================================================== -->
+                            <StackPanel x:Name="ToolDriversPanel" Spacing="16" Visibility="Collapsed">
+                                <!-- Top Bar -->
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="مدیریت و پاکسازی درایورهای ویندوز (Driver Manager)" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="شناسایی کدهای خطای سخت‌افزاری، پاکسازی ایمن نسخه‌های تکراری DriverStore و آپدیت درایورها" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                                        <Button x:Name="CheckDriverUpdatesBtn" Click="CheckDriverUpdatesBtn_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE895;" FontSize="13" Foreground="#0284C7" />
+                                                <TextBlock Text="بررسی آپدیت درایورها" FontSize="12" FontWeight="SemiBold" />
+                                            </StackPanel>
+                                        </Button>
+                                        <Button Click="RefreshDrivers_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE72C;" FontSize="13" />
+                                                <TextBlock Text="بروزرسانی لیست" FontSize="12" FontWeight="SemiBold" />
+                                            </StackPanel>
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Summary Stats Banner (3 Columns) -->
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
+                                    <Border CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#3B82F6" BorderThickness="0,0,0,3">
+                                        <StackPanel Spacing="3" HorizontalAlignment="Center">
+                                            <TextBlock Text="کل بسته‌های درایور" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="DriversTotalCountText" Text="-- بسته" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="1" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#EF4444" BorderThickness="0,0,0,3">
+                                        <StackPanel Spacing="3" HorizontalAlignment="Center">
+                                            <TextBlock Text="خطاهای سخت‌افزاری" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="DriversErrorCountText" Text="۰ خطا" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </StackPanel>
+                                    </Border>
+
+                                    <Border Grid.Column="2" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#F59E0B" BorderThickness="0,0,0,3">
+                                        <StackPanel Spacing="3" HorizontalAlignment="Center">
+                                            <TextBlock Text="نسخه‌های تکراری قدیمی" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="DriversDuplicateCountText" Text="۰ بسته" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+
+                                <!-- Duplicate Cleanup Action Banner (Visible when duplicates > 0) -->
+                                <Border x:Name="DriversDuplicateBanner" Visibility="Collapsed" CornerRadius="10" Padding="18,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="#F59E0B" BorderThickness="1">
+                                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch">
+                                        <StackPanel VerticalAlignment="Center" Spacing="3">
+                                            <TextBlock x:Name="DriversDuplicateBannerTitle" Text="پاکسازی بسته‌های تکراری و اشغال‌کننده فضای سیستم" FontSize="13" FontWeight="Bold" />
+                                            <TextBlock Text="این درایورها نسخه‌های قدیمی‌تر هستند که با نصب نسخه جدید جایگزین شده‌اند و با ایجاد Restore Point به صورت ایمن حذف می‌شوند." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </StackPanel>
+                                        <Button x:Name="CleanOldDriversBtn" Click="CleanOldDriversBtn_Click" Grid.Column="1" Content="پاکسازی درایورهای قدیمی DriverStore" Height="34" CornerRadius="8" FontWeight="SemiBold" FontSize="11.5" Style="{ThemeResource AccentButtonStyle}" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Search / Filter -->
+                                <AutoSuggestBox x:Name="DriversSearchBox" PlaceholderText="جستجو در بین درایورها..." QueryIcon="Find" Height="36" TextChanged="DriversSearchBox_TextChanged" />
+
+                                <!-- Driver Items List -->
+                                <ProgressRing x:Name="DriversLoadingSpinner" IsActive="True" Width="36" Height="36" HorizontalAlignment="Center" Margin="0,24,0,0" />
+                                <StackPanel x:Name="DriversCardsContainer" Spacing="8" Visibility="Collapsed" />
                             </StackPanel>
 
                         </StackPanel>

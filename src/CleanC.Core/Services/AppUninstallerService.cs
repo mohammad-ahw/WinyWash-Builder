@@ -43,6 +43,11 @@ namespace CleanC.Core.Services
                                 string? displayName = appKey.GetValue("DisplayName")?.ToString()?.Trim();
                                 if (string.IsNullOrWhiteSpace(displayName)) continue;
 
+                                string publisher = appKey.GetValue("Publisher")?.ToString() ?? string.Empty;
+
+                                // Filter out system drivers, VC++ redistributables, system components
+                                if (IsSystemOrDriverPackage(displayName, publisher)) continue;
+
                                 // Ignore system components and updates
                                 var sysComp = appKey.GetValue("SystemComponent");
                                 if (sysComp != null && Convert.ToInt32(sysComp) == 1) continue;
@@ -50,17 +55,14 @@ namespace CleanC.Core.Services
                                 var parentKey = appKey.GetValue("ParentKeyName");
                                 if (parentKey != null && !string.IsNullOrWhiteSpace(parentKey.ToString())) continue;
 
-                                if (displayName.StartsWith("KB", StringComparison.OrdinalIgnoreCase) && displayName.Length > 2 && char.IsDigit(displayName[2]))
-                                    continue;
-
                                 string? uninstall = appKey.GetValue("UninstallString")?.ToString();
                                 string? quietUninstall = appKey.GetValue("QuietUninstallString")?.ToString();
                                 if (string.IsNullOrWhiteSpace(uninstall) && string.IsNullOrWhiteSpace(quietUninstall)) continue;
 
                                 string version = appKey.GetValue("DisplayVersion")?.ToString() ?? string.Empty;
-                                string publisher = appKey.GetValue("Publisher")?.ToString() ?? string.Empty;
                                 string installDate = appKey.GetValue("InstallDate")?.ToString() ?? string.Empty;
                                 string displayIcon = appKey.GetValue("DisplayIcon")?.ToString() ?? string.Empty;
+                                string? installLocation = appKey.GetValue("InstallLocation")?.ToString()?.Trim();
 
                                 DateTime? parsedDate = null;
                                 if (!string.IsNullOrEmpty(installDate) && installDate.Length == 8 && int.TryParse(installDate, out _))
@@ -82,7 +84,28 @@ namespace CleanC.Core.Services
                                 var sizeObj = appKey.GetValue("EstimatedSize");
                                 if (sizeObj != null)
                                 {
-                                    sizeBytes = Convert.ToInt64(sizeObj) * 1024L; // in KB
+                                    sizeBytes = Convert.ToInt64(sizeObj) * 1024L; // in KB to bytes
+                                }
+                                else if (!string.IsNullOrEmpty(installLocation) && Directory.Exists(installLocation))
+                                {
+                                    try
+                                    {
+                                        var di = new DirectoryInfo(installLocation);
+                                        long dirTotal = 0;
+                                        foreach (var f in di.EnumerateFiles("*", SearchOption.TopDirectoryOnly))
+                                        {
+                                            dirTotal += f.Length;
+                                        }
+                                        foreach (var d in di.EnumerateDirectories())
+                                        {
+                                            foreach (var f in d.EnumerateFiles("*", SearchOption.TopDirectoryOnly))
+                                            {
+                                                dirTotal += f.Length;
+                                            }
+                                        }
+                                        if (dirTotal > 0) sizeBytes = dirTotal;
+                                    }
+                                    catch { }
                                 }
 
                                 if (!apps.ContainsKey(displayName))
@@ -227,6 +250,46 @@ namespace CleanC.Core.Services
             {
                 return false;
             }
+        }
+
+        private static bool IsSystemOrDriverPackage(string displayName, string publisher)
+        {
+            if (string.IsNullOrWhiteSpace(displayName)) return true;
+
+            // Windows updates & internal KBs
+            if (displayName.StartsWith("KB", StringComparison.OrdinalIgnoreCase) && displayName.Length > 2 && char.IsDigit(displayName[2]))
+                return true;
+
+            // VC++ Redistributables & Toolsets
+            if (displayName.Contains("Visual C++", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Redistributable", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // Driver packages and hardware helpers
+            if (displayName.StartsWith("Windows Driver Package", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Realtek High Definition Audio", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Realtek Audio Driver", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Realtek Card Reader", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Intel(R) Management Engine", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Intel(R) Dynamic Tuning", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Intel(R) Processor Graphics", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Intel(R) Wireless", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("NVIDIA Graphics Driver", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("NVIDIA PhysX", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("NVIDIA FrameView", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("NVIDIA HD Audio", StringComparison.OrdinalIgnoreCase) ||
+                displayName.Contains("Synaptics Pointing Device", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            // System Runtimes
+            if (displayName.StartsWith("Microsoft .NET", StringComparison.OrdinalIgnoreCase) ||
+                displayName.StartsWith(".NET Framework", StringComparison.OrdinalIgnoreCase) ||
+                displayName.StartsWith("Microsoft Windows Desktop Runtime", StringComparison.OrdinalIgnoreCase) ||
+                displayName.StartsWith("Microsoft ASP.NET Core", StringComparison.OrdinalIgnoreCase) ||
+                displayName.StartsWith("Microsoft Edge WebView2", StringComparison.OrdinalIgnoreCase))
+                return true;
+
+            return false;
         }
     }
 }

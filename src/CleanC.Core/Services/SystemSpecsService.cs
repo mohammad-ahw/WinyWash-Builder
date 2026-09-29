@@ -8,6 +8,8 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Linq;
+using System.Xml.Linq;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -29,6 +31,29 @@ namespace CleanC.Core.Services
         public string TemperatureFormatted { get; set; } = "در دسترس نیست";
         public string WearFormatted { get; set; } = "در دسترس نیست";
         public string PowerOnHoursFormatted { get; set; } = "در دسترس نیست";
+    }
+
+    public class LogicalDriveItem
+    {
+        public string Letter { get; set; } = string.Empty; // "C:", "G:"
+        public string VolumeLabel { get; set; } = string.Empty;
+        public string FileSystem { get; set; } = "NTFS";
+        public long TotalSizeBytes { get; set; }
+        public long FreeSizeBytes { get; set; }
+        public long UsedSizeBytes => Math.Max(0, TotalSizeBytes - FreeSizeBytes);
+        public double UsedPercent => TotalSizeBytes > 0 ? (UsedSizeBytes * 100.0) / TotalSizeBytes : 0;
+        public string FormattedTotal => Models.SystemStats.FormatBytes(TotalSizeBytes);
+        public string FormattedFree => Models.SystemStats.FormatBytes(FreeSizeBytes);
+        public string FormattedUsed => Models.SystemStats.FormatBytes(UsedSizeBytes);
+        public bool IsSystemDrive => Letter.StartsWith("C", StringComparison.OrdinalIgnoreCase);
+    }
+
+    public class WindowsActivationInfo
+    {
+        public bool IsActivated { get; set; }
+        public string StatusText { get; set; } = "نامشخص";
+        public string Description { get; set; } = string.Empty;
+        public int StatusCode { get; set; }
     }
 
     public class DetailedSystemSpecs
@@ -61,6 +86,9 @@ namespace CleanC.Core.Services
         public string OsInstallDate { get; set; } = string.Empty;
         public string OsUptimeFormatted { get; set; } = string.Empty;
 
+        // Activation
+        public WindowsActivationInfo Activation { get; set; } = new WindowsActivationInfo();
+
         // Battery (if laptop)
         public bool HasBattery { get; set; }
         public int BatteryHealthPercent { get; set; } = 100;
@@ -74,6 +102,9 @@ namespace CleanC.Core.Services
 
         // Disks List
         public List<DiskItemInfo> Disks { get; set; } = new List<DiskItemInfo>();
+
+        // Logical Drives (This PC Drive Manager)
+        public List<LogicalDriveItem> LogicalDrives { get; set; } = new List<LogicalDriveItem>();
 
         // SSD Health Summary
         public bool HasSsdHealthData { get; set; }
@@ -208,7 +239,17 @@ namespace CleanC.Core.Services
                     if (instVal != null && long.TryParse(instVal.ToString(), out long instSec))
                     {
                         var dt = DateTimeOffset.FromUnixTimeSeconds(instSec).LocalDateTime;
-                        specs.OsInstallDate = dt.ToString("yyyy/MM/dd");
+                        try
+                        {
+                            var pc = new System.Globalization.PersianCalendar();
+                            string shamsi = $"{pc.GetYear(dt):0000}/{pc.GetMonth(dt):00}/{pc.GetDayOfMonth(dt):00}";
+                            string miladi = dt.ToString("yyyy/MM/dd");
+                            specs.OsInstallDate = $"{shamsi} ({miladi})";
+                        }
+                        catch
+                        {
+                            specs.OsInstallDate = dt.ToString("yyyy/MM/dd");
+                        }
                     }
                 }
             }
@@ -217,18 +258,27 @@ namespace CleanC.Core.Services
             try
             {
                 TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
-                specs.OsUptimeFormatted = $"{(int)uptime.TotalHours} ساعت و {uptime.Minutes} دقیقه";
+                DateTime bootTime = DateTime.Now - uptime;
+                string daysStr = uptime.Days > 0 ? $"{uptime.Days} روز و " : "";
+                specs.OsUptimeFormatted = $"{daysStr}{uptime.Hours} ساعت و {uptime.Minutes} دقیقه (روشن‌شده در {bootTime:HH:mm})";
             }
             catch { }
 
-            // 5. GPU Info (Direct Registry reading from Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318})
+            // 5. Windows Activation Status
+            try
+            {
+                specs.Activation = GetActivationStatus();
+            }
+            catch { }
+
+            // 6. GPU Info (Direct Registry reading)
             try
             {
                 GetGpuInfoFromRegistry(specs);
             }
             catch { }
 
-            // 6. Battery Status (Win32 API)
+            // 7. Battery Status (Win32 API + XML Fallback)
             try
             {
                 if (GetSystemPowerStatus(out var pStatus))
@@ -238,6 +288,7 @@ namespace CleanC.Core.Services
                     {
                         specs.HasBattery = true;
                         specs.BatteryHealthPercent = pStatus.BatteryLifePercent;
+                        ReadBatteryReportDetails(specs);
                     }
                     else
                     {
@@ -247,10 +298,17 @@ namespace CleanC.Core.Services
             }
             catch { }
 
-            // 7. Disks Info (System.IO.DriveInfo)
+            // 8. Disks Info (System.IO.DriveInfo)
             try
             {
                 GetDisksFromDrives(specs);
+            }
+            catch { }
+
+            // 9. Logical Drives (This PC Drives Manager)
+            try
+            {
+                specs.LogicalDrives = GetLogicalDrives();
             }
             catch { }
 
@@ -311,6 +369,207 @@ namespace CleanC.Core.Services
                     HealthStatus = "سالم و فعال"
                 });
             }
+        }
+
+        [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        private static extern bool SetVolumeLabel(string lpRootPathName, string? lpVolumeName);
+
+        public static bool SetDriveLabel(string driveLetter, string newLabel)
+        {
+            try
+            {
+                string root = driveLetter.Trim().TrimEnd('\\') + "\\";
+                return SetVolumeLabel(root, newLabel);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public static async Task<(bool Success, string Message)> ChangeDriveLetterAsync(string oldLetter, string newLetter)
+        {
+            oldLetter = oldLetter.Trim().TrimEnd(':').ToUpperInvariant();
+            newLetter = newLetter.Trim().TrimEnd(':').ToUpperInvariant();
+
+            if (oldLetter == "C" || newLetter == "C")
+            {
+                return (false, "تغییر حرف درایو سیستم‌عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست.");
+            }
+
+            if (oldLetter == newLetter)
+            {
+                return (false, "حرف انتخابی با حرف فعلی درایو یکسان است.");
+            }
+
+            var existingDrives = DriveInfo.GetDrives();
+            if (existingDrives.Any(d => d.Name.StartsWith(newLetter, StringComparison.OrdinalIgnoreCase)))
+            {
+                return (false, $"حرف درایو {newLetter}: در حال حاضر توسط درایو دیگری در سیستم در حال استفاده است.");
+            }
+
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo("powershell.exe", $"-NoProfile -ExecutionPolicy Bypass -Command \"Get-Partition -DriveLetter {oldLetter} | Set-Partition -NewDriveLetter {newLetter}\"")
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+
+                    using var p = Process.Start(psi);
+                    if (p == null) return (false, "عدم توانایی در فراخوانی ابزار مدیریت پارتیشن.");
+
+                    string err = p.StandardError.ReadToEnd();
+                    p.WaitForExit(8000);
+
+                    if (p.ExitCode == 0)
+                    {
+                        return (true, $"حرف درایو با موفقیت از {oldLetter}: به {newLetter}: تغییر یافت.");
+                    }
+
+                    return (false, $"خطا در تغییر حرف درایو: {err}".Trim());
+                }
+                catch (Exception ex)
+                {
+                    return (false, $"خطای سیستمی: {ex.Message}");
+                }
+            });
+        }
+
+        public static List<LogicalDriveItem> GetLogicalDrives()
+        {
+            var result = new List<LogicalDriveItem>();
+            try
+            {
+                var drives = DriveInfo.GetDrives();
+                foreach (var d in drives)
+                {
+                    if (!d.IsReady || d.DriveType != DriveType.Fixed) continue;
+                    result.Add(new LogicalDriveItem
+                    {
+                        Letter = d.Name.TrimEnd('\\'),
+                        VolumeLabel = string.IsNullOrWhiteSpace(d.VolumeLabel) ? "درایو محلی" : d.VolumeLabel,
+                        FileSystem = d.DriveFormat,
+                        TotalSizeBytes = d.TotalSize,
+                        FreeSizeBytes = d.AvailableFreeSpace
+                    });
+                }
+            }
+            catch { }
+            return result;
+        }
+
+        public static WindowsActivationInfo GetActivationStatus()
+        {
+            var info = new WindowsActivationInfo();
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(
+                    "SELECT LicenseStatus, Description FROM SoftwareLicensingProduct WHERE PartialProductKey IS NOT NULL AND ApplicationID = '55c92734-d682-4d71-983e-d6ec3f16059f'"
+                );
+                foreach (var mo in searcher.Get())
+                {
+                    int status = mo["LicenseStatus"] != null ? Convert.ToInt32(mo["LicenseStatus"]) : 0;
+                    string desc = mo["Description"]?.ToString() ?? "";
+                    info.StatusCode = status;
+                    info.Description = desc;
+
+                    switch (status)
+                    {
+                        case 1:
+                            info.IsActivated = true;
+                            info.StatusText = "فعال‌شده با لایسنس معتبر (Licensed)";
+                            break;
+                        case 2:
+                            info.IsActivated = false;
+                            info.StatusText = "دوره آزمایشی اولیه (OOB Grace)";
+                            break;
+                        case 3:
+                            info.IsActivated = false;
+                            info.StatusText = "دوره مهلت تمدید (OOT Grace)";
+                            break;
+                        case 4:
+                            info.IsActivated = false;
+                            info.StatusText = "لایسنس غیرمعتبر یا جعلی (Non-Genuine)";
+                            break;
+                        case 5:
+                            info.IsActivated = false;
+                            info.StatusText = "فعال‌نشده / نیازمند فعال‌سازی (Notification)";
+                            break;
+                        case 6:
+                            info.IsActivated = false;
+                            info.StatusText = "مهلت فعال‌سازی تمدید شده (Extended Grace)";
+                            break;
+                        default:
+                            info.IsActivated = false;
+                            info.StatusText = "لایسنس نامعتبر یا غیرفعال";
+                            break;
+                    }
+                    return info;
+                }
+            }
+            catch
+            {
+                info.StatusText = "اطلاعات لایسنس در دسترس نیست";
+            }
+            return info;
+        }
+
+        private static void ReadBatteryReportDetails(DetailedSystemSpecs specs)
+        {
+            if (!specs.HasBattery) return;
+            if (specs.BatteryDesignCapacityMWh > 0 && specs.BatteryFullChargeCapacityMWh > 0) return;
+
+            try
+            {
+                string tempXml = Path.Combine(Path.GetTempPath(), $"cleanc_batt_{Guid.NewGuid():N}.xml");
+                var psi = new ProcessStartInfo("powercfg.exe", $"/batteryreport /xml /output \"{tempXml}\"")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true
+                };
+
+                using var p = Process.Start(psi);
+                if (p != null)
+                {
+                    p.WaitForExit(3000);
+                    if (File.Exists(tempXml))
+                    {
+                        try
+                        {
+                            string xml = File.ReadAllText(tempXml);
+                            var doc = XDocument.Parse(xml);
+                            var batteryNode = doc.Descendants("Battery").FirstOrDefault();
+                            if (batteryNode != null)
+                            {
+                                string? dCapStr = batteryNode.Element("DesignCapacity")?.Value;
+                                string? fCapStr = batteryNode.Element("FullChargeCapacity")?.Value;
+                                string? cycleStr = batteryNode.Element("CycleCount")?.Value;
+
+                                if (long.TryParse(dCapStr, out long dCap) && dCap > 0) specs.BatteryDesignCapacityMWh = dCap;
+                                if (long.TryParse(fCapStr, out long fCap) && fCap > 0) specs.BatteryFullChargeCapacityMWh = fCap;
+                                if (int.TryParse(cycleStr, out int cycles)) specs.BatteryCycleCount = cycles;
+
+                                if (specs.BatteryDesignCapacityMWh > 0 && specs.BatteryFullChargeCapacityMWh > 0)
+                                {
+                                    double health = ((double)specs.BatteryFullChargeCapacityMWh / (double)specs.BatteryDesignCapacityMWh) * 100.0;
+                                    specs.BatteryHealthPercent = Math.Clamp((int)Math.Round(health), 1, 100);
+                                }
+                            }
+                        }
+                        finally
+                        {
+                            try { File.Delete(tempXml); } catch { }
+                        }
+                    }
+                }
+            }
+            catch { }
         }
 
         private static void EnrichWithWmiData(DetailedSystemSpecs specs)
