@@ -1,7 +1,5 @@
 using System;
 using System.IO;
-using Windows.Graphics.Imaging;
-using Windows.Storage;
 
 namespace CleanC.UI
 {
@@ -12,7 +10,7 @@ namespace CleanC.UI
 
         public static bool IsWallpaperDark(bool forceRefresh = false)
         {
-            if (!forceRefresh && _isCachedDark.HasValue && (DateTime.Now - _lastCheck).TotalSeconds < 3)
+            if (!forceRefresh && _isCachedDark.HasValue && (DateTime.Now - _lastCheck).TotalSeconds < 5)
             {
                 return _isCachedDark.Value;
             }
@@ -53,45 +51,33 @@ namespace CleanC.UI
                     return false;
                 }
 
-                var file = StorageFile.GetFileFromPathAsync(wallpaperPath).AsTask().GetAwaiter().GetResult();
-                using var stream = file.OpenAsync(FileAccessMode.Read).AsTask().GetAwaiter().GetResult();
-                var decoder = BitmapDecoder.CreateAsync(stream).AsTask().GetAwaiter().GetResult();
+                // Fast non-blocking GDI+ analysis without WinRT deadlocks
+                using var fs = new FileStream(wallpaperPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                using var bmp = new System.Drawing.Bitmap(fs);
 
-                var transform = new BitmapTransform
-                {
-                    ScaledWidth = 16,
-                    ScaledHeight = 16,
-                    InterpolationMode = BitmapInterpolationMode.Linear
-                };
-
-                var pixelData = decoder.GetPixelDataAsync(
-                    BitmapPixelFormat.Rgba8,
-                    BitmapAlphaMode.Premultiplied,
-                    transform,
-                    ExifOrientationMode.IgnoreExifOrientation,
-                    ColorManagementMode.DoNotColorManage).AsTask().GetAwaiter().GetResult();
-
-                byte[] pixels = pixelData.DetachPixelData();
                 double totalLuminance = 0;
-                int pixelCount = pixels.Length / 4;
+                int samples = 0;
+                int stepX = Math.Max(1, bmp.Width / 12);
+                int stepY = Math.Max(1, bmp.Height / 12);
 
-                for (int i = 0; i < pixels.Length; i += 4)
+                for (int x = 0; x < bmp.Width; x += stepX)
                 {
-                    byte r = pixels[i];
-                    byte g = pixels[i + 1];
-                    byte b = pixels[i + 2];
-                    totalLuminance += (0.299 * r + 0.587 * g + 0.114 * b);
+                    for (int y = 0; y < bmp.Height; y += stepY)
+                    {
+                        var color = bmp.GetPixel(x, y);
+                        totalLuminance += (0.299 * color.R + 0.587 * color.G + 0.114 * color.B);
+                        samples++;
+                    }
                 }
 
-                double avgLuminance = totalLuminance / Math.Max(1, pixelCount);
-                // If average luminance is below 130 out of 255, it is a dark wallpaper
+                double avgLuminance = totalLuminance / Math.Max(1, samples);
                 _isCachedDark = avgLuminance < 130.0;
                 _lastCheck = DateTime.Now;
                 return _isCachedDark.Value;
             }
             catch
             {
-                // Fallback to false (standard high-contrast black text in Light mode)
+                // Fallback to false (standard light theme)
                 _isCachedDark = false;
                 return false;
             }

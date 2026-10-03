@@ -113,9 +113,37 @@ namespace CleanC.Core.Services
             return freed;
         }
 
+        private static bool IsProtectedSystemPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return true;
+            try
+            {
+                string full = Path.GetFullPath(path).TrimEnd('\\', '/');
+                // Disallow cleaning drive roots (e.g. C:, C:\, D:, D:\)
+                if (full.Length <= 3 && full.Contains(':')) return true;
+
+                string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows).TrimEnd('\\');
+                string sysDir = Environment.SystemDirectory.TrimEnd('\\');
+                string progDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles).TrimEnd('\\');
+                string progX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).TrimEnd('\\');
+                string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).TrimEnd('\\');
+
+                if (string.Equals(full, winDir, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(full, sysDir, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(full, progDir, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(full, progX86, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(full, userDir, StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+
         public static long SafeCleanFolder(string dirPath)
         {
-            if (string.IsNullOrWhiteSpace(dirPath) || !Directory.Exists(dirPath)) return 0;
+            if (string.IsNullOrWhiteSpace(dirPath) || !Directory.Exists(dirPath) || IsProtectedSystemPath(dirPath)) return 0;
             long freed = 0;
 
             var enumOptions = new EnumerationOptions

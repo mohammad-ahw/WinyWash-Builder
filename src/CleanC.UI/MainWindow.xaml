@@ -67,6 +67,36 @@
                     <Button x:Name="RefreshStatsBtn" Click="RefreshStatsBtn_Click" ToolTipService.ToolTip="بروزرسانی وضعیت سیستم" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Width="32" Height="32" Padding="0" CornerRadius="16">
                         <FontIcon x:Name="RefreshStatsIcon" Glyph="&#xE72C;" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                     </Button>
+                    <Button x:Name="NotificationHistoryBtn" ToolTipService.ToolTip="تاریخچه عملیات و اعلان‌ها" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Width="32" Height="32" Padding="0" CornerRadius="16">
+                        <Grid>
+                            <FontIcon Glyph="&#xEA8F;" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                            <Ellipse x:Name="NotificationBadgeDot" Width="7" Height="7" Fill="#3B82F6" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-2,-2,0" Visibility="Collapsed" />
+                        </Grid>
+                        <Button.Flyout>
+                            <Flyout x:Name="NotificationHistoryFlyout" Placement="BottomEdgeAlignedRight">
+                                <Grid Width="360" MaxHeight="450" RowDefinitions="Auto,*,Auto" FlowDirection="RightToLeft">
+                                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Text="تاریخچه اعلان‌ها و اقدامات" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
+                                        <Button x:Name="ClearHistoryBtn" Click="ClearHistoryBtn_Click" Grid.Column="1" Padding="6,4" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="پاکسازی تاریخچه">
+                                            <StackPanel Orientation="Horizontal" Spacing="4">
+                                                <FontIcon Glyph="&#xE74D;" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock Text="پاکسازی" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" MaxHeight="350">
+                                        <StackPanel x:Name="NotificationHistoryStack" Spacing="8">
+                                            <TextBlock x:Name="EmptyHistoryText" Text="هنوز هیچ اعلانی ثبت نشده است." FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" Margin="0,20,0,0" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </Flyout>
+                        </Button.Flyout>
+                    </Button>
                     <Button x:Name="ThemeToggleBtn" Click="ThemeToggleBtn_Click" ToolTipService.ToolTip="تغییر تم (تاریک / روشن)" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Width="32" Height="32" Padding="0" CornerRadius="16">
                         <FontIcon x:Name="ThemeIcon" Glyph="&#xE708;" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                     </Button>
@@ -273,65 +303,128 @@
                             </StackPanel>
                         </Border>
 
-                        <!-- Bento Status Grid (Full Stretch) -->
+                        <!-- Bento Status Grid (Modern Telemetry & Statistics) -->
                         <Grid x:Name="BentoGrid" ColumnDefinitions="*,*,*" ColumnSpacing="12" RowSpacing="12" HorizontalAlignment="Stretch">
                             <!-- RAM Card -->
-                            <Border x:Name="BentoRamCard" Grid.Column="0" CornerRadius="10" Padding="16,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
-                                <StackPanel Spacing="9" HorizontalAlignment="Stretch">
-                                    <StackPanel Orientation="Horizontal" Spacing="8">
-                                        <FontIcon Glyph="&#xE9D2;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                        <TextBlock x:Name="CardRamTitle" Text="حافظه رم (RAM)" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                            <Border x:Name="BentoRamCard" Grid.Column="0" CornerRadius="12" Padding="18,16" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                <StackPanel Spacing="10" HorizontalAlignment="Stretch">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <Border Width="26" Height="26" CornerRadius="6" Background="#1A3B82F6">
+                                                <FontIcon Glyph="&#xE9D2;" FontSize="13" Foreground="#3B82F6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock x:Name="CardRamTitle" Text="حافظه رم (RAM)" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+                                        </StackPanel>
+                                        <Border x:Name="CardRamStatusBadge" Grid.Column="1" Background="#1810B981" BorderBrush="#3010B981" BorderThickness="1" CornerRadius="4" Padding="6,2">
+                                            <TextBlock x:Name="CardRamStatusText" Text="وضعیت روان" FontSize="10" FontWeight="SemiBold" Foreground="#10B981" />
+                                        </Border>
+                                    </Grid>
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="CardRamText" Text="-- / --" FontSize="19" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="فضای مصرفی در حال حاضر" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                     </StackPanel>
-                                    <TextBlock x:Name="CardRamText" Text="-- / --" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                    <ProgressBar x:Name="CardRamProgress" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
-                                    <Button x:Name="CardBoostRamBtn" Click="QuickBoostBtn_Click" Content="آزادسازی فوری رم" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
+                                    <ProgressBar x:Name="CardRamProgress" Minimum="0" Maximum="100" Value="0" Height="5" CornerRadius="3" HorizontalAlignment="Stretch" Foreground="#3B82F6" />
+                                    <Grid ColumnDefinitions="*,*" Margin="0,2,0,0">
+                                        <Border Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="6" Padding="8,4" Margin="0,0,3,0">
+                                            <TextBlock x:Name="CardRamAvailableText" Text="در دسترس: --" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </Border>
+                                        <Border Grid.Column="1" Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="6" Padding="8,4" Margin="3,0,0,0">
+                                            <TextBlock x:Name="CardRamTotalBadge" Text="مجموع: --" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </Border>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
 
                             <!-- Drive C: Card -->
-                            <Border x:Name="BentoDiskCard" Grid.Column="1" CornerRadius="10" Padding="16,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
-                                <StackPanel Spacing="9" HorizontalAlignment="Stretch">
+                            <Border x:Name="BentoDiskCard" Grid.Column="1" CornerRadius="12" Padding="18,16" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                <StackPanel Spacing="10" HorizontalAlignment="Stretch">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xEDA2;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                            <TextBlock x:Name="CardDiskTitle" Text="وضعیت درایو و دیسک (SSD)" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Border Width="26" Height="26" CornerRadius="6" Background="#1A10B981">
+                                                <FontIcon Glyph="&#xEDA2;" FontSize="13" Foreground="#10B981" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock x:Name="CardDiskTitle" Text="دیسک سیستم (Drive :C)" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
                                         </StackPanel>
-                                        <Border x:Name="CardDiskHealthBadge" Grid.Column="1" Background="#1810B981" BorderBrush="#3510B981" BorderThickness="1" CornerRadius="4" Padding="5,1">
+                                        <Border x:Name="CardDiskHealthBadge" Grid.Column="1" Background="#1810B981" BorderBrush="#3510B981" BorderThickness="1" CornerRadius="4" Padding="6,2">
                                             <TextBlock x:Name="CardDiskHealthText" Text="سالم (Healthy)" FontSize="10" FontWeight="SemiBold" Foreground="#10B981" />
                                         </Border>
                                     </Grid>
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <TextBlock x:Name="CardDiskText" Text="-- آزاد از --" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                        <TextBlock x:Name="CardDiskTypeBadge" Grid.Column="1" Text="NVMe SSD" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
-                                    </Grid>
-                                    <ProgressBar x:Name="CardDiskProgress" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
-                                    <Grid ColumnDefinitions="*,*">
-                                        <Button x:Name="CardToggleCustomCleanBtn" Click="CardToggleCustomCleanBtn_Click" Content="سفارشی‌سازی" Margin="0,0,3,0" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
-                                        <Button x:Name="CardLargeFilesBtn" Grid.Column="1" Click="CardLargeFilesBtn_Click" Content="فایل‌های حجیم" Margin="3,0,0,0" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="CardDiskText" Text="-- آزاد از --" FontSize="19" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="فضای ذخیره‌سازی درایو اصلی" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <ProgressBar x:Name="CardDiskProgress" Minimum="0" Maximum="100" Value="0" Height="5" CornerRadius="3" HorizontalAlignment="Stretch" Foreground="#10B981" />
+                                    <Grid ColumnDefinitions="*,*" Margin="0,2,0,0">
+                                        <Border Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="6" Padding="8,4" Margin="0,0,3,0">
+                                            <TextBlock x:Name="CardDiskTypeBadge" Text="NVMe SSD" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </Border>
+                                        <Border Grid.Column="1" Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="6" Padding="8,4" Margin="3,0,0,0">
+                                            <TextBlock Text="فایل‌سیستم: NTFS" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </Border>
                                     </Grid>
                                 </StackPanel>
                             </Border>
 
                             <!-- CPU & Network Card -->
-                            <Border x:Name="BentoCpuCard" Grid.Column="2" CornerRadius="10" Padding="16,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
-                                <StackPanel Spacing="9" HorizontalAlignment="Stretch">
+                            <Border x:Name="BentoCpuCard" Grid.Column="2" CornerRadius="12" Padding="18,16" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                <StackPanel Spacing="10" HorizontalAlignment="Stretch">
                                     <Grid ColumnDefinitions="*,Auto">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
-                                            <FontIcon Glyph="&#xE774;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
-                                            <TextBlock x:Name="CardCpuTitle" Text="وضعیت پردازنده و سخت‌افزار" FontWeight="Medium" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Border Width="26" Height="26" CornerRadius="6" Background="#1A8B5CF6">
+                                                <FontIcon Glyph="&#xE770;" FontSize="13" Foreground="#8B5CF6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <TextBlock x:Name="CardCpuTitle" Text="پردازنده و سخت‌افزار" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
                                         </StackPanel>
-                                        <Border x:Name="CardPowerBadge" Grid.Column="1" Background="{ThemeResource AppHeaderPillBrush}" CornerRadius="4" Padding="5,1">
+                                        <Border x:Name="CardPowerBadge" Grid.Column="1" Background="{ThemeResource AppHeaderPillBrush}" CornerRadius="4" Padding="6,2">
                                             <TextBlock x:Name="CardPowerText" Text="متصل به برق" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </Border>
                                     </Grid>
-                                    <Grid ColumnDefinitions="*,Auto">
-                                        <TextBlock x:Name="CardCpuText" Text="مصرف CPU: 0%" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                        <TextBlock x:Name="CardGpuSummaryText" Grid.Column="1" Text="گرافیک" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                    <StackPanel Spacing="2">
+                                        <TextBlock x:Name="CardCpuText" Text="مصرف CPU: 0%" FontSize="19" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                        <TextBlock Text="بار پردازشی هسته‌های سیستم" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                    </StackPanel>
+                                    <ProgressBar x:Name="CardCpuProgress" Minimum="0" Maximum="100" Value="0" Height="5" CornerRadius="3" HorizontalAlignment="Stretch" Foreground="#8B5CF6" />
+                                    <Grid ColumnDefinitions="*,*" Margin="0,2,0,0">
+                                        <Border Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="6" Padding="8,4" Margin="0,0,3,0">
+                                            <TextBlock x:Name="CardGpuSummaryText" Text="گرافیک فعال" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                                        </Border>
+                                        <Border Grid.Column="1" Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="6" Padding="8,4" Margin="3,0,0,0">
+                                            <TextBlock Text="معماری ۶۴ بیتی" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        </Border>
                                     </Grid>
-                                    <ProgressBar x:Name="CardCpuProgress" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
-                                    <Button x:Name="CardFlushDnsBtn" Click="CardFlushDnsBtn_Click" Content="تخلیه کش DNS" HorizontalAlignment="Stretch" Height="32" Padding="0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" />
                                 </StackPanel>
                             </Border>
+                        </Grid>
+
+                        <!-- Dashboard Quick Actions Strip (Direct Shortcuts to Distinct Tools) -->
+                        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10" HorizontalAlignment="Stretch">
+                            <Button Click="DashboardDnsBtn_Click" HorizontalAlignment="Stretch" Height="42" Padding="10,0" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE774;" FontSize="14" Foreground="#06B6D4" />
+                                    <TextBlock Text="تنظیم هوشمند DNS" FontSize="12" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Click="DashboardSpeedTestBtn_Click" HorizontalAlignment="Stretch" Grid.Column="1" Height="42" Padding="10,0" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE768;" FontSize="14" Foreground="#10B981" />
+                                    <TextBlock Text="تست سرعت اینترنت" FontSize="12" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Click="DashboardStartupBtn_Click" HorizontalAlignment="Stretch" Grid.Column="2" Height="42" Padding="10,0" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE7B5;" FontSize="14" Foreground="#F59E0B" />
+                                    <TextBlock Text="برنامه‌های استارتاپ" FontSize="12" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
+
+                            <Button Click="DashboardUninstallerBtn_Click" HorizontalAlignment="Stretch" Grid.Column="3" Height="42" Padding="10,0" CornerRadius="8" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="#8B5CF6" />
+                                    <TextBlock Text="حذف نرم‌افزارهای اضافی" FontSize="12" FontWeight="SemiBold" />
+                                </StackPanel>
+                            </Button>
                         </Grid>
 
                         <!-- Customization / Advanced Items Expander (For power users) -->
@@ -555,6 +648,64 @@
                                         </Button>
                                     </Border>
                                 </Grid>
+
+                                <!-- Section 4: Advanced Network & Privacy Optimization -->
+                                <TextBlock Text="شبکه، حریم خصوصی و بهینه‌سازی پیشرفته" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,10,0,0" />
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
+                                    <!-- Card 10: DNS & Anti-Sanction Switcher -->
+                                    <Border Grid.Column="0" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                        <Button Click="LaunchToolPage_Click" Tag="dns_manager" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#06B6D4" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <FontIcon Glyph="&#xE774;" FontSize="18" Foreground="#06B6D4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                    <TextBlock Text="تنظیم DNS و تحریم‌شکن" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                    <TextBlock Text="شکن، الکترو، ۴۰۳ آنلاین، رادار و کلودفلر" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </Border>
+
+                                    <!-- Card 11: Windows 11 Context Menu Manager -->
+                                    <Border Grid.Column="1" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                        <Button Click="LaunchToolPage_Click" Tag="context_menu" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#8B5CF6" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <FontIcon Glyph="&#xE700;" FontSize="18" Foreground="#8B5CF6" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                    <TextBlock Text="منوی کلیک‌راست ویندوز ۱۱" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                    <TextBlock Text="سوییچ بین منوی جدید و کلاسیک کامل" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </Border>
+
+                                    <!-- Card 12: Privacy & Telemetry Debloater -->
+                                    <Border Grid.Column="2" CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                        <Button Click="LaunchToolPage_Click" Tag="privacy_debloat" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="Transparent" BorderThickness="0" CornerRadius="12" Padding="20,18" HorizontalContentAlignment="Stretch">
+                                            <Grid ColumnDefinitions="Auto,*">
+                                                <Border Width="42" Height="42" CornerRadius="10" Margin="0,0,12,0" VerticalAlignment="Center">
+                                                    <Border.Background>
+                                                        <SolidColorBrush Color="#10B981" Opacity="0.15" />
+                                                    </Border.Background>
+                                                    <FontIcon Glyph="&#xE8F8;" FontSize="18" Foreground="#10B981" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="4">
+                                                    <TextBlock Text="حریم خصوصی و ضدجاسوسی" FontWeight="SemiBold" FontSize="13.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                    <TextBlock Text="قطع تلمتری، تبلیغات و سرچ بینگ استارت" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                </StackPanel>
+                                            </Grid>
+                                        </Button>
+                                    </Border>
+                                </Grid>
                             </StackPanel>
 
                             <!-- =================================================== -->
@@ -696,39 +847,62 @@
                                 <!-- Central Speed Gauge -->
                                 <Border CornerRadius="14" Padding="28,24" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                     <StackPanel Spacing="20" HorizontalAlignment="Stretch">
-                                        <Grid Height="220" HorizontalAlignment="Center">
-                                            <ProgressRing x:Name="SpeedGaugeRing" Width="200" Height="200" Minimum="0" Maximum="100" Value="0" IsIndeterminate="False" />
-                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
-                                                <TextBlock x:Name="SpeedGaugePhaseText" Text="آماده شروع تست" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
-                                                <TextBlock x:Name="SpeedGaugeValueText" Text="۰.۰" FontSize="44" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                <TextBlock Text="Mbps (مگابیت بر ثانیه)" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
-                                                <TextBlock x:Name="SpeedGaugeMBsText" Text="۰.۰۰ مگابایت بر ثانیه" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        <!-- Phase Status Badge (Decoupled from gauge circle) -->
+                                        <Border HorizontalAlignment="Center" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" CornerRadius="20" Padding="18,7">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <FontIcon Glyph="&#xE774;" FontSize="13" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="SpeedGaugePhaseText" Text="آماده شروع تست سرعت" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Speed Gauge Dial -->
+                                        <Grid Width="250" Height="250" HorizontalAlignment="Center">
+                                            <!-- Background Circular Track -->
+                                            <Ellipse Width="240" Height="240" Stroke="{ThemeResource AppCardSecondaryBrush}" StrokeThickness="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <!-- WinUI ProgressRing as Gauge Meter -->
+                                            <ProgressRing x:Name="SpeedGaugeRing" Width="240" Height="240" Minimum="0" Maximum="100" Value="0" IsIndeterminate="False" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <!-- Inside Gauge Content -->
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                                                <TextBlock x:Name="SpeedGaugeValueText" Text="۰.۰" FontSize="52" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <TextBlock Text="Mbps" FontSize="14" FontWeight="Bold" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" Margin="0,-4,0,6" />
+                                                <Border Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" CornerRadius="12" Padding="12,4" HorizontalAlignment="Center">
+                                                    <TextBlock x:Name="SpeedGaugeMBsText" Text="۰.۰۰ مگابایت بر ثانیه" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                                </Border>
                                             </StackPanel>
                                         </Grid>
 
                                         <!-- 3 Stat Cards Below Gauge (Ping, Download, Upload) -->
                                         <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
                                             <!-- Ping -->
-                                            <Border Grid.Column="0" CornerRadius="8" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#F59E0B" BorderThickness="0,0,0,3">
-                                                <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                                    <TextBlock Text="تاخیر پینگ (Ping)" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock x:Name="SpeedPingValText" Text="-- ms" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Border Grid.Column="0" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#F59E0B" BorderThickness="0,0,0,3">
+                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                        <FontIcon Glyph="&#xE916;" FontSize="13" Foreground="#F59E0B" VerticalAlignment="Center" />
+                                                        <TextBlock Text="تاخیر پینگ (Ping)" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock x:Name="SpeedPingValText" Text="-- ms" FontSize="19" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                                 </StackPanel>
                                             </Border>
 
                                             <!-- Download Speed -->
-                                            <Border Grid.Column="1" CornerRadius="8" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#10B981" BorderThickness="0,0,0,3">
-                                                <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                                    <TextBlock Text="سرعت دانلود (Download)" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock x:Name="SpeedDownloadValText" Text="-- Mbps" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Border Grid.Column="1" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#10B981" BorderThickness="0,0,0,3">
+                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                        <FontIcon Glyph="&#xE896;" FontSize="13" Foreground="#10B981" VerticalAlignment="Center" />
+                                                        <TextBlock Text="سرعت دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock x:Name="SpeedDownloadValText" Text="-- Mbps" FontSize="19" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                                 </StackPanel>
                                             </Border>
 
                                             <!-- Upload Speed -->
-                                            <Border Grid.Column="2" CornerRadius="8" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#3B82F6" BorderThickness="0,0,0,3">
-                                                <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                                    <TextBlock Text="سرعت آپلود (Upload)" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock x:Name="SpeedUploadValText" Text="-- Mbps" FontSize="18" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <Border Grid.Column="2" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#3B82F6" BorderThickness="0,0,0,3">
+                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                                    <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                        <FontIcon Glyph="&#xE898;" FontSize="13" Foreground="#3B82F6" VerticalAlignment="Center" />
+                                                        <TextBlock Text="سرعت آپلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                                    </StackPanel>
+                                                    <TextBlock x:Name="SpeedUploadValText" Text="-- Mbps" FontSize="19" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                                 </StackPanel>
                                             </Border>
                                         </Grid>
@@ -984,6 +1158,20 @@
                                     </Grid>
                                 </Border>
 
+                                <!-- Drivers Batch Selection & Deletion Bar -->
+                                <Border x:Name="DriversBatchBar" Visibility="Collapsed" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AccentFillColorDefaultBrush}" BorderThickness="1">
+                                    <Grid ColumnDefinitions="Auto,*,Auto">
+                                        <CheckBox x:Name="DriversSelectAll" Checked="DriversSelectAll_Checked" Unchecked="DriversSelectAll_Unchecked" Content="انتخاب همه درایورها" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                        <TextBlock x:Name="DriversSelectedCountText" Grid.Column="1" Text="۰ درایور انتخاب شده" VerticalAlignment="Center" FontWeight="SemiBold" FontSize="12.5" />
+                                        <Button x:Name="DriversBatchDeleteBtn" Grid.Column="2" Click="DriversBatchDeleteBtn_Click" Height="34" CornerRadius="6" Background="#EF4444" Foreground="White" FontWeight="SemiBold" Padding="16,0">
+                                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                                <FontIcon Glyph="&#xE74D;" FontSize="13" />
+                                                <TextBlock x:Name="DriversBatchDeleteBtnText" Text="حذف درایورهای انتخاب‌شده" FontSize="11.5" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
                                 <!-- Search / Filter -->
                                 <AutoSuggestBox x:Name="DriversSearchBox" PlaceholderText="جستجو در بین درایورها..." QueryIcon="Find" Height="36" TextChanged="DriversSearchBox_TextChanged" />
 
@@ -992,10 +1180,199 @@
                                 <StackPanel x:Name="DriversCardsContainer" Spacing="8" Visibility="Collapsed" />
                             </StackPanel>
 
+                            <!-- =================================================== -->
+                            <!-- Sub-View 8: Smart DNS & Anti-Sanction Switcher       -->
+                            <!-- =================================================== -->
+                            <StackPanel x:Name="ToolDnsPanel" Spacing="16" Visibility="Collapsed">
+                                <!-- Top Bar -->
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="تنظیم هوشمند DNS و تحریم‌شکن‌های قانونی" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="عبور مطمئن از تحریم‌های توسعه‌دهندگان، داکر، انویدیا، ادوبی، گیمینگ و کاهش پینگ اتصال" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Button x:Name="ResetDnsDhcpBtn" Click="ResetDnsDhcpBtn_Click" Height="36" Padding="14,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE777;" FontSize="13" />
+                                            <TextBlock Text="ریست به خودکار (DHCP)" FontSize="12" FontWeight="SemiBold" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+
+                                <!-- Active DNS Status Card -->
+                                <Border CornerRadius="12" Padding="20,16" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                    <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
+                                        <Border Width="38" Height="38" CornerRadius="10" Background="#1A06B6D4" Margin="0,0,14,0" VerticalAlignment="Center">
+                                            <FontIcon Glyph="&#xE774;" FontSize="16" Foreground="#06B6D4" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="دی‌ان‌اس فعال در حال حاضر سیستم:" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                                <TextBlock x:Name="ActiveDnsNameText" Text="در حال بررسی..." FontSize="14" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <TextBlock x:Name="ActiveDnsIpText" Text="" FontSize="12" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                        <Button Grid.Column="2" Click="FlushDnsQuickBtn_Click" Content="تخلیه کش DNS" Height="32" Padding="12,0" CornerRadius="6" FontSize="11.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Presets Container -->
+                                <TextBlock Text="پروژه‌ها و سرویس‌های آماده تحریم‌شکن و دی‌ان‌اس‌های پرسرعت جهانی" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="0,4,0,0" />
+                                <StackPanel x:Name="DnsPresetsContainer" Spacing="8" />
+                            </StackPanel>
+
+                            <!-- =================================================== -->
+                            <!-- Sub-View 9: Windows 11 Context Menu Manager          -->
+                            <!-- =================================================== -->
+                            <StackPanel x:Name="ToolContextMenuPanel" Spacing="16" Visibility="Collapsed">
+                                <!-- Top Bar -->
+                                <Grid ColumnDefinitions="*" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="مدیریت منوی کلیک‌راست ویندوز ۱۱ (Context Menu)" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="تغییر ظاهر منوی راست‌کلیک میان استایل مدرن ویندوز ۱۱ و استایل کلاسیک سریع ویندوز ۱۰" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Toggle Card -->
+                                <Border CornerRadius="12" Padding="22,18" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch">
+                                        <StackPanel VerticalAlignment="Center" Spacing="4">
+                                            <TextBlock Text="حالت منوی کلاسیک کامل (ویندوز ۱۰ بدون Show more options)" FontSize="14" FontWeight="SemiBold" />
+                                            <TextBlock Text="با فعال‌سازی این گزینه، تمام گزینه‌های برنامه‌ها مانند WinRAR، 7-Zip و Visual Studio با یک کلیک مستقیم و بدون نیاز به فشردن Shift یا Show More ظاهر می‌شوند." FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" LineHeight="18" />
+                                        </StackPanel>
+                                        <ToggleSwitch x:Name="ClassicMenuToggle" Grid.Column="1" Toggled="ClassicMenuToggle_Toggled" OnContent="کلاسیک (سریع)" OffContent="مدرن ویندوز ۱۱" Margin="16,0,0,0" VerticalAlignment="Center" />
+                                    </Grid>
+                                </Border>
+
+                                <!-- Explorer Restart Helper Card -->
+                                <Border CornerRadius="12" Padding="20,16" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                    <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch">
+                                        <StackPanel VerticalAlignment="Center" Spacing="2">
+                                            <TextBlock Text="راه‌اندازی مجدد فرآیند Windows Explorer" FontSize="13" FontWeight="SemiBold" />
+                                            <TextBlock Text="در صورتی که منو بلافاصله اعمال نشد، با ریست اکسپلورر تغییرات در کسری از ثانیه فعال می‌شوند." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </StackPanel>
+                                        <Button Grid.Column="1" Click="RestartExplorerBtn_Click" Content="ریست اکسپلورر" Height="34" Padding="16,0" CornerRadius="6" FontWeight="SemiBold" FontSize="11.5" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" />
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- =================================================== -->
+                            <!-- Sub-View 10: Windows 11 Privacy & Debloater         -->
+                            <!-- =================================================== -->
+                            <StackPanel x:Name="ToolPrivacyPanel" Spacing="16" Visibility="Collapsed">
+                                <!-- Top Bar -->
+                                <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+                                    <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+                                        <Button Click="BackToToolsLauncher_Click" Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                                            <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        </Button>
+                                        <StackPanel Spacing="3" VerticalAlignment="Center">
+                                            <TextBlock Text="حریم خصوصی و حذف تلمتری ویندوز ۱۱ (Privacy Debloater)" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                                            <TextBlock Text="توقف ارسال مخفیانه لاگ‌ها و دیتاها به سرورهای مایکروسافت و افزایش سرعت عملکرد سیستم" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
+                                        </StackPanel>
+                                    </StackPanel>
+
+                                    <Button x:Name="ApplyPrivacyDebloatBtn" Click="ApplyPrivacyDebloatBtn_Click" Style="{ThemeResource AccentButtonStyle}" Height="36" Padding="16,0" CornerRadius="8">
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <FontIcon Glyph="&#xE8F8;" FontSize="13" />
+                                            <TextBlock Text="اعمال تمامی بهینه‌سازی‌های امنیتی" FontSize="12" FontWeight="SemiBold" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+
+                                <!-- Privacy Options Cards -->
+                                <StackPanel Spacing="10">
+                                    <Border CornerRadius="10" Padding="18,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <FontIcon Glyph="&#xE895;" FontSize="16" Foreground="#10B981" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="قطع تلمتری و گزارش عملکرد (DiagTrack)" FontSize="13" FontWeight="SemiBold" />
+                                                <TextBlock Text="غیرفعال‌سازی سرویس Connected User Experiences and Telemetry و توقف ارسال بسته‌های پس‌زمینه" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="PrivacyDiagTrackStatus" Grid.Column="2" Text="محافظت‌شده ✓" Foreground="#10B981" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border CornerRadius="10" Padding="18,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <FontIcon Glyph="&#xE721;" FontSize="16" Foreground="#0284C7" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="حذف جستجوی وب بینگ از استارت منو (Bing Search)" FontSize="13" FontWeight="SemiBold" />
+                                                <TextBlock Text="جلوگیری از ارسال متن جستجوی شما به اینترنت و افزایش چشمگیر سرعت باز شدن جستجوی فایل‌ها" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                            <TextBlock Text="بهینه‌سازی فعال ✓" Grid.Column="2" Foreground="#0284C7" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border CornerRadius="10" Padding="18,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <FontIcon Glyph="&#xE719;" FontSize="16" Foreground="#F59E0B" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="غیرفعال‌سازی شناسه تبلیغاتی ویندوز (Advertising ID)" FontSize="13" FontWeight="SemiBold" />
+                                                <TextBlock Text="جلوگیری از ساخت پروفایل کاربری تبلیغاتی توسط اپلیکیشن‌های استور مایکروسافت" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                            <TextBlock Text="مسدود شده ✓" Grid.Column="2" Foreground="#F59E0B" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+
+                                    <Border CornerRadius="10" Padding="18,14" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                        <Grid ColumnDefinitions="Auto,*,Auto">
+                                            <FontIcon Glyph="&#xE81C;" FontSize="16" Foreground="#8B5CF6" Margin="0,0,12,0" VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                                                <TextBlock Text="توقف ثبت تاریخچه فعالیت‌ها (Activity History)" FontSize="13" FontWeight="SemiBold" />
+                                                <TextBlock Text="توقف جمع‌آوری سوابق باز کردن برنامه‌ها، مرور وب و فایل‌ها توسط ویندوز" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            </StackPanel>
+                                            <TextBlock Text="ایمن ✓" Grid.Column="2" Foreground="#8B5CF6" FontWeight="SemiBold" FontSize="11.5" VerticalAlignment="Center" />
+                                        </Grid>
+                                    </Border>
+                                </StackPanel>
+                            </StackPanel>
+
                         </StackPanel>
                     </Grid>
                 </ScrollViewer>
             </Grid>
+        <!-- Global Floating Toast Notification (Appears seamlessly over ANY active view) -->
+        <Border x:Name="FloatingToastCard"
+                Grid.Row="1"
+                VerticalAlignment="Top"
+                HorizontalAlignment="Center"
+                Canvas.ZIndex="999"
+                Margin="0,16,0,0"
+                Padding="16,10,14,10"
+                CornerRadius="12"
+                Background="{ThemeResource AppToastBackgroundBrush}"
+                BorderBrush="{ThemeResource AppToastBorderBrush}"
+                BorderThickness="1"
+                Translation="0,0,32"
+                Shadow="{StaticResource SharedCardShadow}"
+                MaxWidth="560"
+                Visibility="Collapsed"
+                Opacity="0"
+                FlowDirection="RightToLeft">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Border x:Name="ToastIconBox" Grid.Column="0" Width="30" Height="30" CornerRadius="8" Background="#1A10B981" VerticalAlignment="Center" Margin="0,0,12,0">
+                    <FontIcon x:Name="ToastIcon" Glyph="&#xE73E;" FontSize="13" Foreground="#10B981" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                </Border>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2">
+                    <TextBlock x:Name="ToastTitleText" Text="عملیات موفق" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                    <TextBlock x:Name="ToastMessageText" Text="پیام نوتیفیکیشن" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                </StackPanel>
+                <Button x:Name="ToastCloseBtn" Click="ToastCloseBtn_Click" Grid.Column="2" Width="26" Height="26" Padding="0" Margin="12,0,0,0" Background="Transparent" BorderThickness="0" CornerRadius="13" VerticalAlignment="Center">
+                    <FontIcon Glyph="&#xE711;" FontSize="10" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                </Button>
+            </Grid>
+        </Border>
         </Grid>
     </Grid>
 </Window>

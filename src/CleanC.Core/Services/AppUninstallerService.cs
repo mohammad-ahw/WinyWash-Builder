@@ -183,6 +183,70 @@ namespace CleanC.Core.Services
             });
         }
 
+        public static (string fileName, string arguments) ParseUninstallCommand(string commandLine)
+        {
+            if (string.IsNullOrWhiteSpace(commandLine))
+                return (string.Empty, string.Empty);
+
+            string trimmed = commandLine.Trim();
+
+            // 1. Quoted executable path
+            if (trimmed.StartsWith("\""))
+            {
+                int endQuote = trimmed.IndexOf('"', 1);
+                if (endQuote > 1)
+                {
+                    string fileName = trimmed.Substring(1, endQuote - 1).Trim();
+                    string args = endQuote + 1 < trimmed.Length ? trimmed.Substring(endQuote + 1).Trim() : string.Empty;
+                    return (fileName, args);
+                }
+            }
+
+            // 2. MsiExec command (e.g. MsiExec.exe /I{...} or msiexec /X{...})
+            if (trimmed.StartsWith("MsiExec.exe", StringComparison.OrdinalIgnoreCase) || trimmed.StartsWith("msiexec", StringComparison.OrdinalIgnoreCase))
+            {
+                int spaceIdx = trimmed.IndexOf(' ');
+                string args = spaceIdx > 0 ? trimmed.Substring(spaceIdx + 1).Trim() : string.Empty;
+                // Normalize /I or -I to /X (uninstall instead of install)
+                if (args.StartsWith("/I", StringComparison.OrdinalIgnoreCase))
+                {
+                    args = "/X" + args.Substring(2);
+                }
+                else if (args.StartsWith("-I", StringComparison.OrdinalIgnoreCase))
+                {
+                    args = "-X" + args.Substring(2);
+                }
+                return ("msiexec.exe", args);
+            }
+
+            // 3. Unquoted executable with spaces (e.g. C:\Program Files (x86)\App\Uninstall.exe /s)
+            string lower = trimmed.ToLowerInvariant();
+            int exeIdx = lower.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+            if (exeIdx > 0)
+            {
+                int fileEnd = exeIdx + 4;
+                string candidateFile = trimmed.Substring(0, fileEnd).Trim();
+                string candidateArgs = fileEnd < trimmed.Length ? trimmed.Substring(fileEnd).Trim() : string.Empty;
+                return (candidateFile, candidateArgs);
+            }
+
+            // 4. rundll32.exe special case
+            if (lower.StartsWith("rundll32.exe") || lower.StartsWith("rundll32"))
+            {
+                int spaceIdx = trimmed.IndexOf(' ');
+                return ("rundll32.exe", spaceIdx > 0 ? trimmed.Substring(spaceIdx + 1).Trim() : string.Empty);
+            }
+
+            // 5. Fallback split on first space
+            var parts = trimmed.Split(new[] { ' ' }, 2, StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length > 1)
+            {
+                return (parts[0], parts[1]);
+            }
+
+            return (trimmed, string.Empty);
+        }
+
         public static bool LaunchUninstall(InstalledAppInfo app)
         {
             try
@@ -203,52 +267,32 @@ namespace CleanC.Core.Services
                 string cmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
                 if (string.IsNullOrWhiteSpace(cmd)) return false;
 
-                cmd = cmd.Trim();
+                var (fileName, args) = ParseUninstallCommand(cmd);
+                if (string.IsNullOrWhiteSpace(fileName)) return false;
 
-                // If msiexec command
-                if (cmd.StartsWith("MsiExec.exe", StringComparison.OrdinalIgnoreCase) || cmd.StartsWith("msiexec", StringComparison.OrdinalIgnoreCase))
-                {
-                    string args = cmd.Length > 11 ? cmd.Substring(11).Trim() : "";
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "msiexec.exe",
-                        Arguments = args,
-                        UseShellExecute = true
-                    });
-                    return true;
-                }
-
-                // If quoted executable
-                if (cmd.StartsWith("\""))
-                {
-                    int endQuote = cmd.IndexOf('"', 1);
-                    if (endQuote > 1)
-                    {
-                        string exe = cmd.Substring(1, endQuote - 1);
-                        string args = endQuote + 1 < cmd.Length ? cmd.Substring(endQuote + 1).Trim() : "";
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = exe,
-                            Arguments = args,
-                            UseShellExecute = true
-                        });
-                        return true;
-                    }
-                }
-
-                // General launch via cmd or shell
-                var parts = cmd.Split(' ', 2);
                 Process.Start(new ProcessStartInfo
                 {
-                    FileName = parts[0],
-                    Arguments = parts.Length > 1 ? parts[1] : "",
+                    FileName = fileName,
+                    Arguments = args,
                     UseShellExecute = true
                 });
                 return true;
             }
             catch
             {
-                return false;
+                // Fallback via cmd.exe /c
+                try
+                {
+                    string fallbackCmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c {fallbackCmd}",
+                        UseShellExecute = true
+                    });
+                    return true;
+                }
+                catch { return false; }
             }
         }
 
@@ -277,56 +321,52 @@ namespace CleanC.Core.Services
                 string cmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
                 if (string.IsNullOrWhiteSpace(cmd)) return false;
 
-                cmd = cmd.Trim();
-                ProcessStartInfo? psiToRun = null;
+                var (fileName, args) = ParseUninstallCommand(cmd);
+                if (string.IsNullOrWhiteSpace(fileName)) return false;
 
-                if (cmd.StartsWith("MsiExec.exe", StringComparison.OrdinalIgnoreCase) || cmd.StartsWith("msiexec", StringComparison.OrdinalIgnoreCase))
+                var psiToRun = new ProcessStartInfo
                 {
-                    string args = cmd.Length > 11 ? cmd.Substring(11).Trim() : "";
-                    psiToRun = new ProcessStartInfo
-                    {
-                        FileName = "msiexec.exe",
-                        Arguments = args,
-                        UseShellExecute = true
-                    };
-                }
-                else if (cmd.StartsWith("\""))
-                {
-                    int endQuote = cmd.IndexOf('"', 1);
-                    if (endQuote > 1)
-                    {
-                        string exe = cmd.Substring(1, endQuote - 1);
-                        string args = endQuote + 1 < cmd.Length ? cmd.Substring(endQuote + 1).Trim() : "";
-                        psiToRun = new ProcessStartInfo
-                        {
-                            FileName = exe,
-                            Arguments = args,
-                            UseShellExecute = true
-                        };
-                    }
-                }
-
-                if (psiToRun == null)
-                {
-                    var parts = cmd.Split(' ', 2);
-                    psiToRun = new ProcessStartInfo
-                    {
-                        FileName = parts[0],
-                        Arguments = parts.Length > 1 ? parts[1] : "",
-                        UseShellExecute = true
-                    };
-                }
+                    FileName = fileName,
+                    Arguments = args,
+                    UseShellExecute = true
+                };
 
                 using var process = Process.Start(psiToRun);
                 if (process != null)
                 {
-                    await process.WaitForExitAsync();
+                    try
+                    {
+                        await process.WaitForExitAsync();
+                    }
+                    catch
+                    {
+                        // In case process handle cannot be monitored directly with UseShellExecute, allow user interaction window
+                        await Task.Delay(3000);
+                    }
                     return true;
                 }
                 return false;
             }
             catch
             {
+                // Fallback via cmd.exe /c
+                try
+                {
+                    string fallbackCmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
+                    var psiFallback = new ProcessStartInfo
+                    {
+                        FileName = "cmd.exe",
+                        Arguments = $"/c {fallbackCmd}",
+                        UseShellExecute = true
+                    };
+                    using var pFallback = Process.Start(psiFallback);
+                    if (pFallback != null)
+                    {
+                        try { await pFallback.WaitForExitAsync(); } catch { await Task.Delay(3000); }
+                        return true;
+                    }
+                }
+                catch { }
                 return false;
             }
         }

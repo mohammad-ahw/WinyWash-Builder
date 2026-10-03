@@ -59,8 +59,61 @@ namespace CleanC.Core.Services
                 }
                 catch { }
 
+                // 4. Disable Advertising ID
+                try
+                {
+                    using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo"))
+                    {
+                        key?.SetValue("Enabled", 0, RegistryValueKind.DWord);
+                        appliedCount++;
+                    }
+                }
+                catch { }
+
+                // 5. Disable Web/Bing Search in Start Menu (huge boost for Start Menu search speed!)
+                try
+                {
+                    using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Policies\Microsoft\Windows\Explorer"))
+                    {
+                        key?.SetValue("DisableSearchBoxSuggestions", 1, RegistryValueKind.DWord);
+                    }
+                    using (var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Search"))
+                    {
+                        key?.SetValue("BingSearchEnabled", 0, RegistryValueKind.DWord);
+                        appliedCount++;
+                    }
+                }
+                catch { }
+
+                // 6. Disable Activity History Tracking
+                try
+                {
+                    using (var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System"))
+                    {
+                        if (key != null)
+                        {
+                            key.SetValue("PublishUserActivities", 0, RegistryValueKind.DWord);
+                            key.SetValue("EnableActivityFeed", 0, RegistryValueKind.DWord);
+                            appliedCount++;
+                        }
+                    }
+                }
+                catch { }
+
                 return appliedCount;
             });
+        }
+
+        public static bool IsTelemetryDisabled()
+        {
+            try
+            {
+                using var key = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection", false);
+                var val = key?.GetValue("AllowTelemetry");
+                if (val != null && Convert.ToInt32(val) == 0) return true;
+            }
+            catch { }
+            return false;
         }
 
         private static bool StopAndDisableService(string serviceName)

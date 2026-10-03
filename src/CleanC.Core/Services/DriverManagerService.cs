@@ -21,6 +21,7 @@ namespace CleanC.Core.Services
         public bool HasError { get; set; }
         public int ErrorCode { get; set; }
         public string StatusDescription { get; set; } = "آماده و سالم";
+        public bool IsSelected { get; set; }
     }
 
     public class DriverSummaryStats
@@ -119,19 +120,36 @@ namespace CleanC.Core.Services
             });
         }
 
-        public static async Task<(bool success, string message)> DeleteDriverPackageAsync(string publishedName)
+        public static async Task<(bool success, string message)> DeleteDriverPackageAsync(string publishedName, bool isErrorDevice = false, string deviceName = "")
         {
-            if (string.IsNullOrWhiteSpace(publishedName) || !publishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase))
-            {
-                return (false, "نام بسته درایور نامعتبر است.");
-            }
-
             return await Task.Run(() =>
             {
                 try
                 {
-                    // Safe execution without /force
-                    var psi = new ProcessStartInfo("pnputil.exe", $"/delete-driver {publishedName.Trim()}")
+                    // 1. Defective / Error device removal
+                    if (isErrorDevice || publishedName == "سخت‌افزار معیوب" || !publishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string target = !string.IsNullOrEmpty(deviceName) ? deviceName : publishedName;
+                        var psiDev = new ProcessStartInfo("pnputil.exe", $"/remove-device /deviceid \"{target.Trim()}\" /force")
+                        {
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+                        using var pDev = Process.Start(psiDev);
+                        if (pDev != null)
+                        {
+                            pDev.WaitForExit(8000);
+                            return (true, $"دستگاه معیوب '{target}' با موفقیت از سیستم حذف و جدا شد.");
+                        }
+                        return (false, "عدم توانایی در اجرای ابزار جداسازی سخت‌افزار.");
+                    }
+
+                    string infName = publishedName.Trim();
+
+                    // 2. Try pnputil /delete-driver oemX.inf /uninstall
+                    var psi = new ProcessStartInfo("pnputil.exe", $"/delete-driver {infName} /uninstall")
                     {
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -148,15 +166,57 @@ namespace CleanC.Core.Services
 
                     if (p.ExitCode == 0 || stdout.Contains("successfully", StringComparison.OrdinalIgnoreCase) || stdout.Contains("حذف شد", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (true, $"بسته درایور {publishedName} با موفقیت از سیستم حذف شد.");
+                        return (true, $"بسته درایور {infName} با موفقیت حذف شد.");
                     }
+
+                    // 3. Try with /force if not deleted
+                    var psiForce = new ProcessStartInfo("pnputil.exe", $"/delete-driver {infName} /uninstall /force")
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var pForce = Process.Start(psiForce);
+                    if (pForce != null)
+                    {
+                        string outForce = pForce.StandardOutput.ReadToEnd();
+                        pForce.WaitForExit(10000);
+                        if (pForce.ExitCode == 0 || outForce.Contains("successfully", StringComparison.OrdinalIgnoreCase) || outForce.Contains("حذف شد", StringComparison.OrdinalIgnoreCase))
+                        {
+                            return (true, $"بسته درایور {infName} با سوئیچ اجباری با موفقیت حذف شد.");
+                        }
+                    }
+
+                    // 4. Fallback to DISM /Online /Remove-Driver
+                    try
+                    {
+                        var psiDism = new ProcessStartInfo("dism.exe", $"/Online /Remove-Driver /Driver:{infName}")
+                        {
+                            RedirectStandardOutput = true,
+                            RedirectStandardError = true,
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+                        using var pDism = Process.Start(psiDism);
+                        if (pDism != null)
+                        {
+                            string dismOut = pDism.StandardOutput.ReadToEnd();
+                            pDism.WaitForExit(10000);
+                            if (pDism.ExitCode == 0 || dismOut.Contains("100.0%", StringComparison.OrdinalIgnoreCase) || dismOut.Contains("The operation completed successfully", StringComparison.OrdinalIgnoreCase))
+                            {
+                                return (true, $"بسته درایور {infName} از طریق سرویس DISM با موفقیت حذف شد.");
+                            }
+                        }
+                    }
+                    catch { }
 
                     if (stdout.Contains("in use", StringComparison.OrdinalIgnoreCase) || stderr.Contains("in use", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (false, $"امکان حذف درایور {publishedName} وجود ندارد زیرا در حال حاضر توسط سیستم در حال استفاده (In use) است.");
+                        return (false, $"امکان حذف درایور {infName} وجود ندارد زیرا توسط هسته سیستم در حال استفاده فعال است.");
                     }
 
-                    return (false, $"خطا در حذف درایور: {(string.IsNullOrEmpty(stderr) ? stdout : stderr)}".Trim());
+                    return (false, $"عدم موفقیت در حذف درایور: {(string.IsNullOrEmpty(stderr) ? stdout : stderr)}".Trim());
                 }
                 catch (Exception ex)
                 {

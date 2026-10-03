@@ -48,6 +48,10 @@
                     <SolidColorBrush x:Key="AdminBadgeBackgroundBrush" Color="#250078D4" />
                     <SolidColorBrush x:Key="AdminBadgeBorderBrush" Color="#550078D4" />
                     <SolidColorBrush x:Key="AdminBadgeForegroundBrush" Color="#0078D4" />
+
+                    <!-- Opaque Toast Notification Surface (100% solid, prevents text bleed-through) -->
+                    <SolidColorBrush x:Key="AppToastBackgroundBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="AppToastBorderBrush" Color="#CBD5E1" />
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key="Dark">
@@ -89,6 +93,10 @@
                     <SolidColorBrush x:Key="AdminBadgeBackgroundBrush" Color="#2560CDFF" />
                     <SolidColorBrush x:Key="AdminBadgeBorderBrush" Color="#4560CDFF" />
                     <SolidColorBrush x:Key="AdminBadgeForegroundBrush" Color="#60CDFF" />
+
+                    <!-- Opaque Toast Notification Surface in Dark Mode (100% solid, prevents text bleed-through) -->
+                    <SolidColorBrush x:Key="AppToastBackgroundBrush" Color="#1E2430" />
+                    <SolidColorBrush x:Key="AppToastBorderBrush" Color="#334155" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
@@ -109,7 +117,16 @@
             <CornerRadius x:Key="CardCornerRadius">16</CornerRadius>
             <CornerRadius x:Key="HeroCornerRadius">20</CornerRadius>
             <CornerRadius x:Key="ButtonCornerRadius">8</CornerRadius>
-            <FontFamily x:Key="AppFontFamily">Segoe UI Variable, Vazirmatn, Segoe UI</FontFamily>
+            <FontFamily x:Key="AppFontFamily">ms-appx:///Assets/Fonts/Vazirmatn-Regular.ttf#Vazirmatn, Segoe UI Variable, Tahoma</FontFamily>
+            <FontFamily x:Key="AppFontBold">ms-appx:///Assets/Fonts/Vazirmatn-Bold.ttf#Vazirmatn, Segoe UI Variable, Tahoma</FontFamily>
+            <FontFamily x:Key="AppFontSemiBold">ms-appx:///Assets/Fonts/Vazirmatn-SemiBold.ttf#Vazirmatn, Segoe UI Variable, Tahoma</FontFamily>
+
+            <Style TargetType="TextBlock">
+                <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            </Style>
+            <Style TargetType="Control">
+                <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

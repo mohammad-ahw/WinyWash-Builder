@@ -14,8 +14,12 @@ namespace CleanC.Core.Services
         public double PingMs { get; set; }
         public double DownloadSpeedMbps { get; set; }
         public double DownloadSpeedMBs => Math.Round(DownloadSpeedMbps / 8.0, 2);
+        public double PeakDownloadSpeedMbps { get; set; }
+        public double PeakDownloadSpeedMBs => Math.Round(PeakDownloadSpeedMbps / 8.0, 2);
         public double UploadSpeedMbps { get; set; }
         public double UploadSpeedMBs => Math.Round(UploadSpeedMbps / 8.0, 2);
+        public int ActiveConnections { get; set; } = 8;
+        public bool IsMultiConnectionIdmMode { get; set; } = true;
         
         public string ClientIp { get; set; } = string.Empty;
         public string IspName { get; set; } = string.Empty;
@@ -37,8 +41,7 @@ namespace CleanC.Core.Services
         {
             var handler = new HttpClientHandler
             {
-                AutomaticDecompression = System.Net.DecompressionMethods.All,
-                ServerCertificateCustomValidationCallback = (m, c, ch, e) => true
+                AutomaticDecompression = System.Net.DecompressionMethods.All
             };
 
             _httpClient = new HttpClient(handler)
@@ -156,20 +159,21 @@ namespace CleanC.Core.Services
                 result.PingMs = 0;
             }
 
-            // 3. Multi-Stream Concurrent Download Test (Ookla / IDM architecture)
-            // 4 parallel connections saturate available bandwidth without single-stream throttling
+            // 3. Multi-Stream Concurrent Download Test (Real 8-Thread IDM-Style Architecture)
             long totalBytesDownloaded = 0;
-            const int streamCount = 4;
+            const int streamCount = 8;
             const int testDurationSec = 6;
             using var downloadCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
             downloadCts.CancelAfter(TimeSpan.FromSeconds(testDurationSec + 1));
 
             var downloadUrls = new[]
             {
-                "https://speed.cloudflare.com/__down?bytes=15000000",
+                "https://speed.cloudflare.com/__down?bytes=25000000",
                 "https://cachefly.cachefly.net/10mb.test",
                 "https://speed.cloudflare.com/__down?bytes=20000000",
-                "https://speed.cloudflare.com/__down?bytes=10000000"
+                "https://speed.cloudflare.com/__down?bytes=30000000",
+                "https://cachefly.cachefly.net/10mb.test",
+                "https://speed.cloudflare.com/__down?bytes=15000000"
             };
 
             var downloadTasks = new List<Task>();
@@ -197,15 +201,15 @@ namespace CleanC.Core.Services
                         }
                         catch
                         {
-                            // If stream times out or was cancelled, exit stream loop
                             break;
                         }
                     }
                 }));
             }
 
-            // Progress reporting loop with smoothed moving speed (eliminated initial TCP burst)
+            // Progress reporting loop with smoothed moving speed and peak capture
             double smoothedMbps = 0;
+            double peakSpeedMbps = 0;
             long lastSampleBytes = 0;
             var lastSampleTime = streamStopwatch.Elapsed;
             var recordedSpeeds = new List<double>();
@@ -222,15 +226,16 @@ namespace CleanC.Core.Services
                 if (deltaSec > 0.05 && deltaBytes >= 0)
                 {
                     double instantMbps = (deltaBytes * 8.0) / (deltaSec * 1_000_000.0);
-                    // Exponential smoothing for realistic gauge feel
-                    smoothedMbps = smoothedMbps == 0 ? instantMbps : (0.35 * instantMbps + 0.65 * smoothedMbps);
+                    if (instantMbps > peakSpeedMbps) peakSpeedMbps = instantMbps;
 
-                    // Ignore initial 0.5s ramp-up for final average calculation
+                    smoothedMbps = smoothedMbps == 0 ? instantMbps : (0.4 * instantMbps + 0.6 * smoothedMbps);
+
                     if (curTime.TotalSeconds > 0.5 && instantMbps > 0)
                     {
                         recordedSpeeds.Add(instantMbps);
                     }
 
+                    result.PeakDownloadSpeedMbps = Math.Round(peakSpeedMbps, 2);
                     int progressPct = (int)Math.Clamp((curTime.TotalSeconds / testDurationSec) * 100.0, 1, 98);
                     onProgress?.Invoke("download", Math.Round(smoothedMbps, 2), progressPct, result);
 
@@ -249,6 +254,7 @@ namespace CleanC.Core.Services
 
             streamStopwatch.Stop();
             result.BytesDownloaded = Interlocked.Read(ref totalBytesDownloaded);
+            result.PeakDownloadSpeedMbps = Math.Round(peakSpeedMbps, 2);
 
             if (result.BytesDownloaded > 0)
             {

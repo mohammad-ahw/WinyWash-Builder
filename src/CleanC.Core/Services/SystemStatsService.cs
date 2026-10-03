@@ -19,6 +19,11 @@ namespace CleanC.Core.Services
         private static string _cachedGpuSummary = string.Empty;
         private static bool _hardwareInitialized = false;
 
+        static SystemStatsService()
+        {
+            Task.Run(InitHardwareInfo);
+        }
+
         public static SystemStats GetCurrentStats()
         {
             var stats = new SystemStats();
@@ -50,9 +55,8 @@ namespace CleanC.Core.Services
             }
             catch { }
 
-            // 4. Hardware Details (Cached once for instant speed)
-            InitHardwareInfo();
-            stats.DiskModel = _cachedDiskModel;
+            // 4. Hardware Details (Non-blocking background cache)
+            stats.DiskModel = string.IsNullOrEmpty(_cachedDiskModel) ? "درایو محلی ویندوز" : _cachedDiskModel;
             stats.DiskType = _cachedDiskType;
             stats.DiskHealth = _cachedDiskHealth;
             stats.GpuSummary = _cachedGpuSummary;
