@@ -1,0 +1,20 @@
+<!-- ============================================================================== -->
+<!-- CleanC UI Section 07: Windows Personalization & Graphics Full Page             -->
+<!-- ============================================================================== -->
+<StackPanel x:Name="ToolPersonalizationPanel" Spacing="16" Visibility="Visible" xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+    <!-- Top Bar -->
+    <Grid ColumnDefinitions="*" HorizontalAlignment="Stretch" Margin="0,0,0,4">
+        <StackPanel Orientation="Horizontal" Spacing="14" VerticalAlignment="Center">
+            <Button Width="38" Height="38" Padding="0" CornerRadius="19" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" ToolTipService.ToolTip="بازگشت به ابزارها">
+                <FontIcon Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            </Button>
+            <StackPanel Spacing="3" VerticalAlignment="Center">
+                <TextBlock Text="استایل، تم و گرافیک ویندوز" FontSize="16" FontWeight="Bold" LineHeight="24" />
+                <TextBlock Text="شخصی‌سازی ظاهر، تم و انیمیشن‌های ویندوز با اعمال آنی بدون نیاز به ریستارت" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" LineHeight="18" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+
+    <!-- Personalization Cards Container: Host for CreateToggleCard / CreateActionCard -->
+    <StackPanel x:Name="PersonalizationCardsContainer" Spacing="10" />
+</StackPanel>
