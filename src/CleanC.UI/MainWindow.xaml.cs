@@ -2046,7 +2046,6 @@ namespace CleanC.UI
             ToolWindowsUpdatePanel.Visibility = Visibility.Collapsed;
             ToolDriversPanel.Visibility = Visibility.Collapsed;
             if (ToolDnsPanel != null) ToolDnsPanel.Visibility = Visibility.Collapsed;
-            if (ToolContextMenuPanel != null) ToolContextMenuPanel.Visibility = Visibility.Collapsed;
             if (ToolPrivacyPanel != null) ToolPrivacyPanel.Visibility = Visibility.Collapsed;
 
             switch (pageId)
@@ -2081,10 +2080,6 @@ namespace CleanC.UI
                 case "dns_manager":
                     if (ToolDnsPanel != null) ToolDnsPanel.Visibility = Visibility.Visible;
                     LoadDnsPage();
-                    break;
-                case "context_menu":
-                    if (ToolContextMenuPanel != null) ToolContextMenuPanel.Visibility = Visibility.Visible;
-                    LoadContextMenuPage();
                     break;
                 case "privacy_debloat":
                     if (ToolPrivacyPanel != null) ToolPrivacyPanel.Visibility = Visibility.Visible;
@@ -3584,34 +3579,85 @@ namespace CleanC.UI
             var border = new Border
             {
                 Background = GetThemeBrush("AppCardSecondaryBrush"),
-                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
-                BorderThickness = new Thickness(1),
+                BorderBrush = item.IsNextGenFeatureUpdate
+                    ? new SolidColorBrush(ColorHelper.FromArgb(255, 139, 92, 246))
+                    : (item.IsOptional ? new SolidColorBrush(ColorHelper.FromArgb(255, 6, 182, 212)) : GetThemeBrush("AppCardBorderBrush")),
+                BorderThickness = new Thickness(item.IsNextGenFeatureUpdate ? 1.5 : 1),
                 CornerRadius = new CornerRadius(10),
-                Padding = new Thickness(16, 12, 16, 12)
+                Padding = new Thickness(16, 14, 16, 14)
             };
 
             var grid = new Grid();
+            grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            var stack = new StackPanel { Spacing = 3, VerticalAlignment = VerticalAlignment.Center };
-            
-            var titleStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            // 1. Icon Box
+            var iconBox = new Border
+            {
+                Width = 40,
+                Height = 40,
+                CornerRadius = new CornerRadius(10),
+                Background = item.IsNextGenFeatureUpdate
+                    ? new SolidColorBrush(ColorHelper.FromArgb(35, 139, 92, 246))
+                    : (item.IsOptional ? new SolidColorBrush(ColorHelper.FromArgb(30, 6, 182, 212)) : new SolidColorBrush(ColorHelper.FromArgb(30, 2, 132, 199))),
+                Margin = new Thickness(0, 0, 14, 0),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var icon = new FontIcon
+            {
+                Glyph = item.IsNextGenFeatureUpdate ? "\uE7FB" : (item.IsOptional ? "\uE896" : "\uE895"),
+                FontSize = 18,
+                Foreground = item.IsNextGenFeatureUpdate
+                    ? new SolidColorBrush(ColorHelper.FromArgb(255, 167, 139, 250))
+                    : (item.IsOptional ? new SolidColorBrush(ColorHelper.FromArgb(255, 6, 182, 212)) : new SolidColorBrush(ColorHelper.FromArgb(255, 2, 132, 199))),
+                HorizontalAlignment = HorizontalAlignment.Center,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            iconBox.Child = icon;
+            Grid.SetColumn(iconBox, 0);
+            grid.Children.Add(iconBox);
+
+            // 2. Text Stack
+            var stack = new StackPanel { Spacing = 4, VerticalAlignment = VerticalAlignment.Center };
+            var titleStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
+
+            // Badge
+            var badgeBorder = new Border
+            {
+                Background = item.IsNextGenFeatureUpdate
+                    ? new SolidColorBrush(ColorHelper.FromArgb(40, 139, 92, 246))
+                    : (item.IsOptional ? new SolidColorBrush(ColorHelper.FromArgb(35, 6, 182, 212)) : new SolidColorBrush(ColorHelper.FromArgb(30, 2, 132, 199))),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(8, 2, 8, 2),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            badgeBorder.Child = new TextBlock
+            {
+                Text = item.CategoryName,
+                FontSize = 10.5,
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                Foreground = item.IsNextGenFeatureUpdate
+                    ? new SolidColorBrush(ColorHelper.FromArgb(255, 192, 132, 252))
+                    : (item.IsOptional ? new SolidColorBrush(ColorHelper.FromArgb(255, 6, 182, 212)) : new SolidColorBrush(ColorHelper.FromArgb(255, 2, 132, 199)))
+            };
+            titleStack.Children.Add(badgeBorder);
+
             if (!string.IsNullOrEmpty(item.KbArticleId))
             {
                 var kbBadge = new Border
                 {
-                    Background = new SolidColorBrush(ColorHelper.FromArgb(30, 2, 132, 199)),
+                    Background = GetThemeBrush("AppHeaderPillBrush"),
                     CornerRadius = new CornerRadius(6),
-                    Padding = new Thickness(8, 2, 8, 2),
+                    Padding = new Thickness(6, 2, 6, 2),
                     VerticalAlignment = VerticalAlignment.Center
                 };
                 kbBadge.Child = new TextBlock
                 {
                     Text = item.KbArticleId,
-                    FontSize = 11,
-                    FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                    Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 2, 132, 199))
+                    FontSize = 10.5,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
                 };
                 titleStack.Children.Add(kbBadge);
             }
@@ -3620,7 +3666,7 @@ namespace CleanC.UI
             {
                 Text = item.Title,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                FontSize = 13,
+                FontSize = 13.5,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 VerticalAlignment = VerticalAlignment.Center
             };
@@ -3639,18 +3685,20 @@ namespace CleanC.UI
                 stack.Children.Add(descText);
             }
 
-            Grid.SetColumn(stack, 0);
+            Grid.SetColumn(stack, 1);
             grid.Children.Add(stack);
+
+            // 3. Actions / Size Column
+            var actionStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(12, 0, 0, 0) };
 
             if (item.SizeBytes > 0)
             {
                 var sizeBadge = new Border
                 {
                     Background = GetThemeBrush("AppHeaderPillBrush"),
-                    CornerRadius = new CornerRadius(12),
+                    CornerRadius = new CornerRadius(10),
                     Padding = new Thickness(10, 4, 10, 4),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(12, 0, 0, 0)
+                    VerticalAlignment = VerticalAlignment.Center
                 };
                 sizeBadge.Child = new TextBlock
                 {
@@ -3658,9 +3706,36 @@ namespace CleanC.UI
                     FontSize = 11,
                     Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
                 };
-                Grid.SetColumn(sizeBadge, 1);
-                grid.Children.Add(sizeBadge);
+                actionStack.Children.Add(sizeBadge);
             }
+
+            // Direct Action Button (opens ms-settings:windowsupdate)
+            var openBtn = new Button
+            {
+                Content = item.IsNextGenFeatureUpdate ? "مشاهده و دریافت در ویندوز" : (item.IsOptional ? "مشاهده در آپدیت" : "تنظیمات آپدیت"),
+                Height = 32,
+                Padding = new Thickness(12, 0, 12, 0),
+                CornerRadius = new CornerRadius(6),
+                FontSize = 11,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            if (item.IsNextGenFeatureUpdate)
+            {
+                openBtn.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
+            }
+            openBtn.Click += (s, e) =>
+            {
+                try
+                {
+                    Process.Start(new ProcessStartInfo("ms-settings:windowsupdate") { UseShellExecute = true });
+                }
+                catch { }
+            };
+            actionStack.Children.Add(openBtn);
+
+            Grid.SetColumn(actionStack, 2);
+            grid.Children.Add(actionStack);
 
             border.Child = grid;
             return border;
@@ -4341,62 +4416,97 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // Tool 9: Windows 11 Classic Context Menu Manager
-        // ====================================================================
-
-        private void LoadContextMenuPage()
-        {
-            if (ClassicMenuToggle == null) return;
-            bool isClassic = ContextMenuManagerService.IsClassicMenuEnabled();
-            ClassicMenuToggle.IsOn = isClassic;
-        }
-
-        private async void ClassicMenuToggle_Toggled(object sender, RoutedEventArgs e)
-        {
-            if (ClassicMenuToggle == null) return;
-            bool enableClassic = ClassicMenuToggle.IsOn;
-            bool ok = await ContextMenuManagerService.SetClassicMenuEnabledAsync(enableClassic);
-            if (ok)
-            {
-                string msg = enableClassic ? "منوی کلیک‌راست کلاسیک ویندوز ۱۰ با موفقیت فعال شد." : "منوی کلیک‌راست مدرن ویندوز ۱۱ فعال شد.";
-                ShowInfoBar("منوی راست‌کلیک", msg, InfoBarSeverity.Success);
-            }
-            else
-            {
-                ShowInfoBar("خطا در تغییر منو", "خطایی در اعمال تنظیمات رجیستری رخ داد.", InfoBarSeverity.Error);
-            }
-        }
-
-        private void RestartExplorerBtn_Click(object sender, RoutedEventArgs e)
-        {
-            ContextMenuManagerService.RestartExplorer();
-            ShowInfoBar("راه‌اندازی مجدد اکسپلورر", "فرآیند Windows Explorer با موفقیت مجدداً راه‌اندازی شد.", InfoBarSeverity.Informational);
-        }
-
-        // ====================================================================
-        // Tool 10: Windows 11 Privacy & Debloater
+        // Tool 9: Windows 11 Privacy & Debloater (Auto-Applying Live Toggles)
         // ====================================================================
 
         private void LoadPrivacyPage()
         {
-            if (PrivacyDiagTrackStatus != null)
-            {
-                PrivacyDiagTrackStatus.Text = "آماده بهینه‌سازی";
-            }
+            if (PrivacyCardsContainer == null) return;
+            PrivacyCardsContainer.Children.Clear();
+
+            // 1. DiagTrack / Connected User Experiences
+            bool isDiagDisabled = TelemetryOptimizerService.IsDiagTrackDisabled();
+            PrivacyCardsContainer.Children.Add(CreateToggleCard(
+                "\uE895",
+                "قطع کامل سرویس تلمتری و گزارش DiagTrack",
+                "غیرفعال‌سازی سرویس Connected User Experiences و توقف ارسال بسته‌های تشخیصی و لاگ به سرورهای مایکروسافت",
+                isDiagDisabled,
+                ColorHelper.FromArgb(255, 16, 185, 129),
+                (isOn) =>
+                {
+                    TelemetryOptimizerService.SetDiagTrackDisabled(isOn);
+                    ShowInfoBar("تلمتری DiagTrack", isOn ? "سرویس تلمتری قطع و غیرفعال شد." : "سرویس تلمتری به حالت پیش‌فرض ویندوز بازگشت.", InfoBarSeverity.Success);
+                }));
+
+            // 2. Bing Search in Start Menu
+            bool isBingDisabled = TelemetryOptimizerService.IsBingSearchDisabled();
+            PrivacyCardsContainer.Children.Add(CreateToggleCard(
+                "\uE721",
+                "حذف جستجوی وب بینگ از استارت منو (Bing Search)",
+                "جلوگیری از ارسال متن‌های تایپ‌شده شما در منوی استارت به وب و افزایش چشمگیر سرعت باز شدن و جستجوی فایل‌ها",
+                isBingDisabled,
+                ColorHelper.FromArgb(255, 2, 132, 199),
+                (isOn) =>
+                {
+                    TelemetryOptimizerService.SetBingSearchDisabled(isOn);
+                    ShowInfoBar("جستجوی استارت منو", isOn ? "سرچ وب بینگ غیرفعال شد (جستجوی محلی فوق‌سریع)." : "جستجوی وب در استارت فعال شد.", InfoBarSeverity.Success);
+                }));
+
+            // 3. Advertising ID
+            bool isAdvDisabled = TelemetryOptimizerService.IsAdvertisingIdDisabled();
+            PrivacyCardsContainer.Children.Add(CreateToggleCard(
+                "\uE719",
+                "غیرفعال‌سازی شناسه تبلیغاتی ویندوز (Advertising ID)",
+                "جلوگیری از ساخت و ردگیری پروفایل کاربری تبلیغاتی توسط برنامه‌ها و مایکروسافت استور",
+                isAdvDisabled,
+                ColorHelper.FromArgb(255, 245, 158, 11),
+                (isOn) =>
+                {
+                    TelemetryOptimizerService.SetAdvertisingIdDisabled(isOn);
+                    ShowInfoBar("شناسه تبلیغاتی", isOn ? "شناسه تبلیغاتی ویندوز مسدود گردید." : "شناسه تبلیغاتی فعال شد.", InfoBarSeverity.Success);
+                }));
+
+            // 4. Activity History
+            bool isActDisabled = TelemetryOptimizerService.IsActivityHistoryDisabled();
+            PrivacyCardsContainer.Children.Add(CreateToggleCard(
+                "\uE81C",
+                "توقف ثبت تاریخچه فعالیت‌ها و فایل‌ها (Activity History)",
+                "توقف ذخیره و همگام‌سازی سوابق باز کردن برنامه‌ها، اسناد و مرور وب توسط ویندوز",
+                isActDisabled,
+                ColorHelper.FromArgb(255, 139, 92, 246),
+                (isOn) =>
+                {
+                    TelemetryOptimizerService.SetActivityHistoryDisabled(isOn);
+                    ShowInfoBar("تاریخچه فعالیت‌ها", isOn ? "ثبت فعالیت‌ها متوقف و غیرفعال شد." : "ثبت سوابق فعالیت‌ها فعال شد.", InfoBarSeverity.Success);
+                }));
+
+            // 5. Tailored Experiences & Feedback Tracking
+            bool isFeedDisabled = TelemetryOptimizerService.IsFeedbackTrackingDisabled();
+            PrivacyCardsContainer.Children.Add(CreateToggleCard(
+                "\uE9E9",
+                "قطع نظرسنجی‌ها و تجربیات شخصی‌سازی مایکروسافت",
+                "جلوگیری از نمایش پاپ‌آپ‌های ارزیابی و توقف پایش نحوه استفاده از ابزارهای ویندوز",
+                isFeedDisabled,
+                ColorHelper.FromArgb(255, 236, 72, 153),
+                (isOn) =>
+                {
+                    TelemetryOptimizerService.SetFeedbackTrackingDisabled(isOn);
+                    ShowInfoBar("بازخورد مایکروسافت", isOn ? "نظرسنجی‌ها و پایش تجربیات قطع شدند." : "پایش تجربیات فعال شد.", InfoBarSeverity.Success);
+                }));
         }
 
-        private async void ApplyPrivacyDebloatBtn_Click(object sender, RoutedEventArgs e)
+        private async void EnableAllPrivacyProtectionsBtn_Click(object sender, RoutedEventArgs e)
         {
-            if (ApplyPrivacyDebloatBtn != null) ApplyPrivacyDebloatBtn.IsEnabled = false;
             int count = await TelemetryOptimizerService.DisableTelemetryAndDiagTrackAsync();
-            if (ApplyPrivacyDebloatBtn != null) ApplyPrivacyDebloatBtn.IsEnabled = true;
+            LoadPrivacyPage();
+            ShowInfoBar("حریم خصوصی ویندوز ۱۱", $"تمامی {count} گزینه محافظتی با موفقیت فعال و در ویندوز ذخیره شدند.", InfoBarSeverity.Success);
+        }
 
-            if (PrivacyDiagTrackStatus != null)
-            {
-                PrivacyDiagTrackStatus.Text = "غیرفعال و امن شد ✓";
-            }
-
-            ShowInfoBar("حریم خصوصی ویندوز ۱۱", $"تعداد {count} مورد از سرویس‌های تلمتری و ردیابی مایکروسافت با موفقیت متوقف گردید.", InfoBarSeverity.Success);
+        private async void ResetPrivacyDefaultsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            int count = await TelemetryOptimizerService.RestoreDefaultPrivacySettingsAsync();
+            LoadPrivacyPage();
+            ShowInfoBar("حریم خصوصی ویندوز ۱۱", "تنظیمات به حالت استاندارد و پیش‌فرض اولیه ویندوز بازگردانی شدند.", InfoBarSeverity.Informational);
         }
 
         private void ShowInfoBar(string title, string message, InfoBarSeverity severity)
