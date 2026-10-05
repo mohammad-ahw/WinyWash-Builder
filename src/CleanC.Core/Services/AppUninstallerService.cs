@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using Microsoft.Win32;
 
@@ -105,11 +106,24 @@ namespace CleanC.Core.Services
                                         }
                                         if (dirTotal > 0) sizeBytes = dirTotal;
                                     }
-                                    catch { }
+                                    catch (Exception __ex)
+                                    {
+                                        CcLog.Ignore(__ex);
+                                    }
                                 }
 
                                 if (!apps.ContainsKey(displayName))
                                 {
+                                    if (string.IsNullOrEmpty(displayIcon) && !string.IsNullOrEmpty(installLocation) && Directory.Exists(installLocation))
+                                    {
+                                        try
+                                        {
+                                            var candidate = Directory.EnumerateFiles(installLocation, "*.exe", SearchOption.TopDirectoryOnly).FirstOrDefault();
+                                            if (candidate != null) displayIcon = candidate;
+                                        }
+                                        catch { }
+                                    }
+
                                     apps[displayName] = new InstalledAppInfo
                                     {
                                         DisplayName = displayName,
@@ -125,10 +139,16 @@ namespace CleanC.Core.Services
                                     };
                                 }
                             }
-                            catch { }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
 
                 // 2. Scan Windows Store Apps (AppX / MSIX)
@@ -153,7 +173,34 @@ namespace CleanC.Core.Services
                                 fName.StartsWith("Microsoft.VCLibs", StringComparison.OrdinalIgnoreCase)) continue;
 
                             DateTime? installed = null;
-                            try { installed = pkg.InstalledDate.DateTime; } catch { }
+                            try { installed = pkg.InstalledDate.DateTime; } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
+
+                            string? logoPath = null;
+                            try
+                            {
+                                string installPath = pkg.InstalledLocation.Path;
+                                if (Directory.Exists(installPath))
+                                {
+                                    string assetsDir = Path.Combine(installPath, "Assets");
+                                    if (Directory.Exists(assetsDir))
+                                    {
+                                        logoPath = Directory.EnumerateFiles(assetsDir, "*logo*.png", SearchOption.AllDirectories)
+                                            .OrderByDescending(f => f.Contains("44") || f.Contains("150") || f.Contains("Store"))
+                                            .FirstOrDefault();
+                                    }
+                                    if (string.IsNullOrEmpty(logoPath))
+                                    {
+                                        logoPath = Directory.EnumerateFiles(installPath, "*.png", SearchOption.TopDirectoryOnly).FirstOrDefault();
+                                    }
+                                }
+                            }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
 
                             apps[dName] = new InstalledAppInfo
                             {
@@ -165,14 +212,21 @@ namespace CleanC.Core.Services
                                 EstimatedSizeBytes = 0,
                                 UninstallString = "",
                                 QuietUninstallString = "",
+                                DisplayIcon = logoPath ?? string.Empty,
                                 IsStoreApp = true,
                                 PackageFullName = fName
                             };
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // Default sorting: Most recently installed apps first, then alphabetically
                 return apps.Values
@@ -247,16 +301,51 @@ namespace CleanC.Core.Services
             return (trimmed, string.Empty);
         }
 
+        /// <summary>
+        /// اجرای فرمان حذف. اول QuietUninstallString (بی‌صدا) ترجیح داده می‌شود،
+        /// بعد UninstallString. اگر فایل اجرایی مسیر مطلقِ ناموجود باشد، اجرا نمی‌شود.
+        /// </summary>
+        private static (string fileName, string arguments) ResolveUninstallCommand(InstalledAppInfo app)
+        {
+            // Quiet اول — حذف بی‌صدا بدون پنجره‌ای که کاربر منتظرش نیست
+            string cmd = !string.IsNullOrWhiteSpace(app.QuietUninstallString)
+                ? app.QuietUninstallString
+                : app.UninstallString;
+
+            if (string.IsNullOrWhiteSpace(cmd)) return (string.Empty, string.Empty);
+            return ParseUninstallCommand(cmd);
+        }
+
+        private static bool IsSafeToStart(string fileName)
+        {
+            if (string.IsNullOrWhiteSpace(fileName)) return false;
+
+            // مسیر مطلق باید واقعاً وجود داشته باشد؛ در غیر این صورت اجرای آن یا شکست می‌خورد
+            // یا (در UseShellExecute) چیز دیگری را باز می‌کند
+            if (Path.IsPathRooted(fileName))
+            {
+                try
+                {
+                    if (!File.Exists(fileName)) return false;
+                }
+                catch { return false; }
+            }
+
+            return true;
+        }
+
         public static bool LaunchUninstall(InstalledAppInfo app)
         {
             try
             {
                 if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
                 {
+                    // PackageFullName داخل بولکوی PowerShell قرار می‌گیرد؛ آپاستریک را دوبل می‌کنیم
+                    string escaped = app.PackageFullName.Replace("'", "''");
                     var psi = new ProcessStartInfo
                     {
                         FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{app.PackageFullName}'\"",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{escaped}'\"",
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
@@ -264,11 +353,8 @@ namespace CleanC.Core.Services
                     return true;
                 }
 
-                string cmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
-                if (string.IsNullOrWhiteSpace(cmd)) return false;
-
-                var (fileName, args) = ParseUninstallCommand(cmd);
-                if (string.IsNullOrWhiteSpace(fileName)) return false;
+                var (fileName, args) = ResolveUninstallCommand(app);
+                if (!IsSafeToStart(fileName)) return false;
 
                 Process.Start(new ProcessStartInfo
                 {
@@ -280,19 +366,7 @@ namespace CleanC.Core.Services
             }
             catch
             {
-                // Fallback via cmd.exe /c
-                try
-                {
-                    string fallbackCmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
-                    Process.Start(new ProcessStartInfo
-                    {
-                        FileName = "cmd.exe",
-                        Arguments = $"/c {fallbackCmd}",
-                        UseShellExecute = true
-                    });
-                    return true;
-                }
-                catch { return false; }
+                return false;
             }
         }
 
@@ -302,10 +376,11 @@ namespace CleanC.Core.Services
             {
                 if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
                 {
+                    string escaped = app.PackageFullName.Replace("'", "''");
                     var psi = new ProcessStartInfo
                     {
                         FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{app.PackageFullName}'\"",
+                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{escaped}'\"",
                         UseShellExecute = false,
                         CreateNoWindow = true
                     };
@@ -318,11 +393,8 @@ namespace CleanC.Core.Services
                     return false;
                 }
 
-                string cmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
-                if (string.IsNullOrWhiteSpace(cmd)) return false;
-
-                var (fileName, args) = ParseUninstallCommand(cmd);
-                if (string.IsNullOrWhiteSpace(fileName)) return false;
+                var (fileName, args) = ResolveUninstallCommand(app);
+                if (!IsSafeToStart(fileName)) return false;
 
                 var psiToRun = new ProcessStartInfo
                 {
@@ -332,41 +404,23 @@ namespace CleanC.Core.Services
                 };
 
                 using var process = Process.Start(psiToRun);
-                if (process != null)
+                if (process == null) return false;
+
+                try
                 {
-                    try
-                    {
-                        await process.WaitForExitAsync();
-                    }
-                    catch
-                    {
-                        // In case process handle cannot be monitored directly with UseShellExecute, allow user interaction window
-                        await Task.Delay(3000);
-                    }
+                    await process.WaitForExitAsync();
+                    return process.ExitCode == 0;
+                }
+                catch
+                {
+                    // بعضی uninstallerها با UseShellExecute قابل ردیابی نیستند؛
+                    // در این حالت فرض می‌کنیم اجرا شده و کاربر پنجره را می‌بیند
+                    await Task.Delay(3000);
                     return true;
                 }
-                return false;
             }
             catch
             {
-                // Fallback via cmd.exe /c
-                try
-                {
-                    string fallbackCmd = !string.IsNullOrWhiteSpace(app.UninstallString) ? app.UninstallString : app.QuietUninstallString;
-                    var psiFallback = new ProcessStartInfo
-                    {
-                        FileName = "cmd.exe",
-                        Arguments = $"/c {fallbackCmd}",
-                        UseShellExecute = true
-                    };
-                    using var pFallback = Process.Start(psiFallback);
-                    if (pFallback != null)
-                    {
-                        try { await pFallback.WaitForExitAsync(); } catch { await Task.Delay(3000); }
-                        return true;
-                    }
-                }
-                catch { }
                 return false;
             }
         }

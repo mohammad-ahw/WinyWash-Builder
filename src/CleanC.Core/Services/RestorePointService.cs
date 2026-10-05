@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Management;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -28,7 +29,10 @@ namespace CleanC.Core.Services
                     });
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static async Task<(bool Success, string Message)> CreateRestorePointAsync(string description = "CleanC Optimization Point")
@@ -43,7 +47,10 @@ namespace CleanC.Core.Services
                         using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\SystemRestore");
                         key?.SetValue("SystemRestorePointCreationFrequency", 0, RegistryValueKind.DWord);
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
 
                     // 2. Try native WMI
                     try
@@ -65,7 +72,10 @@ namespace CleanC.Core.Services
                             return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه‌های قدیمی‌تر به صورت خودکار پاکسازی شدند).");
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
 
                     // 3. Fallback to PowerShell Checkpoint-Computer
                     var psi = new ProcessStartInfo
@@ -134,7 +144,10 @@ namespace CleanC.Core.Services
                         {
                             item.Mo.Delete();
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                     }
                 }
             }
@@ -153,7 +166,10 @@ namespace CleanC.Core.Services
                     using var ps = Process.Start(psi);
                     ps?.WaitForExit(10000);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
         }
     }

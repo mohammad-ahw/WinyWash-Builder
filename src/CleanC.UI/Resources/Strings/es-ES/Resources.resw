@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>Ejecutando como administrador</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>Centro de recuperación y deshacer</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>Actualizar estado del sistema</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>Historial de notificaciones y acciones</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>Cambiar tema (Oscuro / Claro)</value></data>
+  <data name="Settings" xml:space="preserve"><value>Configuración</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>Panel de optimización</value></data>
+  <data name="NavTools" xml:space="preserve"><value>Herramientas del sistema</value></data>
+  <data name="HeroCategory" xml:space="preserve"><value>Estado de salud y rendimiento</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>El sistema está listo para optimizarse</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>Limpie archivos temporales, libere memoria y detenga procesos en segundo plano con 1 clic.</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>Sistema optimizado con éxito</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Cachés vaciadas, memoria liberada y respuesta mejorada.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>Espacio liberable:</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>Última limpieza:</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>Total liberado:</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>Aceleración rápida del sistema</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>Eliminar residuos, optimizar RAM, vaciar DNS y detener servicios en segundo plano</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Limpieza avanzada de disco</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>Selección personalizada de categorías de archivos residuales</value></data>
+  <data name="SettingsTitle" xml:space="preserve"><value>Configuración</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>Aspecto, idioma, bandeja del sistema y exportación de informes</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>Idioma (Language)</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>Ajusta automáticamente la dirección del diseño y la tipografía.</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>Tema de la aplicación</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>Seguir el sistema Windows o fijar modo claro/oscuro.</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>Sistema</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>Claro</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>Oscuro</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>Segundo plano y bandeja del sistema</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>Comportamiento del icono junto al reloj al cerrar o minimizar.</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>Seguir ejecutando en segundo plano al cerrar la ventana</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>Minimizar a la bandeja del sistema</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>Iniciar con Windows</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>Iniciar CleanC automáticamente al iniciar sesión.</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>Política de eliminación de archivos personales</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>Para duplicados y archivos grandes. Los residuos del sistema siempre se eliminan definitivamente.</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>Mover a la Papelera de reciclaje (Recomendado)</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>Cuarentena CleanC — Restaurable en el centro de recuperación</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>Eliminación definitiva — Libera espacio de inmediato</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>Restauración automática de estado</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>Conservar tamaño, posición de ventana y selecciones entre sesiones.</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>Tamaño y posición de la ventana</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>Última vista abierta</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>Selecciones de escaneo de limpieza</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>Restablecer tamaño de ventana</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>Restablecer toda la configuración</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>Datos de la aplicación</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>Abrir carpeta de configuración</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>Abrir carpeta de registros</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>Exportar informes</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>Generar informes para IA (.md) y especificaciones técnicas de hardware (.txt).</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>Informe de diagnóstico para IA (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>Informe de especificaciones de hardware (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>Acerca de CleanC</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>Suite moderna de optimización, limpieza y diagnóstico para Windows 11.</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>Buscar actualizaciones</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>Página del proyecto en GitHub</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>Copiar información de diagnóstico</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>Volver a herramientas del sistema</value></data>
+</root>

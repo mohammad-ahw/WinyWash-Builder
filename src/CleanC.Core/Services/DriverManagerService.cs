@@ -6,6 +6,7 @@ using System.Linq;
 using System.Management;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 
 namespace CleanC.Core.Services
 {
@@ -57,7 +58,10 @@ namespace CleanC.Core.Services
                         list = ParsePnpUtilDrivers(output);
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 2. Identify duplicate older versions in DriverStore
                 // Group by OriginalName (e.g. realtekhsa.inf)
@@ -107,7 +111,10 @@ namespace CleanC.Core.Services
                         });
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 var stats = new DriverSummaryStats
                 {
@@ -209,7 +216,10 @@ namespace CleanC.Core.Services
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
 
                     if (stdout.Contains("in use", StringComparison.OrdinalIgnoreCase) || stderr.Contains("in use", StringComparison.OrdinalIgnoreCase))
                     {
@@ -249,7 +259,10 @@ namespace CleanC.Core.Services
                         list.Add(title);
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return list;
             });
@@ -324,7 +337,10 @@ namespace CleanC.Core.Services
             {
                 if (Version.TryParse(verStr, out var v)) return v;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return new Version(0, 0, 0, 0);
         }
 
@@ -334,7 +350,10 @@ namespace CleanC.Core.Services
             {
                 if (DateTime.TryParse(dateStr, out var dt)) return dt;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return DateTime.MinValue;
         }
 

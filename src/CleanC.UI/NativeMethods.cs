@@ -1,0 +1,75 @@
+// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.UI\NativeMethods.cs
+using System;
+using System.Runtime.InteropServices;
+
+namespace CleanC.UI
+{
+    /// <summary>
+    /// Win32 interop مربوط به لایه‌ی برنامه (single-instance، پنجره و ...)
+    /// </summary>
+    internal static class NativeMethods
+    {
+        private const int SW_RESTORE = 9;
+        private const int SW_SHOW = 5;
+
+        [DllImport("user32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern IntPtr FindWindowW(string? lpClassName, string lpWindowName);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        [DllImport("user32.dll")]
+        private static extern bool IsIconic(IntPtr hWnd);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
+
+        /// <summary>
+        /// F5 — آیا پنجره‌ی اصلی همین حالا فوکوس دارد؟
+        /// نوتیفیکیشن ویندوزی فقط زمانی می‌فرستیم که کاربر پنجره را نمی‌بیند،
+        /// وگرنه InfoBar داخلی خودش کافی است.
+        /// </summary>
+        internal static bool IsWindowFocused(IntPtr hWnd)
+        {
+            if (hWnd == IntPtr.Zero) return false;
+            try { return GetForegroundWindow() == hWnd; }
+            catch { return true; /* در صورت شکست، اعلان داخلی همچنان نمایش داده می‌شود */ }
+        }
+
+        /// <summary>
+        /// پنجره‌ی بازِ CleanC را از حالت minimize درمی‌آورد و به جلو می‌آورد.
+        /// در صورت نبود پنجره بی‌اثر برمی‌گردد.
+        /// </summary>
+        internal static void ActivateExistingInstance()
+        {
+            try
+            {
+                IntPtr hWnd = FindWindowW(null, "CleanC");
+                if (hWnd == IntPtr.Zero) return;
+
+                if (IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);
+                else ShowWindow(hWnd, SW_SHOW);
+
+                SetForegroundWindow(hWnd);
+            }
+            catch
+            {
+                // فعال‌سازی پنجره هرگز نباید مانع اجرای برنامه شود
+            }
+        }
+
+        /// <summary>
+        /// آیا پنجره در حالت minimize است؟
+        /// WinAppSDK نسخه‌ی فعلی AppWindow.PresenterState ندارد، پس مستقیم از Win32 می‌پرسیم.
+        /// </summary>
+        internal static bool IsWindowMinimized(IntPtr hWnd)
+        {
+            if (hWnd == IntPtr.Zero) return false;
+            try { return IsIconic(hWnd); }
+            catch { return false; }
+        }
+    }
+}

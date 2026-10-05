@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>Запуск от имени администратора</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>Центр восстановления и отмены</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>Обновить статус системы</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>История уведомлений и действий</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>Сменить тему (Темная / Светлая)</value></data>
+  <data name="Settings" xml:space="preserve"><value>Настройки приложения</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>Панель оптимизации</value></data>
+  <data name="NavTools" xml:space="preserve"><value>Системные утилиты Windows</value></data>
+  <data name="HeroCategory" xml:space="preserve"><value>Состояние и производительность системы</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>Система готова к оптимизации</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>Очистите временные файлы, освободите память и завершите фоновые процессы в один клик.</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>Система успешно оптимизирована</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Кэш очищен, оперативная память освобождена, отклик системы улучшен.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>Можно освободить:</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>Последняя очистка:</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>Всего освобождено:</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>Быстрое ускорение системы</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>Удаление мусора, очистка RAM, сброс DNS и остановка фоновых служб</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Глубокая очистка диска</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>Выборочное сканирование и детальная настройка категорий мусора</value></data>
+  <data name="SettingsTitle" xml:space="preserve"><value>Настройки приложения</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>Внешний вид, язык, поведение в трее и экспорт отчетов</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>Язык интерфейса (Language)</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>Автоматически настраивает направление интерфейса и шрифты.</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>Тема оформления</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>Следовать настройкам Windows или зафиксировать светлую/темную тему.</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>Системная</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>Светлая</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>Темная</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>Работа в фоне и область уведомлений</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>Поведение иконки возле часов при закрытии или сворачивании окна.</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>Продолжать работу в фоне при закрытии окна</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>Сворачивать в область уведомлений (трей)</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>Автозагрузка с Windows</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>Автоматически запускать CleanC при входе в Windows.</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>Политика удаления личных файлов</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>Для дубликатов и больших файлов. Системный мусор всегда удаляется безвозвратно.</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>Перемещать в Корзину (Рекомендуется)</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>Карантин CleanC — с возможностью восстановления</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>Безвозвратное удаление — мгновенное освобождение места</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>Автосохранение состояния</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>Сохранять геометрию окна, выбранные пункты и последнюю открытую вкладку.</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>Размер и положение окна</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>Последний открытый раздел</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>Выбранные пункты очистки</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>Сбросить размер окна</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>Сбросить все настройки</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>Данные приложения</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>Открыть папку настроек</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>Открыть папку журналов</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>Экспорт отчетов</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>Формирование отчета для нейросетей (AI) и подробных спецификаций оборудования.</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>Отчет для искусственного интеллекта (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>Спецификация оборудования (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>О программе CleanC</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>Современный диспетчер очистки, оптимизации и диагностики для Windows 11.</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>Проверить обновления</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>Страница проекта на GitHub</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>Скопировать диагностику</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>Назад к утилитам</value></data>
+</root>

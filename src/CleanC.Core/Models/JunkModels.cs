@@ -101,6 +101,9 @@ namespace CleanC.Core.Models
         public string IconGlyph { get; set; } = "\uE7B8";
         public long FreedBytes { get; set; }
         public bool WasEmpty { get; set; }
+
+        // گامی که در میانه بهینه‌سازی شکست خورده و باید در گزارش با رنگ هشدار دیده شود
+        public bool IsFailed { get; set; }
         public string StatusSummary { get; set; } = string.Empty;
         public string FormattedFreed => SystemStats.FormatBytes(FreedBytes);
     }

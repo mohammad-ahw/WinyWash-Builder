@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <RootNamespace>CleanC.UI</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
@@ -11,8 +11,18 @@
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsPackageType>None</WindowsPackageType>
     <Nullable>enable</Nullable>
-    <LangVersion>12</LangVersion>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
+    <Version>1.1.0</Version>
+    <AssemblyTitle>CleanC PC Manager</AssemblyTitle>
+    <Product>CleanC PC Manager</Product>
+    <Company>CleanC</Company>
+    <!-- خروجی publish: فقط runtime مربوط به همین سیستم (جلوگیری از کپی runtimes لینوکس/مک) -->
+    <PublishReadyToRun>true</PublishReadyToRun>
+    <PublishSingleFile>false</PublishSingleFile>
+    <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
+    <NoWarn>$(NoWarn);PRI249</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,9 +31,19 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
-    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
-    <PackageReference Include="System.Drawing.Common" Version="8.0.0" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" />
+    <PackageReference Include="Microsoft.Windows.SDK.BuildTools" />
+    <PackageReference Include="System.Drawing.Common" />
+    <!-- C6: کانتینر DI و toolkit MVVM -->
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" />
+    <PackageReference Include="CommunityToolkit.Mvvm" />
+    <!--
+      B9/C3: این پکیج فقط به‌صورت transitive از WindowsAppSDK می‌آید و هیچ‌جا استفاده نمی‌شود،
+      ولی native هایش (onnxruntime.dll ≈20.7MB + DirectML.dll ≈17.8MB) در هر خروجی کپی می‌شوند.
+      رفرنسِ مستقیم با ExcludeAssets="native" باعث می‌شود فقط همین پکیج از کپیِ native صرف‌نظر کند؛
+      مدیریت پکیج (build targets و managed هایش) سر جایش می‌ماند.
+    -->
+    <PackageReference Include="Microsoft.Windows.AI.MachineLearning" ExcludeAssets="native" />
   </ItemGroup>
 
   <ItemGroup>
@@ -34,6 +54,8 @@
     <Content Include="Assets\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Resources\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 </Project>
-

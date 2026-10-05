@@ -1,5 +1,8 @@
+// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.UI\App.xaml.cs
 using System;
+using System.Diagnostics;
 using System.IO;
+using System.Threading;
 using Microsoft.UI.Xaml;
 
 namespace CleanC.UI
@@ -8,27 +11,59 @@ namespace CleanC.UI
     {
         private Window? _window;
 
+        // جلوگیری از اجرای همزمان دو نمونه از CleanC (Single Instance)
+        private static Mutex? _singleInstanceMutex;
+
         public App()
         {
             this.InitializeComponent();
+
+            // C6 — ریشه‌ی ترکیب DI همین ابتدا ساخته می‌شود تا خطای ثبت سرویس‌ها
+            // در همان لحظه‌ی اجرا دیده شود، نه وسط کارِ کاربر.
+            AppServices.EnsureBuilt();
+
             this.UnhandledException += (sender, e) =>
             {
-                e.Handled = true;
-                try
-                {
-                    string logDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC");
-                    Directory.CreateDirectory(logDir);
-                    string logFile = Path.Combine(logDir, "crash.log");
-                    File.AppendAllText(logFile, $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] UnhandledException: {e.Message}\n{e.Exception}\n\n");
-                }
-                catch { }
-
-                System.Diagnostics.Debug.WriteLine($"[App UnhandledException Handled] {e.Message}");
+                // C9 — عمداً Handed=false مانده: ادامه‌ی اجرا با state ناسازگار باعث
+                // خراب‌شدنِ بی‌صدای داده (تنظیمات/آمار/رجیستری) می‌شود. لاگ ثبت می‌شود
+                // و برنامه متوقف می‌شود تا خطا دفن نشود.
+                LogCrash("UnhandledException", e.Exception ?? new Exception(e.Message));
+                Debug.WriteLine($"[App UnhandledException] {e.Message}");
             };
+        }
+
+        /// <summary>
+        /// ثبت خطای غیرمنتظره در %LOCALAPPDATA%\CleanC\crash.log
+        /// همه‌ی catchهای برنامه باید از اینجا استفاده کنند تا خطاها سکوت نشوند.
+        /// </summary>
+        public static void LogCrash(string context, Exception ex)
+        {
+            try
+            {
+                string logDir = Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC");
+                Directory.CreateDirectory(logDir);
+                string logFile = Path.Combine(logDir, "crash.log");
+                File.AppendAllText(logFile,
+                    $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {context}: {ex.Message}\n{ex}\n\n");
+            }
+            catch
+            {
+                // لاگ‌کردن هرگز نباید خودش باعث crash شود
+            }
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
+            // اگر نمونه‌ای از قبل در حال اجراست، همان را به جلو بیاور و از ساخت پنجره دوم جلوگیری کن
+            _singleInstanceMutex = new Mutex(true, "Local\\CleanC.SingleInstance", out bool createdNew);
+            if (!createdNew)
+            {
+                NativeMethods.ActivateExistingInstance();
+                Environment.Exit(0);
+                return;
+            }
+
             _window = new MainWindow();
             _window.Activate();
         }

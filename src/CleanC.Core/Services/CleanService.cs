@@ -1,7 +1,9 @@
+// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.Core\Services\CleanService.cs
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using CleanC.Core.Native;
 
@@ -37,6 +39,10 @@ namespace CleanC.Core.Services
             });
         }
 
+        /// <summary>
+        /// یک دسته زائد را پاک می‌کند و «فقط» فضایی که واقعاً آزاد شده را برمی‌گرداند.
+        /// هرگز مقدار تخمینی اسکن را به‌جای نتیجه واقعی گزارش نمی‌کند.
+        /// </summary>
         public static long CleanCategory(JunkCategory item)
         {
             if (item == null) return 0;
@@ -46,9 +52,12 @@ namespace CleanC.Core.Services
             {
                 try
                 {
-                    Win32.SHEmptyRecycleBin(IntPtr.Zero, null,
-                        Win32.SHERB_NOCONFIRMATION | Win32.SHERB_NOPROGRESSUI | Win32.SHERB_NOSOUND);
-                    return item.Bytes;
+                    // D5: تأیید خالی کردن سطل بازیافت را به خود ویندوز می‌سپاریم
+                    // (SHERB_NOCONFIRMATION حذف شد) تا کاربر قبل از پاکسازی دائمی بداند چه می‌کند.
+                    int hr = Win32.SHEmptyRecycleBin(IntPtr.Zero, null,
+                        Win32.SHERB_NOPROGRESSUI | Win32.SHERB_NOSOUND);
+                    // فقط در صورت موفقیت (S_OK) فضای تخمینی را به‌عنوان آزادشده بپذیر
+                    return hr == 0 ? item.Bytes : 0;
                 }
                 catch
                 {
@@ -60,8 +69,9 @@ namespace CleanC.Core.Services
             {
                 try
                 {
-                    int cleanedCount = RegistryCleanerService.CleanOrphanedRegistry();
-                    return Math.Max(cleanedCount * 1024, item.Bytes);
+                    // کلیدهای رجیستری فضای دیسک آزاد نمی‌کنند؛ صفر برمی‌گردانیم تا گزارش دروغ نباشد
+                    RegistryCleanerService.CleanOrphanedRegistry();
+                    return 0;
                 }
                 catch
                 {
@@ -77,6 +87,9 @@ namespace CleanC.Core.Services
             {
                 if (string.IsNullOrWhiteSpace(path)) continue;
 
+                // پوشه‌های رهاشده فقط با بازبینی کامل LeftoverCleaner حذف می‌شوند
+                if (item.GroupId == "leftovers" && !LeftoverCleanerService.IsSafeToDelete(path)) continue;
+
                 if (Directory.Exists(path))
                 {
                     freed += SafeCleanFolder(path);
@@ -90,14 +103,19 @@ namespace CleanC.Core.Services
                                 Directory.Delete(path, false);
                             }
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                     }
                 }
                 else if (File.Exists(path))
                 {
+                    if (IsProtectedSystemPath(path)) continue;
                     try
                     {
                         var fi = new FileInfo(path);
+                        if (IsReparsePoint(fi.Attributes)) continue;
                         long len = fi.Length;
                         if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
                         {
@@ -106,40 +124,76 @@ namespace CleanC.Core.Services
                         fi.Delete();
                         freed += len;
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
             }
 
             return freed;
         }
 
+        /// <summary>
+        /// مسیرهایی که هرگز نباید پاک شوند: ریشه درایوها، ویندوز، Program Files،
+        /// ریشه پروفایل کاربر، پوشه Users و پوشه‌های شخصی (Documents/Desktop/...).
+        /// </summary>
         private static bool IsProtectedSystemPath(string path)
         {
             if (string.IsNullOrWhiteSpace(path)) return true;
             try
             {
                 string full = Path.GetFullPath(path).TrimEnd('\\', '/');
+
                 // Disallow cleaning drive roots (e.g. C:, C:\, D:, D:\)
                 if (full.Length <= 3 && full.Contains(':')) return true;
 
-                string winDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows).TrimEnd('\\');
-                string sysDir = Environment.SystemDirectory.TrimEnd('\\');
-                string progDir = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles).TrimEnd('\\');
-                string progX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86).TrimEnd('\\');
-                string userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile).TrimEnd('\\');
-
-                if (string.Equals(full, winDir, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(full, sysDir, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(full, progDir, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(full, progX86, StringComparison.OrdinalIgnoreCase) ||
-                    string.Equals(full, userDir, StringComparison.OrdinalIgnoreCase))
+                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var protectedExact = new List<string>
                 {
-                    return true;
+                    Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+                    Environment.SystemDirectory,
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                    userDir,
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                    Path.Combine(Path.GetPathRoot(userDir) ?? "C:\\", "Users"),
+                    // پوشه‌های شخصی: داخل اینها فایل کاربر است، نه زائد سیستم
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                };
+                if (!string.IsNullOrEmpty(userDir))
+                {
+                    protectedExact.Add(Path.Combine(userDir, "Downloads"));
+                    protectedExact.Add(Path.Combine(userDir, "OneDrive"));
+                    protectedExact.Add(Path.Combine(userDir, "Desktop"));
+                }
+
+                foreach (var p in protectedExact)
+                {
+                    if (string.IsNullOrEmpty(p)) continue;
+                    if (string.Equals(full, p.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase))
+                        return true;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
+
+        /// <summary>
+        /// جلوگیری از پیروی junction/symlink: اگر مسیر یک reparse point باشد،
+        /// حذف recursive می‌تواند کل هدف را از بین ببرد.
+        /// </summary>
+        private static bool IsReparsePoint(FileAttributes attributes)
+            => (attributes & FileAttributes.ReparsePoint) != 0;
 
         public static long SafeCleanFolder(string dirPath)
         {
@@ -156,12 +210,14 @@ namespace CleanC.Core.Services
             try
             {
                 var dir = new DirectoryInfo(dirPath);
+                if (IsReparsePoint(dir.Attributes)) return 0;
 
                 // Enumerate and delete files
                 foreach (var file in dir.EnumerateFiles("*", enumOptions))
                 {
                     try
                     {
+                        if (IsReparsePoint(file.Attributes)) continue;
                         long len = file.Length;
                         if ((file.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
                         {
@@ -181,13 +237,17 @@ namespace CleanC.Core.Services
                 {
                     try
                     {
+                        if (IsReparsePoint(sub.Attributes)) continue;
+
                         freed += SafeCleanFolder(sub.FullName);
 
                         if ((sub.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
                         {
                             sub.Attributes = FileAttributes.Normal;
                         }
-                        sub.Delete(true);
+                        // فقط زمانی حذف می‌شود که واقعاً خالی مانده باشد؛
+                        // قبلاً Delete(true) بود که شرط «خالی بودن» را دور می‌زد
+                        sub.Delete(false);
                     }
                     catch
                     {

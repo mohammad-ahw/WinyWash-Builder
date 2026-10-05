@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 
 namespace CleanC.Core.Services
 {
@@ -125,7 +126,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // If none found with filter, grab whatever is up
             if (names.Count == 0)
@@ -140,7 +144,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
 
             return names;
@@ -257,7 +264,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return ("خودکار", "", "خودکار (DHCP)");
         }
@@ -274,7 +284,10 @@ namespace CleanC.Core.Services
                 using var p = Process.Start(psi);
                 p?.WaitForExit(3000);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
     }
 }

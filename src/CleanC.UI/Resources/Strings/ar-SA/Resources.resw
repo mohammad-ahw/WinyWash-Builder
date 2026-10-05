@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>تشغيل كمسؤول</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>مركز الاستعادة والتراجع</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>تحديث حالة النظام</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>سجل الإشعارات والعمليات</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>تبديل المظهر (داكن / فاتح)</value></data>
+  <data name="Settings" xml:space="preserve"><value>إعدادات التطبيق</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>لوحة التحكم والتحسين</value></data>
+  <data name="NavTools" xml:space="preserve"><value>أدوات نظام ويندوز</value></data>
+  <data name="HeroCategory" xml:space="preserve"><value>حالة صحة وأداء النظام</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>النظام جاهز للتحسين والتنظيف</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>بنقرة واحدة يتم حذف الملفات المؤقتة، تحرير الذاكرة وإيقاف العمليات غير الضرورية.</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>تم تحسين النظام بنجاح</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>تم تفريغ الملفات المؤقتة وتحسين استجابة النظام.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>المساحة القابلة للتفريغ:</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>آخر تنظيف:</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>إجمالي المحرر:</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>تحسين النظام السريع</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>تفريغ الذاكرة المؤقتة، تنظيف RAM، وتفريغ ذاكرة DNS</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>تنظيف القرص المتقدم</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>تحديد مخصص لعناصر الفحص وملفات النظام المهملة</value></data>
+  <data name="SettingsTitle" xml:space="preserve"><value>إعدادات التطبيق</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>المظهر، اللغة، سلوك شريط المهام وتصدير التقارير</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>لغة التطبيق</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>تغيير اتجاه الواجهة (RTL/LTR) مع تكييف الخطوط المناسبة لكل لغة.</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>سمة التطبيق</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>اتباع سمة ويندوز أو التثبيت على الوضع الفاتح أو الداكن.</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>النظام</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>فاتح</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>داكن</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>التشغيل في الخلفية وشريط المهام</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>التحكم في أيقونة منطقة الإشعارات بجانب الساعة عند إغلاق النافذة.</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>البقاء قيد التشغيل في الخلفية عند إغلاق النافذة</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>التصغير مباشرة إلى منطقة الإشعارات</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>بدء التشغيل مع ويندوز</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>تشغيل CleanC تلقائياً عند تسجيل الدخول إلى النظام.</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>سياسة حذف الملفات الشخصية</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>تنطبق على الملفات المكررة والكبيرة. ملفات النظام المهملة تحذف دائماً بشكل نهائي.</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>النقل إلى سلة المحذوفات (مستحسن)</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>حجر CleanC — حفظ آمن مع إمكانية الاستعادة</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>حذف نهائي — تحرير المساحة فوراً بدون استعادة</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>استعادة الحالة تلقائياً</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>حفظ موقع النافذة، خيارات الفحص والصفحة الأخيرة.</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>حجم وموقع النافذة</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>آخر واجهة مفتوحة</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>خيارات فحص التنظيف</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>إعادة ضبط حجم النافذة</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>إعادة ضبط كافة الإعدادات</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>بيانات التطبيق</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>فتح مجلد الإعدادات</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>فتح مجلد السجلات</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>تصدير التقارير</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>توليد تقارير سياقية للذكاء الاصطناعي ومواصفات عتاد تفصيلية.</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>تقرير الذكاء الاصطناعي (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>تقرير مواصفات العتاد (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>حول CleanC</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>أداة عصرية لتحسين وصيانة وإدارة عتاد ويندوز 11.</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>التحقق من التحديثات</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>صفحة المشروع على GitHub</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>نسخ معلومات التشخيص</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>العودة إلى قائمة الأدوات</value></data>
+</root>

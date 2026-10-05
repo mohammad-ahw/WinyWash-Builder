@@ -1,57 +1,147 @@
+// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.Core\Services\RegistryCleanerService.cs
 using System;
 using System.Collections.Generic;
 using System.IO;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
 {
     public class RegistryCleanerService
     {
+        // هم اسکن و هم پاکسازی از همین لیست استفاده می‌کنند تا عدد گزارش‌شده با عدد واقعی یکی باشد.
+        // به‌صورت method ساخته می‌شود تا handleهای ریشه در زمان بارگذاری نوع باز نمانند.
+        private static (RegistryKey Root, string Path)[] GetUninstallRoots() => new (RegistryKey, string)[]
+        {
+            (Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+            (Registry.LocalMachine, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
+            (Registry.LocalMachine, @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+        };
+
         public static (int DeadMuiEntries, int OrphanedKeys) ScanOrphanedRegistry()
         {
-            int deadMui = 0;
+            int deadMui = CountDeadMuiEntries();
             int orphanedKeys = 0;
-
-            // 1. Scan MuiCache for deleted application paths
-            try
+            foreach (var (root, path) in GetUninstallRoots())
             {
-                using var muiKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache");
-                if (muiKey != null)
-                {
-                    foreach (var valName in muiKey.GetValueNames())
-                    {
-                        string cleanPath = valName.Split(new[] { ".FriendlyAppName", ".ApplicationCompany" }, StringSplitOptions.None)[0];
-                        if (cleanPath.Contains(":") && (cleanPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || cleanPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            if (!File.Exists(cleanPath))
-                            {
-                                deadMui++;
-                            }
-                        }
-                    }
-                }
+                orphanedKeys += CollectDeadUninstallKeys(root, path).Count;
             }
-            catch { }
-
-            // 2. Scan orphaned Uninstall keys (apps uninstalled but left broken registry entries)
-            try
-            {
-                orphanedKeys += ScanUninstallPath(Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-                orphanedKeys += ScanUninstallPath(Registry.LocalMachine, @"Software\Microsoft\Windows\CurrentVersion\Uninstall");
-                orphanedKeys += ScanUninstallPath(Registry.LocalMachine, @"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall");
-            }
-            catch { }
-
             return (deadMui, orphanedKeys);
         }
 
-        private static int ScanUninstallPath(RegistryKey root, string path)
+        public static int CleanOrphanedRegistry()
+        {
+            int cleaned = 0;
+
+            cleaned += CleanDeadMuiEntries();
+
+            // هم HKCU و هم HKLM — بدون دسترسی Administrator پاکسازی HKLM سکوت می‌کند و چیزی شمرده نمی‌شود
+            foreach (var (root, path) in GetUninstallRoots())
+            {
+                cleaned += CleanDeadUninstallKeys(root, path);
+            }
+
+            return cleaned;
+        }
+
+        // --------------------------------------------------------------------
+        // MuiCache
+        // --------------------------------------------------------------------
+
+        private static bool IsMuiCacheCandidate(string valName, out string cleanPath)
+        {
+            cleanPath = string.Empty;
+            try
+            {
+                cleanPath = valName.Split(new[] { ".FriendlyAppName", ".ApplicationCompany" }, StringSplitOptions.None)[0];
+                if (!cleanPath.Contains(":")) return false;
+                if (!cleanPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) &&
+                    !cleanPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)) return false;
+
+                // اگر درایو اصلاً وصل نیست (فلش/شبکه قطع) فایل «مفقود» نیست، فقط در دسترس نیست
+                string? root = Path.GetPathRoot(cleanPath);
+                if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) return false;
+
+                return !File.Exists(cleanPath);
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        private static int CountDeadMuiEntries()
         {
             int count = 0;
             try
             {
+                using var muiKey = Registry.CurrentUser.OpenSubKey(
+                    @"Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache", false);
+                if (muiKey == null) return 0;
+
+                foreach (var valName in muiKey.GetValueNames())
+                {
+                    if (IsMuiCacheCandidate(valName, out _)) count++;
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return count;
+        }
+
+        private static int CleanDeadMuiEntries()
+        {
+            int cleaned = 0;
+            try
+            {
+                using var muiKey = Registry.CurrentUser.OpenSubKey(
+                    @"Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache", true);
+                if (muiKey == null) return 0;
+
+                var toDelete = new List<string>();
+                foreach (var valName in muiKey.GetValueNames())
+                {
+                    if (IsMuiCacheCandidate(valName, out _)) toDelete.Add(valName);
+                }
+
+                foreach (var del in toDelete)
+                {
+                    try
+                    {
+                        muiKey.DeleteValue(del, false);
+                        // فقط چیزی را بشمار که واقعاً حذف شده باشد
+                        if (muiKey.GetValue(del) == null) cleaned++;
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return cleaned;
+        }
+
+        // --------------------------------------------------------------------
+        // Uninstall keys
+        // --------------------------------------------------------------------
+
+        /// <summary>
+        /// کلیدهای Uninstall را جمع می‌کند که هم UninstallString دارند، هم مسیرشان
+        /// روی درایوی موجود است و هم فایل واقعاً وجود ندارد.
+        /// </summary>
+        private static List<string> CollectDeadUninstallKeys(RegistryKey root, string path)
+        {
+            var dead = new List<string>();
+            try
+            {
                 using var unKey = root.OpenSubKey(path, false);
-                if (unKey == null) return 0;
+                if (unKey == null) return dead;
 
                 foreach (var sub in unKey.GetSubKeyNames())
                 {
@@ -60,127 +150,134 @@ namespace CleanC.Core.Services
                         using var app = unKey.OpenSubKey(sub, false);
                         if (app == null) continue;
 
-                        string? unString = app.GetValue("UninstallString")?.ToString();
                         string? installLoc = app.GetValue("InstallLocation")?.ToString();
-
                         if (!string.IsNullOrWhiteSpace(installLoc) && Directory.Exists(installLoc))
                             continue; // Still exists
 
-                        if (!string.IsNullOrWhiteSpace(unString))
-                        {
-                            string exePath = ExtractExePath(unString);
-                            if (!string.IsNullOrEmpty(exePath) && exePath.Contains(":") && !File.Exists(exePath))
-                            {
-                                count++;
-                            }
-                        }
+                        string? unString = app.GetValue("UninstallString")?.ToString();
+                        if (string.IsNullOrWhiteSpace(unString)) continue;
+
+                        string exePath = ExtractExePath(unString);
+                        if (string.IsNullOrEmpty(exePath)) continue;
+                        if (!exePath.Contains(":")) continue; // نام نسبی مثل MsiExec.exe → قابل قضاوت نیست
+
+                        string? rootDrive = Path.GetPathRoot(exePath);
+                        if (string.IsNullOrEmpty(rootDrive) || !Directory.Exists(rootDrive)) continue;
+
+                        if (!File.Exists(exePath)) dead.Add(sub);
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
             }
-            catch { }
-            return count;
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return dead;
         }
 
-        private static string ExtractExePath(string raw)
+        private static int CleanDeadUninstallKeys(RegistryKey root, string path)
         {
+            int cleaned = 0;
             try
             {
-                raw = raw.Trim();
-                if (raw.StartsWith("\""))
+                var dead = CollectDeadUninstallKeys(root, path);
+                if (dead.Count == 0) return 0;
+
+                using var unKey = root.OpenSubKey(path, true);
+                if (unKey == null) return 0;
+
+                foreach (var subKey in dead)
                 {
-                    int endQuote = raw.IndexOf('"', 1);
-                    if (endQuote > 1) return raw.Substring(1, endQuote - 1);
+                    try
+                    {
+                        unKey.DeleteSubKeyTree(subKey, false);
+                        // تأیید حذف واقعی پیش از شمارش
+                        if (unKey.OpenSubKey(subKey, false) == null) cleaned++;
+                    }
+                    catch
+                    {
+                        // بدون دسترسی Administrator یا کلید توسط فرآیند دیگری نگه داشته شده
+                    }
                 }
-                int spaceIdx = raw.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
-                if (spaceIdx > 0) return raw.Substring(0, spaceIdx + 4).Trim('"');
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return cleaned;
+        }
+
+        /// <summary>
+        /// مسیر فایل آن‌اینستالر را از داخل UninstallString بیرون می‌کشد.
+        ///
+        /// نکته‌ی امنیتی: خروجی فقط باید «مسیر مطلق» باشد. اگر چیزی مثل
+        /// `MsiExec.exe /X{GUID}` یا `cmd /c MsiExec.exe ...` استخراج شود،
+        /// رشته خالی برمی‌گردد تا کلید رجیستری «موجود» تلقی شود و حذف نگردد.
+        /// (حذف کلید معتبر بدتر از نگه‌داشتن کلید مرده است.)
+        ///
+        /// فرمت‌های پوشش‌داده‌شده:
+        ///   "C:\Program Files\App\unins.exe" /S
+        ///   cmd /c "C:\Program Files\App\unins.exe"        ← نقل‌قول در وسط
+        ///   C:\Program Files\App\unins.exe --silent
+        ///   MsiExec.exe /X{GUID}                            ← نام نسبی → رد می‌شود
+        /// </summary>
+        private static string ExtractExePath(string raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return "";
+
+            try
+            {
+                raw = raw.Trim().Trim('"');
+
+                // ۱) اولین بازه‌ی نقل‌قولیِ موجود در رشته (پوشش پیشوندهای cmd/powershell)
+                int firstQuote = raw.IndexOf('"');
+                if (firstQuote >= 0)
+                {
+                    int endQuote = raw.IndexOf('"', firstQuote + 1);
+                    if (endQuote > firstQuote + 1)
+                    {
+                        string quoted = raw.Substring(firstQuote + 1, endQuote - firstQuote - 1).Trim();
+                        if (IsRootedExecutable(quoted)) return quoted;
+                    }
+                }
+
+                // ۲) بدون نقل‌قول: همه‌چیز تا انتهای `.exe`
+                int exeIdx = raw.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+                if (exeIdx > 0)
+                {
+                    string candidate = raw.Substring(0, exeIdx + 4).Trim().Trim('"', '\'');
+                    if (IsRootedExecutable(candidate)) return candidate;
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+
             return "";
         }
 
-        public static int CleanOrphanedRegistry()
+        /// <summary>
+        /// فقط مسیرهای مطلق با درایوِ حاضر قابل قضاوت هستند.
+        /// نام نسبی (`MsiExec.exe`) یا پیشوند shell (`cmd /c ...`) این شرط را رد نمی‌کنند.
+        /// </summary>
+        private static bool IsRootedExecutable(string path)
         {
-            int cleaned = 0;
-
-            // 1. Clean dead MuiCache entries
+            if (string.IsNullOrWhiteSpace(path)) return false;
             try
             {
-                using var muiKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\MuiCache", true);
-                if (muiKey != null)
-                {
-                    var toDelete = new List<string>();
-                    foreach (var valName in muiKey.GetValueNames())
-                    {
-                        string cleanPath = valName.Split(new[] { ".FriendlyAppName", ".ApplicationCompany" }, StringSplitOptions.None)[0];
-                        if (cleanPath.Contains(":") && (cleanPath.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) || cleanPath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase)))
-                        {
-                            if (!File.Exists(cleanPath))
-                            {
-                                toDelete.Add(valName);
-                            }
-                        }
-                    }
-
-                    foreach (var del in toDelete)
-                    {
-                        try
-                        {
-                            muiKey.DeleteValue(del, false);
-                            cleaned++;
-                        }
-                        catch { }
-                    }
-                }
+                if (!Path.IsPathRooted(path)) return false;
+                if (!path.Contains(':')) return false;          // UNC و مسیر نسبی رد می‌شود
+                return true;
             }
-            catch { }
-
-            // 2. Clean orphaned HKCU Uninstall subkeys (safe user scope)
-            try
+            catch
             {
-                using var unKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Uninstall", true);
-                if (unKey != null)
-                {
-                    var deadSubs = new List<string>();
-                    foreach (var sub in unKey.GetSubKeyNames())
-                    {
-                        try
-                        {
-                            using var app = unKey.OpenSubKey(sub, false);
-                            if (app == null) continue;
-
-                            string? unString = app.GetValue("UninstallString")?.ToString();
-                            string? installLoc = app.GetValue("InstallLocation")?.ToString();
-
-                            if (!string.IsNullOrWhiteSpace(installLoc) && Directory.Exists(installLoc))
-                                continue;
-
-                            if (!string.IsNullOrWhiteSpace(unString))
-                            {
-                                string exePath = ExtractExePath(unString);
-                                if (!string.IsNullOrEmpty(exePath) && exePath.Contains(":") && !File.Exists(exePath))
-                                {
-                                    deadSubs.Add(sub);
-                                }
-                            }
-                        }
-                        catch { }
-                    }
-
-                    foreach (var dead in deadSubs)
-                    {
-                        try
-                        {
-                            unKey.DeleteSubKeyTree(dead, false);
-                            cleaned++;
-                        }
-                        catch { }
-                    }
-                }
+                return false;
             }
-            catch { }
-
-            return cleaned;
         }
     }
 }

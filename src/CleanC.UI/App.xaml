@@ -16,42 +16,82 @@
                     <!-- Solid, high-contrast typography so text never gets washed out -->
                     <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#0F172A" />
                     <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#1E293B" />
-                    <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#334155" />
+                    <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#475569" />
                     <SolidColorBrush x:Key="DefaultTextForegroundThemeBrush" Color="#0F172A" />
                     <SolidColorBrush x:Key="ButtonForeground" Color="#0F172A" />
                     <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#0F172A" />
                     <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#0F172A" />
                     
-                    <!-- Ultra-Translucent Frosted Glass Card: 22% white lets the desktop wallpaper and acrylic blur shine completely through -->
-                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#38FFFFFF" />
-                    <!-- Specular glass rim border with crisp visible definition in Light mode -->
-                    <LinearGradientBrush x:Key="AppCardBorderBrush" StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#F0FFFFFF" Offset="0.0" />
-                        <GradientStop Color="#30000000" Offset="1.0" />
-                    </LinearGradientBrush>
+                    <!-- Fluent 2 Solid-Glass Cards: ~92% white with subtle cool tint ensures stable, gorgeous presentation without wallpaper noise -->
+                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#EBFBFCFE" />
+                    <!-- Crisp visible border definition in Light mode -->
+                    <SolidColorBrush x:Key="AppCardBorderBrush" Color="#18000000" />
                     
                     <!-- Secondary surface inside cards (chips, sub-cards, list items, bento buttons) -->
-                    <SolidColorBrush x:Key="AppCardSecondaryBrush" Color="#28FFFFFF" />
+                    <SolidColorBrush x:Key="AppCardSecondaryBrush" Color="#F6FFFFFF" />
                     
-                    <!-- Translucent Glass Header -->
-                    <SolidColorBrush x:Key="AppHeaderBackgroundBrush" Color="#25FFFFFF" />
-                    <LinearGradientBrush x:Key="AppHeaderBorderBrush" StartPoint="0,0" EndPoint="0,1">
-                        <GradientStop Color="#F0FFFFFF" Offset="0.0" />
-                        <GradientStop Color="#20000000" Offset="1.0" />
-                    </LinearGradientBrush>
+                    <!-- Header Background and Border -->
+                    <SolidColorBrush x:Key="AppHeaderBackgroundBrush" Color="#EFF3F4F8" />
+                    <SolidColorBrush x:Key="AppHeaderBorderBrush" Color="#18000000" />
                     
                     <!-- Quick action button pill background & segmented switcher background -->
-                    <SolidColorBrush x:Key="AppHeaderPillBrush" Color="#28FFFFFF" />
-                    <SolidColorBrush x:Key="AppHeaderPillHoverBrush" Color="#40FFFFFF" />
+                    <SolidColorBrush x:Key="AppHeaderPillBrush" Color="#E8F1F5F9" />
+                    <SolidColorBrush x:Key="AppHeaderPillHoverBrush" Color="#F1F5F9" />
                     
                     <!-- Running as Admin Pill Badge -->
-                    <SolidColorBrush x:Key="AdminBadgeBackgroundBrush" Color="#250078D4" />
-                    <SolidColorBrush x:Key="AdminBadgeBorderBrush" Color="#550078D4" />
+                    <SolidColorBrush x:Key="AdminBadgeBackgroundBrush" Color="#200078D4" />
+                    <SolidColorBrush x:Key="AdminBadgeBorderBrush" Color="#450078D4" />
                     <SolidColorBrush x:Key="AdminBadgeForegroundBrush" Color="#0078D4" />
 
                     <!-- Opaque Toast Notification Surface (100% solid, prevents text bleed-through) -->
                     <SolidColorBrush x:Key="AppToastBackgroundBrush" Color="#FFFFFF" />
                     <SolidColorBrush x:Key="AppToastBorderBrush" Color="#CBD5E1" />
+
+                    <!-- Dashboard V2 Redesign Tokens -->
+                    <!-- کارت Aurora عمداً در هر دو تم تیره است تا متن سفید روی آن همیشه خوانا بماند -->
+                    <SolidColorBrush x:Key="HeroCardBackgroundBrush" Color="#D90E1726" />
+                    <LinearGradientBrush x:Key="HeroScrimBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0.0" />
+                        <GradientStop Color="#00000000" Offset="0.45" />
+                        <GradientStop Color="#9905070C" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <!-- Hero text/chip tokens (سطح تیره ثابت در هر دو تم) -->
+                    <SolidColorBrush x:Key="HeroTitleBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroSubtitleBrush" Color="#D9FFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipLabelBrush" Color="#CCFFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipValueBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipBackgroundBrush" Color="#47000000" />
+                    <SolidColorBrush x:Key="HeroChipBorderBrush" Color="#24FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetryLabelBrush" Color="#D9FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetryValueBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetrySeparatorBrush" Color="#A0FFFFFF" />
+                    <!-- هاور/فشردن هدر Expander باید بر اساس تم باشد (سیاه در لایت، سفید در دارک) -->
+                    <Color x:Key="ExpanderHeaderHoverColor">#10000000</Color>
+                    <Color x:Key="ExpanderHeaderPressedColor">#1A000000</Color>
+                    <SolidColorBrush x:Key="HealthGaugeTrackBrush" Color="#18000000" />
+                    <LinearGradientBrush x:Key="AppSparklineFillBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#250067C0" Offset="0.0" />
+                        <GradientStop Color="#000067C0" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="SparklineStrokeRamBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="SparklineStrokeCpuBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="SparklineStrokeDiskBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <LinearGradientBrush x:Key="SparklineFillRamBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#250067C0" Offset="0.0" />
+                        <GradientStop Color="#000067C0" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="SparklineFillCpuBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#250067C0" Offset="0.0" />
+                        <GradientStop Color="#000067C0" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="SparklineFillDiskBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#250067C0" Offset="0.0" />
+                        <GradientStop Color="#000067C0" Offset="1.0" />
+                    </LinearGradientBrush>
+
+                    <!-- System Tools Redesign Tokens -->
+                    <SolidColorBrush x:Key="AppAccentTintBrush" Color="#220067C0" />
+                    <SolidColorBrush x:Key="AppAccentBorderBrush" Color="#660067C0" />
                 </ResourceDictionary>
 
                 <ResourceDictionary x:Key="Dark">
@@ -97,6 +137,51 @@
                     <!-- Opaque Toast Notification Surface in Dark Mode (100% solid, prevents text bleed-through) -->
                     <SolidColorBrush x:Key="AppToastBackgroundBrush" Color="#1E2430" />
                     <SolidColorBrush x:Key="AppToastBorderBrush" Color="#334155" />
+
+                    <!-- Dashboard V2 Redesign Tokens -->
+                    <!-- یکسان با Light تا کارت Aurora در هر دو تم تیره بماند -->
+                    <SolidColorBrush x:Key="HeroCardBackgroundBrush" Color="#D90E1726" />
+                    <LinearGradientBrush x:Key="HeroScrimBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0.0" />
+                        <GradientStop Color="#00000000" Offset="0.45" />
+                        <GradientStop Color="#9905070C" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <!-- Hero text/chip tokens (سطح تیره ثابت در هر دو تم) -->
+                    <SolidColorBrush x:Key="HeroTitleBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroSubtitleBrush" Color="#D9FFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipLabelBrush" Color="#CCFFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipValueBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipBackgroundBrush" Color="#47000000" />
+                    <SolidColorBrush x:Key="HeroChipBorderBrush" Color="#24FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetryLabelBrush" Color="#D9FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetryValueBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetrySeparatorBrush" Color="#A0FFFFFF" />
+                    <Color x:Key="ExpanderHeaderHoverColor">#15FFFFFF</Color>
+                    <Color x:Key="ExpanderHeaderPressedColor">#25FFFFFF</Color>
+                    <SolidColorBrush x:Key="HealthGaugeTrackBrush" Color="#20FFFFFF" />
+                    <LinearGradientBrush x:Key="AppSparklineFillBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#3060CDFF" Offset="0.0" />
+                        <GradientStop Color="#0060CDFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="SparklineStrokeRamBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="SparklineStrokeCpuBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="SparklineStrokeDiskBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <LinearGradientBrush x:Key="SparklineFillRamBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#3060CDFF" Offset="0.0" />
+                        <GradientStop Color="#0060CDFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="SparklineFillCpuBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#3060CDFF" Offset="0.0" />
+                        <GradientStop Color="#0060CDFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="SparklineFillDiskBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#3060CDFF" Offset="0.0" />
+                        <GradientStop Color="#0060CDFF" Offset="1.0" />
+                    </LinearGradientBrush>
+
+                    <!-- System Tools Redesign Tokens -->
+                    <SolidColorBrush x:Key="AppAccentTintBrush" Color="#2460CDFF" />
+                    <SolidColorBrush x:Key="AppAccentBorderBrush" Color="#6660CDFF" />
                 </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
@@ -113,13 +198,16 @@
 
             <SolidColorBrush x:Key="BoostBorderBrush" Color="#300078D4" />
 
+            <SolidColorBrush x:Key="AppAccentTintBrush" Color="#2460CDFF" />
+            <SolidColorBrush x:Key="AppAccentBorderBrush" Color="#6660CDFF" />
+
             <!-- Fluent 2 / Glassmorphism Design Tokens -->
             <CornerRadius x:Key="CardCornerRadius">16</CornerRadius>
             <CornerRadius x:Key="HeroCornerRadius">20</CornerRadius>
             <CornerRadius x:Key="ButtonCornerRadius">8</CornerRadius>
-            <FontFamily x:Key="AppFontFamily">ms-appx:///Assets/Fonts/Vazirmatn-Regular.ttf#Vazirmatn, Segoe UI Variable, Tahoma</FontFamily>
-            <FontFamily x:Key="AppFontBold">ms-appx:///Assets/Fonts/Vazirmatn-Bold.ttf#Vazirmatn, Segoe UI Variable, Tahoma</FontFamily>
-            <FontFamily x:Key="AppFontSemiBold">ms-appx:///Assets/Fonts/Vazirmatn-SemiBold.ttf#Vazirmatn, Segoe UI Variable, Tahoma</FontFamily>
+            <FontFamily x:Key="AppFontFamily">Segoe UI Variable Text, Segoe UI, Microsoft YaHei, Yu Gothic UI, Malgun Gothic, Tahoma</FontFamily>
+            <FontFamily x:Key="AppFontBold">Segoe UI Variable Display, Segoe UI, Microsoft YaHei, Yu Gothic UI, Malgun Gothic, Tahoma</FontFamily>
+            <FontFamily x:Key="AppFontSemiBold">Segoe UI Variable Text, Segoe UI, Microsoft YaHei, Yu Gothic UI, Malgun Gothic, Tahoma</FontFamily>
 
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />

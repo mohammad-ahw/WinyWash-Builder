@@ -1,16 +1,24 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net8.0-windows10.0.26100.0</TargetFramework>
+    <TargetFramework>net10.0-windows10.0.26100.0</TargetFramework>
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>x64</Platforms>
-    <LangVersion>12</LangVersion>
+    <LangVersion>latest</LangVersion>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
-    <PackageReference Include="System.Management" Version="8.0.0" />
+    <!-- System.Management for WMI/DXDIAG and Microsoft.Data.Sqlite for reading the USO store.db in WindowsUpdateService -->
+    <!-- System.Diagnostics.EventLog for reading boot degradation events (EventID=101) used by BootImpactService -->
+    <PackageReference Include="System.Management" />
+    <PackageReference Include="Microsoft.Data.Sqlite" />
+    <PackageReference Include="System.Diagnostics.EventLog" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- دسترسی به متدهای ForTests (مثل SetRunKeyPathOverrideForTests) برای تست‌ها -->
+    <InternalsVisibleTo Include="CleanC.Core.Tests" />
   </ItemGroup>
 </Project>

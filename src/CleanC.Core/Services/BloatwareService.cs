@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using Microsoft.Win32;
 
@@ -117,14 +118,20 @@ namespace CleanC.Core.Services
                 {
                     ScanPackagedBloatware(candidates);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 2. Scan OEM Bloatware and Unused Win32 Apps
                 try
                 {
                     ScanWin32Apps(candidates);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return candidates;
             });
@@ -310,10 +317,16 @@ namespace CleanC.Core.Services
                             }
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static async Task<bool> RemoveAppAsync(CandidateAppItem app)
@@ -410,7 +423,10 @@ namespace CleanC.Core.Services
                     return GetDirectorySizeFast(path);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return 85 * 1024 * 1024; // Default estimate 85 MB
         }
 
@@ -425,7 +441,10 @@ namespace CleanC.Core.Services
                     size += fi.Length;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return size;
         }
 
@@ -475,13 +494,19 @@ namespace CleanC.Core.Services
                                         map[exeName] = dt;
                                     }
                                 }
-                                catch { }
+                                catch (Exception __ex)
+                                {
+                                    CcLog.Ignore(__ex);
+                                }
                             }
                         }
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return map;
         }
     }

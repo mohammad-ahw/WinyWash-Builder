@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Management;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using CleanC.Core.Native;
 
@@ -18,6 +19,13 @@ namespace CleanC.Core.Services
         private static string _cachedDiskHealth = "سالم (Healthy)";
         private static string _cachedGpuSummary = string.Empty;
         private static bool _hardwareInitialized = false;
+
+        // 3. Drive C: — TotalSize عملاً ثابت است و AvailableFreeSpace هر چند ثانیه یک‌بار کافی است.
+        //    قبلاً هر تیک تایمر (۲٫۵ ثانیه) مستقیم درایو را چک می‌کردیم.
+        private static long _cachedDiskTotalBytes;
+        private static long _cachedDiskFreeBytes;
+        private static DateTime _diskFreeCachedAtUtc = DateTime.MinValue;
+        private static readonly TimeSpan DiskFreeCacheTtl = TimeSpan.FromSeconds(3);
 
         static SystemStatsService()
         {
@@ -41,19 +49,33 @@ namespace CleanC.Core.Services
             // 2. CPU via GetSystemTimes
             stats.CpuPercent = GetCpuUsage();
 
-            // 3. Drive C: via DriveInfo
+            // 3. Drive C: (با کش کوتاه‌مدت — جزئیات در فیلدهای بالا)
             try
             {
-                var driveC = new DriveInfo("C");
-                if (driveC.IsReady)
+                var now = DateTime.UtcNow;
+                if (_cachedDiskTotalBytes == 0 || (now - _diskFreeCachedAtUtc) >= DiskFreeCacheTtl)
                 {
-                    stats.DiskTotalBytes = driveC.TotalSize;
-                    stats.DiskFreeBytes = driveC.AvailableFreeSpace;
+                    var driveC = new DriveInfo("C");
+                    if (driveC.IsReady)
+                    {
+                        _cachedDiskTotalBytes = driveC.TotalSize;
+                        _cachedDiskFreeBytes = driveC.AvailableFreeSpace;
+                        _diskFreeCachedAtUtc = now;
+                    }
+                }
+
+                if (_cachedDiskTotalBytes > 0)
+                {
+                    stats.DiskTotalBytes = _cachedDiskTotalBytes;
+                    stats.DiskFreeBytes = _cachedDiskFreeBytes;
                     stats.DiskUsedBytes = stats.DiskTotalBytes - stats.DiskFreeBytes;
                     stats.DiskPercent = Math.Round(((double)stats.DiskUsedBytes / stats.DiskTotalBytes) * 100.0, 1);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 4. Hardware Details (Non-blocking background cache)
             stats.DiskModel = string.IsNullOrEmpty(_cachedDiskModel) ? "درایو محلی ویندوز" : _cachedDiskModel;
@@ -69,7 +91,10 @@ namespace CleanC.Core.Services
                     ? (pStatus.IsLaptop ? "متصل به شارژر" : "متصل به برق")
                     : $"{pStatus.BatteryPercent}% باتری";
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return stats;
         }
@@ -121,7 +146,10 @@ namespace CleanC.Core.Services
                     _cachedGpuSummary = gpu.IntegratedGpuName;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static double GetCpuUsage()
@@ -133,11 +161,12 @@ namespace CleanC.Core.Services
 
                 if (_firstCpuSample)
                 {
+                    // فقط baseline ذخیره می‌شود؛ عدد واقعی از نمونه دوم (تیک بعدی) به دست می‌آید
                     _prevIdleTime = idleTime;
                     _prevKernelTime = kernelTime;
                     _prevUserTime = userTime;
                     _firstCpuSample = false;
-                    return 5.0; // Typical baseline initial estimate
+                    return 0.0;
                 }
 
                 long usr = userTime - _prevUserTime;

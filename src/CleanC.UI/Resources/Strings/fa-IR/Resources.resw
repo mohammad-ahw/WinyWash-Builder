@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>اجرا با دسترسی مدیر</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>مرکز بازیابی و بازگشت تغییرات</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>بروزرسانی وضعیت سیستم</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>تاریخچه عملیات و اعلان‌ها</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>تغییر تم (تاریک / روشن)</value></data>
+  <data name="Settings" xml:space="preserve"><value>تنظیمات برنامه</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>داشبورد بهینه سازی</value></data>
+  <data name="NavTools" xml:space="preserve"><value>ابزارهای سیستمی ویندوز</value></data>
+
+  <!-- Dashboard -->
+  <data name="HeroCategory" xml:space="preserve"><value>وضعیت سلامت و کارایی سیستم</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>سیستم آماده بهینه سازی است</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>با ۱ کلیک فایل‌های موقت پاک، حافظه رم آزاد و پردازه‌های اضافی بسته می‌شوند.</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>سیستم بهینه‌سازی شد</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>فایل‌های موقت پاکسازی و عملکرد ویندوز ارتقا یافت.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>قابل آزادسازی:</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>آخرین پاکسازی:</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>مجموع آزادشده:</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>بهینه سازی سریع سیستم</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>پاکسازی کش، آزادسازی رم، تخلیه DNS و غیرفعال‌سازی سرویس‌های پس‌زمینه</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>تنظیمات پیشرفته پاکسازی دیسک</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>انتخاب اختصاصی موارد اسکن و پاکسازی کش و فایل‌های زاید</value></data>
+
+  <!-- Settings -->
+  <data name="SettingsTitle" xml:space="preserve"><value>تنظیمات برنامه</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>ظاهر، زبان برنامه، رفتار در پس‌زمینه و خروجی گزارش</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>زبان برنامه (Language)</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>جهت چیدمان راست‌به‌چپ (RTL) و چپ‌به‌راست (LTR) به همراه قلم متناسب با هر زبان تغییر می‌کند.</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>تم برنامه</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>«سیستم» از تم ویندوز پیروی می‌کند؛ دو حالت دیگر تم را ثابت نگه می‌دارند.</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>سیستم</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>روشن</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>تاریک</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>اجرا در پس‌زمینه و نوار وظیفه</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>تنظیم نحوه کارکرد برنامه در کنار ساعت سیستم (بخش اعلان‌های ویندوز).</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>با بستن پنجره، برنامه در پس‌زمینه اجرا شود</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>هنگام کوچک کردن، به بخش اعلان‌های نوار وظیفه منتقل شود</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>شروع همراه با ویندوز</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>اجرای خودکار CleanC همزمان با ورود به حساب کاربری ویندوز.</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>رفتار حذف فایل‌های شخصی</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>برای حذف تکراری‌ها، فایل‌های حجیم و سازماندهی دانلودها. کش و زباله‌ها همیشه قطعی حذف می‌شوند.</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>انتقال به سطل بازیافت ویندوز (پیش فرض)</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>قرنطینه CleanC — نگهداری امن در پوشه برنامه با قابلیت بازگردانی</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>حذف قطعی — آزادسازی فوری و غیرقابل بازگردانی</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>بازیابی خودکار وضعیت</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>ذخیره فوری تغییرات و بازیابی در اجرای بعدی برنامه.</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>اندازه و موقعیت پنجره</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>آخرین صفحه مشاهده شده</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>انتخاب‌های اسکن پاکسازی</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>بازنشانی اندازه پنجره</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>بازنشانی همه تنظیمات</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>داده‌های برنامه</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>باز کردن پوشه تنظیمات</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>باز کردن پوشه لاگ‌ها</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>خروجی گزارش</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>تهیه گزارش تحلیلی برای هوش مصنوعی و مشخصات دقیق سخت‌افزاری به سبک ابزارهای حرفه‌ای.</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>گزارش کامل برای هوش مصنوعی (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>مشخصات جامع سخت‌افزار (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>درباره CleanC</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>ابزار مدرن بهینه سازی، پاکسازی و مدیریت سخت‌افزار در ویندوز ۱۱.</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>بررسی بروزرسانی</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>صفحه پروژه در گیت‌هاب</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>کپی اطلاعات عیب‌یابی</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>بازگشت به فهرست ابزارها</value></data>
+</root>

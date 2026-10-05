@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 
 namespace CleanC.Core.Services
@@ -33,7 +34,10 @@ namespace CleanC.Core.Services
                         });
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
                 finally
                 {
                     p.Dispose();
@@ -83,7 +87,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
                 finally
                 {
                     p.Dispose();

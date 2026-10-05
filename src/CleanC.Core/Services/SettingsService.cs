@@ -1,0 +1,213 @@
+// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.Core\Services\SettingsService.cs
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Text.Json;
+using System.Text.Json.Serialization;
+using CleanC.Core.Diagnostics;
+
+namespace CleanC.Core.Services
+{
+    /// <summary>
+    /// تنظیمات پایدار برنامه: تم، رفتار تری‌آیکون، هندسه‌ی پنجره، نمای آخر و انتخاب‌های اسکن.
+    /// در %LOCALAPPDATA%\CleanC\settings.json نگهداری می‌شود.
+    /// </summary>
+    public sealed class AppSettings
+    {
+        /// <summary>سه حالت مجاز: "System" | "Light" | "Dark"</summary>
+        public string Theme { get; set; } = "System";
+
+        /// <summary>کد زبان برنامه یا "Auto" برای تشخیص خودکار از ساعت/منطقه ویندوز</summary>
+        public string Language { get; set; } = "Auto";
+
+        /// <summary>بستن پنجره به‌جای خروج، برنامه را در تری‌آیکون نگه می‌دارد.</summary>
+        public bool CloseToTray { get; set; } = true;
+
+        /// <summary>کوچک‌نمایی پنجره آن را در تری‌آیکون پنهان می‌کند.</summary>
+        public bool MinimizeToTray { get; set; }
+
+        /// <summary>در اجراهای بعدی اندازه و موقعیت پنجره بازیابی شود.</summary>
+        public bool SaveWindowPlacement { get; set; } = true;
+
+        /// <summary>نمای آخر (داشبورد / ابزارها / تنظیمات) در اجراهای بعدی بازیابی شود.</summary>
+        public bool SaveLastView { get; set; } = true;
+
+        /// <summary>تیک خوردن/ندوردن آیتم‌های اسکن پاکسازی بین اجراها حفظ شود.</summary>
+        public bool SaveScanSelections { get; set; } = true;
+
+        // هندسه‌ی پنجره در پیکسل فیزیکی (همان چیزی که AppWindow برمی‌گرداند)
+        public int WindowWidth { get; set; } = 1080;
+        public int WindowHeight { get; set; } = 800;
+        public int WindowX { get; set; } = int.MinValue;
+        public int WindowY { get; set; } = int.MinValue;
+
+        /// <summary>"dashboard" | "tools" | "settings"</summary>
+        public string LastView { get; set; } = "dashboard";
+
+        /// <summary>شناسه‌ی آیتم زباله‌دان → آیا در اسکن تیک بخورد.</summary>
+        public Dictionary<string, bool> JunkSelections { get; set; } = new();
+
+        /// <summary>
+        /// F3 — رفتار حذفِ فایل‌های شخصی کاربر (تکراری/حجیم/دانلودها/دسکتاپ):
+        /// "RecycleBin" (پیش‌فرض) | "Quarantine" | "Permanent".
+        /// کش و زباله‌ها همیشه قطعی حذف می‌شوند چون هدفشان آزادسازی فضاست.
+        /// </summary>
+        public string DeleteMode { get; set; } = "RecycleBin";
+
+        /// <summary>
+        /// B4 — تاریخچه‌ی اعلان‌ها؛ باقی‌مانده‌ی ری‌استارت‌ها (سقف در Normalize).
+        /// Severity به‌صورت رشته ذخیره می‌شود تا JSON ساده بماند.
+        /// </summary>
+        public List<NotificationHistoryEntry> NotificationHistory { get; set; } = new();
+
+        /// <summary>آیا مکان‌یابی معتبری ذخیره شده و ارزش بازیابی دارد.</summary>
+        [JsonIgnore]
+        public bool HasSavedPlacement =>
+            WindowWidth >= 660 && WindowHeight >= 550 &&
+            WindowX != int.MinValue && WindowY != int.MinValue;
+
+        /// <summary>نگاشت تم ذخیره‌شده به ElementTheme (پیش‌فرض: از تنظیمات سیستم).</summary>
+        [JsonIgnore]
+        public bool IsDarkRequested => string.Equals(Theme, "Dark", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>یک رکورد از تاریخچه‌ی اعلان‌ها (B4) — در settings.json نگه داشته می‌شود.</summary>
+    public sealed class NotificationHistoryEntry
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
+        /// <summary>Informational | Success | Warning | Error</summary>
+        public string Severity { get; set; } = "Informational";
+        public DateTime At { get; set; } = DateTime.Now;
+    }
+
+    /// <summary>
+    /// بارگذاری/ذخیره‌ی <see cref="AppSettings"/> به‌صورت اتمیک و thread-safe.
+    /// هیچ خطای دیسک به بالا پرتاب نمی‌شود؛ خطاها در ignored.log ثبت می‌شوند.
+    /// </summary>
+    public static class SettingsService
+    {
+        private static readonly object Sync = new();
+
+        private static readonly JsonSerializerOptions JsonOptions = new()
+        {
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true
+        };
+
+        private static string _filePath = BuildDefaultPath();
+
+        /// <summary>مسیر فایل تنظیمات — برای تست قابل تغییر است.</summary>
+        public static string FilePath
+        {
+            get => _filePath;
+            set => _filePath = string.IsNullOrWhiteSpace(value) ? BuildDefaultPath() : value;
+        }
+
+        private static string BuildDefaultPath() => Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "CleanC", "settings.json");
+
+        public static AppSettings Load()
+        {
+            try
+            {
+                string path = FilePath;
+                if (File.Exists(path))
+                {
+                    var loaded = JsonSerializer.Deserialize<AppSettings>(File.ReadAllText(path), JsonOptions);
+                    if (loaded != null)
+                    {
+                        Normalize(loaded);
+                        return loaded;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "SettingsService.Load");
+            }
+
+            return new AppSettings();
+        }
+
+        public static void Save(AppSettings settings)
+        {
+            if (settings == null) return;
+
+            lock (Sync)
+            {
+                try
+                {
+                    string path = FilePath;
+                    string? dir = Path.GetDirectoryName(path);
+                    if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+
+                    // نوشتن در فایل موقت و جایگزینی اتمیک تا نیمه‌نوشته‌ها خراب نشوند
+                    string tmp = path + ".tmp";
+                    File.WriteAllText(tmp, JsonSerializer.Serialize(settings, JsonOptions));
+                    File.Move(tmp, path, overwrite: true);
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex, "SettingsService.Save");
+                }
+            }
+        }
+
+        private static void Normalize(AppSettings settings)
+        {
+            // دی‌سریالایز کردن مقایسه‌گر پیش‌فرض می‌سازد؛ برای id های غیرحساس به حروف بهتر است
+            // یک دیکشنری با مقایسه‌گر نادیده‌گرفتن حروف بسازیم.
+            var normalized = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
+            if (settings.JunkSelections != null)
+            {
+                foreach (var kv in settings.JunkSelections)
+                {
+                    if (!string.IsNullOrWhiteSpace(kv.Key)) normalized[kv.Key] = kv.Value;
+                }
+            }
+            settings.JunkSelections = normalized;
+
+            if (settings.WindowWidth < 660 || settings.WindowHeight < 550)
+            {
+                settings.WindowWidth = 1080;
+                settings.WindowHeight = 800;
+            }
+
+            string? view = settings.LastView?.Trim().ToLowerInvariant();
+            settings.LastView = view is "tools" or "settings" or "dashboard" ? view! : "dashboard";
+
+            string? theme = settings.Theme?.Trim();
+            settings.Theme = string.Equals(theme, "Light", StringComparison.OrdinalIgnoreCase) ? "Light"
+                           : string.Equals(theme, "Dark", StringComparison.OrdinalIgnoreCase) ? "Dark"
+                           : "System";
+
+            if (string.IsNullOrWhiteSpace(settings.Language)) settings.Language = "Auto";
+
+            // F3 — مقدار نامعتبر حذف به پیش‌فرض برمی‌گردد
+            settings.DeleteMode = SafeDeleteService.ModeToString(SafeDeleteService.ParseMode(settings.DeleteMode));
+
+            // B4 — تاریخچه‌ی اعلان‌ها: سقف ۵۰ مورد، مرتب‌سازی جدیدترین اول،
+            // حذف رکوردهای خالی و کوتاه‌کردن پیام‌های خیلی بلند.
+            const int MaxNotifications = 50;
+            settings.NotificationHistory = (settings.NotificationHistory ?? new List<NotificationHistoryEntry>())
+                .Where(e => e != null &&
+                            (!string.IsNullOrWhiteSpace(e.Title) || !string.IsNullOrWhiteSpace(e.Message)))
+                .OrderByDescending(e => e.At)
+                .Take(MaxNotifications)
+                .ToList();
+
+            foreach (var entry in settings.NotificationHistory)
+            {
+                entry.Title = (entry.Title ?? string.Empty).Trim();
+                entry.Message = (entry.Message ?? string.Empty).Trim();
+                if (entry.Message.Length > 400) entry.Message = entry.Message.Substring(0, 400);
+
+                entry.Severity = entry.Severity is "Success" or "Warning" or "Error" or "Informational"
+                    ? entry.Severity
+                    : "Informational";
+            }
+        }
+    }
+}

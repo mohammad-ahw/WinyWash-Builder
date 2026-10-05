@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -61,7 +62,10 @@ namespace CleanC.Core.Services
 
                 info.HasDualGpu = !string.IsNullOrEmpty(info.DedicatedGpuName) && !string.IsNullOrEmpty(info.IntegratedGpuName);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return info;
         }
@@ -112,7 +116,10 @@ namespace CleanC.Core.Services
                     // 3. Ensure browsers are not draining battery on dedicated GPU
                     OptimizeBrowserPreferences(key);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return result;
             });
@@ -139,7 +146,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static List<string> FindHeavyApplicationExecutables()
@@ -176,7 +186,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
 
             return found;
@@ -207,7 +220,10 @@ namespace CleanC.Core.Services
                                 }
                             }
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                     }
                 }
 
@@ -229,7 +245,10 @@ namespace CleanC.Core.Services
                                 }
                             }
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                     }
                 }
 
@@ -247,7 +266,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return found;
         }
@@ -308,7 +330,10 @@ namespace CleanC.Core.Services
                     return true;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
     }

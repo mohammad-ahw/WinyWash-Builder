@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Xml.Linq;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -141,7 +142,10 @@ namespace CleanC.Core.Services
                 {
                     EnrichWithWmiData(specs);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return specs;
             });
@@ -178,7 +182,10 @@ namespace CleanC.Core.Services
                     specs.CpuCores = Math.Max(1, Environment.ProcessorCount / 2);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 2. Motherboard & BIOS Info (Direct Registry)
             try
@@ -200,7 +207,10 @@ namespace CleanC.Core.Services
                     specs.BiosReleaseDate = rawDate;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 3. RAM Details (Win32 GlobalMemoryStatusEx)
             try
@@ -214,7 +224,10 @@ namespace CleanC.Core.Services
                     specs.RamType = "DDR4 / DDR5";
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 4. OS Version & Uptime (Direct Registry + Environment)
             try
@@ -253,7 +266,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             try
             {
@@ -262,21 +278,30 @@ namespace CleanC.Core.Services
                 string daysStr = uptime.Days > 0 ? $"{uptime.Days} روز و " : "";
                 specs.OsUptimeFormatted = $"{daysStr}{uptime.Hours} ساعت و {uptime.Minutes} دقیقه (روشن‌شده در {bootTime:HH:mm})";
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 5. Windows Activation Status
             try
             {
                 specs.Activation = GetActivationStatus();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 6. GPU Info (Direct Registry reading)
             try
             {
                 GetGpuInfoFromRegistry(specs);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 7. Battery Status (Win32 API + XML Fallback)
             try
@@ -296,21 +321,30 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 8. Disks Info (System.IO.DriveInfo)
             try
             {
                 GetDisksFromDrives(specs);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 9. Logical Drives (This PC Drives Manager)
             try
             {
                 specs.LogicalDrives = GetLogicalDrives();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return specs;
         }
@@ -482,12 +516,18 @@ namespace CleanC.Core.Services
                         }
                         finally
                         {
-                            try { File.Delete(tempXml); } catch { }
+                            try { File.Delete(tempXml); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
                         }
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static void EnrichWithWmiData(DetailedSystemSpecs specs)
@@ -580,7 +620,10 @@ namespace CleanC.Core.Services
                         break;
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 2. Win32_BaseBoard & Win32_BIOS
                 try
@@ -593,7 +636,10 @@ namespace CleanC.Core.Services
                         break;
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 try
                 {
@@ -609,7 +655,10 @@ namespace CleanC.Core.Services
                         break;
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 3. Win32_PhysicalMemory
                 try
@@ -650,7 +699,10 @@ namespace CleanC.Core.Services
                     else if (smbiosType == 34 || smbiosType == 35) specs.RamType = "DDR5";
                     else if (smbiosType == 24) specs.RamType = "DDR3";
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 4. Battery (root\WMI)
                 try
@@ -671,7 +723,10 @@ namespace CleanC.Core.Services
                                 if (mo["DesignedCapacity"] != null) { design = Convert.ToInt64(mo["DesignedCapacity"]); break; }
                             }
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
 
                         try
                         {
@@ -681,7 +736,10 @@ namespace CleanC.Core.Services
                                 if (mo["FullChargedCapacity"] != null) { full = Convert.ToInt64(mo["FullChargedCapacity"]); break; }
                             }
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
 
                         try
                         {
@@ -691,7 +749,10 @@ namespace CleanC.Core.Services
                                 if (mo["CycleCount"] != null) { cycles = Convert.ToInt32(mo["CycleCount"]); break; }
                             }
                         }
-                        catch { }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
 
                         specs.BatteryDesignCapacityMWh = design;
                         specs.BatteryFullChargeCapacityMWh = full;
@@ -703,14 +764,20 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 5. Physical Disks & SSD reliability
                 try
                 {
                     GetWmiDisks(specs);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return specs;
             });
@@ -736,7 +803,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             try
             {
@@ -788,7 +858,10 @@ namespace CleanC.Core.Services
                     specs.Disks = diskItems;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static string GenerateReportText(DetailedSystemSpecs specs)

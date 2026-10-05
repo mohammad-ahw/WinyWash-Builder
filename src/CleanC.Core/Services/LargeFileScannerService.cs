@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using CleanC.Core.Native;
 
@@ -62,10 +63,16 @@ namespace CleanC.Core.Services
                                     });
                                 }
                             }
-                            catch { }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
 
                 // Sort descending by size
@@ -73,22 +80,33 @@ namespace CleanC.Core.Services
             });
         }
 
+        /// <summary>
+        /// D5 — انتقال فایل حجیم به سطل بازیافت (نه حذف دائمی).
+        /// </summary>
         public static bool DeleteLargeFile(string filePath)
         {
             try
             {
-                if (File.Exists(filePath))
+                if (!File.Exists(filePath)) return false;
+
+                var fi = new FileInfo(filePath);
+                if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden)) != 0)
                 {
-                    var fi = new FileInfo(filePath);
-                    if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden)) != 0)
-                    {
-                        fi.Attributes = FileAttributes.Normal;
-                    }
-                    fi.Delete();
-                    return true;
+                    fi.Attributes = FileAttributes.Normal;
                 }
+
+                // یک فایل بالای ۵۰۰ مگابایت با یک کلیک قابل بازگردانی باشد.
+                Microsoft.VisualBasic.FileIO.FileSystem.DeleteFile(
+                    filePath,
+                    Microsoft.VisualBasic.FileIO.UIOption.OnlyErrorDialogs,
+                    Microsoft.VisualBasic.FileIO.RecycleOption.SendToRecycleBin);
+
+                return true;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
     }

@@ -1,0 +1,34 @@
+﻿<Project>
+  <!--
+    مدیریت متمرکز نسخه‌ی پکیج‌ها (Central Package Management).
+    از این به بعد هیچ csproj-ای Version= ندارد؛ همه‌ی نسخه‌ها همین‌جا نگه داشته
+    می‌شوند تا ارتقای یک وابستگی در سراسر solution یک‌جا انجام شود.
+  -->
+  <PropertyGroup>
+    <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- CleanC.Core -->
+    <PackageVersion Include="System.Management" Version="10.0.12" />
+    <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+    <!-- F6: خواندن EventID=101 از Microsoft-Windows-Diagnostics-Performance برای Impact Score -->
+    <PackageVersion Include="System.Diagnostics.EventLog" Version="10.0.12" />
+
+    <!-- CleanC.UI -->
+    <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.5.1" />
+    <PackageVersion Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+    <PackageVersion Include="System.Drawing.Common" Version="10.0.12" />
+    <!-- C6: DI container + MVVM toolkit -->
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="10.0.12" />
+    <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
+    <!-- B9/C3: فقط برای خاموش کردن runtime آن (رفرنسِ مستقیم با ExcludeAssets) -->
+    <PackageVersion Include="Microsoft.Windows.AI.MachineLearning" Version="2.1.74" />
+
+    <!-- تست -->
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageVersion Include="xunit" Version="2.9.3" />
+    <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageVersion Include="coverlet.collector" Version="6.0.4" />
+  </ItemGroup>
+</Project>

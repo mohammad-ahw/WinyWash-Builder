@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 
 namespace CleanC.Core.Services
 {
@@ -145,7 +146,10 @@ namespace CleanC.Core.Services
                             pings.Add(sw.Elapsed.TotalMilliseconds);
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
 
                 if (pings.Count > 0)
@@ -250,7 +254,10 @@ namespace CleanC.Core.Services
                 downloadCts.Cancel();
                 await Task.WhenAll(downloadTasks).ConfigureAwait(false);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             streamStopwatch.Stop();
             result.BytesDownloaded = Interlocked.Read(ref totalBytesDownloaded);
@@ -332,7 +339,10 @@ namespace CleanC.Core.Services
                         uploadCts.Cancel();
                         await Task.WhenAll(uploadTasks).ConfigureAwait(false);
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
 
                     upSw.Stop();
                     result.BytesUploaded = Interlocked.Read(ref totalBytesUploaded);
@@ -344,7 +354,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             result.IsSuccess = true;
             lock (_testHistory)

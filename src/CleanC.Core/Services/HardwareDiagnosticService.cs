@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using CleanC.Core.Native;
 
@@ -33,7 +34,10 @@ namespace CleanC.Core.Services
                     var displayItem = CheckRefreshRate();
                     if (displayItem != null) list.Add(displayItem);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 2. Power Plan Optimization Check
                 try
@@ -41,7 +45,10 @@ namespace CleanC.Core.Services
                     var powerItem = PowerPlanService.CheckPowerPlanAttention();
                     if (powerItem != null) list.Add(powerItem);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 3. Bloatware & Unused Apps Check
                 try
@@ -62,7 +69,10 @@ namespace CleanC.Core.Services
                         });
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 4. Advanced Network & Responsiveness Tweaks Check
                 try
@@ -70,7 +80,10 @@ namespace CleanC.Core.Services
                     var advItem = AdvancedTweakService.CheckAdvancedTweaksAttention();
                     if (advItem != null) list.Add(advItem);
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 5. SSD Critical Space Check
                 try
@@ -94,7 +107,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // 6. HAGS (Hardware-Accelerated GPU Scheduling) Check
                 try
@@ -112,7 +128,10 @@ namespace CleanC.Core.Services
                         });
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return list;
             });

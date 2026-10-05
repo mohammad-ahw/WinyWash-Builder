@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -19,7 +20,10 @@ namespace CleanC.Core.Services
                 var val = key?.GetValue("AllowTelemetry");
                 if (val != null && Convert.ToInt32(val) == 0) return true;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
@@ -38,11 +42,18 @@ namespace CleanC.Core.Services
                 {
                     EnableAndStartService("DiagTrack");
                     EnableAndStartService("dmwappushservice");
+                    // مقدار AllowTelemetry را حذف می‌کنیم تا Windows به پیش‌فرض edition خودش
+                    // (Home/Pro=Basic(1)، Enterprise/Education=0) برگردد.
+                    // قبلاً 3 (Full) می‌گذاشتیم که بدترین حالت تله‌متری است و عملاً
+                    // «خاموش کردن» را به «حداکثر تله‌متری» تبدیل می‌کرد.
                     using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection");
-                    key?.SetValue("AllowTelemetry", 3, RegistryValueKind.DWord);
+                    key?.DeleteValue("AllowTelemetry", false);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         // 2. Bing Search in Start Menu
@@ -58,7 +69,10 @@ namespace CleanC.Core.Services
                 var v2 = k2?.GetValue("BingSearchEnabled");
                 if (v2 != null && Convert.ToInt32(v2) == 0) return true;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
@@ -75,7 +89,10 @@ namespace CleanC.Core.Services
                     k2?.SetValue("BingSearchEnabled", disable ? 0 : 1, RegistryValueKind.DWord);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         // 3. Advertising ID
@@ -87,7 +104,10 @@ namespace CleanC.Core.Services
                 var val = key?.GetValue("Enabled");
                 if (val != null && Convert.ToInt32(val) == 0) return true;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
@@ -98,7 +118,10 @@ namespace CleanC.Core.Services
                 using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo");
                 key?.SetValue("Enabled", disable ? 0 : 1, RegistryValueKind.DWord);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         // 4. Activity History & Feed Tracking
@@ -110,7 +133,10 @@ namespace CleanC.Core.Services
                 var val = key?.GetValue("PublishUserActivities");
                 if (val != null && Convert.ToInt32(val) == 0) return true;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
@@ -122,7 +148,10 @@ namespace CleanC.Core.Services
                 key?.SetValue("PublishUserActivities", disable ? 0 : 1, RegistryValueKind.DWord);
                 key?.SetValue("EnableActivityFeed", disable ? 0 : 1, RegistryValueKind.DWord);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         // 5. Tailored Experiences & Diagnostic Feedback
@@ -134,7 +163,10 @@ namespace CleanC.Core.Services
                 var val = key?.GetValue("TailoredExperiencesWithDiagnosticDataEnabled");
                 if (val != null && Convert.ToInt32(val) == 0) return true;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
@@ -151,7 +183,10 @@ namespace CleanC.Core.Services
                     k2?.SetValue("NumberOfSIUFInPeriod", disable ? 0 : 1, RegistryValueKind.DWord);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         // Master 1-Click Method

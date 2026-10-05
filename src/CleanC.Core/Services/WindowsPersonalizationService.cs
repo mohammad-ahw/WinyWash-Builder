@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -30,7 +31,10 @@ namespace CleanC.Core.Services
                 SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, UIntPtr.Zero, "Environment", 2, 1000, out _);
                 SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, UIntPtr.Zero, "TraySettings", 2, 1000, out _);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static PersonalizationSettings GetCurrentSettings()
@@ -76,7 +80,10 @@ namespace CleanC.Core.Services
                 using var menuKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32");
                 s.IsClassicContextMenuEnabled = (menuKey != null);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return s;
         }
@@ -89,7 +96,10 @@ namespace CleanC.Core.Services
                 key?.SetValue("EnableTransparency", enable ? 1 : 0, RegistryValueKind.DWord);
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void SetAutoColorization(bool enable)
@@ -100,7 +110,10 @@ namespace CleanC.Core.Services
                 key?.SetValue("AutoColorization", enable ? 1 : 0, RegistryValueKind.DWord);
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void SetWindowsDarkMode(bool dark)
@@ -116,7 +129,10 @@ namespace CleanC.Core.Services
                 }
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void SetVisualEffectsPerformance(bool bestPerformance)
@@ -127,7 +143,10 @@ namespace CleanC.Core.Services
                 key?.SetValue("VisualFXSetting", bestPerformance ? 2 : 1, RegistryValueKind.DWord);
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void SetShowFileExtensions(bool show)
@@ -138,7 +157,10 @@ namespace CleanC.Core.Services
                 key?.SetValue("HideFileExt", show ? 0 : 1, RegistryValueKind.DWord);
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void SetShowHiddenFiles(bool show)
@@ -149,7 +171,10 @@ namespace CleanC.Core.Services
                 key?.SetValue("Hidden", show ? 1 : 2, RegistryValueKind.DWord);
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void SetClassicContextMenu(bool enable)
@@ -168,7 +193,10 @@ namespace CleanC.Core.Services
                 }
                 BroadcastSettingsChange();
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
     }
 }

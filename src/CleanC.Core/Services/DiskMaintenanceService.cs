@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 
 namespace CleanC.Core.Services
@@ -99,7 +100,10 @@ namespace CleanC.Core.Services
                     });
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return result;
         }
 
@@ -127,7 +131,10 @@ namespace CleanC.Core.Services
                         return process.ExitCode == 0;
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return false;
             });

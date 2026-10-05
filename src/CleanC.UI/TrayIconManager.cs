@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using CleanC.Core.Services;
 using Microsoft.UI.Xaml;
@@ -14,6 +15,7 @@ namespace CleanC.UI
         private readonly Action _onRestore;
         private readonly Action _onQuickBoost;
         private readonly Action _onNavigateDns;
+        private readonly Action _onExit;
         private readonly SUBCLASSPROC _subclassProc;
         private bool _disposed;
         private const uint WM_TRAYICON = 0x8000 + 101; // WM_APP + 101
@@ -62,6 +64,10 @@ namespace CleanC.UI
         private const uint WM_LBUTTONDBLCLK = 0x0203;
         private const uint WM_RBUTTONUP = 0x0205;
 
+        // D13 — انتخاب آیکون تری با کیبورد (Shift+F10 / Enter در ناحیه اعلان)
+        private const uint NIN_SELECT = 0x0400;
+        private const uint NIN_KEYSELECT = 0x0401;
+
         private const uint MF_STRING = 0x00000000;
         private const uint MF_SEPARATOR = 0x00000800;
         private const uint TPM_RIGHTALIGN = 0x0008;
@@ -102,6 +108,9 @@ namespace CleanC.UI
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         private static extern IntPtr LoadImage(IntPtr hInst, string name, uint type, int cx, int cy, uint fuLoad);
 
+        [DllImport("user32.dll")]
+        private static extern bool DestroyIcon(IntPtr hIcon);
+
         private delegate IntPtr SUBCLASSPROC(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, IntPtr dwRefData);
 
         [DllImport("comctl32.dll", SetLastError = true)]
@@ -115,13 +124,21 @@ namespace CleanC.UI
 
         private IntPtr _hIcon = IntPtr.Zero;
 
-        public TrayIconManager(Window window, Action onRestore, Action onQuickBoost, Action onNavigateDns)
+        // D13 — هِدِر منوی تری با کش ۱ ثانیه‌ای؛ GetCurrentStats نباید داخل
+        // window-proc هر بار اجرا شود چون پیام‌های پنجره را معطل می‌کند.
+        private string _statusHeader = "CleanC";
+        private DateTime _statusHeaderAtUtc = DateTime.MinValue;
+
+        // onExit: خروج باید از مسیر MainWindow بگذرد تا تنظیمات ذخیره شود و
+        // جلوی بستنِ لغو‌شده‌ی Close-to-Tray گرفته شود؛ Application.Current.Exit این مسیر را دور می‌زند.
+        public TrayIconManager(Window window, Action onRestore, Action onQuickBoost, Action onNavigateDns, Action onExit)
         {
             _window = window;
             _hwnd = WinRT.Interop.WindowNative.GetWindowHandle(window);
             _onRestore = onRestore;
             _onQuickBoost = onQuickBoost;
             _onNavigateDns = onNavigateDns;
+            _onExit = onExit;
             _subclassProc = WindowSubclassProc;
 
             InitializeTray();
@@ -155,7 +172,10 @@ namespace CleanC.UI
 
                 Shell_NotifyIcon(NIM_ADD, ref nid);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private IntPtr WindowSubclassProc(IntPtr hWnd, uint uMsg, IntPtr wParam, IntPtr lParam, IntPtr uIdSubclass, IntPtr dwRefData)
@@ -163,15 +183,24 @@ namespace CleanC.UI
             if (uMsg == WM_TRAYICON)
             {
                 uint msg = (uint)(lParam.ToInt64() & 0xFFFF);
-                if (msg == WM_LBUTTONUP || msg == WM_LBUTTONDBLCLK)
+
+                switch (msg)
                 {
-                    RestoreWindow();
-                    return IntPtr.Zero;
-                }
-                else if (msg == WM_RBUTTONUP)
-                {
-                    ShowTrayMenu();
-                    return IntPtr.Zero;
+                    case WM_LBUTTONUP:
+                    case WM_LBUTTONDBLCLK:
+                        RestoreWindow();
+                        return IntPtr.Zero;
+
+                    case WM_RBUTTONUP:
+                        ShowTrayMenu();
+                        return IntPtr.Zero;
+
+                    // D13 — دسترسی با کیبورد: وقتی آیکون تری با Enter/Space انتخاب می‌شود،
+                    // باید مثل کلیکِ ماوس پنجره فعال شود وگرنه تری با کیبورد غیرقابل‌دسترس است.
+                    case NIN_SELECT:
+                    case NIN_KEYSELECT:
+                        RestoreWindow();
+                        return IntPtr.Zero;
                 }
             }
 
@@ -192,10 +221,24 @@ namespace CleanC.UI
 
             try
             {
-                var stats = SystemStatsService.GetCurrentStats();
-                string statusHeader = $"CleanC (پردازنده: {stats.CpuPercent}% • رم: {stats.RamPercent}%)";
+                // D13 — آمار سیستم از کش ۱ ثانیه‌ای می‌آید (کلیکِ پشت‌سرهم روی تری
+                // نباید چند بار سیستم را اسکن کند)
+                DateTime nowUtc = DateTime.UtcNow;
+                if ((nowUtc - _statusHeaderAtUtc).TotalSeconds >= 1.0)
+                {
+                    _statusHeaderAtUtc = nowUtc;
+                    try
+                    {
+                        var stats = SystemStatsService.GetCurrentStats();
+                        _statusHeader = $"CleanC (پردازنده: {stats.CpuPercent}% • رم: {stats.RamPercent}%)";
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex, "ShowTrayMenu.Stats");
+                    }
+                }
 
-                AppendMenu(hMenu, MF_STRING, 0, statusHeader);
+                AppendMenu(hMenu, MF_STRING, 0, _statusHeader);
                 AppendMenu(hMenu, MF_SEPARATOR, 0, "");
                 AppendMenu(hMenu, MF_STRING, IDM_RESTORE, "🪟 نمایش پنجره اصلی CleanC");
                 AppendMenu(hMenu, MF_STRING, IDM_BOOST_RAM, "🚀 آزادسازی آنی حافظه رم (RAM Boost)");
@@ -247,15 +290,36 @@ namespace CleanC.UI
 
                 case IDM_EXIT:
                     Dispose();
-                    Application.Current.Exit();
+                    if (_onExit != null)
+                    {
+                        _window.DispatcherQueue?.TryEnqueue(() => _onExit.Invoke());
+                    }
+                    else
+                    {
+                        Application.Current.Exit();
+                    }
                     break;
             }
         }
 
         public void ShowBalloonNotification(string title, string message)
+            => ShowBalloonNotification(title, message, WinNotifySeverity.Info);
+
+        /// <summary>
+        /// F5 — balloon با شدت واقعی: آیکون و رنگ هشدار/خطا متناسب با severity
+        /// تا کاربر از پشت پنجره هم بتواند فوریت پیام را تشخیص دهد.
+        /// </summary>
+        public void ShowBalloonNotification(string title, string message, WinNotifySeverity severity)
         {
             try
             {
+                uint flags = severity switch
+                {
+                    WinNotifySeverity.Error => 0x00000003,   // NIIF_ERROR
+                    WinNotifySeverity.Warning => 0x00000002, // NIIF_WARNING
+                    _ => 0x00000001                           // NIIF_INFO
+                };
+
                 var nid = new NOTIFYICONDATA
                 {
                     cbSize = (uint)Marshal.SizeOf<NOTIFYICONDATA>(),
@@ -264,11 +328,40 @@ namespace CleanC.UI
                     uFlags = NIF_INFO,
                     szInfoTitle = title,
                     szInfo = message,
-                    dwInfoFlags = 0x00000001 /* NIIF_INFO */
+                    dwInfoFlags = flags
                 };
                 Shell_NotifyIcon(NIM_MODIFY, ref nid);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+        }
+
+        /// <summary>
+        /// F5 — به‌روزرسانی tooltip تری‌آیکون؛ جایگزین badge ویندوز وقتی
+        /// API آن برای اپ unpackaged در دسترس نباشد.
+        /// </summary>
+        public void UpdateTooltip(string text)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(text)) return;
+
+                var nid = new NOTIFYICONDATA
+                {
+                    cbSize = (uint)Marshal.SizeOf<NOTIFYICONDATA>(),
+                    hWnd = _hwnd,
+                    uID = TRAY_ID,
+                    uFlags = NIF_TIP,
+                    szTip = text
+                };
+                Shell_NotifyIcon(NIM_MODIFY, ref nid);
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public void Dispose()
@@ -287,8 +380,19 @@ namespace CleanC.UI
                 Shell_NotifyIcon(NIM_DELETE, ref nid);
 
                 RemoveWindowSubclass(_hwnd, _subclassProc, new IntPtr(1001));
+
+                // D13 — آیکونِ بارگذاری‌شده با LR_LOADFROMFILE یک handle دستی دارد
+                // و بدون DestroyIcon در GDI نشت می‌کند (حتی بعد از NIM_DELETE).
+                if (_hIcon != IntPtr.Zero)
+                {
+                    DestroyIcon(_hIcon);
+                    _hIcon = IntPtr.Zero;
+                }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
     }
 }

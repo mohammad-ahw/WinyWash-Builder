@@ -2,32 +2,92 @@ using System;
 using System.IO;
 using System.Text.Json;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
 {
     public class RegistryBackupService
     {
-        private static string BackupDir => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC", "Backups");
-        private static string StateFilePath => Path.Combine(BackupDir, "tweaks_applied_flag.json");
+        private const string FlagFileName = "tweaks_applied_flag.json";
 
-        public static bool HasAppliedTweaks()
+        /// <summary>
+        /// مسیر اصلی (جدید): %ProgramData%\CleanC\Backups
+        /// دلیل جابجایی: %LOCALAPPDATA% داخل مسیر اسکن پاک‌سازهاست؛
+        /// نگه‌داشتن پرچم و بکاپ‌ها آنجا یعنی ممکن است توسط خود CleanC پاک شوند
+        /// و «بازگردانی تغییرات» از کار بیفتد. ProgramData سراسری است و
+        /// عمری برابر با نصب نرم‌افزار دارد.
+        /// </summary>
+        private static readonly string PreferredBackupDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "CleanC", "Backups");
+
+        /// <summary>مسیر قدیمی — فقط برای مهاجرت و پشتیبانی خواندن رکوردهای موجود.</summary>
+        private static readonly string LegacyBackupDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC", "Backups");
+
+        private static string? _resolvedBackupDir;
+
+        private static string ResolveBackupDir()
+        {
+            if (_resolvedBackupDir != null) return _resolvedBackupDir;
+
+            try
+            {
+                Directory.CreateDirectory(PreferredBackupDir);
+                MigrateLegacyFiles(LegacyBackupDir, PreferredBackupDir);
+                _resolvedBackupDir = PreferredBackupDir;
+            }
+            catch
+            {
+                // بدون دسترسی Administrator یا ProgramData در دسترس نبود
+                _resolvedBackupDir = LegacyBackupDir;
+            }
+
+            return _resolvedBackupDir;
+        }
+
+        /// <summary>
+        /// انتقال یک‌باره‌ی فایل‌های مسیر قدیمی به مسیر جدید (بدون حذف منبع).
+        /// </summary>
+        private static void MigrateLegacyFiles(string from, string to)
         {
             try
             {
-                return File.Exists(StateFilePath);
+                if (!Directory.Exists(from)) return;
+                foreach (var file in Directory.GetFiles(from))
+                {
+                    string dest = Path.Combine(to, Path.GetFileName(file));
+                    if (File.Exists(dest)) continue;
+                    File.Copy(file, dest, false);
+                }
             }
-            catch { return false; }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+        }
+
+        private static void TryDeleteFlag(string path)
+        {
+            try { if (File.Exists(path)) File.Delete(path); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
         }
 
         public static void MarkTweaksApplied()
         {
             try
             {
-                Directory.CreateDirectory(BackupDir);
-                File.WriteAllText(StateFilePath, JsonSerializer.Serialize(new { AppliedAt = DateTime.UtcNow }));
+                string dir = ResolveBackupDir();
+                Directory.CreateDirectory(dir);
+                File.WriteAllText(Path.Combine(dir, FlagFileName),
+                    JsonSerializer.Serialize(new { AppliedAt = DateTime.UtcNow }));
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static async Task<int> RollbackAllTweaksAsync()
@@ -109,13 +169,14 @@ namespace CleanC.Core.Services
                         chromePolicy?.DeleteValue("BackgroundModeEnabled", false);
                     }
 
-                    // Remove flag file
-                    if (File.Exists(StateFilePath))
-                    {
-                        File.Delete(StateFilePath);
-                    }
+                    // Remove flag file (هر دو مسیر — مهاجرتِ ناقص را هم جبران می‌کند)
+                    TryDeleteFlag(Path.Combine(ResolveBackupDir(), FlagFileName));
+                    TryDeleteFlag(Path.Combine(LegacyBackupDir, FlagFileName));
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return revertedCount;
             });

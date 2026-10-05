@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>관리자 권한으로 실행 중</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>복구 및 실행 취소 센터</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>시스템 상태 새로 고침</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>알림 및 작업 기록</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>테마 전환 (어둡게 / 밝게)</value></data>
+  <data name="Settings" xml:space="preserve"><value>애플리케이션 설정</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>최적화 대시보드</value></data>
+  <data name="NavTools" xml:space="preserve"><value>Windows 시스템 도구</value></data>
+  <data name="HeroCategory" xml:space="preserve"><value>시스템 상태 및 성능</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>시스템이 최적화 준비를 마쳤습니다</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>원클릭으로 임시 파일을 정리하고, 메모리를 확보하며, 불필요한 백그라운드 프로세스를 종료합니다.</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>시스템이 성공적으로 최적화되었습니다</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>캐시가 제거되었고 메모리가 확보되어 쾌적해졌습니다.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>정리 가능 용량:</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>마지막 정리:</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>총 확보 용량:</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>빠른 시스템 부스트</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>정크 파일 제거, RAM 확보, DNS 플러시 및 백그라운드 서비스 최적화</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>고급 디스크 정리</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>스캔 항목 맞춤 설정 및 불필요한 파일 범주 선택</value></data>
+  <data name="SettingsTitle" xml:space="preserve"><value>애플리케이션 설정</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>테마, 언어, 트레이 동작 및 진단 보고서 내보내기</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>표시 언어 (Language)</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>배치 방향과 시스템 폰트를 언어에 맞춰 자동으로 최적화합니다.</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>앱 테마</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>Windows 설정을 따르거나 밝은/어두운 모드로 고정합니다.</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>시스템</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>밝게</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>어둡게</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>백그라운드 실행 및 시스템 트레이</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>창을 닫거나 최소화할 때 작업 표시줄 알림 영역(시계 옆) 동작을 설정합니다.</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>창을 닫아도 백그라운드에서 계속 실행</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>최소화 시 작업 표시줄 알림 영역으로 숨기기</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>Windows 시작 시 자동 실행</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>Windows 로그인 시 CleanC를 자동으로 실행합니다.</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>개인 파일 삭제 정책</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>중복 파일 및 대용량 파일에 적용됩니다. 시스템 정크는 항상 완전히 삭제됩니다.</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>휴지통으로 이동 (권장)</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>CleanC 격리 보관소 — 복구 센터에서 언제든 복원 가능</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>영구 삭제 — 즉시 디스크 용량을 확보하며 복구 불가</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>자동 상태 복원</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>창 위치, 마지막 화면 및 선택 항목을 다음 실행 시 복원합니다.</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>창 크기 및 위치</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>마지막으로 열었던 화면</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>정리 스캔 체크 항목</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>창 위치 초기화</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>모든 설정 초기화</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>애플리케이션 데이터</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>설정 폴더 열기</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>로그 폴더 열기</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>보고서 내보내기</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>AI 프롬프트용 상세 진단 파일 및 하드웨어 사양을 내보냅니다.</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>AI 진단 보고서 (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>하드웨어 사양 보고서 (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>CleanC 정보</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>Windows 11을 위한 현대적인 PC 관리, 최적화 및 하드웨어 진단 도구.</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>업데이트 확인</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>GitHub 프로젝트 페이지</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>진단 정보 복사</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>도구 목록으로 돌아가기</value></data>
+</root>

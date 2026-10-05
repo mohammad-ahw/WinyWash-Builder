@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using CleanC.Core.Native;
 
@@ -171,7 +172,10 @@ namespace CleanC.Core.Services
                 {
                     var thumbFiles = Directory.GetFiles(explorerCacheDir, "thumbcache_*.db").ToList();
                     long thumbBytes = 0;
-                    foreach (var f in thumbFiles) { try { thumbBytes += new FileInfo(f).Length; } catch { } }
+                    foreach (var f in thumbFiles) { try { thumbBytes += new FileInfo(f).Length; } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+} }
                     if (thumbBytes > 0)
                     {
                         grpRec.Items.Add(new JunkCategory
@@ -285,7 +289,10 @@ namespace CleanC.Core.Services
                         });
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 result.Groups.Add(grpSys);
 
@@ -611,7 +618,10 @@ namespace CleanC.Core.Services
                             });
                         }
                     }
-                    catch { }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
 
                 if (grpDownloads.Items.Count > 0)
@@ -654,7 +664,10 @@ namespace CleanC.Core.Services
                         result.Groups.Add(grpLeftovers);
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return result;
             });
@@ -671,10 +684,16 @@ namespace CleanC.Core.Services
                 var dir = new DirectoryInfo(path);
                 foreach (var file in dir.EnumerateFiles("*", new EnumerationOptions { IgnoreInaccessible = true, RecurseSubdirectories = true }))
                 {
-                    try { size += file.Length; } catch { }
+                    try { size += file.Length; } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return size;
         }
@@ -716,7 +735,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return paths;
         }
@@ -729,7 +751,10 @@ namespace CleanC.Core.Services
                 int hr = Win32.SHQueryRecycleBin(null, ref rbInfo);
                 if (hr == 0) return rbInfo.i64Size;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return 0;
         }
     }

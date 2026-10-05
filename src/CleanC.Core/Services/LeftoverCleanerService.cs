@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
@@ -111,7 +112,10 @@ namespace CleanC.Core.Services
                     ScanPublicDirectory(publicDir, installedNames, leftovers);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return leftovers;
         }
@@ -163,7 +167,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static void ScanUserProfileDirectory(string userProfile, HashSet<string> installedSignatures, List<LeftoverFolderItem> result)
@@ -230,7 +237,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static void ScanPublicDirectory(string publicDir, HashSet<string> installedSignatures, List<LeftoverFolderItem> result)
@@ -276,7 +286,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static bool HasPersonalOrProjectFiles(string dirPath)
@@ -304,7 +317,10 @@ namespace CleanC.Core.Services
                     if (scannedCount > 100) break;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return false;
         }
@@ -330,7 +346,10 @@ namespace CleanC.Core.Services
                     if (Directory.Exists(Path.Combine(programsDir, name))) return true;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
@@ -364,7 +383,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 try
                 {
@@ -385,7 +407,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
 
             // Top-level Software registry keys
@@ -400,7 +425,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             try
             {
@@ -413,7 +441,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // Program Files and Program Files (x86)
             try
@@ -429,7 +460,10 @@ namespace CleanC.Core.Services
                     foreach (var d in Directory.GetDirectories(pfx)) signatures.Add(Path.GetFileName(d));
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // LocalAppData\Programs
             try
@@ -441,7 +475,10 @@ namespace CleanC.Core.Services
                     foreach (var d in Directory.GetDirectories(programs)) signatures.Add(Path.GetFileName(d));
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return signatures;
         }
@@ -457,8 +494,113 @@ namespace CleanC.Core.Services
                     size += fi.Length;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return size;
+        }
+
+        // ====================================================================
+        // حذف ایمن (guard در برابر حذف تصادفی مسیرهای حساس)
+        // ====================================================================
+
+        /// <summary>
+        /// ریشه‌های مجازی که اسکنر فقط یک سطح داخل آنها را بررسی می‌کند.
+        /// هر مسیر حذف باید دقیقاً یک سطح زیر یکی از اینها باشد.
+        /// </summary>
+        private static string[] GetAllowedRoots()
+        {
+            string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            var roots = new List<string>
+            {
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                Path.Combine(userProfile, @"AppData\LocalLow"),
+                Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                userProfile,
+                Environment.GetEnvironmentVariable("PUBLIC") ?? @"C:\Users\Public",
+            };
+            return roots.Where(r => !string.IsNullOrWhiteSpace(r)).ToArray();
+        }
+
+        /// <summary>
+        /// بازبینی مجدد یک مسیر پیش از حذف. اسکن و حذف ممکن است با فاصله انجام شوند،
+        /// پس همه شرط‌های ایمنی باید دوباره اعمال شوند.
+        /// </summary>
+        public static bool IsSafeToDelete(string fullPath)
+        {
+            if (string.IsNullOrWhiteSpace(fullPath)) return false;
+
+            try
+            {
+                if (!Path.IsPathRooted(fullPath)) return false;
+                if (!Directory.Exists(fullPath)) return false;
+
+                string full = Path.GetFullPath(fullPath).TrimEnd('\\', '/');
+                string dirName = Path.GetFileName(full);
+
+                if (string.IsNullOrEmpty(dirName)) return false;
+                if (ProtectedNames.Contains(dirName)) return false;
+                if (ProtectedUserProfileFolders.Contains(dirName)) return false;
+                if (ProtectedPublicFolders.Contains(dirName)) return false;
+                if (dirName.StartsWith(".") || dirName.StartsWith("$")) return false;
+
+                // فقط یک سطح زیر ریشه مجاز (دقیقاً همان چیزی که اسکنر دیده)
+                var root = GetAllowedRoots().FirstOrDefault(r =>
+                    full.StartsWith(Path.GetFullPath(r).TrimEnd('\\', '/') + "\\", StringComparison.OrdinalIgnoreCase));
+                if (root == null) return false;
+                string relative = full.Substring(Path.GetFullPath(root).TrimEnd('\\', '/').Length + 1);
+                if (relative.Contains('\\')) return false; // عمق بیش از ۱ سطح → خارج از محدوده اسکن
+
+                // جلوگیری از حذف از طریق junction/symlink
+                var di = new DirectoryInfo(full);
+                if ((di.Attributes & FileAttributes.ReparsePoint) != 0) return false;
+
+                // پوشه شخصی / پروژه گیت هرگز حذف نمی‌شود
+                if (HasPersonalOrProjectFiles(full)) return false;
+
+                // اگر هنوز در Program Files یا LocalAppData\Programs نصب است، باقی می‌ماند
+                if (ExistsInProgramFiles(dirName) || ExistsInLocalAppDataPrograms(dirName)) return false;
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// پوشه‌های رهاشده را حذف می‌کند و «فقط فضایی که واقعاً آزاد شده» را برمی‌گرداند.
+        /// هر مسیر پیش از حذف دوباره بررسی ایمنی می‌شود.
+        /// </summary>
+        public static long DeleteLeftoverFolders(IEnumerable<LeftoverFolderItem> items)
+        {
+            if (items == null) return 0;
+            long freed = 0;
+
+            foreach (var item in items)
+            {
+                if (item == null) continue;
+                try
+                {
+                    if (!IsSafeToDelete(item.FullPath)) continue;
+
+                    // اندازه واقعی را همین الان بگیر، نه مقدار ذخیره‌شده از زمان اسکن
+                    long size = GetDirectorySizeSafe(item.FullPath);
+                    if (size <= 0) continue;
+
+                    Directory.Delete(item.FullPath, true);
+                    if (!Directory.Exists(item.FullPath)) freed += size;
+                }
+                catch
+                {
+                    // پوشه خالی نیست/قفل است → چیزی گزارش نمی‌شود
+                }
+            }
+
+            return freed;
         }
     }
 }

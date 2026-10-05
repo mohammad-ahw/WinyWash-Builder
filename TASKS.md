@@ -1,0 +1,209 @@
+# TASKS — وضعیت پروژه CleanC
+
+> آخرین بروزرسانی: **۲۰۲۶/۱۰/۰۵**
+> وضعیت هر آیتم با بازبینی مستقیم کد مشخص شده (نه حافظه).
+> نشان‌گرها: ✅ انجام شده | ⚠️ ناقص/جزئی | ❌ انجام نشده
+
+---
+
+## خلاصه
+
+| گروه | موضوع | انجام‌شده | ناقص | نشده |
+| :--- | :--- | :--: | :--: | :--: |
+| **A** | باگ‌های P0 | 10/10 | 0 | 0 |
+| **B** | کندی، لگ، ساختار | 9/11 | 2 | 0 |
+| **C** | تکنولوژی | 8/9 | 1 | 0 |
+| **D** | چیزهای جاافتاده | 12/13 | 1 | 0 |
+| **E** | کد مرده | 5/5 | 0 | 0 |
+| **F** | فیچر | 8/8 | 0 | 0 |
+| | **مجموع** | **52/56** | **4** | **0** |
+
+---
+
+## گروه A — باگ‌های بحرانی (P0)
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| A1 لایت مود | ✅ | ۱۹ hex حذف شد؛ `useWhiteText = isDarkTheme` (والپیپر دیگه روی متن اثر ندارد)؛ `catch` حالا `App.LogCrash` می‌زند؛ هیچ `Foreground="#FFFFFF"` در Hero نمانده. `_isWallpaperDark` فقط برای نور Acrylic. |
+| A2 دیتای جعلی | ✅ | سیدها صفر شدند (`_cumulativeFreedBytes=0`، تاریخ `MinValue`)؛ `history` در `clean_stats.json` (۹۰ روز)؛ نمودار ۷ روزه واقعی؛ نوار دیسک واقعی؛ `HeroCleanableText="-"` و با اسکن پس‌زمینه پر می‌شود؛ `freed <= 0` دیگر گزارش نمی‌شود (پیام «قبلاً پاک بود»). |
+| A3 Quick Boost بدون رعایت چک‌باکس | ✅ | `Directory.Delete(...,true)` حذف شده و `DeleteLeftoverFolders` با گارد `IsSafeToDelete` صدا زده می‌شود — و **fallback «اگر هیچی تیک نخورده بود، همه پاک شوند» حذف شد** (اگر هیچ موردی انتخاب نشده باشد، InfoBar هشدار و توقف). دیالوگ تأیید طبق درخواست کاربر حذف شد. |
+| A4 پوشه‌های AppData/ProgramData | ✅ | `GetAllowedRoots()` + `IsSafeToDelete()` (عمق، reparse-point، نام محافظت‌شده، فایل شخصی/پروژه‌ای) + `DeleteLeftoverFolders` فقط در صورت موفقیت گزارش می‌کند. |
+| A5 حذف recursive | ✅ | `sub.Delete(false)` ✅ + `IsProtectedSystemPath` (ریشه درایو، Windows، Program Files، UserProfile، `C:\Users`، پوشه‌های شخصی، AppData roots) ✅ + `IsReparsePoint` ✅. |
+| A6 گارد پکیج‌های ویندوز | ✅ | `PackageSignatureKind.System` + پیشوندها (`Microsoft.Windows.`, DesktopAppInstaller, UI.Xaml, VCLibs). |
+| A7 پاک‌سازی رجیستری | ✅ | `GetUninstallRoots` مشترک بین اسکن/پاک، تأیید حذف واقعی، گارد درایو — و `ExtractExePath` بازنویسی شد: اول بازه‌ی نقل‌قولی وسط رشته (پوشش `cmd /c "..."`)، بعد پیشوند نسبی مثل `MsiExec.exe` با `Path.IsPathRooted` رد می‌شود. |
+| A8 فایل‌های Deep Storage در گیت | ✅ | هر ۶ فایل (`DeepStorageModels.cs`، `DeepStorageCleanService.cs`، `MainWindow.Tools.cs`، `MainWindow.DeepStorage.cs`، `NetworkSpeedService.cs`، `NativeMethods.cs`) در فاز ۱ staged شدند و در کامیت نهایی commit می‌شوند → کلون تمیز build می‌شود. |
+| A9 استارت‌آپ | ✅ | فیلتر `desktop.ini/thumbs.db/...`، `Location=WindowsService`، `ServiceKey`/`OriginalValue`، بازگردانی با startType اولیه — و قالب بکاپ به `v3|Location|ServiceKey|OriginalValue|Command|OriginalKind` ارتقا یافت (خواندن v2 و legacy حفظ شد)؛ بازگردانی حالا `REG_EXPAND_SZ` را برمی‌گرداند. |
+| A10 UWP/StartupTask/RunOnce/Task | ✅ | **سه منبع جدید در `StartupExtraSources.cs`** — (۱) `HKCU/HKLM RunOnce`؛ (۲) **StartupTaskهای MSIX/UWP** از `AppModel\SystemAppData\<PackageFamilyName>\<AppId>` با پارامتر `State`/`UserEnabledStartupOnce`/`LastDisabledTime` (نام نمایشی از شناسه‌ی پکیج پاک می‌شود)؛ (۳) **تسک‌های Task Scheduler** با تریگر `At logon time` / `At system start up` از خروجی CSV `schtasks /query /fo CSV /v` (پارسر CSV با پشتیبانی از `""`، رد کردن ۱۳۵ خط هِدِرِ تکراریِ هر پوشه، حذف تسک‌های `\Microsoft\Windows\`) که در `Task.Run` موازی اجرا می‌شود (حدود ۴ ثانیه). غیرفعال/بازگردانی برای هر سه شاخه پیاده شده (delete value / `schtasks /change /disable|/enable` / مقدار `State=0`) + `ServiceKey` حالا در رکورد بکاپ حفظ می‌شود تا غیرفعال‌سازیِ مجدد هم ممکن باشد. **این سه مورد عمداً وارد Quick Boost خودکار نمی‌شوند.** روی همین سیستم: ۱۷ تسک + ۹ StartupTask. |
+
+---
+
+## گروه B — کندی، لگ و سنگینی (P1)
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| B1 کار سنگین روی UI thread | ✅ | `FlushDns + CleanBackgroundHelpers` و `CleanOrphanedRegistry + Scan/DeleteLeftoverFolders` حالا داخل `await Task.Run(...)` اجرا می‌شوند؛ بقیه‌ی مراقبت‌ها از قبل `Task.Run` داشتند. |
+| B2 تایمرهای 2.5s/1.5s | ✅ | چهار ریشه هزینه بسته شد: (۱) `PowerPlanService.GetActiveScheme` هر ۲٫۵s یک `powercfg.exe` بالا می‌آورد → **کش ۳۰ ثانیه‌ای + باطل‌سازی در `SetActiveScheme`**؛ (۲) `GetActiveNetworkConsumer` با ۱۰ بار `GetProcessesByName` → **یک بار `Process.GetProcesses()` با کش ۲ ثانیه‌ای**؛ (۳) `DriveInfo("C")` هر تیک → **کش ۳ ثانیه‌ای**؛ (۴) **تایمر ۱٫۵ ثانیه‌ای اسپارک‌لاین حذف شد** (کاملاً تکراری با `RefreshSystemStats` بود و هر دو بافرهای نمونه را دو نرخ مختلف push می‌کردند → تاریخچه نمودار خراب می‌شد). |
+| B3 virtualization + icon cache | ⚠️ | **هش کش آیکون اصلاح شد (فاز ۴):** `StableHash32` (FNV-1a قطعی) به‌جای `Math.Abs((exe+appName).GetHashCode())` — هم تصادفِ per-process بودن و هم `OverflowException` روی `int.MinValue` حذف شد + پاک‌سازی یک‌باره فایل‌های قدیمی کش. **virtualization هنوز مانده:** `UninstallerAppsStack`، `DeepStorageItemsStack`، `AdvancedGroupsContainer`، `ReportGroupsContainer` همگی StackPanel هستند؛ فقط `LiveCleanListView` ListView است. |
+| B4 تاریخچه اعلان | ✅ | تاریخچه ایجاد شد ✅ + دکمه پاک کردن ✅ + نماد «خالی» ✅ — و در **فاز ۱۳**: با **سقف ۵۰ مورد** (در ذخیره و نمایش) + **persist در `AppSettings.NotificationHistory`** (با `Normalize`: مرتب‌سازی جدیدترین اول، حذف رکوردهای خالی، کوتاه‌کردن پیام‌ها به ۴۰۰ کاراکتر، نرمال‌سازی Severity) → بعد از ری‌استارت برمی‌گردد؛ «پاک کردن» هم ذخیره‌شده را پاک می‌کند. (`StatusInfoBar` در فاز ۵ از `DashboardView` بیرون آمد و حالا در هر دو تب دیده می‌شود ✅) |
+| B5 پنل‌های eager | ⚠️ | **`x:Load` در این نسخه از WinUI 3 عملاً کار نمی‌کند** (در زمان اجرا بررسی شد): کدِ تولیدیِ `x:Load` برای ساختِ تنبل، `dataRoot.FindName(...)` را صدا می‌زند، ولی `Window` متد `FindName` ندارد → یک shim روی `Content` (ریشه‌ی واقعی درخت) گذاشته شد. با این حال `Content.FindName` برای المان‌های معمولی جواب می‌دهد ولی برای المان‌های `x:Load` حتی بعد از `true` شدنِ binding هم `null` برمی‌گرداند (ورودیِ deferred در name scope ثبت نمی‌شود) و صفِ `UnloadedElementsToUpdate` کدِ تولیدی هرگز پر نمی‌شود. `x:Load` از ۱۰ پنل حذف و همه‌چیز به حالت eager برگردانده شد → رفتار قبلی کامل حفظ شد. **راه‌حل درست: بیرون بردن پنل‌ها به `UserControl`های جدا و ساختِ آن‌ها در `NavigateToToolPage`** — یک refactor مجزا و پرریسک که فعلاً انجام نشده. |
+| B6 توقف تایمرها | ✅ | `Closed += StopBackgroundTimers()` → `_statsTimer`، `_toastDismissTimer` و هر دو debounce توقف پیدا می‌کنند (`_sparklineTimer` در فاز ۳ حذف شد). |
+| B7 فایل debug | ✅ | نویسنده `specs_test_from_ui.txt` حذف شد. |
+| B8 حجم bin | ✅ | در **فاز ۱۵**: خروجی‌های **کهنه‌** پاک شدند — ۴ پوشه‌ی `net8.0-windows10.0.26100.0` باقی‌مانده از قبل از مهاجرت .NET 10 (۵۳۸MB) + یک publish کهنه‌ی self-contained به‌نام `win-x64` که داخل build output جا خوش کرده بود (۱۲۳MB) → **`bin` از ۷۴۱MB به ۷۹MB رسید (۸۹٪ کمتر)** و build بعدی آنها را دوباره نساخت. نکته: پوشه‌ی `runtimes\` (همه‌ی RIDها) عمدیِ رفتارِ build بدون RID است و فقط publish آن را جمع می‌کند (پس `publish.ps1` را دست نزدیم). `bin` در `.gitignore` است و هرگز commit نمی‌شود. |
+| B9 زائد بودن publish | ✅ | RIDهای غیر ویندوز حذف شد (۳۰۷→۲۱۱MB) ✅، فایل‌های debug حذف شدند ✅ + در **فاز ۱۵** `onnxruntime.dll` (20.7MB) و `DirectML.dll` (17.8MB) هم حذف شدند: این دو از پکیجِ transitive `Microsoft.Windows.AI.MachineLearning` می‌آمدند → رفرنسِ مستقیم با `ExcludeAssets="native"` در `CleanC.UI.csproj` (نسخه در `Directory.Packages.props`) → **publish از ۲۱۱MB به ۱۷۳MB رسید (۲۵۴ فایل)**. خودِ publish (`publish\`) هم اجرا شد و سالم بالا آمد تا مطمئن شویم چیزی از AI/ML در startup لود نمی‌شود. |
+| B10 فایل‌های اضافه root | ✅ | `inspect_preview.py` و `preview_*.txt` حذف شدند و پوشه `CleanC_UI_For_Claude` هم از ایندکس git حذف شده (`D` staged). |
+| B11 آیکون‌های تکراری | ✅ | `Icon.ico` و `Logo.png` حذف شدند (~657KB)؛ `MainWindow.xaml` حالا `Assets/app-icon.png` را نشان می‌دهد. فایل‌های مرجع باقی‌مانده: `app.ico` و `app-icon.png`. |
+
+---
+
+## گروه C — تکنولوژی (P1)
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| C1 .NET 10 | ✅ | SDK 10.0.401 نصب شد؛ TFM → `net10.0-windows10.0.26100.0` / `net10.0`. |
+| C2 LangVersion + ImplicitUsings | ✅ | `LangVersion=latest` (C# 14) و `ImplicitUsings=enable` در هر دو پروژه. |
+| C3 حذف وابستگی بلااستفاده | ✅ | **`Microsoft.Data.Sqlite` بلااستفاده نیست** و باید بماند — در `WindowsUpdateService.cs:8,233` برای خواندن USO `store.db` استفاده می‌شود (حذفش خطا می‌دهد). **`onnxruntime`/`DirectML`/`Microsoft.Windows.AI.*` در فاز ۱۵ از خروجی حذف شدند** (native آنها با `ExcludeAssets="native"`؛ اینها رفرنسِ مستقیم نبودند و فقط از WindowsAppSDK می‌آمدند) و `System.Numerics.Tensors` (0.4MB) که وابسته‌ی همان است باقی ماند چون managed و بی‌خطر است. |
+| C4 publish درست | ✅ | `publish.ps1` با `-r win-x64 --self-contained` → **۲۱۱MB / ۲۵۴ فایل** (هدف ۱۱۰-۱۳۰MB بود؛ فاصله عمدتاً WinAppSDK AI + WinUI.dll). |
+| C5 WindowsAppSDK | ✅ | 2.5.1 = آخرین stable (بررسی شد). BuildTools هم latest. |
+| C6 MVVM + DI | ⚠️ | **زیرساخت در فاز ۱۴ کامل شد:** `Microsoft.Extensions.DependencyInjection` (10.0.12) + `CommunityToolkit.Mvvm` (8.4.2) اضافه شد (هر دو در `Directory.Packages.props`)، **ریشه‌ی ترکیب `AppServices.AddCleanCServices()`** در `AppServices.cs` + `AppServices.EnsureBuilt()` در سازنده‌ی `App` (خطای ثبت همان ابتدا دیده می‌شود)، **سرویس instance برای تنظیمات** (`ISettingsStore`/`SettingsStore` با debounce ذخیره درون خودش + هوک `OnSaveRequested` برای ثبت موقعیت پنجره) و **`SettingsViewModel`** با `[ObservableProperty]` (syntax partial-property برای سازگاری AOT/WinRT و بدون هشدار MVVMTK0045) + `Hydrate()` با گاردِ سکوتِ رویداد. صفحه‌ی تنظیمات با **`x:Bind`** (سوییچ‌ها TwoWay، رادیوها OneWay روی حالت‌های محاسبه‌شده) به VM وصل شد و handlerهای جایگزین (`TraySetting_Toggled`، `PersistenceSetting_Toggled`، `ApplyDeleteModeToUi`، `SyncThemeRadios`) حذف شدند؛ `AutoStartToggle` (F1، رجیستری) عمداً در code-behind ماند. **باقی‌مانده:** بقیه‌ی صفحات (داشبورد/ابزارها) هنوز code-behind هستند — مهاجرت کاملِ MVVM یک refactor بزرگِ جداگانه است؛ سرویس‌های `CleanC.Core` همچنان static هستند و فقط از مسیر `ISettingsStore` instance شدند. |
+| C7 زیرساخت | ✅ | `.editorconfig` ✅، `Directory.Build.props` ✅، `AnalysisLevel=latest` ✅ + **`Directory.Packages.props` ✅** (Central Package Management، هیچ csproj-ای Version= ندارد) + **پروژه‌ی تست `tests\CleanC.Core.Tests` ✅ (۷۷ تست xUnit)** + **CI در `.github/workflows/ci.yml` ✅** (restore → build → test روی windows-latest). |
+| C8 catch خالی / async void | ✅ | **۲۱۶ `catch {}` خالی** از طریق `CleanC.Core.Diagnostics.CcLog` ثبت می‌شوند (حلقه‌ی ۲۵۶تایی حافظه + حداکثر ۲ خط در ثانیه در `%LOCALAPPDATA%\CleanC\logs\ignored.log`)؛ **همه‌ی هندلرهای `async void` از `SafeInvoker.Run` رد می‌شوند** — در **بازبینی نهایی (فاز ۱۶)** ۴ هندلرِ سطل بازیافت که در فاز ۱۱ بدون پوشش مانده بودند هم به الگوی `Task + SafeInvoker` برگردانده شدند (۲ هندلرِ تکی هم try/catch داخلی داشتند و همگی یکدست شدند) → **تعداد `private async void` در کل `CleanC.UI` الان صفر است** (۳۳ فراخوانی `SafeInvoker.Run`). |
+| C9 UnhandledException | ✅ | `LogCrash` می‌زند ✅ + در **فاز ۱۳** `e.Handled = true` حذف شد → خطا دفن نمی‌شود و برنامه با state ناسازگار ادامه نمی‌دهد (fail-fast؛ چون `catch`های خالی از فاز ۶ از طریق `CcLog` و هندلرهای `async void` از `SafeInvoker` پوشش داده شده‌اند). |
+
+---
+
+## گروه D — چیزهای جاافتاده (فنی و UX)
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| D1 اعلان‌ها | ✅ | `FloatingToastCard` حالا **سطحی** است و روی هر تب دیده می‌شود ✅ + تاریخچه اعلان ✅ + **`StatusInfoBar` از داخل `DashboardView` بیرون آمد و به سطح `Grid` والد رفت (فاز ۵) → در هر دو تب دیده می‌شود ✅** + **نوتیفیکیشن ویندوزی واقعی در فاز ۱۲ (F5)**: toast وقتی پنجره فوکوس ندارد، balloon با شدت واقعی، صفِ toastها و badge/tooltip عدد سلامت ✅ — **بدون شمارنده/دسته‌بندیِ تاریخچه (بدون سقف و بدون persist).** |
+| D2 ذخیره تنظیمات / صفحه Settings | ✅ | `AppSettings` + `SettingsService` (`%LOCALAPPDATA%\CleanC\settings.json`، نوشتن اتمیک با فایل موقت) ✅ + **صفحه سومِ نوار ناوبری: «تنظیمات برنامه»** ✅. ذخیره می‌شود: تم (System/Light/Dark)، اندازه/موقعیت پنجره (با اعتبارسنجی روی نمایشگرهای فعلی)، نمای آخر (داشبورد/ابزارها/تنظیمات)، انتخاب‌های اسکن (`JunkSelections`) + ۳ کلید جداگانه برای خاموش کردن هرکدام + دکمه‌های بازنشانی و مسیرهای دیتا/لاگ. ذخیره‌ی debounce‌شده (۶۰۰ms) + ذخیره‌ی نهایی هنگام `Closed`. |
+| D3 minimize/close to tray | ✅ | **بستن پنجره** → `AppWindow.Closing` لغو می‌شود و پنجره در تری می‌ماند (هشدار اول فقط یک‌بار در اجرا) ✅. **کوچک‌نمایی** → در `Window.Activated` با `NativeMethods.IsWindowMinimized` چک می‌شود (نه `Alt+Tab`) و مخفی می‌شود ✅. **خروج واقعی** از مسیر `ExitApplication` می‌گذرد (ذخیره‌ی تنظیمات + `Dispose` تری) ✅. |
+| D4 Fast Startup در Quick Boost | ✅ | در **فاز ۱۱ (F2)** به‌عنوان مرحله‌ی ۷.۵ به Quick Boost اضافه شد: سه حالتِ صریح (از قبل فعال / هایبرنیشن خاموش → «انجام نشد» بدون دست زدن به `hiberfil.sys` / `SetFastStartup(true)` با گزارش موفق-ناموفق). `HiberbootEnabled` هم خوانده می‌شود. |
+| D5 تأیید حذف | ⚠️ | confirm برای: حذف دسته‌ای Uninstall ✅، درایور/دسته درایور ✅، فرمت درایو ✅، پاک‌سازی عمیق سیستم ✅ + **هر ۴ حذف Deep Storage** (دیالوگ با شمارش و حجم) ✅ + **حذف تکی فایل حجیم** (تأیید دومرحله روی دکمه، چون دیالوگ دوم باز است) ✅ + **خالی کردن Recycle Bin** (حذف `SHERB_NOCONFIRMATION` → تأیید خودِ ویندوز) ✅ + فایل حجیم حالا به سطل بازیافت می‌رود نه حذف دائمی ✅. **بدون confirm فقط «حذف تکی اپ» باقی مانده.** |
+| D6 کیبورد/دسترس‌پذیری | ✅ | **میان‌برها:** `Ctrl+1/2/3` روی نوار ناوبری (داشبورد/ابزارها/تنظیمات) + `F5` روی بروزرسانی وضعیت. **نام‌های دسترسی:** `AutomationProperties.Name` روی هر دکمه‌ی فقط-آیکون (۴ دکمه‌ی هدر، دکمه‌ی بستنِ toast، ۱۰ دکمه‌ی بازگشت به فهرست ابزارها، بروزرسانی درایورها) + tooltip هم‌ارز. **High Contrast:** `IsHighContrastEnabled()` خوانده می‌شود و در `ApplyTheme` بازنویسی brushها/رنگ‌های متن، در `ConfigureSystemBackdrop` Acrylic خاموش می‌شود (شفافیت در HC ممنوع) + با `UISettings.ColorValuesChanged` دوباره ارزیابی می‌شود. **LiveRegion:** `AutomationProperties.LiveSetting="Polite"` روی `ToastMessageText` و `StatusInfoBar` + اعلامِ زنده در `ShowInfoBar`/`ShowFloatingToast` از مسیر `OnCreateAutomationPeer` (کارخانه‌ی `AutomationPeer.CreatePeerForElement` در WinUI 3 وجود ندارد؛ با reflection گرفته می‌شود). **`TabIndex` عمداً تنظیم نشد:** ترتیبِ فوکوسِ پیش‌فرض از ترتیبِ درخت (و جهتِ RTL) پیروی می‌کند و درست است؛ دادنِ عددِ صریحِ مثبت، فوکوسِ هدر/ناوبری را به **آخر** می‌برد. (`Ctrl+,` برای تنظیمات امکان‌پذیر نبود: `VirtualKey.OemComma` در WinUI 3 وجود ندارد.) |
+| D7 single instance | ✅ | `Mutex("Local\\CleanC.SingleInstance")` + `NativeMethods.ActivateExistingInstance()`. |
+| D8 About / آپدیت / خروجی گزارش | ✅ | بخش «درباره CleanC» در صفحه‌ی تنظیمات: نسخه‌ی برنامه (بدون هشِ build)، نسخه‌ی .NET و توضیح سیستم‌عامل. **«بررسی به‌روزرسانی»** releases API گیت‌هاب را می‌خواند و سه حالت را صریح گزارش می‌کند: نسخه‌ی جدیدتر هست / به‌روز هستی / منبع در دسترس نیست (۴۰۴ یا خطای شبکه) — چون مخزن خصوصی است، حالت سوم دیده می‌شود. **«صفحه‌ی پروژه»** از remote واقعی git باز می‌شود. **«کپی اطلاعات عیب‌یابی»** گزارش متنی (نسخه، زمان بیلد، رانتایم، OS، مسیرها) تولید می‌کند. |
+| D9 ادعاهای README | ✅ | README بازنویسی شد: .NET 8→10، حذف بخش CLI، اضافه شدن بخش Build ✅ + در **فاز ۱۳** ادعاهای غیرقابل‌اثبات حذف شدند: **«under 500 milliseconds»** → «گزارش شفاف از نتیجه‌ی هر مرحله» (EN) و «در پس‌زمینه… مقدار واقعی فضای آزادشده» (FA)؛ **«zero footprint in registry»** → «فقط وقتی توئیک یا «شروع با ویندوز» را فعال کنید» (EN و FA). |
+| D10 مسیر بکاپ رجیستری | ✅ | `PreferredBackupDir = %ProgramData%\CleanC\Backups` با مهاجرت یک‌باره از `%LOCALAPPDATA%` (منبع حذف نمی‌شود)؛ rollback هر دو مسیر را پاک می‌کند. (متد بلااستفاده‌ی `HasAppliedTweaks` در فاز E4 حذف شد.) |
+| D11 AllowTelemetry | ✅ | `SetDiagTrackDisabled(false)` حالا `DeleteValue("AllowTelemetry")` می‌کند تا پیش‌فرض edition (Home/Pro=1، Enterprise=0) برگردد؛ با `RollbackAllTweaksAsync` هم هماهنگ است. |
+| D12 پیام «بهینه‌سازی انجام شد» | ✅ | `HeroHealthTitle` (XAML:200) و `HeroHealthSubtitle` (XAML:207) حالا `x:Name` دارند و مرئی‌اند. |
+| D13 Tray | ✅ | هر سه مورد در **فاز ۱۳**: `DestroyIcon(_hIcon)` در `Dispose` (نشت handle آیکونِ بارگذاری‌شده با `LR_LOADFROMFILE`) ✅ + `NIN_SELECT`/`NIN_KEYSELECT` در window-proc → انتخاب آیکون با کیبورد پنجره را فعال می‌کند ✅ + `GetCurrentStats()` حالا پشت **کشِ ۱ ثانیه‌ای** در `ShowTrayMenu` است تا داخل window-proc اجرا نشود. |
+
+---
+
+## گروه E — کد مرده و بهم‌ریختگی
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| E1 هندلرهای بدون binding | ✅ | ۱۰ هندلر حذف شد (`LaunchTool_Click`، `CardFlushDnsBtn_Click`، `CardToggleCustomCleanBtn_Click`، `CardLargeFilesBtn_Click` و ۶ هندلر داشبورد). |
+| E2 سرویس‌های بلااستفاده | ✅ | `SmartCleanOrchestrator.cs` و `ContextMenuManagerService.cs` حذف شدند. |
+| E3 کنترل‌های collapsed / XAML بلااستفاده | ✅ | ۳ `Border` کاملاً خالی حذف شد (`CardRamStatusBadge`، `CardPowerBadge`، `CardDiskHealthBadge` — هر سه داخل بلوک‌های `<!-- Collapsed legacy elements -->`) + ۲۸ `x:Name` بلااستفاده روی المان‌های نمودار تاریخچه پاک‌سازی حذف شد (المان‌ها سر جایشان ماندند، فقط فیلد تولیدی کم شد). هیچ المان `Collapsed` بدون مرجع کد پیدا نشد. |
+| E4 `HasAppliedTweaks` / `NonEssentialSignatures` | ✅ | هر دو واقعاً مرده بودند: `HasAppliedTweaks` هیچ فراخواننده‌ای نداشت؛ `NonEssentialSignatures` فقط از طریق `IsNonEssentialApp` خوانده می‌شد که خودش فراخواننده نداشت → هر سه حذف شدند. `SafeAutoDisableSignatures`، `WhitelistSignatures` و `VpnSignatures` استفاده می‌شوند و ماندند. |
+| E5 فایل‌های اضافه | ✅ | `preview_*.txt` و `inspect_preview.py` حذف شدند ✅ + پوشه‌ی `CleanC_UI_For_Claude` دیگر هیچ فایلِ tracked ندارد (حذف در ایندکس staged است) ✅. |
+
+---
+
+## گروه F — فیچر مکمل
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| F1 صفحه Settings (تم ۳حالته + ذخیره پنجره + close-to-tray + startup) | ✅ | صفحه + تم ۳حالته + ذخیره‌ی پنجره + close-to-tray در **فاز ۷ (D2/D3)** انجام شد ✅ + «شروع همراه با ویندوز» در **فاز ۱۱** اضافه شد: کارت toggle در تنظیمات + ثبت/حذف مقدار `CleanC` در `HKCU\Software\Microsoft\Windows\CurrentVersion\Run` از `StartupOptimizerService`. منبع حقیقت **رجیستری** است نه `AppSettings` (کاربر می‌تواند همان آیتم را از Task Manager هم خاموش کند)، مسیرِ ناموجود ثبت نمی‌شود، و اگر نوشتن شکست بخورد کلید برمی‌گردد + `ShowInfoBar` خطا. ۴ تست `StartupRegistrationTests` (کلید رجیستری در تست‌ها به مسیر موقت منتقل می‌شود؛ `InternalsVisibleTo` به `CleanC.Core.csproj` اضافه شد). |
+| F2 Quick Boost حرفه‌ای‌تر | ✅ | خلاصه‌ی گزارش هر مرحله با `StatusSummary` و `WasEmpty` ✅ + در **فاز ۱۱**: گام‌های ۴ تا ۹ هرکدام داخل `try/catch` جدا افتادند تا شکستِ یکی کلِ بهینه‌سازی را قطع نکند؛ شکست هر گام به‌صورت ردیفِ `IsFailed=true` در گزارش (glyph ✕ قرمز + badge قرمز) نمایش داده می‌شود و ردیف موفقِ همان گام حذف می‌شود (`HasFailure`). گام جدید **Fast Startup** (مرحله‌ی ۷.۵) اضافه شد: اگر از قبل فعال → «از قبل فعال بود»، اگر هایبرنیشن خاموش → **بدون دست زدن به `hiberfil.sys`** «انجام نشد» گزارش می‌شود، وگرنه `SetFastStartup(true)` با گزارش موفق/ناموفق (دسترسی Administrator). `CleanupReportItem.IsFailed` به مدل اضافه شد. |
+| F3 Undo واقعی حذف فایل (Recycle Bin / quarantine) | ✅ | سرویس جدید **`SafeDeleteService`** با سه حالت `SafeDeleteMode`: **RecycleBin (پیش‌فرض)** / **Quarantine** / **Permanent** — `DefaultMode` از تنظیمات (`AppSettings.DeleteMode` با `Normalize` سه‌حالته) خوانده می‌شود. فقط فایل‌های شخصی (چهار حذف Deep Storage) از حالت پیروی می‌کنند؛ **زباله/کش با `DeleteJunk*` همیشه قطعی حذف می‌شوند** تا وعده‌ی «X فضا آزاد شد» دروغ نباشد. `DeleteFiles/DeleteDirectories` یک `SafeDeleteBatchResult` برمی‌گرداند که `FreedBytes` (فقط قطعی) و `MovedBytes` (سطل/قرنطینه) را جدا نگه می‌دارد؛ اگر نه سطل کار کرد نه قرنطینه، فایل حذف **نمی‌شود** و `Failed` گزارش می‌شود (داده نابود نمی‌شود). **متن دروغین «به سطل بازیافت منتقل خواهد شد» در `ConfirmDeepStorageBatchDeleteAsync` حالا از `DescribeMode` می‌آید و متن نتیجه از `DescribeBatch`** (صادق: «جابه‌جا شد (تا خالی کردن سطل آزاد نمی‌شود)» به‌جای «آزاد گردید»). سه رادیوی «رفتار حذف» در تنظیمات + کارت **«فایل‌های قرنطینه‌شده» در مرکز بازیابی** (فهرست نشست‌ها، بازگردانی، حذف قطعیِ دومرحله‌ای) + پاک‌سازی خودکار نشست‌های قدیمی‌تر از ۳۰ روز در هر اجرا. ۲۷ تست `SafeDeleteServiceTests` + ۸ تست `DeleteMode` در `SettingsServiceTests`. |
+| F4 تاریخچه پاکسازی + نمودار واقعی ۷ روزه | ✅ | `history` در `clean_stats.json` + `RenderCleanupHistory`. |
+| F5 AppNotification ویندوز + badge واقعی | ✅ | سرویس جدید **`WindowsNotificationService`**: ثبت **AUMID** در `HKCU\Software\Classes\AppUserModelId\CleanC.App` + `AppNotificationManager.Register()` + نمایش با `AppNotificationBuilder` — همه با فلگ «در دسترس بودن» و try/catch. **سیاست نمایش:** نوتیفیکیشن ویندوزی فقط وقتی پنجره‌ی CleanC فوکوس ندارد (`NativeMethods.IsWindowFocused`)، وگرنه همان InfoBar/toast داخلی کافی است؛ اول toast و اگر ثبت نشده باشد **balloon تری‌آیکون با `dwInfoFlags` واقعی** (`NIIF_WARNING=2` / `NIIF_ERROR=3`) از `ShowBalloonNotification(title, message, severity)`. **صف floating toast** (سقف ۸ مورد) تا پیام‌های پشت‌سرهم روی هم نیفتند. **badge عدد سلامت** با `BadgeUpdateManager` — چون اپ unpackaged است و میانبرِ Start Menu با AUMID ما ندارد، روی این سیستم COMException می‌دهد؛ در آن صورت فقط یک‌بار ثبت می‌شود و برای همیشه غیرفعال می‌گردد و عدد سلامت روی **tooltip تری‌آیکون** نمایش داده می‌شود (بدون سیلِ استثنا در لاگ). |
+| F6 Startup planner (UWP/StartupTask/Task + Impact Score) | ✅ | **`BootImpactService.cs`** از رویداد **`EventID=101`** کانال `Microsoft-Windows-Diagnostics-Performance/Operational` تأخیر واقعیِ هر برنامه در بالا آمدن ویندوز را می‌خواند (`File Name` / `Total Time` / `Degradation Time`، کش ۱۵ دقیقه‌ای، حداکثر ۱۵۰۰ رویداد، با `System.Diagnostics.EventLog` پکیج شد). مقیاس مشترکِ «تأخیر/۱۰۰»: ۱–۳۴ کم، ۳۵–۶۴ متوسط، ۶۵–۱۰۰ زیاد — هم برای داده‌ی اندازه‌گیری‌شده و هم برای تخمینِ دسته‌بندی (تا badge هیچ‌وقت بی‌معنا نشود). نتیجه در badge کارتِ استارت‌آپ + خط «تأخیر اندازه‌گیری‌شده: X میلی‌ثانیه» نمایش داده می‌شود و شکستِ غیرفعال‌سازی حالا کلید را به حالت قبل برمی‌گرداند. ۱۰ تست واحد `BootImpactServiceTests` اضافه شد. |
+| F7 Export گزارش TXT/CSV | ✅ | بخش «خروجی گزارش» در تنظیمات با سه خروجی: **مشخصات سیستم (TXT)**، **فهرست استارت‌آپ (CSV)** و **تاریخچه‌ی پاکسازی (CSV)** — هر سه از دیالوگ `FileSavePicker` (با `InitializeWithWindow`) و ذخیره‌ی **اتمیک با UTF-8 + BOM** از مسیر `ReportExportService.WriteUtf8Bom`. CSV با escape طبق RFC 4180 ساخته می‌شود تا نام‌ها/مسیرهای دارای کاما و نقل‌قول خراب نشوند؛ اسکن استارت‌آپ داخل `Task.Run` انجام می‌شود. ۱۰ تست واحد `ReportExportServiceTests` اضافه شد. |
+| F8 Recycle Bin manager + Diagnostic quick-launcher | ✅ | Quick-launcher واقعاً وجود دارد ✅ + در **فاز ۱۱**: سرویس جدید `RecycleBinService` (پارس فایل‌های `$I` نسخه‌ی ۱/۲ **بدون COM و بدون دیالوگ سیستم**، محاسبه‌ی حجم پوشه‌ها با سقف ۵۰هزار ورودی، `Restore` با جایگزینی نام تکراریِ ` (restored N)` و fallback کپی برای پوشه‌ها، `Delete`، `EmptyAll`) + ابزار جدید **«سطل بازیافت»** در Tools با **پیش‌نمایش آیتم‌به‌آیتم** (مسیر اصلی LTR، نوع، زمان حذف، حجم)، انتخاب گروهی، و بازگردانی/حذف قطعیِ تکی و گروهی با `ContentDialog` تأیید. ۱۵ تست `RecycleBinServiceTests`. |
+
+---
+
+## اولویت پیشنهادی برای ادامه
+
+**بلوکر + خطرناک (دیتای کاربر) — همه انجام شد:**
+1. ✅ **A8** — `git add` کردن فایل‌های Deep Storage/NetworkSpeed/NativeMethods (فاز ۱، staged)
+2. ✅ **A7** — باگ پارسر `cmd /c "..."` (فاز ۲)
+3. ✅ **A9** — تنزل `REG_EXPAND_SZ` (فاز ۲)
+4. ✅ **D10** — بکاپ در پوشه‌ای که پاک‌کننده‌ها پاک می‌کنند (فاز ۲)
+5. ✅ **D11** — `AllowTelemetry=3` (فاز ۲)
+
+**کندی + رفتار خطرناک Quick Boost — همه انجام شد:**
+6. ✅ **B1** — `Task.Run` برای کارهای سنگین Quick Boost (فاز ۳)
+7. ✅ **B2** — تایمرها: `powercfg` هر ۲٫۵s، `GetProcessesByName` ×10، `DriveInfo`، تایمر ۱٫۵s تکراری (فاز ۳)
+8. ✅ **B6** — `_statsTimer.Stop()` موقع بستن (فاز ۳)
+9. ✅ **A3** — رعایت چک‌باکس‌ها (دیالوگ تأیید طبق درخواست کاربر حذف شد) (فاز ۳)
+10. ✅ **B3** — ایمن‌سازی `Math.Abs(GetHashCode())` (فاز ۴)
+
+**بقیه‌ی فاز ۴ و ۵ — همه انجام شد (build پاک: ۰ هشدار / ۰ خطا):**
+11. ✅ **B11** — حذف `Icon.ico` و `Logo.png` (~657KB) (فاز ۴)
+12. ✅ **E3** — ۳ `Border` خالی + ۲۸ `x:Name` بلااستفاده (فاز ۴)
+13. ✅ **E4** — `HasAppliedTweaks` / `NonEssentialSignatures` / `IsNonEssentialApp` (فاز ۴)
+14. ✅ **D5** — تأیید حذف Deep Storage + فایل حجیم + Recycle Bin (فاز ۵)
+15. ✅ **D1** — `StatusInfoBar` به سطح Grid والد منتقل شد (فاز ۵)
+
+**فاز ۶ — همه انجام شد (build پاک + ۳۷ تست سبز):**
+16. ✅ **C8** — ۲۱۶ `catch {}` خالی → `CcLog`؛ ۲۰ `async void` → `SafeInvoker` / `async Task`
+17. ✅ **C7** — `Directory.Packages.props` + پروژه‌ی تست xUnit + CI workflow
+
+**فاز ۷ — همه انجام شد (build پاک ۰/۰ + ۵۷ تست سبز):**
+18. ✅ **D2** — `SettingsService`/`AppSettings` + صفحه «تنظیمات برنامه» + ذخیره‌ی تم/پنجره/نمای آخر/انتخاب‌های اسکن
+19. ✅ **D3** — close-to-tray، minimize-to-tray (با `IsIconic`، نه Alt+Tab) و خروج ایمن از مسیر تری
+20. ✅ تایم‌استمپ `CcLog` به میلادی ثابت تبدیل شد (روی `fa-IR` داشت ۱۴۰۵ می‌نوشت) + تست‌ها دیگر روی لاگ واقعی کاربر نمی‌نویسند
+
+**فاز ۸ — انجام شد (build پاک ۰/۰ + ۵۷ تست سبز + اجرای واقعی بدون کرش):**
+21. ⚠️ **B5** — ساخت تنبلِ پنل‌های ابزار: `x:Load` در WinUI 3 روی ریشه‌ی `Window` عملاً کار نمی‌کند (بررسی زمان اجرا)؛ کد به حالت eager برگردانده شد و راه‌حل واقعی (بیرون بردن پنل‌ها به `UserControl`) به‌عنوان کار مجزا یادداشت شد.
+22. ✅ **D6** — میان‌برهای `Ctrl+1/2/3` و `F5` + `AutomationProperties.Name` روی دکمه‌های فقط-آیکون + پشتیبانی High Contrast (خاموش کردن بازنویسی رنگ و Acrylic) + `LiveSetting` و اعلامِ زنده برای toast و نوار وضعیت.
+
+**فاز ۹ — انجام شد (build پاک ۰/۰ + ۶۷ تست سبز + اجرای واقعی بدون کرش):**
+23. ✅ **A10** — سه منبع جدید استارت‌آپ (`RunOnce`، StartupTaskهای MSIX/UWP، تسک‌های Logon/Boot) + غیرفعال/بازگردانیِ آنها + حفظ `ServiceKey` در بکاپ.
+24. ✅ **F6** — Impact Score از رویداد واقعی `EventID=101` (لاگ بوت ویندوز) + مقیاس یکسان برای داده‌ی اندازه‌گیری‌شده و تخمینِ دسته‌بندی + نمایش در UI و مدیریت خطای toggle.
+
+**فاز ۱۰ — انجام شد (build پاک ۰/۰ + ۷۷ تست سبز + اجرای واقعی بدون کرش):**
+25. ✅ **D8** — بخش «درباره CleanC» (نسخه/‌.NET/OS) + «بررسی به‌روزرسانی» با سه حالت مشخص + «صفحه‌ی پروژه» + «کپی اطلاعات عیب‌یابی».
+26. ✅ **F7** — خروجی گزارش TXT/CSV از صفحه‌ی تنظیمات با `FileSavePicker`، ذخیره‌ی اتمیک UTF-8+BOM و escape طبق RFC 4180.
+
+**فاز ۱۱ — انجام شد (build پاک ۰/۰ + ۹۶ تست سبز + اجرای واقعی بدون کرش):**
+27. ✅ **F1** — «شروع همراه با ویندوز»: کارت toggle در تنظیمات + ثبت/حذف `HKCU\...\Run\CleanC` از `StartupOptimizerService` (منبع حقیقت = رجیستری، برگرداندن کلید در صورت شکست) + ۴ تست.
+28. ✅ **F2** — گام‌های Quick Boost جداگانه محافظت شدند و شکست هر گام با `IsFailed` در گزارش دیده می‌شود + افزودن گام **Fast Startup** با سه حالت صریح.
+29. ✅ **F8** — سرویس `RecycleBinService` (پارس `$I` + بازگردانی/حذف/خالی‌سازی) + ابزار «سطل بازیافت» با پیش‌نمایش آیتم‌به‌آیتم + ۱۵ تست.
+
+**فاز ۱۲ — انجام شد (build پاک ۰/۰ + ۱۳۱ تست سبز + اجرای واقعی بدون کرش):**
+30. ✅ **F3** — حذف امن: `SafeDeleteService` با سه حالت (سطل/قرنطینه/قطعی) + تفکیک `FreedBytes` از `MovedBytes` + اصلاح پیام دروغین Deep Storage + کارت قرنطینه در مرکز بازیابی + تنظیمات «رفتار حذف» + ۲۷ تست.
+31. ✅ **F5** — نوتیفیکیشن ویندوزی: `WindowsNotificationService` (AUMID + toast) + balloon با شدت واقعی + صفِ toastها + badge/tooltip عدد سلامت؛ فقط وقتی پنجره فوکوس ندارد.
+
+**فاز ۱۳ — انجام شد (build پاک ۰/۰ + ۱۳۳ تست سبز + اجرای واقعی بدون کرش و بدون crash.log):**
+32. ✅ **C9** — `e.Handled = true` حذف شد (لاگ crash می‌ماند، اجرای بعدی متوقف می‌شود).
+33. ✅ **D13** — `DestroyIcon` + `NIN_SELECT`/`NIN_KEYSELECT` + کشِ ۱ ثانیه‌ای `GetCurrentStats` در menu-tray.
+34. ✅ **B4** — سقف ۵۰تایی + persist تاریخچه‌ی اعلان‌ها در `settings.json` (۲ تست).
+35. ✅ **D9** — ادعاهای «زیر ۵۰۰ms» و «صفر footprint در رجیستری» از README (EN/FA) حذف شدند.
+36. ✅ **D4** — تأیید شد که در فاز ۱۱ (گام ۷.۵ Quick Boost) انجام شده بود.
+
+**فاز ۱۴ — انجام شد (build پاک ۰/۰ + ۱۳۳ تست سبز + اجرای واقعی بدون کرش و بدون crash.log):**
+37. ⚠️ **C6** — زیرساخت MVVM/DI ساخته شد: `Directory.Packages.props` ← DI 10.0.12 + CommunityToolkit.Mvvm 8.4.2، `AppServices.cs` (composition root)، `ISettingsStore`/`SettingsStore` (ذخیره‌ی debounce‌شده به‌جای مستقیم‌های استاتیک)، `SettingsViewModel` (partial-property) و `x:Bind` در XAML؛ handlerهای جایگزین حذف شدند. **جزئی ماند:** فقط صفحه‌ی تنظیمات به VM رفت (بقیه‌ی صفحات code-behind‌اند).
+
+**فاز ۱۵ — انجام شد (build پاک ۰/۰ + ۱۳۳ تست سبز + اجرای build و publish هر دو بدون کرش):**
+38. ✅ **B8** — خروجی‌های کهنه‌ی `bin` پاک شد (۴ پوشه‌ی net8.0 + یک publish کهنه‌ی `win-x64`) → **۷۴۱MB → ۷۹MB**.
+39. ✅ **B9** — `onnxruntime.dll` + `DirectML.dll` با `ExcludeAssets="native"` از خروجی حذف شدند → **publish ۲۱۱MB → ۱۷۳MB** (اجرای publish هم سالم بود).
+40. ✅ **C3** — وابستگی‌های بلااستفاده‌ی AI/ML بسته شد؛ `Microsoft.Data.Sqlite` عمداً ماند (USO `store.db`).
+
+**فاز ۱۶ — بازبینی نهایی (build پاک ۰/۰ + ۱۳۳ تست سبز):**
+41. ✅ هر ۶۱ handler در XAML کدِ پشتیبان دارد و هیچ handlerِ تعریف‌شده‌ای (به‌جز ۲ موردِ `Click` که در کد `+=` می‌شوند) بدون مصرف نبود.
+42. ✅ `catch {}` خالی = صفر · `e.Handled = true` فقط در هندلر کیبوردِ Escape ( legitimately) · `TODO/FIXME` = صفر · کلید/توکن/پسورد در کد = صفر.
+43. ✅ **رفع باگ:** ۴ هندلرِ `async void` سطل بازیافت (بازگردانی/حذف گروهی/خالی‌سازی/بروزرسانی) که در فاز ۱۱ بدون `SafeInvoker` مانده بودند → به الگوی `Task + SafeInvoker.Run` برگردانده شدند؛ حالا `private async void` در کل UI صفر است (با fail-fast فاز ۱۳ اینها می‌توانستند کل برنامه را بکشند).
+
+**پیشرفت فاز‌ها:** ۱ ✅ | ۲ ✅ | ۳ ✅ | ۴ ✅ | ۵ ✅ | ۶ ✅ | ۷ ✅ | ۸ ✅ | ۹ ✅ | ۱۰ ✅ | ۱۱ ✅ | ۱۲ ✅ | ۱۳ ✅ | ۱۴ ✅ | ۱۵ ✅ | ۱۶ ✅ — **همه‌ی فاز‌ها تمام شد**
+
+**بقیه:** ✅ **همه‌چیز تمام شد** — کامیت نهایی `dcf9b62` (۹۹ فایل، working tree تمیز) + بیلد نهایی Release **۰ هشدار / ۰ خطا** + ۱۳۳ تست سبز + اجرای نهایی ۱۸ ثانیه‌ای بدون کرش (crash.log خالی؛ تنها لاگِ شناخته‌شده همان `TrySetBadge: COMException` یک‌بار در هر اجراست).
+
+---
+
+## دستورهای مهم
+
+```powershell
+dotnet build CleanC.sln -c Release     # صفر خطا / صفر هشدار
+dotnet test    CleanC.sln -c Release --no-build   # تست‌ها (۱۳۳ عدد)
+.\publish.ps1                          # خروجی توزیع
+dotnet list CleanC.sln package --vulnerable --include-transitive
+```
+
+> `dotnet build` را با `-p:Platform` اجرا نکنید؛ پیکربندی solution فقط `Any CPU` است.

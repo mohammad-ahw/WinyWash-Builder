@@ -1,0 +1,22 @@
+<Project>
+  <!--
+    تنظیمات مشترک همه‌ی پروژه‌های CleanC.
+    هر پروژه می‌تواند Property خودش را override کند.
+  -->
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <AnalysisLevel>latest</AnalysisLevel>
+    <EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <!-- خطاهای متداول C#/WinUI که عمداً در این کدپایه استفاده شده‌اند -->
+    <NoWarn>$(NoWarn);CS8618;CS0067;CS0169;CS0414;CA1416;CA1401;SYSLIB0014;SYSLIB0050;SYSLIB0057</NoWarn>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+    <DebugType>portable</DebugType>
+    <Optimize>true</Optimize>
+  </PropertyGroup>
+</Project>

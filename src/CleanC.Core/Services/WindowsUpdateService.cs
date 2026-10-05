@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using Microsoft.Data.Sqlite;
 using Microsoft.Win32;
 
@@ -57,7 +58,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             // 2. Check wuauserv Service Status via Registry
             try
@@ -100,7 +104,10 @@ namespace CleanC.Core.Services
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 // -------------------------------------------------------------
                 // 2. Check Windows Update Agent (WUA COM API)
@@ -129,7 +136,10 @@ namespace CleanC.Core.Services
 
                                     string desc = update.Description?.ToString() ?? "";
                                     long size = 0;
-                                    try { size = Convert.ToInt64(update.MaxDownloadSize); } catch { }
+                                    try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
 
                                     string kb = "";
                                     try
@@ -140,7 +150,10 @@ namespace CleanC.Core.Services
                                             kb = "KB" + update.KBArticleIDs.Item(0).ToString();
                                         }
                                     }
-                                    catch { }
+                                    catch (Exception __ex)
+                                    {
+                                        CcLog.Ignore(__ex);
+                                    }
 
                                     bool isNextGen = title.Contains("Windows 11, version", StringComparison.OrdinalIgnoreCase) ||
                                                      title.Contains("Feature update", StringComparison.OrdinalIgnoreCase);
@@ -157,7 +170,10 @@ namespace CleanC.Core.Services
                                     });
                                 }
                             }
-                            catch { }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
 
                             // 2B. Search Optional / Preview / Driver updates (BrowseOnly=1)
                             try
@@ -172,7 +188,10 @@ namespace CleanC.Core.Services
 
                                     string desc = update.Description?.ToString() ?? "";
                                     long size = 0;
-                                    try { size = Convert.ToInt64(update.MaxDownloadSize); } catch { }
+                                    try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
 
                                     string kb = "";
                                     try
@@ -183,10 +202,16 @@ namespace CleanC.Core.Services
                                             kb = "KB" + update.KBArticleIDs.Item(0).ToString();
                                         }
                                     }
-                                    catch { }
+                                    catch (Exception __ex)
+                                    {
+                                        CcLog.Ignore(__ex);
+                                    }
 
                                     bool isDriver = false;
-                                    try { isDriver = (Convert.ToInt32(update.Type) == 2); } catch { }
+                                    try { isDriver = (Convert.ToInt32(update.Type) == 2); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
 
                                     bool isNextGen = title.Contains("Windows 11, version", StringComparison.OrdinalIgnoreCase) ||
                                                      title.Contains("Feature update", StringComparison.OrdinalIgnoreCase);
@@ -203,11 +228,17 @@ namespace CleanC.Core.Services
                                     });
                                 }
                             }
-                            catch { }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
                         }
                     }
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return list;
             });
@@ -252,10 +283,16 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             finally
             {
-                try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch { }
+                try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
             }
 
             return results;
@@ -395,7 +432,10 @@ namespace CleanC.Core.Services
 
                 foreach (var v in valuesToRemove)
                 {
-                    try { key.DeleteValue(v, false); } catch { }
+                    try { key.DeleteValue(v, false); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
                 }
 
                 return true;
@@ -495,7 +535,10 @@ namespace CleanC.Core.Services
                 using var p = Process.Start(psi);
                 p?.WaitForExit(5000);
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         private static long GetDirectorySize(string path)
@@ -506,10 +549,16 @@ namespace CleanC.Core.Services
                 var dir = new DirectoryInfo(path);
                 foreach (var file in dir.EnumerateFiles("*", SearchOption.AllDirectories))
                 {
-                    try { size += file.Length; } catch { }
+                    try { size += file.Length; } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return size;
         }
 
@@ -518,11 +567,17 @@ namespace CleanC.Core.Services
             var dir = new DirectoryInfo(path);
             foreach (var file in dir.EnumerateFiles())
             {
-                try { file.Delete(); } catch { }
+                try { file.Delete(); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
             }
             foreach (var sub in dir.EnumerateDirectories())
             {
-                try { sub.Delete(true); } catch { }
+                try { sub.Delete(true); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
             }
         }
     }

@@ -2,6 +2,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
 using Microsoft.Win32;
 
@@ -32,7 +33,10 @@ namespace CleanC.Core.Services
                     status.IsFastStartupEnabled = (val != null && Convert.ToInt32(val) == 1);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             try
             {
@@ -49,8 +53,8 @@ namespace CleanC.Core.Services
                     }
                     catch
                     {
-                        // File locked by system, estimate typical size if cannot read directly
-                        status.HiberfilSizeBytes = 6L * 1024 * 1024 * 1024; // ~6 GB baseline
+                        // اندازه واقعی خوانده نشد → صفر گزارش می‌شود، نه مقدار حدسی
+                        status.HiberfilSizeBytes = 0;
                     }
                 }
                 else
@@ -58,8 +62,14 @@ namespace CleanC.Core.Services
                     status.IsHibernationEnabled = false;
                     status.HiberfilSizeBytes = 0;
                 }
+
+                // بدون هیبرنیشن، Fast Startup عملاً اجرا نمی‌شود (ویندوز HiberbootEnabled را نادیده می‌گیرد)
+                if (!status.IsHibernationEnabled) status.IsFastStartupEnabled = false;
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return status;
         }
@@ -75,7 +85,10 @@ namespace CleanC.Core.Services
                     return true;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return false;
         }
@@ -97,13 +110,24 @@ namespace CleanC.Core.Services
                     };
 
                     using var p = Process.Start(psi);
-                    if (p != null)
+                    if (p == null) return false;
+
+                    if (!p.WaitForExit(10000))
                     {
-                        p.WaitForExit(10000);
-                        return p.ExitCode == 0;
+                        // طولانی‌تر از حد انتظار → فرآیند را متوقف کن تا جزء آویزان نماند
+                        try { p.Kill(); } catch (Exception __ex)
+{
+    CcLog.Ignore(__ex);
+}
+                        return false;
                     }
+
+                    return p.ExitCode == 0;
                 }
-                catch { }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
 
                 return false;
             });

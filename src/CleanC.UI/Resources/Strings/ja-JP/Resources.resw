@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>管理者として実行中</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>復元・元に戻すセンター</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>システム状態を更新</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>通知と操作履歴</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>テーマ切り替え（ダーク / ライト）</value></data>
+  <data name="Settings" xml:space="preserve"><value>アプリケーション設定</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>最適化ダッシュボード</value></data>
+  <data name="NavTools" xml:space="preserve"><value>Windows ツール群</value></data>
+  <data name="HeroCategory" xml:space="preserve"><value>システムの健全性とパフォーマンス</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>最適化の準備が完了しています</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>1クリックで一時ファイルを消去し、メモリを解放して不要なプロセスを停止します。</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>システムの最適化が完了しました</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>キャッシュが整理され、メモリが解放され快適になりました。</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>解放可能容量:</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>前回のクリーンアップ:</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>累計解放容量:</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>クイックシステムブースト</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>ジャンク削除、RAM最適化、DNSフラッシュ、バックグラウンド処理停止</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>高度なディスククリーンアップ</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>スキャン項目と不要ファイルカテゴリの詳細選択</value></data>
+  <data name="SettingsTitle" xml:space="preserve"><value>設定</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>外観、言語、トレイ動作、レポート出力の管理</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>表示言語 (Language)</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>言語に合わせたレイアウト方向とフォント表示を自動調整します。</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>テーマ</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>Windows設定に従うか、ライト/ダークに固定します。</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>システム</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>ライト</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>ダーク</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>バックグラウンドと通知領域</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>ウィンドウを閉じた際や最小化時のタスクバー通知領域（トレイ）での動作を設定します。</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>ウィンドウを閉じてもバックグラウンドで実行を継続する</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>最小化時に通知領域アイコンに格納する</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>Windows 起動時に自動実行</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>サインイン時に CleanC を自動的に開始します。</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>個人ファイルの削除ポリシー</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>重複ファイルや大容量ファイルに適用されます。システム不要ファイルは常に完全削除されます。</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>ごみ箱へ移動（推奨）</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>CleanC 隔離領域 — 復元センターからいつでも戻せます</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>完全に削除 — 即座に空き容量を確保します（復元不可）</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>状態の自動復元</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>ウィンドウの位置や前回の画面、選択項目を次回起動時に復元します。</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>ウィンドウのサイズと位置</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>前回開いていた画面</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>クリーンアップのスキャン選択項目</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>ウィンドウ位置をリセット</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>すべての設定をリセット</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>アプリデータ</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>設定フォルダーを開く</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>ログフォルダーを開く</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>レポート出力</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>AIプロンプト向けの詳細診断ファイルや詳細ハードウェア仕様を出力します。</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>AI 診断レポート (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>ハードウェア仕様レポート (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>CleanC について</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>Windows 11 向け次世代 PC 管理・最適化・診断ツール。</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>更新プログラムの確認</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>GitHub プロジェクトページ</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>診断情報をコピー</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>ツール一覧に戻る</value></data>
+</root>

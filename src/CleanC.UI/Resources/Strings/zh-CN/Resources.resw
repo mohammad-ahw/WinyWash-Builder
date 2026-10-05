@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="RunningAsAdmin" xml:space="preserve"><value>以管理员身份运行</value></data>
+  <data name="RestoreCenter" xml:space="preserve"><value>恢复与撤销中心</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>刷新系统状态</value></data>
+  <data name="NotificationHistory" xml:space="preserve"><value>通知与操作历史</value></data>
+  <data name="ToggleTheme" xml:space="preserve"><value>切换主题（深色 / 浅色）</value></data>
+  <data name="Settings" xml:space="preserve"><value>应用程序设置</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>系统优化仪表板</value></data>
+  <data name="NavTools" xml:space="preserve"><value>Windows 系统工具箱</value></data>
+  <data name="HeroCategory" xml:space="preserve"><value>系统健康度与运行性能</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>系统已就绪，随时可进行优化</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>一键清理临时文件、释放内存并终止无用的后台能耗进程。</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>系统已完成深度优化</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>临时垃圾已清除，内存已释放，系统响应更敏捷。</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>可释放空间：</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>上次清理：</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>累计已释放：</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>一键快速加速</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>清除缓存、精简内存占用、刷新 DNS 并优化后台遥测服务</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>高级磁盘清理</value></data>
+  <data name="AdvancedCleanSub" xml:space="preserve"><value>自定义扫描选项与垃圾文件分类</value></data>
+  <data name="SettingsTitle" xml:space="preserve"><value>应用程序设置</value></data>
+  <data name="SettingsSub" xml:space="preserve"><value>外观、语言切换、后台托盘行为与报告导出</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>界面语言 (Language)</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>自动适配排版方向与系统本地字体渲染。</value></data>
+  <data name="ThemeTitle" xml:space="preserve"><value>应用主题</value></data>
+  <data name="ThemeSub" xml:space="preserve"><value>跟随系统或固定为浅色/深色模式。</value></data>
+  <data name="ThemeSystem" xml:space="preserve"><value>跟随系统</value></data>
+  <data name="ThemeLight" xml:space="preserve"><value>浅色</value></data>
+  <data name="ThemeDark" xml:space="preserve"><value>深色</value></data>
+  <data name="BackgroundBehaviorTitle" xml:space="preserve"><value>后台运行与系统托盘</value></data>
+  <data name="BackgroundBehaviorSub" xml:space="preserve"><value>控制关闭或最小化窗口时在任务栏时钟旁通知区域的常驻状态。</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>关闭窗口时保持在后台运行</value></data>
+  <data name="MinimizeToTray" xml:space="preserve"><value>最小化窗口时隐藏至任务栏通知区域</value></data>
+  <data name="AutoStartTitle" xml:space="preserve"><value>开机自启动</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>登录 Windows 时自动启动 CleanC。</value></data>
+  <data name="DeleteBehaviorTitle" xml:space="preserve"><value>个人文件删除策略</value></data>
+  <data name="DeleteBehaviorSub" xml:space="preserve"><value>针对重复文件、超大文件与下载整理。系统垃圾总是被彻底清除。</value></data>
+  <data name="DeleteModeRecycle" xml:space="preserve"><value>移至回收站（推荐）</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>CleanC 隔离区 — 可在撤销中心随时恢复</value></data>
+  <data name="DeleteModePermanent" xml:space="preserve"><value>永久删除 — 立即释放磁盘空间且不可撤销</value></data>
+  <data name="AutoStateRestoreTitle" xml:space="preserve"><value>自动记忆与状态恢复</value></data>
+  <data name="AutoStateRestoreSub" xml:space="preserve"><value>在各次运行间记忆窗口大小位置及勾选项。</value></data>
+  <data name="SaveWindowPlacement" xml:space="preserve"><value>窗口尺寸与屏幕位置</value></data>
+  <data name="SaveLastView" xml:space="preserve"><value>上次访问的页面</value></data>
+  <data name="SaveScanSelections" xml:space="preserve"><value>清理扫描勾选项</value></data>
+  <data name="ResetWindowSize" xml:space="preserve"><value>重置窗口布局</value></data>
+  <data name="ResetAllSettings" xml:space="preserve"><value>恢复全部默认设置</value></data>
+  <data name="AppDataTitle" xml:space="preserve"><value>应用存储数据</value></data>
+  <data name="OpenSettingsFolder" xml:space="preserve"><value>打开配置目录</value></data>
+  <data name="OpenLogsFolder" xml:space="preserve"><value>打开日志目录</value></data>
+  <data name="ExportReportTitle" xml:space="preserve"><value>诊断与报告导出</value></data>
+  <data name="ExportReportSub" xml:space="preserve"><value>生成适合大语言模型提示词的 Markdown 与详尽硬件规格文件。</value></data>
+  <data name="ExportAiReport" xml:space="preserve"><value>AI 提示词诊断报告 (.md)</value></data>
+  <data name="ExportSpecsReport" xml:space="preserve"><value>详细硬件规格报告 (.txt)</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>关于 CleanC</value></data>
+  <data name="AboutSub" xml:space="preserve"><value>面向 Windows 11 的现代化电脑优化管家与硬件监测工具。</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>检查软件更新</value></data>
+  <data name="ProjectPage" xml:space="preserve"><value>GitHub 项目主页</value></data>
+  <data name="CopyDiagnostics" xml:space="preserve"><value>复制系统诊断信息</value></data>
+  <data name="BackToTools" xml:space="preserve"><value>返回系统工具列表</value></data>
+</root>

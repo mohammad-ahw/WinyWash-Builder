@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CleanC.Core.Diagnostics;
 
 namespace CleanC.Core.Services
 {
@@ -32,6 +33,18 @@ namespace CleanC.Core.Services
             public int BatteryFullLifeTime;
         }
 
+        /// <summary>
+        /// کش پلن برق فعال.
+        /// <c>GetPowerStatus</c> هر ۲٫۵ ثانیه (تایمر آمار داشبورد) صدا زده می‌شود و بدون کش،
+        /// هر بار یک پروسه‌ی <c>powercfg.exe</c> بالا می‌آورد (چند ده میلی‌ثانیه + مصرف CPU
+        /// و افت فریم UI). پلن برق به‌ندرت عوض می‌شود؛ بنابراین نتیجه را ۳۰ ثانیه نگه می‌داریم
+        /// و فقط بعد از تغییر واقعی (SetActiveScheme) تازه‌سازی می‌کنیم.
+        /// </summary>
+        private static readonly TimeSpan SchemeCacheTtl = TimeSpan.FromSeconds(30);
+        private static readonly object SchemeLock = new();
+        private static (string Guid, string Name)? _schemeCache;
+        private static DateTime _schemeCacheAtUtc = DateTime.MinValue;
+
         public static PowerStatusInfo GetPowerStatus()
         {
             var info = new PowerStatusInfo();
@@ -46,7 +59,10 @@ namespace CleanC.Core.Services
                     info.BatteryPercent = status.BatteryLifePercent <= 100 ? status.BatteryLifePercent : 100;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             try
             {
@@ -63,12 +79,40 @@ namespace CleanC.Core.Services
                     info.IsHighPerformanceOrUltimate = true;
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return info;
         }
 
-        public static (string Guid, string Name) GetActiveScheme()
+        public static (string Guid, string Name) GetActiveScheme(bool forceRefresh = false)
+        {
+            lock (SchemeLock)
+            {
+                if (!forceRefresh && _schemeCache.HasValue &&
+                    (DateTime.UtcNow - _schemeCacheAtUtc) < SchemeCacheTtl)
+                {
+                    return _schemeCache.Value;
+                }
+            }
+
+            var result = ReadActiveSchemeFromPowercfg();
+
+            lock (SchemeLock)
+            {
+                _schemeCache = result;
+                _schemeCacheAtUtc = DateTime.UtcNow;
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// اجرای واقعی <c>powercfg /getactivescheme</c>. فقط از داخل GetActiveScheme صدا زده می‌شود.
+        /// </summary>
+        private static (string Guid, string Name) ReadActiveSchemeFromPowercfg()
         {
             try
             {
@@ -92,7 +136,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return (string.Empty, "Balanced");
         }
@@ -119,7 +166,10 @@ namespace CleanC.Core.Services
                     };
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return null;
         }
@@ -141,7 +191,10 @@ namespace CleanC.Core.Services
                     return SetActiveScheme(duplicatedGuid);
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return false;
         }
@@ -157,7 +210,18 @@ namespace CleanC.Core.Services
                 };
                 using var p = Process.Start(psi);
                 p?.WaitForExit(3000);
-                return p?.ExitCode == 0;
+
+                bool ok = p?.ExitCode == 0;
+                if (ok)
+                {
+                    // پلن واقعاً عوض شد؛ کش را باطل کن تا خواندن بعدی تازه باشد
+                    lock (SchemeLock)
+                    {
+                        _schemeCache = null;
+                        _schemeCacheAtUtc = DateTime.MinValue;
+                    }
+                }
+                return ok;
             }
             catch
             {
@@ -188,7 +252,10 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch { }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
 
             return null;
         }
