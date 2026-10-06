@@ -15,6 +15,7 @@ namespace CleanC.Core.Services
     {
         Bloatware,
         OemTrial,
+        BorderlineOptional,
         LargeUnused
     }
 
@@ -45,7 +46,6 @@ namespace CleanC.Core.Services
             "Microsoft.WindowsCalculator",
             "Microsoft.WindowsTerminal",
             "Microsoft.WindowsNotepad",
-            "Microsoft.Paint",
             "Microsoft.WindowsCamera",
             "Microsoft.DesktopAppInstaller",
             "Microsoft.ScreenSketch",
@@ -63,6 +63,18 @@ namespace CleanC.Core.Services
             "Microsoft Visual C++", "Windows", "CleanC", "NVIDIA", "AMD", "Intel", "Realtek",
             "Synaptics", "DragonCenter", "Dragon Center", "MSI Center", "Nahimic", "ELAN",
             "Touchpad", "Audio", "Driver", "DirectX", "DotNet", ".NET"
+        };
+
+        // Borderline apps that should NEVER be deleted automatically without user prompt
+        private static readonly Dictionary<string, (string Name, string Desc)> BorderlineSignatures = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Microsoft.Paint", ("Microsoft Paint", "نرم‌افزار نقاشی پیش‌فرض ویندوز") },
+            { "Microsoft.XboxApp", ("Xbox App", "برنامه اصلی ایکس‌باکس و بازی‌های ویندوز") },
+            { "Microsoft.XboxGamingOverlay", ("Xbox Game Bar", "نوار ابزار و ضبط ویدیوی بازی") },
+            { "Microsoft.XboxGameOverlay", ("Xbox Game Overlay", "پوشش درون‌بازی ایکس‌باکس") },
+            { "Microsoft.XboxIdentityProvider", ("Xbox Identity Provider", "سرویس ورود به اکانت مایکروسافت در بازی‌ها") },
+            { "Microsoft.XboxSpeechToTextOverlay", ("Xbox Speech To Text", "ابزار تبدیل گفتار به نوشتار ایکس‌باکس") },
+            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام‌سازی گوشی با ویندوز") }
         };
 
         // Known promotional pre-installed packages
@@ -265,7 +277,7 @@ namespace CleanC.Core.Services
                             sizeBytes = GetDirectorySizeFast(installLocation);
                         }
 
-                        if (sizeBytes > 400 * 1024 * 1024) // > 400 MB
+                        if (sizeBytes > 500 * 1024 * 1024) // > 500 MB
                         {
                             bool isUnused = false;
                             string desc = "برنامه حجیم";
@@ -277,10 +289,10 @@ namespace CleanC.Core.Services
                             if (matchingRuns.Count > 0)
                             {
                                 var lastRun = matchingRuns.Max(r => r.Value);
-                                if (lastRun < DateTime.Now.AddDays(-60))
+                                if (lastRun < DateTime.Now.AddDays(-30))
                                 {
                                     isUnused = true;
-                                    desc = $"بیش از ۶۰ روز است اجرا نشده (آخرین اجرا: {lastRun:yyyy/MM/dd})";
+                                    desc = $"بیش از ۳۰ روز است اجرا نشده (آخرین اجرا: {lastRun:yyyy.MM.dd})";
                                 }
                             }
                             else
@@ -291,10 +303,10 @@ namespace CleanC.Core.Services
                                 {
                                     if (DateTime.TryParseExact(installDate, "yyyyMMdd", null, System.Globalization.DateTimeStyles.None, out var iDate))
                                     {
-                                        if (iDate < DateTime.Now.AddDays(-45))
+                                        if (iDate < DateTime.Now.AddDays(-30))
                                         {
                                             isUnused = true;
-                                            desc = $"نصب شده در تاریخ {iDate:yyyy/MM/dd} ولی ثبت استفاده‌ای از آن نشده است";
+                                            desc = $"نصب شده در تاریخ {iDate:yyyy.MM.dd} ولی ثبت استفاده‌ای از آن نشده است";
                                         }
                                     }
                                 }
@@ -343,6 +355,103 @@ namespace CleanC.Core.Services
                 }
                 return false;
             });
+        }
+
+        public static async Task<List<CandidateAppItem>> ScanBorderlineReviewAppsAsync()
+        {
+            return await Task.Run(() =>
+            {
+                var list = new List<CandidateAppItem>();
+
+                // 1. Packaged apps (Paint, Xbox suite, Phone Link)
+                try
+                {
+                    using var packagesKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages");
+                    if (packagesKey != null)
+                    {
+                        foreach (var packageFullName in packagesKey.GetSubKeyNames())
+                        {
+                            string packageName = packageFullName.Split('_')[0];
+                            foreach (var kvp in BorderlineSignatures)
+                            {
+                                if (packageName.Equals(kvp.Key, StringComparison.OrdinalIgnoreCase) ||
+                                    packageFullName.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if (!list.Any(x => x.DisplayName.Equals(kvp.Value.Name, StringComparison.OrdinalIgnoreCase)))
+                                    {
+                                        long size = EstimatePackageSize(packageFullName);
+                                        list.Add(new CandidateAppItem
+                                        {
+                                            Id = packageFullName,
+                                            DisplayName = kvp.Value.Name,
+                                            PackageFullName = packageFullName,
+                                            SizeBytes = size,
+                                            CategoryType = AppCategoryType.BorderlineOptional,
+                                            CategoryLabel = "اختیاری / در صورت عدم نیاز",
+                                            Description = kvp.Value.Desc,
+                                            IsPackagedApp = true,
+                                            IsSelected = false // Unchecked by default for safety
+                                        });
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                }
+
+                // 2. Large unused Win32 apps (> 500 MB, unused > 30 days)
+                try
+                {
+                    var allCandidates = ScanCandidateAppsAsync().GetAwaiter().GetResult();
+                    var largeUnused = allCandidates.Where(c => c.CategoryType == AppCategoryType.LargeUnused).ToList();
+                    foreach (var item in largeUnused)
+                    {
+                        if (!list.Any(x => x.DisplayName.Equals(item.DisplayName, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            item.IsSelected = false; // Unchecked by default
+                            list.Add(item);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                }
+
+                return list;
+            });
+        }
+
+        public static async Task<(int RemovedCount, long FreedBytes)> CleanAutomaticBloatwareAsync()
+        {
+            var candidates = await ScanCandidateAppsAsync();
+            var autoTargets = candidates
+                .Where(c => c.CategoryType == AppCategoryType.Bloatware || c.CategoryType == AppCategoryType.OemTrial)
+                .ToList();
+
+            int removed = 0;
+            long freed = 0;
+            foreach (var app in autoTargets)
+            {
+                try
+                {
+                    if (await RemoveAppAsync(app))
+                    {
+                        removed++;
+                        freed += app.SizeBytes;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                }
+            }
+            return (removed, freed);
         }
 
         private static bool RemoveAppxPackage(string packageFullName)

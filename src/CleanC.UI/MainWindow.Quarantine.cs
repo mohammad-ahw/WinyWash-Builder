@@ -95,7 +95,7 @@ namespace CleanC.UI
             var summary = new StackPanel { Spacing = 2 };
             summary.Children.Add(new TextBlock
             {
-                Text = $"{session.Entries.Count} مورد · {SystemStats.FormatBytes(totalBytes)} · {session.CreatedAt:yyyy/MM/dd HH:mm}",
+                Text = $"{session.Entries.Count} مورد · {SystemStats.FormatBytes(totalBytes)} · {session.CreatedAt:yyyy.MM.dd HH:mm}",
                 FontSize = 12,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"]
             });

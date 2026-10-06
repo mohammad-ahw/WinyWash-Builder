@@ -156,6 +156,11 @@ namespace CleanC.UI.ViewModels
         {
             if (_loading) return;
             _store.Current.SaveWindowPlacement = value;
+            if (!value)
+            {
+                _store.Current.WindowX = int.MinValue;
+                _store.Current.WindowY = int.MinValue;
+            }
             PersistRequested?.Invoke();
         }
 
@@ -163,6 +168,10 @@ namespace CleanC.UI.ViewModels
         {
             if (_loading) return;
             _store.Current.SaveLastView = value;
+            if (!value)
+            {
+                _store.Current.LastView = "dashboard";
+            }
             PersistRequested?.Invoke();
         }
 

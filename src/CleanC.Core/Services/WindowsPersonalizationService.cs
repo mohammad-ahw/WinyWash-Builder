@@ -1,10 +1,37 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
 namespace CleanC.Core.Services
 {
+    public class GlassPresetConfig
+    {
+        public int Effect { get; set; } = 1;
+        public bool ClearAddress { get; set; } = true;
+        public bool ClearBarBg { get; set; } = true;
+        public bool ClearWinUIBg { get; set; } = true;
+        public bool ShowLine { get; set; } = true;
+
+        public byte LightR { get; set; } = 255;
+        public byte LightG { get; set; } = 255;
+        public byte LightB { get; set; } = 255;
+        public byte LightA { get; set; } = 200;
+
+        public byte DarkR { get; set; } = 0;
+        public byte DarkG { get; set; } = 0;
+        public byte DarkB { get; set; } = 0;
+        public byte DarkA { get; set; } = 120;
+
+        public string ToIniString()
+        {
+            return $"[config]\r\neffect={Effect}\r\nclearAddress={(ClearAddress ? "true" : "false")}\r\nclearBarBg={(ClearBarBg ? "true" : "false")}\r\nclearWinUIBg={(ClearWinUIBg ? "true" : "false")}\r\nshowLine={(ShowLine ? "true" : "false")}\r\n\r\n[light]\r\nr={LightR}\r\ng={LightG}\r\nb={LightB}\r\na={LightA}\r\n\r\n[dark]\r\nr={DarkR}\r\ng={DarkG}\r\nb={DarkB}\r\na={DarkA}\r\n";
+        }
+    }
+
     public class PersonalizationSettings
     {
         public bool IsTransparencyEnabled { get; set; }
@@ -197,6 +224,162 @@ namespace CleanC.Core.Services
             {
                 CcLog.Ignore(__ex);
             }
+        }
+
+        // ====================================================================
+        // Glass / Mica Presets & Configuration
+        // ====================================================================
+
+        public static string GetGlassConfigPath()
+        {
+            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC");
+            Directory.CreateDirectory(dir);
+            return Path.Combine(dir, "glass_config.ini");
+        }
+
+        public static GlassPresetConfig LoadGlassConfig()
+        {
+            string path = GetGlassConfigPath();
+            var cfg = new GlassPresetConfig();
+            if (!File.Exists(path))
+            {
+                SaveGlassConfig(cfg);
+                return cfg;
+            }
+
+            try
+            {
+                var lines = File.ReadAllLines(path);
+                string section = "";
+                foreach (var rawLine in lines)
+                {
+                    var line = rawLine.Trim();
+                    if (line.StartsWith("[") && line.EndsWith("]"))
+                    {
+                        section = line.Substring(1, line.Length - 2).ToLowerInvariant();
+                        continue;
+                    }
+                    var parts = line.Split('=', 2);
+                    if (parts.Length != 2) continue;
+                    var key = parts[0].Trim().ToLowerInvariant();
+                    var val = parts[1].Trim();
+
+                    if (section == "config")
+                    {
+                        if (key == "effect" && int.TryParse(val, out int eff)) cfg.Effect = eff;
+                        else if (key == "clearaddress") cfg.ClearAddress = val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        else if (key == "clearbarbg") cfg.ClearBarBg = val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        else if (key == "clearwinuibg") cfg.ClearWinUIBg = val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                        else if (key == "showline") cfg.ShowLine = val.Equals("true", StringComparison.OrdinalIgnoreCase);
+                    }
+                    else if (section == "light")
+                    {
+                        if (key == "r" && byte.TryParse(val, out byte r)) cfg.LightR = r;
+                        else if (key == "g" && byte.TryParse(val, out byte g)) cfg.LightG = g;
+                        else if (key == "b" && byte.TryParse(val, out byte b)) cfg.LightB = b;
+                        else if (key == "a" && byte.TryParse(val, out byte a)) cfg.LightA = a;
+                    }
+                    else if (section == "dark")
+                    {
+                        if (key == "r" && byte.TryParse(val, out byte r)) cfg.DarkR = r;
+                        else if (key == "g" && byte.TryParse(val, out byte g)) cfg.DarkG = g;
+                        else if (key == "b" && byte.TryParse(val, out byte b)) cfg.DarkB = b;
+                        else if (key == "a" && byte.TryParse(val, out byte a)) cfg.DarkA = a;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex);
+            }
+            return cfg;
+        }
+
+        public static void SaveGlassConfig(GlassPresetConfig cfg)
+        {
+            try
+            {
+                string path = GetGlassConfigPath();
+                File.WriteAllText(path, cfg.ToIniString());
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex);
+            }
+        }
+
+        // ====================================================================
+        // Wallpaper Management & CleanC Gallery
+        // ====================================================================
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto)]
+        private static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+        private const int SPI_SETDESKWALLPAPER = 20;
+        private const int SPIF_UPDATEINIFILE = 0x01;
+        private const int SPIF_SENDCHANGE = 0x02;
+
+        public static string GetCurrentWindowsWallpaper()
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(@"Control Panel\Desktop");
+                return key?.GetValue("WallPaper")?.ToString() ?? string.Empty;
+            }
+            catch
+            {
+                return string.Empty;
+            }
+        }
+
+        public static bool SetDesktopWallpaper(string imagePath)
+        {
+            if (!File.Exists(imagePath)) return false;
+            try
+            {
+                int result = SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, imagePath, SPIF_UPDATEINIFILE | SPIF_SENDCHANGE);
+                return result != 0;
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex);
+                return false;
+            }
+        }
+
+        public static List<string> GetCleanCWallpapers()
+        {
+            var list = new List<string>();
+            try
+            {
+                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
+                string wpDir = Path.Combine(baseDir, "wallpaper");
+                if (!Directory.Exists(wpDir) || Directory.GetFiles(wpDir).Length == 0)
+                {
+                    string rootWp = Path.Combine(Directory.GetCurrentDirectory(), "wallpaper");
+                    if (Directory.Exists(rootWp) && Directory.GetFiles(rootWp).Length > 0) wpDir = rootWp;
+                    else
+                    {
+                        string picWp = @"C:\Users\moham\Pictures\Wallpaper";
+                        if (Directory.Exists(picWp)) wpDir = picWp;
+                    }
+                }
+
+                if (Directory.Exists(wpDir))
+                {
+                    var files = Directory.GetFiles(wpDir, "*.*")
+                        .Where(f => f.EndsWith(".jpg", StringComparison.OrdinalIgnoreCase) ||
+                                    f.EndsWith(".jpeg", StringComparison.OrdinalIgnoreCase) ||
+                                    f.EndsWith(".png", StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                    list.AddRange(files);
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex);
+            }
+            return list;
         }
     }
 }

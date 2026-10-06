@@ -318,5 +318,18 @@ namespace CleanC.Core.Services
 
             return defaultVal ?? key;
         }
+
+        public static string GetFontFamilyName()
+        {
+            return _current.Code switch
+            {
+                "zh-CN" => "Microsoft YaHei, Segoe UI",
+                "ja-JP" => "Yu Gothic UI, Meiryo, Segoe UI",
+                "ko-KR" => "Malgun Gothic, Segoe UI",
+                "ar-SA" => "Segoe UI, Tahoma",
+                "fa-IR" => "Segoe UI, Tahoma",
+                _ => "Segoe UI Variable, Segoe UI"
+            };
+        }
     }
 }

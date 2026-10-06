@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -100,6 +100,20 @@ namespace CleanC.UI
             }
         }
 
+        private string _deepStorageSortMode = "size";
+
+        private void DeepStorageSort_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string sort)
+            {
+                _deepStorageSortMode = sort;
+                SetTabActive(DeepStorageSortSizeBtn, sort == "size");
+                SetTabActive(DeepStorageSortDateBtn, sort == "date");
+                SetTabActive(DeepStorageSortNameBtn, sort == "name");
+                RenderDeepStorageItems();
+            }
+        }
+
         private void DeepStorageTab_Click(object sender, RoutedEventArgs e)
         {
             if (sender is Button btn && btn.Tag is string tag)
@@ -166,7 +180,14 @@ namespace CleanC.UI
                 return;
             }
 
-            foreach (var group in _deepScanResult.Duplicates)
+            var sortedGroups = _deepStorageSortMode switch
+            {
+                "date" => _deepScanResult.Duplicates.OrderByDescending(g => g.Files.Max(f => f.LastModified)).ToList(),
+                "name" => _deepScanResult.Duplicates.OrderBy(g => g.Files.FirstOrDefault()?.FileName ?? "").ToList(),
+                _ => _deepScanResult.Duplicates.OrderByDescending(g => g.WastedSizeBytes).ToList()
+            };
+
+            foreach (var group in sortedGroups)
             {
                 var groupCard = new Border
                 {
@@ -288,7 +309,13 @@ namespace CleanC.UI
                 return;
             }
 
-            foreach (var folder in _deepScanResult.EmptyFolders)
+            var sortedFolders = _deepStorageSortMode switch
+            {
+                "name" => _deepScanResult.EmptyFolders.OrderBy(f => f.FolderName).ToList(),
+                _ => _deepScanResult.EmptyFolders.OrderBy(f => f.FolderPath).ToList()
+            };
+
+            foreach (var folder in sortedFolders)
             {
                 var card = new Border
                 {
@@ -362,7 +389,14 @@ namespace CleanC.UI
                 return;
             }
 
-            foreach (var item in _deepScanResult.MessItems)
+            var sortedMess = _deepStorageSortMode switch
+            {
+                "date" => _deepScanResult.MessItems.OrderByDescending(m => m.LastModified).ToList(),
+                "name" => _deepScanResult.MessItems.OrderBy(m => m.FileName).ToList(),
+                _ => _deepScanResult.MessItems.OrderByDescending(m => m.SizeBytes).ToList()
+            };
+
+            foreach (var item in sortedMess)
             {
                 var card = new Border
                 {
@@ -449,7 +483,22 @@ namespace CleanC.UI
                 return;
             }
 
-            foreach (var item in _deepScanResult.LargeFiles)
+            var files = _deepScanResult.LargeFiles.AsEnumerable();
+            switch (_deepStorageSortMode)
+            {
+                case "date":
+                    files = files.OrderByDescending(f => f.LastModified);
+                    break;
+                case "name":
+                    files = files.OrderBy(f => f.FileName);
+                    break;
+                case "size":
+                default:
+                    files = files.OrderByDescending(f => f.SizeBytes);
+                    break;
+            }
+
+            foreach (var item in files)
             {
                 var card = new Border
                 {
@@ -683,6 +732,15 @@ namespace CleanC.UI
 
             try
             {
+                if (DeepStorageBatchDeleteBtn != null) DeepStorageBatchDeleteBtn.IsEnabled = false;
+                if (DeepStorageBatchDeleteSpinner != null)
+                {
+                    DeepStorageBatchDeleteSpinner.Visibility = Visibility.Visible;
+                    DeepStorageBatchDeleteSpinner.IsActive = true;
+                }
+                if (DeepStorageBatchDeleteIcon != null) DeepStorageBatchDeleteIcon.Visibility = Visibility.Collapsed;
+                if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = "در حال حذف ایمن...";
+
                 switch (_deepStorageActiveTab)
                 {
                     case "duplicates":
@@ -746,6 +804,29 @@ namespace CleanC.UI
                     var severity = batch.FailedCount > 0 ? InfoBarSeverity.Warning : InfoBarSeverity.Success;
                     ShowInfoBar("پاکسازی عمیق دیسک", detail + ".", severity);
 
+                    // فیدبک بصری موفقیت با رنگ سبز زمردی
+                    if (DeepStorageBatchDeleteSpinner != null)
+                    {
+                        DeepStorageBatchDeleteSpinner.Visibility = Visibility.Collapsed;
+                        DeepStorageBatchDeleteSpinner.IsActive = false;
+                    }
+                    if (DeepStorageBatchDeleteIcon != null)
+                    {
+                        DeepStorageBatchDeleteIcon.Glyph = "\uE73E";
+                        DeepStorageBatchDeleteIcon.Visibility = Visibility.Visible;
+                    }
+                    if (DeepStorageBatchDeleteBtnText != null)
+                    {
+                        DeepStorageBatchDeleteBtnText.Text = $"✓ {deletedCount} مورد با موفقیت پاکسازی شد";
+                    }
+                    if (DeepStorageBatchDeleteBtn != null)
+                    {
+                        DeepStorageBatchDeleteBtn.Background = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 16, 185, 129));
+                        DeepStorageBatchDeleteBtn.Foreground = new SolidColorBrush(Microsoft.UI.Colors.White);
+                    }
+
+                    await Task.Delay(2500);
+
                     await RunDeepStorageScanAsync();
                 }
                 else if (batch.FailedCount > 0)
@@ -756,6 +837,111 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 ShowInfoBar("خطا در پاکسازی", ex.Message, InfoBarSeverity.Error);
+            }
+            finally
+            {
+                if (DeepStorageBatchDeleteBtn != null)
+                {
+                    DeepStorageBatchDeleteBtn.ClearValue(Button.BackgroundProperty);
+                    DeepStorageBatchDeleteBtn.ClearValue(Button.ForegroundProperty);
+                    DeepStorageBatchDeleteBtn.IsEnabled = true;
+                }
+                if (DeepStorageBatchDeleteSpinner != null)
+                {
+                    DeepStorageBatchDeleteSpinner.Visibility = Visibility.Collapsed;
+                    DeepStorageBatchDeleteSpinner.IsActive = false;
+                }
+                if (DeepStorageBatchDeleteIcon != null)
+                {
+                    DeepStorageBatchDeleteIcon.Glyph = "\uE74D";
+                    DeepStorageBatchDeleteIcon.Visibility = Visibility.Visible;
+                }
+                if (DeepStorageBatchDeleteBtnText != null)
+                {
+                    DeepStorageBatchDeleteBtnText.Text = "حذف ایمن موارد انتخاب‌شده";
+                }
+            }
+        }
+
+        private void CleanDockerBtn_Click(object sender, RoutedEventArgs e)
+            => SafeInvoker.Run(CleanDockerBtn_ClickAsync(sender, e));
+
+        private async Task CleanDockerBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (CleanDockerBtn != null) CleanDockerBtn.IsEnabled = false;
+            ShowInfoBar("پاکسازی Docker", "در حال پاکسازی کش، کانتینرها و ایمیج‌های استفاده‌نشده...", InfoBarSeverity.Informational);
+            try
+            {
+                var res = await DeepStorageCleanService.CleanDockerCacheAsync();
+                ShowInfoBar("پاکسازی Docker", res.Message, res.Success ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+            }
+            finally
+            {
+                if (CleanDockerBtn != null) CleanDockerBtn.IsEnabled = true;
+            }
+        }
+
+        private void CleanDevCachesBtn_Click(object sender, RoutedEventArgs e)
+            => SafeInvoker.Run(CleanDevCachesBtn_ClickAsync(sender, e));
+
+        private async Task CleanDevCachesBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (CleanDevCachesBtn != null) CleanDevCachesBtn.IsEnabled = false;
+            ShowInfoBar("کش توسعه‌دهندگان", "در حال اسکن و پاکسازی کش‌های npm، pip، NuGet و VS Code...", InfoBarSeverity.Informational);
+            try
+            {
+                var res = await DeepStorageCleanService.CleanDevCachesAsync();
+                if (res.FreedBytes > 0)
+                {
+                    _cumulativeFreedBytes += res.FreedBytes;
+                    _lastCleanFreedBytes = res.FreedBytes;
+                    _lastCleanDateTime = DateTime.Now;
+                    RecordCleanupSession(res.FreedBytes);
+                    SaveCumulativeFreedStats();
+                    UpdateCumulativeChipsUI();
+                    RenderCleanupHistory();
+                }
+                ShowInfoBar("کش توسعه‌دهندگان", res.Message, res.Success ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+            }
+            finally
+            {
+                if (CleanDevCachesBtn != null) CleanDevCachesBtn.IsEnabled = true;
+            }
+        }
+
+        private void CompactWslBtn_Click(object sender, RoutedEventArgs e)
+            => SafeInvoker.Run(CompactWslBtn_ClickAsync(sender, e));
+
+        private async Task CompactWslBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (CompactWslBtn != null) CompactWslBtn.IsEnabled = false;
+            ShowInfoBar("تراکم دیسک WSL2", "در حال خاموش‌سازی و فشرده‌سازی دیسک‌های مجازی WSL2...", InfoBarSeverity.Informational);
+            try
+            {
+                var res = await DeepStorageCleanService.CompactWsl2DiskAsync();
+                ShowInfoBar("تراکم دیسک WSL2", res.Message, res.Success ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+            }
+            finally
+            {
+                if (CompactWslBtn != null) CompactWslBtn.IsEnabled = true;
+            }
+        }
+
+        private void CleanDismBtn_Click(object sender, RoutedEventArgs e)
+            => SafeInvoker.Run(CleanDismBtn_ClickAsync(sender, e));
+
+        private async Task CleanDismBtn_ClickAsync(object sender, RoutedEventArgs e)
+        {
+            if (CleanDismBtn != null) CleanDismBtn.IsEnabled = false;
+            ShowInfoBar("پاکسازی DISM", "در حال پاکسازی فروشگاه قطعات سیستم و بسته‌های جایگزین‌شده (WinSxS)... این عملیات ممکن است چند دقیقه طول بکشد.", InfoBarSeverity.Informational);
+            try
+            {
+                var res = await DeepStorageCleanService.CleanDismComponentsAsync();
+                ShowInfoBar("پاکسازی DISM", res.Message, res.Success ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+            }
+            finally
+            {
+                if (CleanDismBtn != null) CleanDismBtn.IsEnabled = true;
             }
         }
     }

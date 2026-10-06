@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
@@ -317,6 +318,188 @@ namespace CleanC.Core.Services
         public static async Task<SafeDeleteBatchResult> DeleteLargeFilesAsync(IEnumerable<string> filePaths)
         {
             return await DeleteDuplicateFilesAsync(filePaths);
+        }
+
+        // ====================================================================
+        // Extended Deep Cleaners (Docker, Dev Caches, WSL2, DISM)
+        // ====================================================================
+
+        public static async Task<(bool Success, string Message)> CleanDockerCacheAsync()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo("docker", "system prune -f")
+                    {
+                        RedirectStandardOutput = true,
+                        RedirectStandardError = true,
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var p = Process.Start(psi);
+                    if (p == null) return (false, "سرویس Docker روی سیستم نصب یا فعال نیست.");
+                    p.WaitForExit(30000);
+                    return p.ExitCode == 0
+                        ? (true, "کش داکر، ایمیج‌های بی‌استفاده و کانتینرهای متوقف‌شده با موفقیت پاکسازی شدند.")
+                        : (false, "خطا در پاکسازی کش Docker.");
+                }
+                catch
+                {
+                    return (false, "سرویس Docker در دسترس نیست.");
+                }
+            });
+        }
+
+        public static async Task<(bool Success, long FreedBytes, string Message)> CleanDevCachesAsync()
+        {
+            return await Task.Run(() =>
+            {
+                long freed = 0;
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+                var devCacheDirs = new[]
+                {
+                    Path.Combine(localAppData, "npm-cache"),
+                    Path.Combine(localAppData, "pip", "cache"),
+                    Path.Combine(localAppData, "NuGet", "v3-cache"),
+                    Path.Combine(localAppData, "NuGet", "plugins-cache"),
+                    Path.Combine(userProfile, ".gradle", "caches"),
+                    Path.Combine(appData, "Code", "Cache"),
+                    Path.Combine(appData, "Code", "CachedData"),
+                    Path.Combine(appData, "Code", "CachedExtensionVSIXs")
+                };
+
+                foreach (var dir in devCacheDirs)
+                {
+                    if (Directory.Exists(dir))
+                    {
+                        try
+                        {
+                            var di = new DirectoryInfo(dir);
+                            foreach (var file in di.EnumerateFiles("*", SearchOption.AllDirectories))
+                            {
+                                try
+                                {
+                                    long len = file.Length;
+                                    file.Delete();
+                                    freed += len;
+                                }
+                                catch { }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            CcLog.Ignore(ex);
+                        }
+                    }
+                }
+
+                return (true, freed, $"کش‌های محیط‌های برنامه‌نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({SystemStats.FormatBytes(freed)} آزاد شد)");
+            });
+        }
+
+        public static async Task<(bool Success, string Message)> CompactWsl2DiskAsync()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo("wsl", "--shutdown")
+                    {
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using (var p = Process.Start(psi))
+                    {
+                        p?.WaitForExit(10000);
+                    }
+
+                    string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                    var vhdxFiles = new List<string>();
+                    string packagesDir = Path.Combine(localAppData, "Packages");
+                    if (Directory.Exists(packagesDir))
+                    {
+                        try
+                        {
+                            vhdxFiles.AddRange(Directory.GetFiles(packagesDir, "ext4.vhdx", SearchOption.AllDirectories));
+                        }
+                        catch { }
+                    }
+                    string dockerWsl = Path.Combine(localAppData, "Docker", "wsl", "data");
+                    if (Directory.Exists(dockerWsl))
+                    {
+                        try
+                        {
+                            vhdxFiles.AddRange(Directory.GetFiles(dockerWsl, "ext4.vhdx", SearchOption.AllDirectories));
+                        }
+                        catch { }
+                    }
+
+                    if (vhdxFiles.Count == 0)
+                    {
+                        return (true, "سرویس WSL2 خاموش و حافظه رم آزاد شد. فایل دیسک مجازی vhdx مجزا یافت نشد.");
+                    }
+
+                    int compacted = 0;
+                    foreach (var vhdx in vhdxFiles)
+                    {
+                        string script = $"select vdisk file=\"{vhdx}\"\r\nattach vdisk readonly\r\ncompact vdisk\r\ndetach vdisk\r\n";
+                        string tmpScript = Path.Combine(Path.GetTempPath(), $"compact_{Guid.NewGuid():N}.txt");
+                        try
+                        {
+                            File.WriteAllText(tmpScript, script);
+                            var dpPsi = new ProcessStartInfo("diskpart", $"/s \"{tmpScript}\"")
+                            {
+                                UseShellExecute = false,
+                                CreateNoWindow = true
+                            };
+                            using var dp = Process.Start(dpPsi);
+                            dp?.WaitForExit(60000);
+                            compacted++;
+                        }
+                        finally
+                        {
+                            try { File.Delete(tmpScript); } catch { }
+                        }
+                    }
+
+                    return (true, $"تعداد {compacted} دیسک مجازی WSL2 با موفقیت بهینه‌سازی و متراکم شد.");
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                    return (false, "خطا در متراکم‌سازی دیسک WSL2.");
+                }
+            });
+        }
+
+        public static async Task<(bool Success, string Message)> CleanDismComponentsAsync()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var psi = new ProcessStartInfo("dism.exe", "/Online /Cleanup-Image /StartComponentCleanup")
+                    {
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    };
+                    using var p = Process.Start(psi);
+                    if (p == null) return (false, "امکان اجرای ابزار DISM وجود ندارد.");
+                    p.WaitForExit(90000);
+                    return p.ExitCode == 0
+                        ? (true, "فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته‌های قدیمی حذف شدند.")
+                        : (false, "عملیات DISM با خطا یا نیاز به دسترسی Administrator پایان یافت.");
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                    return (false, "خطا در اجرای ابزار پاکسازی DISM.");
+                }
+            });
         }
     }
 }

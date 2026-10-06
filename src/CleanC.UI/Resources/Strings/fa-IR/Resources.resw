@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>اجرا با دسترسی مدیر</value></data>
@@ -10,24 +10,24 @@
   <data name="NavDashboard" xml:space="preserve"><value>داشبورد بهینه سازی</value></data>
   <data name="NavTools" xml:space="preserve"><value>ابزارهای سیستمی ویندوز</value></data>
 
-  <!-- Dashboard -->
+  
   <data name="HeroCategory" xml:space="preserve"><value>وضعیت سلامت و کارایی سیستم</value></data>
-  <data name="HeroTitleReady" xml:space="preserve"><value>سیستم آماده بهینه سازی است</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>با ۱ کلیک فایل‌های موقت پاک، حافظه رم آزاد و پردازه‌های اضافی بسته می‌شوند.</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>سیستم بهینه‌سازی شد</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>فایل‌های موقت پاکسازی و عملکرد ویندوز ارتقا یافت.</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>قابل آزادسازی:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>آخرین پاکسازی:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>مجموع آزادشده:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>بهینه سازی سریع سیستم</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>پاکسازی کش، آزادسازی رم، تخلیه DNS و غیرفعال‌سازی سرویس‌های پس‌زمینه</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>تنظیمات پیشرفته پاکسازی دیسک</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>سیستم آماده بررسی و بهینه‌سازی است</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>پاکسازی متوالی فایل‌های زائد، کش‌ها، حافظه رم و افزایش کارایی</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>سیستم در وضعیت بهینه و پرسرعت قرار دارد</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>تمام بخش‌های موقت پاکسازی، رم آزاد و سرویس‌ها روان‌سازی شدند.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>قابل پاکسازی</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>آخرین پاکسازی</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>مجموع آزادشده</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>بهینه‌سازی و ارتقای سرعت سیستم</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>پاکسازی متوالی فایل‌های موقت، رم، رجیستری و سرویس‌ها</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>سفارشی‌سازی موارد پاکسازی و بهینه‌سازی</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>انتخاب اختصاصی موارد اسکن و پاکسازی کش و فایل‌های زاید</value></data>
 
-  <!-- Settings -->
+  
   <data name="SettingsTitle" xml:space="preserve"><value>تنظیمات برنامه</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>ظاهر، زبان برنامه، رفتار در پس‌زمینه و خروجی گزارش</value></data>
-  <data name="LanguageTitle" xml:space="preserve"><value>زبان برنامه (Language)</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>زبان برنامه</value></data>
   <data name="LanguageSub" xml:space="preserve"><value>جهت چیدمان راست‌به‌چپ (RTL) و چپ‌به‌راست (LTR) به همراه قلم متناسب با هر زبان تغییر می‌کند.</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>تم برنامه</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>«سیستم» از تم ویندوز پیروی می‌کند؛ دو حالت دیگر تم را ثابت نگه می‌دارند.</value></data>
@@ -65,4 +65,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>صفحه پروژه در گیت‌هاب</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>کپی اطلاعات عیب‌یابی</value></data>
   <data name="BackToTools" xml:space="preserve"><value>بازگشت به فهرست ابزارها</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>بازگشت</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>شاخص سلامت سیستم</value></data><data name="RamTitle" xml:space="preserve"><value>حافظه رم (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>پردازنده (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>پایش ترافیک اینترنت</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>پاکسازی‌های اخیر</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>تفکیک فضای دیسک</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>مشخصات جامع سیستم</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>سلامت باتری و توان</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>حذف‌کننده برنامه‌ها</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>تست سرعت و کیفیت اینترنت</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>شخصی‌سازی ویندوز و جلوه‌ها</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>مدیریت بروزرسانی‌های ویندوز</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>مدیریت استارتاپ</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>مدیریت درایورها</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>نگهداری و سلامت دیسک</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>مدیریت DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>مدیریت منوی کلیک راست</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>پاکسازی عمیق دیسک</value></data></root>

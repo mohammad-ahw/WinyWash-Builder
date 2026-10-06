@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Running as administrator</value></data>
@@ -10,24 +10,24 @@
   <data name="NavDashboard" xml:space="preserve"><value>Optimization Dashboard</value></data>
   <data name="NavTools" xml:space="preserve"><value>Windows System Utilities</value></data>
 
-  <!-- Dashboard -->
+  
   <data name="HeroCategory" xml:space="preserve"><value>System Health &amp; Performance Status</value></data>
   <data name="HeroTitleReady" xml:space="preserve"><value>System is ready for optimization</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>Clean temporary clutter, free memory, and stop background drain in one click.</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>System successfully optimized</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Caches purged, memory freed, and performance refreshed.</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>Cleanable Space:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>Last Cleanup:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>Total Freed:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>Quick System Boost</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>Clear junk, trim RAM, flush DNS, and stop background telemetry</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Advanced Disk Cleanup</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>Sequential cleanup of junk files, caches, RAM, and performance boost</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>System is operating in optimal high-speed state</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>All temp items cleaned, memory freed, and services tuned</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>Cleanable Space</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>Last Cleanup</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>Total Freed</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>Quick Boost &amp; System Optimization</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>Sequential clean of junk files, RAM, registry, and services</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Customize Cleanup &amp; Optimization Items</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>Custom scan items and detailed junk category selection</value></data>
 
-  <!-- Settings -->
+  
   <data name="SettingsTitle" xml:space="preserve"><value>Application Settings</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>Appearance, language, background behavior, and report exports</value></data>
-  <data name="LanguageTitle" xml:space="preserve"><value>Application Language</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>Language</value></data>
   <data name="LanguageSub" xml:space="preserve"><value>Switches layout direction (RTL/LTR) and optimizes typography automatically.</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>Color Theme</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>Follow Windows system theme or lock to light/dark mode.</value></data>
@@ -65,4 +65,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub Project Page</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>Copy diagnostic information</value></data>
   <data name="BackToTools" xml:space="preserve"><value>Back to Windows Tools</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>Back</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>System Health Index</value></data><data name="RamTitle" xml:space="preserve"><value>Memory (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>Processor (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>Network Traffic Monitor</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>Recent Cleanups</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>Disk Storage Breakdown</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>Comprehensive System Specs</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>Battery Health &amp; Power</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>App &amp; Bloatware Uninstaller</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>Internet Speed &amp; Quality Test</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows Personalization &amp; Visuals</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update Manager</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>Startup Manager</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>Hardware Drivers Manager</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>Disk Maintenance &amp; TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNS Manager</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>Context Menu Manager</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>Deep Storage Cleaner</value></data></root>

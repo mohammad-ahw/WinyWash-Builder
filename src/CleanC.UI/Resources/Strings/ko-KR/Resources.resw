@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>관리자 권한으로 실행 중</value></data>
@@ -10,20 +10,20 @@
   <data name="NavDashboard" xml:space="preserve"><value>최적화 대시보드</value></data>
   <data name="NavTools" xml:space="preserve"><value>Windows 시스템 도구</value></data>
   <data name="HeroCategory" xml:space="preserve"><value>시스템 상태 및 성능</value></data>
-  <data name="HeroTitleReady" xml:space="preserve"><value>시스템이 최적화 준비를 마쳤습니다</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>원클릭으로 임시 파일을 정리하고, 메모리를 확보하며, 불필요한 백그라운드 프로세스를 종료합니다.</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>시스템이 성공적으로 최적화되었습니다</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>캐시가 제거되었고 메모리가 확보되어 쾌적해졌습니다.</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>정리 가능 용량:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>마지막 정리:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>총 확보 용량:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>빠른 시스템 부스트</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>정크 파일 제거, RAM 확보, DNS 플러시 및 백그라운드 서비스 최적화</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>고급 디스크 정리</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>시스템 최적화 준비 완료</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>정크 파일, 캐시, 메모리 순차 정리 및 성능 향상</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>시스템이 최적의 고속 상태로 실행 중입니다</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>모든 임시 항목이 정리되고 메모리가 확보되었습니다.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>정리 가능 공간</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>최근 정리</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>총 확보 용량</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>원클릭 시스템 부스트 및 최적화</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>임시 파일, 메모리, 레지스트리 및 서비스 순차 정리</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>정리 및 최적화 항목 사용자 지정</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>스캔 항목 맞춤 설정 및 불필요한 파일 범주 선택</value></data>
   <data name="SettingsTitle" xml:space="preserve"><value>애플리케이션 설정</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>테마, 언어, 트레이 동작 및 진단 보고서 내보내기</value></data>
-  <data name="LanguageTitle" xml:space="preserve"><value>표시 언어 (Language)</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>언어 설정</value></data>
   <data name="LanguageSub" xml:space="preserve"><value>배치 방향과 시스템 폰트를 언어에 맞춰 자동으로 최적화합니다.</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>앱 테마</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>Windows 설정을 따르거나 밝은/어두운 모드로 고정합니다.</value></data>
@@ -61,4 +61,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub 프로젝트 페이지</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>진단 정보 복사</value></data>
   <data name="BackToTools" xml:space="preserve"><value>도구 목록으로 돌아가기</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>뒤로</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>시스템 건강 지수</value></data><data name="RamTitle" xml:space="preserve"><value>메모리 (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>프로세서 (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>실시간 네트워크 모니터링</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>최근 정리 기록</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>디스크 저장 공간 분석</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>상세 시스템 사양</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>배터리 수명 및 전원</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>앱 및 불필요한 소프트웨어 제거</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>인터넷 속도 및 품질 테스트</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows 개인 설정 및 시각 효과</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows 업데이트 관리자</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>시작 프로그램 관리</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>드라이버 관리</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>디스크 유지 관리 및 TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNS 관리자</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>컨텍스트 메뉴 관리</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>심층 저장 공간 정리</value></data></root>

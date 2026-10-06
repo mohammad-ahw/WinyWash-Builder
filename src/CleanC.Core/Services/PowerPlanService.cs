@@ -17,6 +17,13 @@ namespace CleanC.Core.Services
         public bool IsHighPerformanceOrUltimate { get; set; }
     }
 
+    public class PowerSchemeInfo
+    {
+        public string Guid { get; set; } = string.Empty;
+        public string Name { get; set; } = string.Empty;
+        public bool IsActive { get; set; }
+    }
+
     public class PowerPlanService
     {
         [DllImport("kernel32.dll")]
@@ -176,30 +183,92 @@ namespace CleanC.Core.Services
 
         public static bool ApplyHighPerformancePlan()
         {
+            return SetActivePlan("high");
+        }
+
+        public static List<PowerSchemeInfo> GetAllSchemes()
+        {
+            var list = new List<PowerSchemeInfo>();
             try
             {
-                // Standard High Performance GUID
-                string highPerfGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
-
-                // Try setting directly
-                if (SetActiveScheme(highPerfGuid)) return true;
-
-                // If scheme not yet present in schemes list, duplicate it
-                string? duplicatedGuid = DuplicateScheme(highPerfGuid);
-                if (!string.IsNullOrEmpty(duplicatedGuid))
+                var psi = new ProcessStartInfo("powercfg", "/list")
                 {
-                    return SetActiveScheme(duplicatedGuid);
+                    RedirectStandardOutput = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true
+                };
+                using var p = Process.Start(psi);
+                if (p != null)
+                {
+                    string output = p.StandardOutput.ReadToEnd();
+                    p.WaitForExit(3000);
+                    var matches = Regex.Matches(output, @"Power Scheme GUID:\s*([a-fA-F0-9\-]+)\s*\((.*?)\)(\s*\*?)");
+                    foreach (Match m in matches)
+                    {
+                        list.Add(new PowerSchemeInfo
+                        {
+                            Guid = m.Groups[1].Value.Trim(),
+                            Name = m.Groups[2].Value.Trim(),
+                            IsActive = m.Groups[3].Value.Contains("*")
+                        });
+                    }
                 }
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
             }
+            return list;
+        }
 
+        public static bool SetActivePlan(string planKey)
+        {
+            try
+            {
+                string ultimateGuid = "e9a42b02-d5df-448d-aa00-03f14749eb61";
+                string highPerfGuid = "8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c";
+                string balancedGuid = "381b4222-f694-41f0-9685-ff5bb260df2e";
+                string powerSaverGuid = "a1841308-3541-4fab-bc81-f71556f20b4a";
+
+                string targetGuid = planKey.ToLowerInvariant() switch
+                {
+                    "ultimate" => ultimateGuid,
+                    "high" => highPerfGuid,
+                    "balanced" => balancedGuid,
+                    "saver" => powerSaverGuid,
+                    _ => planKey
+                };
+
+                // Check existing schemes first
+                var existing = GetAllSchemes();
+                var found = existing.Find(s => s.Guid.Equals(targetGuid, StringComparison.OrdinalIgnoreCase) ||
+                                              (planKey == "ultimate" && s.Name.Contains("Ultimate", StringComparison.OrdinalIgnoreCase)) ||
+                                              (planKey == "high" && s.Name.Contains("High", StringComparison.OrdinalIgnoreCase)) ||
+                                              (planKey == "balanced" && s.Name.Contains("Balanced", StringComparison.OrdinalIgnoreCase)) ||
+                                              (planKey == "saver" && s.Name.Contains("Saver", StringComparison.OrdinalIgnoreCase)));
+                if (found != null)
+                {
+                    return SetActiveScheme(found.Guid);
+                }
+
+                // If not found, try setting target GUID directly
+                if (SetActiveScheme(targetGuid)) return true;
+
+                // Otherwise, duplicate from standard GUID
+                string? dup = DuplicateScheme(targetGuid);
+                if (!string.IsNullOrEmpty(dup))
+                {
+                    return SetActiveScheme(dup);
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
             return false;
         }
 
-        private static bool SetActiveScheme(string guid)
+        public static bool SetActiveScheme(string guid)
         {
             try
             {

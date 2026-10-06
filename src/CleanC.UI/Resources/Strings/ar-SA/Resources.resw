@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>تشغيل كمسؤول</value></data>
@@ -10,16 +10,16 @@
   <data name="NavDashboard" xml:space="preserve"><value>لوحة التحكم والتحسين</value></data>
   <data name="NavTools" xml:space="preserve"><value>أدوات نظام ويندوز</value></data>
   <data name="HeroCategory" xml:space="preserve"><value>حالة صحة وأداء النظام</value></data>
-  <data name="HeroTitleReady" xml:space="preserve"><value>النظام جاهز للتحسين والتنظيف</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>بنقرة واحدة يتم حذف الملفات المؤقتة، تحرير الذاكرة وإيقاف العمليات غير الضرورية.</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>تم تحسين النظام بنجاح</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>تم تفريغ الملفات المؤقتة وتحسين استجابة النظام.</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>المساحة القابلة للتفريغ:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>آخر تنظيف:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>إجمالي المحرر:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>تحسين النظام السريع</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>تفريغ الذاكرة المؤقتة، تنظيف RAM، وتفريغ ذاكرة DNS</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>تنظيف القرص المتقدم</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>النظام جاهز للفحص والتحسين</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>تنظيف الملفات المؤقتة والذاكرة وتحسين الأداء</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>النظام يعمل بأعلى كفاءة وسرعة</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>تم تنظيف جميع العناصر المؤقتة وتحرير الذاكرة وتحسين الخدمات.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>قابل للتنظيف</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>آخر تنظيف</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>إجمالي المساحة المحررة</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>تسريع وتحسين أداء النظام</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>تنظيف الملفات المؤقتة والذاكرة والريجستري والخدمات</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>تخصيص عناصر التنظيف والتحسين</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>تحديد مخصص لعناصر الفحص وملفات النظام المهملة</value></data>
   <data name="SettingsTitle" xml:space="preserve"><value>إعدادات التطبيق</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>المظهر، اللغة، سلوك شريط المهام وتصدير التقارير</value></data>
@@ -61,4 +61,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>صفحة المشروع على GitHub</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>نسخ معلومات التشخيص</value></data>
   <data name="BackToTools" xml:space="preserve"><value>العودة إلى قائمة الأدوات</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>رجوع</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>مؤشر صحة النظام</value></data><data name="RamTitle" xml:space="preserve"><value>ذاكرة الوصول العشوائي (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>المعالج (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>مراقبة حركة الإنترنت</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>عمليات التنظيف الأخيرة</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>تفصيل مساحة القرص</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>مواصفات النظام الشاملة</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>صحة البطارية والطاقة</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>إلغاء تثبيت التطبيقات</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>اختبار سرعة وجودة الإنترنت</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>تخصيص ويندوز والمؤثرات</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>إدارة تحديثات ويندوز</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>إدارة بدء التشغيل</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>إدارة برامج التشغيل</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>صيانة القرص و TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>إدارة DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>إدارة قائمة النقر الأيمن</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>التنظيف العميق للقرص</value></data></root>

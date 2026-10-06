@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
+using System.Net.NetworkInformation;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,19 +15,35 @@ namespace CleanC.Core.Services
     public class SpeedTestResult
     {
         public double PingMs { get; set; }
+        public int PingMsInt => (int)Math.Round(PingMs);
         public double DownloadSpeedMbps { get; set; }
+        public int DownloadSpeedMbpsInt => (int)Math.Round(DownloadSpeedMbps);
         public double DownloadSpeedMBs => Math.Round(DownloadSpeedMbps / 8.0, 2);
+        public int DownloadSpeedMBsInt => (int)Math.Round(DownloadSpeedMbps / 8.0);
         public double PeakDownloadSpeedMbps { get; set; }
+        public int PeakDownloadSpeedMbpsInt => (int)Math.Round(PeakDownloadSpeedMbps);
         public double PeakDownloadSpeedMBs => Math.Round(PeakDownloadSpeedMbps / 8.0, 2);
+        public int PeakDownloadSpeedMBsInt => (int)Math.Round(PeakDownloadSpeedMbps / 8.0);
         public double UploadSpeedMbps { get; set; }
+        public int UploadSpeedMbpsInt => (int)Math.Round(UploadSpeedMbps);
         public double UploadSpeedMBs => Math.Round(UploadSpeedMbps / 8.0, 2);
+        public int UploadSpeedMBsInt => (int)Math.Round(UploadSpeedMbps / 8.0);
         public int ActiveConnections { get; set; } = 8;
         public bool IsMultiConnectionIdmMode { get; set; } = true;
         
         public string ClientIp { get; set; } = string.Empty;
         public string IspName { get; set; } = string.Empty;
         public string Country { get; set; } = string.Empty;
+        public string CountryCode { get; set; } = string.Empty;
         public string City { get; set; } = string.Empty;
+        public bool IsVpnActive { get; set; }
+        public string FlagEmoji => InternetSpeedTestService.GetCountryFlagEmoji(CountryCode);
+
+        // Experience ratings (Speedtest.net style)
+        public string WebBrowsingRating => PingMs <= 90 && DownloadSpeedMbps >= 10 ? "عالی" : (PingMs <= 180 && DownloadSpeedMbps >= 5 ? "خوب" : "متوسط");
+        public string VideoStreamingRating => DownloadSpeedMbps >= 25 ? "4K UHD" : (DownloadSpeedMbps >= 10 ? "Full HD 1080p" : (DownloadSpeedMbps >= 3 ? "HD 720p" : "SD 480p"));
+        public string GamingRating => PingMs <= 40 ? "عالی (بدون لگ)" : (PingMs <= 70 ? "بسیار خوب" : (PingMs <= 120 ? "قابل قبول" : "دارای تاخیر"));
+        public string VideoCallingRating => PingMs <= 110 && UploadSpeedMbps >= 2.5 ? "کیفیت عالی (HD)" : (PingMs <= 180 && UploadSpeedMbps >= 1 ? "کیفیت مطلوب" : "کیفیت پایه");
 
         public long BytesDownloaded { get; set; }
         public long BytesUploaded { get; set; }
@@ -55,6 +73,46 @@ namespace CleanC.Core.Services
             _httpClient.DefaultRequestHeaders.Add("Accept", "*/*");
         }
 
+        public static string GetCountryFlagEmoji(string? countryCode)
+        {
+            if (string.IsNullOrWhiteSpace(countryCode) || countryCode.Length != 2) return "🌐";
+            try
+            {
+                countryCode = countryCode.ToUpperInvariant();
+                if (countryCode[0] < 'A' || countryCode[0] > 'Z' || countryCode[1] < 'A' || countryCode[1] > 'Z') return "🌐";
+                int first = 0x1F1E6 + (countryCode[0] - 'A');
+                int second = 0x1F1E6 + (countryCode[1] - 'A');
+                return char.ConvertFromUtf32(first) + char.ConvertFromUtf32(second);
+            }
+            catch
+            {
+                return "🌐";
+            }
+        }
+
+        public static bool IsVpnOrProxyActive()
+        {
+            try
+            {
+                foreach (var ni in NetworkInterface.GetAllNetworkInterfaces())
+                {
+                    if (ni.OperationalStatus != OperationalStatus.Up) continue;
+                    string desc = (ni.Description + " " + ni.Name).ToLowerInvariant();
+                    if (desc.Contains("tap") || desc.Contains("tun") || desc.Contains("wireguard") ||
+                        desc.Contains("wintun") || desc.Contains("openvpn") || desc.Contains("tailscale") ||
+                        desc.Contains("sing-box") || desc.Contains("v2ray") || desc.Contains("xray") ||
+                        desc.Contains("clash") || desc.Contains("vpn") || desc.Contains("neko") ||
+                        desc.Contains("pptp") || desc.Contains("l2tp") || desc.Contains("sstp") ||
+                        ni.NetworkInterfaceType == NetworkInterfaceType.Tunnel)
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+
         private static readonly List<SpeedTestResult> _testHistory = new();
 
         public static IReadOnlyList<SpeedTestResult> GetHistory()
@@ -70,6 +128,7 @@ namespace CleanC.Core.Services
             CancellationToken cancellationToken = default)
         {
             var result = new SpeedTestResult();
+            result.IsVpnActive = IsVpnOrProxyActive();
 
             // 1. Fetch IP, ISP, and Location metadata fast
             try
@@ -82,6 +141,7 @@ namespace CleanC.Core.Services
                 var root = doc.RootElement;
                 if (root.TryGetProperty("ip", out var q)) result.ClientIp = q.GetString() ?? "";
                 if (root.TryGetProperty("country", out var cnt)) result.Country = cnt.GetString() ?? "";
+                if (root.TryGetProperty("country_code", out var cc)) result.CountryCode = cc.GetString() ?? "";
                 if (root.TryGetProperty("city", out var city)) result.City = city.GetString() ?? "";
                 if (root.TryGetProperty("connection", out var conn) && conn.TryGetProperty("isp", out var isp))
                 {
@@ -97,7 +157,11 @@ namespace CleanC.Core.Services
                     using var linkedCf = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken, cfCts.Token);
                     using var headResp = await _httpClient.GetAsync("https://speed.cloudflare.com/__down?bytes=0", HttpCompletionOption.ResponseHeadersRead, linkedCf.Token);
                     if (headResp.Headers.TryGetValues("cf-meta-ip", out var ips)) result.ClientIp = ips.FirstOrDefault() ?? "";
-                    if (headResp.Headers.TryGetValues("cf-meta-country", out var cnts)) result.Country = cnts.FirstOrDefault() ?? "";
+                    if (headResp.Headers.TryGetValues("cf-meta-country", out var cnts))
+                    {
+                        result.CountryCode = cnts.FirstOrDefault() ?? "";
+                        result.Country = result.CountryCode;
+                    }
                     if (headResp.Headers.TryGetValues("cf-meta-city", out var cities)) result.City = cities.FirstOrDefault() ?? "";
                     result.IspName = "Cloudflare CDN";
                 }
@@ -122,28 +186,22 @@ namespace CleanC.Core.Services
             // Immediately notify UI that metadata is ready!
             onProgress?.Invoke("meta", 0, 0, result);
 
-            // 2. Measure Ping (Latency)
+            // 2. Measure Ping (Native ICMP Ping with fallback)
             try
             {
-                var pings = new List<double>();
-                string[] pingTargets = new[]
-                {
-                    "https://speed.cloudflare.com/__down?bytes=0",
-                    "https://1.1.1.1",
-                    "https://www.google.com"
-                };
+                var pings = new List<long>();
+                string[] pingHosts = new[] { "1.1.1.1", "8.8.8.8", "4.2.2.4" };
+                using var pingSender = new Ping();
 
-                foreach (var target in pingTargets)
+                foreach (var host in pingHosts)
                 {
                     if (cancellationToken.IsCancellationRequested) break;
                     try
                     {
-                        var sw = Stopwatch.StartNew();
-                        using var pingResp = await _httpClient.GetAsync(target, HttpCompletionOption.ResponseHeadersRead, cancellationToken);
-                        sw.Stop();
-                        if (pingResp.IsSuccessStatusCode)
+                        var reply = await pingSender.SendPingAsync(host, 1000);
+                        if (reply.Status == IPStatus.Success)
                         {
-                            pings.Add(sw.Elapsed.TotalMilliseconds);
+                            pings.Add(reply.RoundtripTime);
                         }
                     }
                     catch (Exception __ex)
@@ -154,9 +212,21 @@ namespace CleanC.Core.Services
 
                 if (pings.Count > 0)
                 {
-                    result.PingMs = Math.Round(pings.Min(), 1);
-                    onProgress?.Invoke("ping", result.PingMs, 0, result);
+                    result.PingMs = pings.Min();
                 }
+                else
+                {
+                    // Fallback to HTTP HEAD latency if ICMP is blocked
+                    var sw = Stopwatch.StartNew();
+                    using var pingResp = await _httpClient.GetAsync("https://speed.cloudflare.com/__down?bytes=0", HttpCompletionOption.ResponseHeadersRead, cancellationToken);
+                    sw.Stop();
+                    if (pingResp.IsSuccessStatusCode)
+                    {
+                        result.PingMs = Math.Round((double)sw.ElapsedMilliseconds, 0);
+                    }
+                }
+
+                onProgress?.Invoke("ping", result.PingMs, 0, result);
             }
             catch (Exception) when (!cancellationToken.IsCancellationRequested)
             {
@@ -265,9 +335,21 @@ namespace CleanC.Core.Services
 
             if (result.BytesDownloaded > 0)
             {
-                double finalAvg = recordedSpeeds.Count > 0 
-                    ? recordedSpeeds.Average() 
-                    : (result.BytesDownloaded * 8.0) / (Math.Max(streamStopwatch.Elapsed.TotalSeconds, 0.5) * 1_000_000.0);
+                double finalAvg = 0;
+                if (recordedSpeeds.Count >= 4)
+                {
+                    var sorted = recordedSpeeds.OrderBy(x => x).ToList();
+                    int skip = sorted.Count / 2;
+                    finalAvg = sorted.Skip(skip).Average();
+                }
+                else if (recordedSpeeds.Count > 0)
+                {
+                    finalAvg = recordedSpeeds.Average();
+                }
+                else
+                {
+                    finalAvg = (result.BytesDownloaded * 8.0) / (Math.Max(streamStopwatch.Elapsed.TotalSeconds, 0.5) * 1_000_000.0);
+                }
 
                 result.DownloadSpeedMbps = Math.Round(finalAvg, 2);
                 onProgress?.Invoke("download", result.DownloadSpeedMbps, 100, result);

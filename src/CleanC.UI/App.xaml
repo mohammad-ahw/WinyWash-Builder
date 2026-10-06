@@ -22,21 +22,27 @@
                     <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#0F172A" />
                     <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#0F172A" />
                     
-                    <!-- Fluent 2 Solid-Glass Cards: ~92% white with subtle cool tint ensures stable, gorgeous presentation without wallpaper noise -->
-                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#EBFBFCFE" />
-                    <!-- Crisp visible border definition in Light mode -->
-                    <SolidColorBrush x:Key="AppCardBorderBrush" Color="#18000000" />
+                    <!-- Luminous Frosted Glass Card: crisp high contrast with genuine acrylic blur -->
+                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#D2FFFFFF" />
+                    <!-- Specular glass rim border with crisp visible definition in Light mode -->
+                    <LinearGradientBrush x:Key="AppCardBorderBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FFFFFFFF" Offset="0.0" />
+                        <GradientStop Color="#25000000" Offset="1.0" />
+                    </LinearGradientBrush>
                     
                     <!-- Secondary surface inside cards (chips, sub-cards, list items, bento buttons) -->
-                    <SolidColorBrush x:Key="AppCardSecondaryBrush" Color="#F6FFFFFF" />
+                    <SolidColorBrush x:Key="AppCardSecondaryBrush" Color="#40F1F5F9" />
                     
-                    <!-- Header Background and Border -->
-                    <SolidColorBrush x:Key="AppHeaderBackgroundBrush" Color="#EFF3F4F8" />
-                    <SolidColorBrush x:Key="AppHeaderBorderBrush" Color="#18000000" />
+                    <!-- Translucent Glass Header -->
+                    <SolidColorBrush x:Key="AppHeaderBackgroundBrush" Color="#B8FFFFFF" />
+                    <LinearGradientBrush x:Key="AppHeaderBorderBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#FFFFFFFF" Offset="0.0" />
+                        <GradientStop Color="#18000000" Offset="1.0" />
+                    </LinearGradientBrush>
                     
                     <!-- Quick action button pill background & segmented switcher background -->
-                    <SolidColorBrush x:Key="AppHeaderPillBrush" Color="#E8F1F5F9" />
-                    <SolidColorBrush x:Key="AppHeaderPillHoverBrush" Color="#F1F5F9" />
+                    <SolidColorBrush x:Key="AppHeaderPillBrush" Color="#12000000" />
+                    <SolidColorBrush x:Key="AppHeaderPillHoverBrush" Color="#22000000" />
                     
                     <!-- Running as Admin Pill Badge -->
                     <SolidColorBrush x:Key="AdminBadgeBackgroundBrush" Color="#200078D4" />

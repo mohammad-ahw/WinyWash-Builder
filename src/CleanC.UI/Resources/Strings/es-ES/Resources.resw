@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Ejecutando como administrador</value></data>
@@ -10,20 +10,20 @@
   <data name="NavDashboard" xml:space="preserve"><value>Panel de optimización</value></data>
   <data name="NavTools" xml:space="preserve"><value>Herramientas del sistema</value></data>
   <data name="HeroCategory" xml:space="preserve"><value>Estado de salud y rendimiento</value></data>
-  <data name="HeroTitleReady" xml:space="preserve"><value>El sistema está listo para optimizarse</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>Limpie archivos temporales, libere memoria y detenga procesos en segundo plano con 1 clic.</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>Sistema optimizado con éxito</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Cachés vaciadas, memoria liberada y respuesta mejorada.</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>Espacio liberable:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>Última limpieza:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>Total liberado:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>Aceleración rápida del sistema</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>Eliminar residuos, optimizar RAM, vaciar DNS y detener servicios en segundo plano</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Limpieza avanzada de disco</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>El sistema está listo para la optimización</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>Limpieza secuencial de archivos temporales, caché y RAM</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>El sistema funciona en un estado óptimo de alta velocidad</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Todos los elementos temporales se han limpiado y se liberó memoria.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>Espacio limpiable</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>Última limpieza</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>Total liberado</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>Optimización rápida del sistema</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>Limpieza secuencial de archivos temporales, RAM, registro y servicios</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Personalizar elementos de limpieza y optimización</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>Selección personalizada de categorías de archivos residuales</value></data>
   <data name="SettingsTitle" xml:space="preserve"><value>Configuración</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>Aspecto, idioma, bandeja del sistema y exportación de informes</value></data>
-  <data name="LanguageTitle" xml:space="preserve"><value>Idioma (Language)</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>Idioma</value></data>
   <data name="LanguageSub" xml:space="preserve"><value>Ajusta automáticamente la dirección del diseño y la tipografía.</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>Tema de la aplicación</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>Seguir el sistema Windows o fijar modo claro/oscuro.</value></data>
@@ -61,4 +61,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>Página del proyecto en GitHub</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>Copiar información de diagnóstico</value></data>
   <data name="BackToTools" xml:space="preserve"><value>Volver a herramientas del sistema</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>Volver</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>Índice de salud del sistema</value></data><data name="RamTitle" xml:space="preserve"><value>Memoria (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>Procesador (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>Monitoreo de tráfico de red</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>Limpiezas recientes</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>Desglose de almacenamiento en disco</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>Especificaciones completas del sistema</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>Salud de la batería y energía</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>Desinstalador de aplicaciones</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>Prueba de velocidad y calidad de Internet</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Personalización y efectos visuales de Windows</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Administrador de Windows Update</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>Administrador de inicio</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>Administrador de controladores</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>Mantenimiento de disco y TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>Administrador de DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>Administrador de menú contextual</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>Limpiador profundo de almacenamiento</value></data></root>

@@ -669,6 +669,150 @@ namespace CleanC.Core.Services
                     CcLog.Ignore(__ex);
                 }
 
+                // -------------------------------------------------------------
+                // Group 7: Live System Optimization & Performance Boost
+                // -------------------------------------------------------------
+                progressCallback?.Invoke("در حال ارزیابی گزینه‌های بهینه‌سازی زنده و پایداری...");
+                var grpBoost = new JunkGroup
+                {
+                    Id = "system_boost",
+                    Title = "بهینه‌سازی زنده و پایداری سیستم (Performance & Boost)",
+                    Description = "آزادسازی رم، کش شبکه، پروسس‌های اضافی، استارتاپ، Debloat و پلن انرژی",
+                    IconGlyph = "\uE9D2"
+                };
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "ramBoost",
+                    GroupId = "system_boost",
+                    Title = "آزادسازی حافظه فعال رم (RAM Working Set)",
+                    Description = "تخلیه Working Set پردازه‌ها و آزادسازی فوری حافظه اشغال‌شده بدون بستن برنامه‌ها",
+                    Path = "Memory",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE9D2",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "dnsFlush",
+                    GroupId = "system_boost",
+                    Title = "تخلیه کش DNS و نوسازی ارتباطات شبکه",
+                    Description = "پاکسازی رکوردهای نامعتبر دامنه از کش ویندوز و رفع کندی ارتباطات اینترنتی",
+                    Path = "Network",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE774",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "backgroundHelpers",
+                    GroupId = "system_boost",
+                    Title = "بستن پردازه‌ها و کمک‌کننده‌های اضافی در پس‌زمینه",
+                    Description = "توقف سرویس‌های جانبی، پروسه‌های گزارش‌گیری و آپدیترهای مقیم در پس‌زمینه",
+                    Path = "Processes",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE9F5",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "browserBoost",
+                    GroupId = "system_boost",
+                    Title = "خاموش‌سازی تسک‌های پس‌زمینه مرورگرها (Edge / Chrome)",
+                    Description = "غیرفعال‌سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته‌شدن",
+                    Path = "Browsers",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE774",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "startupOptimize",
+                    GroupId = "system_boost",
+                    Title = "بهینه‌سازی استارتاپ ویندوز",
+                    Description = "غیرفعال‌سازی برنامه‌ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم",
+                    Path = "Startup",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE7B5",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "bloatwareClean",
+                    GroupId = "system_boost",
+                    Title = "حذف برنامه‌ها و بازی‌های تبلیغاتی پیش‌فرض (Debloat)",
+                    Description = "حذف نرم‌افزارها و بازی‌های تبلیغاتی پیش‌فرض و بررسی برنامه‌های کم‌استفاده",
+                    Path = "Bloatware",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE74C",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "powerPlanBoost",
+                    GroupId = "system_boost",
+                    Title = "تنظیم پلن انرژی با کارایی بالا (High Performance Plan)",
+                    Description = "انتقال مدیریت توان ویندوز به پلن حداکثر کارایی سخت‌افزاری پردازنده",
+                    Path = "PowerPlan",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE7E8",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "fastStartup",
+                    GroupId = "system_boost",
+                    Title = "کوتاه‌کردن زمان خاموش‌شدن سیستم (Fast Startup)",
+                    Description = "فعال‌سازی خاموش‌سازی و راه‌اندازی فوق‌سریع ویندوز",
+                    Path = "FastStartup",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE7E8",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "gpuOptimize",
+                    GroupId = "system_boost",
+                    Title = "تخصیص هوشمند کارت گرافیک مجزا",
+                    Description = "هدایت بازی‌ها و برنامه‌های سنگین به پردازنده گرافیکی قدرتمند اصلی",
+                    Path = "GPU",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE790",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "winTweaks",
+                    GroupId = "system_boost",
+                    Title = "بهینه‌سازی تنظیمات عملکرد و حریم خصوصی ویندوز",
+                    Description = "غیرفعال‌سازی تله‌متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز",
+                    Path = "Tweaks",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE770",
+                    IsChecked = true
+                });
+
+                result.Groups.Add(grpBoost);
+
                 return result;
             });
         }

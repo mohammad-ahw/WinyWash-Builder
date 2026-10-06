@@ -171,6 +171,9 @@ namespace CleanC.UI
             {
                 SpecsCardsContainer.Children.Add(CreateLogicalDrivesSection(specs.LogicalDrives));
             }
+
+            // 9. Windows Power Plan Management
+            SpecsCardsContainer.Children.Add(CreatePowerPlanManagementCard());
         }
 
         private void CopySpecsReport_Click(object sender, RoutedEventArgs e)
@@ -450,6 +453,161 @@ namespace CleanC.UI
             mainStack.Children.Add(drivesList);
             container.Child = mainStack;
             return container;
+        }
+
+        private UIElement CreatePowerPlanManagementCard()
+        {
+            var card = new Border
+            {
+                Background = GetThemeBrush("AppCardBackgroundBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(12),
+                Padding = new Thickness(20),
+                Margin = new Thickness(0, 14, 0, 0)
+            };
+
+            var mainStack = new StackPanel { Spacing = 14 };
+
+            // Header
+            var headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+            var titleStack = new StackPanel { Spacing = 3 };
+            titleStack.Children.Add(new TextBlock
+            {
+                Text = "مدیریت و تغییر پلن مصرف انرژی (Windows Power Plan)",
+                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
+                FontSize = 14
+            });
+
+            var status = PowerPlanService.GetPowerStatus();
+            var subText = new TextBlock
+            {
+                Text = $"پلن فعال فعلی: {status.ActiveSchemeName} | اعمال بیدرنگ با دستورات رسمی powercfg بدون نیاز به ری‌استارت",
+                FontSize = 11,
+                Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+            };
+            titleStack.Children.Add(subText);
+            Grid.SetColumn(titleStack, 0);
+            headerGrid.Children.Add(titleStack);
+
+            var activeBadge = new Border
+            {
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(10, 4, 10, 4),
+                VerticalAlignment = VerticalAlignment.Center
+            };
+            var badgeText = new TextBlock
+            {
+                Text = $"⚡ {status.ActiveSchemeName}",
+                FontSize = 11,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"]
+            };
+            activeBadge.Child = badgeText;
+            Grid.SetColumn(activeBadge, 1);
+            headerGrid.Children.Add(activeBadge);
+
+            mainStack.Children.Add(headerGrid);
+
+            // 4 Plans Grid
+            var plansGrid = new Grid { ColumnSpacing = 10, RowSpacing = 10 };
+            plansGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            plansGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            plansGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            plansGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+
+            var plans = new[]
+            {
+                ("ultimate", "حداکثر کارایی (Ultimate Performance)", "حذف کامل تأخیر کلاک و آزادسازی تمام پتانسیل سخت‌افزار", "\uE7E8"),
+                ("high", "کارایی بالا (High Performance)", "اولویت سرعت و عملکرد بدون حالت خواب سریع قطعات", "\uE945"),
+                ("balanced", "متعادل (Balanced - پیش‌فرض)", "توازن هوشمند بین مصرف بهینه انرژی و سرعت پردازش", "\uE953"),
+                ("saver", "ذخیره انرژی (Power Saver)", "کاهش فرکانس کلاک پردازنده جهت افزایش دوام شارژ باتری", "\uEC0A")
+            };
+
+            for (int i = 0; i < plans.Length; i++)
+            {
+                var (key, title, desc, icon) = plans[i];
+                var planBtn = new Button
+                {
+                    HorizontalAlignment = HorizontalAlignment.Stretch,
+                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
+                    Padding = new Thickness(14, 12, 14, 12),
+                    CornerRadius = new CornerRadius(8),
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                    BorderThickness = new Thickness(1)
+                };
+
+                var pGrid = new Grid();
+                pGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                pGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+                var pIcon = new FontIcon
+                {
+                    Glyph = icon,
+                    FontSize = 18,
+                    Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
+                    Margin = new Thickness(0, 0, 12, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(pIcon, 0);
+                pGrid.Children.Add(pIcon);
+
+                var pTextStack = new StackPanel { Spacing = 2 };
+                pTextStack.Children.Add(new TextBlock
+                {
+                    Text = title,
+                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                    FontSize = 12
+                });
+                pTextStack.Children.Add(new TextBlock
+                {
+                    Text = desc,
+                    FontSize = 10.5,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    TextWrapping = TextWrapping.Wrap
+                });
+                Grid.SetColumn(pTextStack, 1);
+                pGrid.Children.Add(pTextStack);
+
+                planBtn.Content = pGrid;
+
+                string captureKey = key;
+                string captureTitle = title;
+                planBtn.Click += async (s, e) =>
+                {
+                    planBtn.IsEnabled = false;
+                    bool ok = await Task.Run(() => PowerPlanService.SetActivePlan(captureKey));
+                    planBtn.IsEnabled = true;
+                    if (ok)
+                    {
+                        var newStatus = PowerPlanService.GetPowerStatus();
+                        badgeText.Text = $"⚡ {newStatus.ActiveSchemeName}";
+                        subText.Text = $"پلن فعال فعلی: {newStatus.ActiveSchemeName} | اعمال بیدرنگ با دستورات رسمی powercfg بدون نیاز به ری‌استارت";
+                        ShowInfoBar("تغییر پلن انرژی", $"پلن انرژی ویندوز با موفقیت به «{captureTitle}» تغییر یافت.", InfoBarSeverity.Success);
+                    }
+                    else
+                    {
+                        ShowInfoBar("خطا در تغییر پلن", "امکان تغییر پلن انرژی وجود ندارد (ممکن است نیازمند دسترسی مدیر باشد).", InfoBarSeverity.Error);
+                    }
+                };
+
+                int r = i / 2;
+                int c = i % 2;
+                Grid.SetRow(planBtn, r);
+                Grid.SetColumn(planBtn, c);
+                plansGrid.Children.Add(planBtn);
+            }
+
+            mainStack.Children.Add(plansGrid);
+            card.Child = mainStack;
+            return card;
         }
 
         private async Task PromptRenameDriveAsync(LogicalDriveItem drive)
@@ -912,17 +1070,17 @@ namespace CleanC.UI
         private async Task StartSpeedTestBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             StartSpeedTestBtn.IsEnabled = false;
-            StopSpeedTestBtn.IsEnabled = true;
             _speedTestCts = new CancellationTokenSource();
 
-            SpeedGaugeValueText.Text = "۰.۰";
+            SpeedGaugeValueText.Text = "0";
             SpeedGaugeMBsText.Text = "در حال اتصال به سرور...";
             SpeedGaugePhaseText.Text = "در حال آماده‌سازی و سنجش تاخیر...";
-            SpeedPingValText.Text = "...";
-            SpeedDownloadValText.Text = "...";
-            SpeedUploadValText.Text = "...";
+            SpeedPingValText.Text = "-- ms";
+            SpeedDownloadValText.Text = "-- Mbps";
+            SpeedUploadValText.Text = "-- Mbps";
             SpeedGaugeRing.IsIndeterminate = false;
             SpeedGaugeRing.Value = 0;
+            if (SpeedExperienceCard != null) SpeedExperienceCard.Visibility = Visibility.Collapsed;
 
             try
             {
@@ -935,8 +1093,16 @@ namespace CleanC.UI
                             SpeedIpChipText.Text = curResult.ClientIp;
                             SpeedIspChipText.Text = !string.IsNullOrEmpty(curResult.IspName) ? curResult.IspName : "ارائه‌دهنده فعال";
                             string loc = $"{curResult.City}, {curResult.Country}".Trim(',', ' ');
-                            SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? loc : "سرور ابری جهانی";
+                            string flag = !string.IsNullOrEmpty(curResult.FlagEmoji) ? curResult.FlagEmoji + " " : "";
+                            SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? $"{flag}{loc}" : "سرور ابری جهانی";
+                            if (SpeedVpnBadge != null)
+                            {
+                                SpeedVpnBadge.Visibility = curResult.IsVpnActive ? Visibility.Visible : Visibility.Collapsed;
+                            }
                         }
+
+                        int curMbpsInt = (int)Math.Round(mbps);
+                        int curMbsInt = (int)Math.Round(mbps / 8.0);
 
                         if (phase == "meta")
                         {
@@ -945,23 +1111,23 @@ namespace CleanC.UI
                         else if (phase == "ping")
                         {
                             SpeedGaugePhaseText.Text = "در حال سنجش تاخیر پینگ...";
-                            SpeedPingValText.Text = $"{mbps.ToString("0", CultureInfo.InvariantCulture)} ms";
+                            SpeedPingValText.Text = $"{curMbpsInt} ms";
                         }
                         else if (phase == "download")
                         {
                             SpeedGaugePhaseText.Text = "در حال سنجش سرعت دانلود چندکاناله...";
-                            SpeedGaugeValueText.Text = mbps.ToString("0.0", CultureInfo.InvariantCulture);
-                            double peakMBs = curResult != null && curResult.PeakDownloadSpeedMbps > 0 ? curResult.PeakDownloadSpeedMbps / 8.0 : (mbps / 8.0);
-                            SpeedGaugeMBsText.Text = $"{(mbps / 8.0).ToString("0.00", CultureInfo.InvariantCulture)} MB/s (پیک: {peakMBs.ToString("0.00", CultureInfo.InvariantCulture)} MB/s)";
-                            SpeedDownloadValText.Text = $"{mbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps ({(mbps / 8.0).ToString("0.00", CultureInfo.InvariantCulture)} MB/s)";
+                            SpeedGaugeValueText.Text = $"{curMbpsInt}";
+                            int peakMBsInt = curResult != null && curResult.PeakDownloadSpeedMbps > 0 ? (int)Math.Round(curResult.PeakDownloadSpeedMbps / 8.0) : curMbsInt;
+                            SpeedGaugeMBsText.Text = $"{curMbsInt} MB/s (پیک: {peakMBsInt} MB/s)";
+                            SpeedDownloadValText.Text = $"{curMbpsInt} Mbps ({curMbsInt} MB/s)";
                             SpeedGaugeRing.Value = pct;
                         }
                         else if (phase == "upload")
                         {
                             SpeedGaugePhaseText.Text = "در حال ارسال داده (آپلود)...";
-                            SpeedGaugeValueText.Text = mbps.ToString("0.0", CultureInfo.InvariantCulture);
-                            SpeedGaugeMBsText.Text = $"{(mbps / 8.0).ToString("0.00", CultureInfo.InvariantCulture)} MB/s";
-                            SpeedUploadValText.Text = $"{mbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps";
+                            SpeedGaugeValueText.Text = $"{curMbpsInt}";
+                            SpeedGaugeMBsText.Text = $"{curMbsInt} MB/s";
+                            SpeedUploadValText.Text = $"{curMbpsInt} Mbps ({curMbsInt} MB/s)";
                             SpeedGaugeRing.Value = pct;
                         }
                     });
@@ -972,21 +1138,36 @@ namespace CleanC.UI
                     SpeedIpChipText.Text = !string.IsNullOrEmpty(result.ClientIp) ? result.ClientIp : "نامشخص";
                     SpeedIspChipText.Text = !string.IsNullOrEmpty(result.IspName) ? result.IspName : "شبکه اینترنت";
                     string loc = $"{result.City}, {result.Country}".Trim(',', ' ');
-                    SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? loc : "سرور ابری جهانی";
+                    string flag = !string.IsNullOrEmpty(result.FlagEmoji) ? result.FlagEmoji + " " : "";
+                    SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? $"{flag}{loc}" : "سرور ابری جهانی";
+                    if (SpeedVpnBadge != null)
+                    {
+                        SpeedVpnBadge.Visibility = result.IsVpnActive ? Visibility.Visible : Visibility.Collapsed;
+                    }
 
                     SpeedGaugePhaseText.Text = "تست با موفقیت تکمیل شد";
-                    SpeedGaugeValueText.Text = result.DownloadSpeedMbps.ToString("0.0", CultureInfo.InvariantCulture);
-                    double peakMBs = result.PeakDownloadSpeedMbps > 0 ? result.PeakDownloadSpeedMbps / 8.0 : result.DownloadSpeedMBs;
-                    SpeedGaugeMBsText.Text = $"{result.DownloadSpeedMBs.ToString("0.00", CultureInfo.InvariantCulture)} MB/s (اوج دانلود: {peakMBs.ToString("0.00", CultureInfo.InvariantCulture)} MB/s)";
-                    SpeedPingValText.Text = result.PingMs > 0 ? $"{result.PingMs} ms" : "موفق";
-                    SpeedDownloadValText.Text = $"{result.DownloadSpeedMbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps ({result.DownloadSpeedMBs.ToString("0.00", CultureInfo.InvariantCulture)} MB/s)";
-                    SpeedUploadValText.Text = result.UploadSpeedMbps > 0 ? $"{result.UploadSpeedMbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps" : "--";
+                    SpeedGaugeValueText.Text = $"{result.DownloadSpeedMbpsInt}";
+                    SpeedGaugeMBsText.Text = $"{result.DownloadSpeedMBsInt} MB/s (اوج دانلود: {result.PeakDownloadSpeedMBsInt} MB/s)";
+                    SpeedPingValText.Text = $"{result.PingMsInt} ms";
+                    SpeedDownloadValText.Text = $"{result.DownloadSpeedMbpsInt} Mbps ({result.DownloadSpeedMBsInt} MB/s)";
+                    SpeedUploadValText.Text = result.UploadSpeedMbps > 0 ? $"{result.UploadSpeedMbpsInt} Mbps ({result.UploadSpeedMBsInt} MB/s)" : "--";
                     SpeedGaugeRing.Value = 100;
+
+                    // Experience Ratings
+                    if (SpeedExperienceCard != null)
+                    {
+                        SpeedExperienceCard.Visibility = Visibility.Visible;
+                        if (SpeedExpWebText != null) SpeedExpWebText.Text = result.WebBrowsingRating;
+                        if (SpeedExpVideoText != null) SpeedExpVideoText.Text = result.VideoStreamingRating;
+                        if (SpeedExpGamingText != null) SpeedExpGamingText.Text = result.GamingRating;
+                        if (SpeedExpCallText != null) SpeedExpCallText.Text = result.VideoCallingRating;
+                    }
+
                     if (LauncherSpeedTestBadge != null)
                     {
-                        LauncherSpeedTestBadge.Text = $"آخرین: {result.DownloadSpeedMbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps";
+                        LauncherSpeedTestBadge.Text = $"دانلود: {result.DownloadSpeedMbpsInt} Mbps ({result.DownloadSpeedMBsInt} MB/s)";
                     }
-                    ShowInfoBar("تست سرعت اینترنت", $"تست چندکاناله تکمیل شد: دانلود {result.DownloadSpeedMbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps ({result.DownloadSpeedMBs.ToString("0.00", CultureInfo.InvariantCulture)} MB/s) | پینگ: {result.PingMs} ms", InfoBarSeverity.Success);
+                    ShowInfoBar("تست سرعت اینترنت", $"تست تکمیل شد: دانلود {result.DownloadSpeedMbpsInt} Mbps ({result.DownloadSpeedMBsInt} MB/s) | آپلود {result.UploadSpeedMbpsInt} Mbps | پینگ: {result.PingMsInt} ms", InfoBarSeverity.Success);
                 }
                 else
                 {
@@ -998,19 +1179,12 @@ namespace CleanC.UI
             catch (Exception)
             {
                 SpeedGaugePhaseText.Text = "تست متوقف شد";
-                SpeedGaugeMBsText.Text = "تست توسط کاربر لغو گردید.";
+                SpeedGaugeMBsText.Text = "تست با خطا مواجه شد.";
             }
             finally
             {
                 StartSpeedTestBtn.IsEnabled = true;
-                StopSpeedTestBtn.IsEnabled = false;
             }
-        }
-
-        private void StopSpeedTestBtn_Click(object sender, RoutedEventArgs e)
-        {
-            _speedTestCts?.Cancel();
-            StopSpeedTestBtn.IsEnabled = false;
         }
 
         // ====================================================================
@@ -1124,6 +1298,12 @@ namespace CleanC.UI
                     }
                 }
             }));
+
+            // 11. Glass / Mica Presets & Options
+            PersonalizationCardsContainer.Children.Add(CreateGlassConfigCard());
+
+            // 12. Wallpaper Management & CleanC Gallery
+            PersonalizationCardsContainer.Children.Add(CreateWallpaperManagementCard());
         }
 
         private Border CreateActionCard(string glyph, string title, string description, string actionBtnText, Windows.UI.Color iconBgColor = default, Action? onClick = null)
@@ -1195,6 +1375,234 @@ namespace CleanC.UI
 
             border.Child = grid;
             return border;
+        }
+
+        private Border CreateGlassConfigCard()
+        {
+            var card = new Border
+            {
+                Background = GetThemeBrush("AppCardBackgroundBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(16, 14, 16, 14),
+                Margin = new Thickness(0, 0, 0, 6)
+            };
+
+            var mainStack = new StackPanel { Spacing = 12 };
+
+            // Header
+            var headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var iconBg = new Border
+            {
+                Width = 34, Height = 34, CornerRadius = new CornerRadius(8),
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(0, 0, 12, 0),
+                VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center,
+                Child = new FontIcon { Glyph = "\uE790", FontSize = 15, Foreground = GetThemeBrush("AccentFillColorDefaultBrush") }
+            };
+            Grid.SetColumn(iconBg, 0);
+            headerGrid.Children.Add(iconBg);
+
+            var titleStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+            titleStack.Children.Add(new TextBlock { Text = "پیکربندی شیشه‌ای ویندوز (Windows Glass / Blur Preset)", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
+            titleStack.Children.Add(new TextBlock { Text = "پیکربندی پیشرفته شفافیت ویندوز (افکت effect=1، شفافیت نوار آدرس و رنگ‌های RGB تم تیره و روشن)", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") });
+            Grid.SetColumn(titleStack, 1);
+            headerGrid.Children.Add(titleStack);
+
+            mainStack.Children.Add(headerGrid);
+
+            // Sub options
+            var cfg = WindowsPersonalizationService.LoadGlassConfig();
+
+            var optionsStack = new StackPanel { Spacing = 8, Margin = new Thickness(46, 0, 0, 0) };
+
+            var chkClearAddress = new CheckBox { Content = "شفاف‌سازی کامل نوار آدرس اکسپلورر (clearAddress=true)", IsChecked = cfg.ClearAddress, FontSize = 11.5 };
+            var chkClearBarBg = new CheckBox { Content = "شفاف‌سازی نوار ابزار و تب‌ها (clearBarBg=true)", IsChecked = cfg.ClearBarBg, FontSize = 11.5 };
+            var chkClearWinUI = new CheckBox { Content = "شفاف‌سازی پس‌زمینه اجزای WinUI (clearWinUIBg=true)", IsChecked = cfg.ClearWinUIBg, FontSize = 11.5 };
+            var chkShowLine = new CheckBox { Content = "نمایش خط حاشیه پنجره (showLine=true)", IsChecked = cfg.ShowLine, FontSize = 11.5 };
+
+            optionsStack.Children.Add(chkClearAddress);
+            optionsStack.Children.Add(chkClearBarBg);
+            optionsStack.Children.Add(chkClearWinUI);
+            optionsStack.Children.Add(chkShowLine);
+
+            // Preset values summary text
+            var summaryBorder = new Border
+            {
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                CornerRadius = new CornerRadius(6),
+                Padding = new Thickness(10, 8, 10, 8),
+                Margin = new Thickness(0, 4, 0, 4),
+                Child = new TextBlock
+                {
+                    Text = "[config] effect=1 | clearAddress=true | clearBarBg=true | clearWinUIBg=true | showLine=true\n[light] r=255, g=255, b=255, a=200  |  [dark] r=0, g=0, b=0, a=120",
+                    FontSize = 10.5,
+                    FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas"),
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    FlowDirection = FlowDirection.LeftToRight
+                }
+            };
+            optionsStack.Children.Add(summaryBorder);
+
+            // Action buttons
+            var btnRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            var saveBtn = new Button
+            {
+                Content = "ذخیره و اعمال تنظیمات کانفیگ",
+                Style = (Style)Application.Current.Resources["AccentButtonStyle"],
+                Height = 30, FontSize = 11.5, CornerRadius = new CornerRadius(6)
+            };
+            saveBtn.Click += (s, e) =>
+            {
+                cfg.ClearAddress = chkClearAddress.IsChecked == true;
+                cfg.ClearBarBg = chkClearBarBg.IsChecked == true;
+                cfg.ClearWinUIBg = chkClearWinUI.IsChecked == true;
+                cfg.ShowLine = chkShowLine.IsChecked == true;
+                WindowsPersonalizationService.SaveGlassConfig(cfg);
+                WindowsPersonalizationService.BroadcastSettingsChange();
+                ShowInfoBar("تنظیمات شیشه‌ای", "تنظیمات glass_config.ini با مقادیر انتخابی ذخیره و در ویندوز اعمال شد.", InfoBarSeverity.Success);
+            };
+
+            var resetBtn = new Button
+            {
+                Content = "بازنشانی به پیش‌فرض",
+                Height = 30, FontSize = 11.5, CornerRadius = new CornerRadius(6),
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush")
+            };
+            resetBtn.Click += (s, e) =>
+            {
+                cfg = new GlassPresetConfig();
+                chkClearAddress.IsChecked = true;
+                chkClearBarBg.IsChecked = true;
+                chkClearWinUI.IsChecked = true;
+                chkShowLine.IsChecked = true;
+                WindowsPersonalizationService.SaveGlassConfig(cfg);
+                WindowsPersonalizationService.BroadcastSettingsChange();
+                ShowInfoBar("بازنشانی تنظیمات", "تنظیمات به مقادیر پیش‌فرض بازنشانی شد.", InfoBarSeverity.Informational);
+            };
+
+            btnRow.Children.Add(saveBtn);
+            btnRow.Children.Add(resetBtn);
+            optionsStack.Children.Add(btnRow);
+
+            mainStack.Children.Add(optionsStack);
+            card.Child = mainStack;
+            return card;
+        }
+
+        private Border CreateWallpaperManagementCard()
+        {
+            var card = new Border
+            {
+                Background = GetThemeBrush("AppCardBackgroundBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(16, 14, 16, 14),
+                Margin = new Thickness(0, 0, 0, 6)
+            };
+
+            var mainStack = new StackPanel { Spacing = 12 };
+
+            // Header
+            var headerGrid = new Grid();
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+            headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+
+            var iconBg = new Border
+            {
+                Width = 34, Height = 34, CornerRadius = new CornerRadius(8),
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                BorderThickness = new Thickness(1),
+                Margin = new Thickness(0, 0, 12, 0),
+                VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Center,
+                Child = new FontIcon { Glyph = "\uEB9F", FontSize = 15, Foreground = GetThemeBrush("AccentFillColorDefaultBrush") }
+            };
+            Grid.SetColumn(iconBg, 0);
+            headerGrid.Children.Add(iconBg);
+
+            var titleStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
+            titleStack.Children.Add(new TextBlock { Text = "گالری والپیپرهای CleanC و تصویر پس‌زمینه ویندوز", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
+            var wallpapers = WindowsPersonalizationService.GetCleanCWallpapers();
+            titleStack.Children.Add(new TextBlock { Text = $"انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({wallpapers.Count} والپیپر گلچین 4K)", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") });
+            Grid.SetColumn(titleStack, 1);
+            headerGrid.Children.Add(titleStack);
+
+            mainStack.Children.Add(headerGrid);
+
+            // Sub options
+            var optionsStack = new StackPanel { Spacing = 10, Margin = new Thickness(46, 0, 0, 0) };
+
+            string curWp = WindowsPersonalizationService.GetCurrentWindowsWallpaper();
+            string wpName = !string.IsNullOrEmpty(curWp) ? Path.GetFileName(curWp) : "والپیپر پیش‌فرض سیستم";
+            var curText = new TextBlock
+            {
+                Text = $"تصویر فعلی پس‌زمینه: {wpName}",
+                FontSize = 11.5,
+                Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+            };
+            optionsStack.Children.Add(curText);
+
+            var btnRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+
+            var randomWpBtn = new Button
+            {
+                Content = "🎲 اعمال والپیپر تصادفی جدید CleanC",
+                Style = (Style)Application.Current.Resources["AccentButtonStyle"],
+                Height = 32, FontSize = 11.5, CornerRadius = new CornerRadius(6)
+            };
+            randomWpBtn.Click += (s, e) =>
+            {
+                var list = WindowsPersonalizationService.GetCleanCWallpapers();
+                if (list.Count > 0)
+                {
+                    string chosen = list[Random.Shared.Next(list.Count)];
+                    bool ok = WindowsPersonalizationService.SetDesktopWallpaper(chosen);
+                    if (ok)
+                    {
+                        curText.Text = $"تصویر فعلی پس‌زمینه: {Path.GetFileName(chosen)}";
+                        ShowInfoBar("والپیپر دسکتاپ", $"تصویر پس‌زمینه دسکتاپ به «{Path.GetFileName(chosen)}» تغییر یافت.", InfoBarSeverity.Success);
+                    }
+                    else
+                    {
+                        ShowInfoBar("خطا در تغییر والپیپر", "امکان تغییر والپیپر دسکتاپ وجود ندارد.", InfoBarSeverity.Warning);
+                    }
+                }
+                else
+                {
+                    ShowInfoBar("والپیپر", "هیچ فایلی در پوشه والپیپرها یافت نشد.", InfoBarSeverity.Informational);
+                }
+            };
+
+            var openFolderBtn = new Button
+            {
+                Content = "باز کردن پوشه والپیپرها",
+                Height = 32, FontSize = 11.5, CornerRadius = new CornerRadius(6),
+                Background = GetThemeBrush("AppCardSecondaryBrush"),
+                BorderBrush = GetThemeBrush("AppCardBorderBrush")
+            };
+            openFolderBtn.Click += (s, e) =>
+            {
+                string dir = Path.Combine(Directory.GetCurrentDirectory(), "wallpaper");
+                if (!Directory.Exists(dir)) dir = @"C:\Users\moham\Pictures\Wallpaper";
+                OpenFolder(dir);
+            };
+
+            btnRow.Children.Add(randomWpBtn);
+            btnRow.Children.Add(openFolderBtn);
+            optionsStack.Children.Add(btnRow);
+
+            mainStack.Children.Add(optionsStack);
+            card.Child = mainStack;
+            return card;
         }
 
         private Border CreateToggleCard(string glyph, string title, string description, bool initialValue, Windows.UI.Color iconBgColor = default, Action<bool>? onToggle = null)
@@ -1709,6 +2117,32 @@ namespace CleanC.UI
             NoUpdatesBanner.Visibility = Visibility.Collapsed;
             PendingUpdatesCountText.Text = "در حال بررسی...";
 
+            if (CheckUpdatesBtn != null) CheckUpdatesBtn.IsEnabled = false;
+            if (CheckUpdatesBtnSpinner != null)
+            {
+                CheckUpdatesBtnSpinner.Visibility = Visibility.Visible;
+                CheckUpdatesBtnSpinner.IsActive = true;
+            }
+            if (CheckUpdatesBtnIcon != null) CheckUpdatesBtnIcon.Visibility = Visibility.Collapsed;
+            if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = "در حال بررسی...";
+
+            if (UpdateStatusIconSpinner != null)
+            {
+                UpdateStatusIconSpinner.Visibility = Visibility.Visible;
+                UpdateStatusIconSpinner.IsActive = true;
+            }
+            if (UpdateStatusIcon != null) UpdateStatusIcon.Visibility = Visibility.Collapsed;
+
+            if (LauncherWindowsUpdateSpinner != null)
+            {
+                LauncherWindowsUpdateSpinner.Visibility = Visibility.Visible;
+                LauncherWindowsUpdateSpinner.IsActive = true;
+            }
+            if (LauncherWindowsUpdateBadge != null)
+            {
+                LauncherWindowsUpdateBadge.Text = "در حال بررسی...";
+            }
+
             try
             {
                 var updates = await WindowsUpdateService.CheckPendingUpdatesAsync();
@@ -1741,6 +2175,30 @@ namespace CleanC.UI
                 UpdatesLoadingSpinner.IsActive = false;
                 PendingUpdatesCountText.Text = "خطا در بررسی";
                 ShowInfoBar("بروزرسانی ویندوز", $"خطا در جستجوی آپدیت‌ها: {ex.Message}", InfoBarSeverity.Warning);
+            }
+            finally
+            {
+                if (CheckUpdatesBtn != null) CheckUpdatesBtn.IsEnabled = true;
+                if (CheckUpdatesBtnSpinner != null)
+                {
+                    CheckUpdatesBtnSpinner.Visibility = Visibility.Collapsed;
+                    CheckUpdatesBtnSpinner.IsActive = false;
+                }
+                if (CheckUpdatesBtnIcon != null) CheckUpdatesBtnIcon.Visibility = Visibility.Visible;
+                if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = "بررسی آپدیت‌های جدید";
+
+                if (UpdateStatusIconSpinner != null)
+                {
+                    UpdateStatusIconSpinner.Visibility = Visibility.Collapsed;
+                    UpdateStatusIconSpinner.IsActive = false;
+                }
+                if (UpdateStatusIcon != null) UpdateStatusIcon.Visibility = Visibility.Visible;
+
+                if (LauncherWindowsUpdateSpinner != null)
+                {
+                    LauncherWindowsUpdateSpinner.Visibility = Visibility.Collapsed;
+                    LauncherWindowsUpdateSpinner.IsActive = false;
+                }
             }
         }
 

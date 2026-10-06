@@ -1,4 +1,4 @@
-﻿// src/CleanC.UI/MainWindow.RecycleBin.cs
+// src/CleanC.UI/MainWindow.RecycleBin.cs
 // F8 — پنل مدیریت سطل بازیافت: پیش‌نمایش آیتم‌به‌آیتم + بازگردانی/حذف قطعی.
 // منطق واقعی فایل‌سیستم در CleanC.Core/Services/RecycleBinService.cs است؛
 // این فایل فقط لایه‌ی نمایش و کنترل رویدادهاست.
@@ -126,7 +126,7 @@ namespace CleanC.UI
             var meta = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
             meta.Children.Add(MetaChip(item.IsDirectory ? "پوشه" : "فایل", "\uE8B7"));
             meta.Children.Add(MetaChip(
-                item.DeletedAt == DateTime.MinValue ? "زمان حذف نامشخص" : item.DeletedAt.ToString("yyyy/MM/dd HH:mm"),
+                item.DeletedAt == DateTime.MinValue ? "زمان حذف نامشخص" : item.DeletedAt.ToString("yyyy.MM.dd HH:mm", System.Globalization.CultureInfo.InvariantCulture),
                 "\uE81C"));
             meta.Children.Add(MetaChip(item.FormattedSize, "\uE964"));
 

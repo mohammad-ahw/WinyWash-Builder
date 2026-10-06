@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Запуск от имени администратора</value></data>
@@ -11,19 +11,19 @@
   <data name="NavTools" xml:space="preserve"><value>Системные утилиты Windows</value></data>
   <data name="HeroCategory" xml:space="preserve"><value>Состояние и производительность системы</value></data>
   <data name="HeroTitleReady" xml:space="preserve"><value>Система готова к оптимизации</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>Очистите временные файлы, освободите память и завершите фоновые процессы в один клик.</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>Система успешно оптимизирована</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Кэш очищен, оперативная память освобождена, отклик системы улучшен.</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>Можно освободить:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>Последняя очистка:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>Всего освобождено:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>Быстрое ускорение системы</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>Удаление мусора, очистка RAM, сброс DNS и остановка фоновых служб</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Глубокая очистка диска</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>Последовательная очистка временных файлов, кэша и ОЗУ</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>Система работает в оптимальном высокоскоростном режиме</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>Временные файлы удалены, память освобождена, службы оптимизированы.</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>Доступно к очистке</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>Последняя очистка</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>Всего освобождено</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>Быстрое ускорение и оптимизация</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>Очистка временных файлов, ОЗУ, реестра и служб</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>Настройка параметров очистки и оптимизации</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>Выборочное сканирование и детальная настройка категорий мусора</value></data>
   <data name="SettingsTitle" xml:space="preserve"><value>Настройки приложения</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>Внешний вид, язык, поведение в трее и экспорт отчетов</value></data>
-  <data name="LanguageTitle" xml:space="preserve"><value>Язык интерфейса (Language)</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>Язык интерфейса</value></data>
   <data name="LanguageSub" xml:space="preserve"><value>Автоматически настраивает направление интерфейса и шрифты.</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>Тема оформления</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>Следовать настройкам Windows или зафиксировать светлую/темную тему.</value></data>
@@ -61,4 +61,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>Страница проекта на GitHub</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>Скопировать диагностику</value></data>
   <data name="BackToTools" xml:space="preserve"><value>Назад к утилитам</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>Назад</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>Индекс состояния системы</value></data><data name="RamTitle" xml:space="preserve"><value>Оперативная память (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>Процессор (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>Мониторинг сети</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>Недавние очистки</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>Структура дискового пространства</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>Полные характеристики системы</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>Состояние батареи и питание</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>Деинсталлятор приложений</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>Тест скорости и качества интернета</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Персонализация Windows и визуальные эффекты</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Управление обновлениями Windows</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>Диспетчер автозагрузки</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>Управление драйверами</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>Обслуживание дисков и TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>Диспетчер DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>Управление контекстным меню</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>Глубокая очистка диска</value></data></root>

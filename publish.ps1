@@ -1,4 +1,4 @@
-﻿<#
+<#
     publish.ps1
     ---------------------------------------------------------------------------
     اسکریپت build و publish رسمی CleanC برای توزیع نهایی.
@@ -113,6 +113,15 @@ if (-not $Symbols) {
         Remove-Item -Force
 }
 
+# کپی والپیپرهای CleanC در صورت وجود
+$wallpaperSrc = Join-Path $root 'wallpaper'
+if (Test-Path -LiteralPath $wallpaperSrc) {
+    Write-Host "==> کپی والپیپرهای CleanC..." -ForegroundColor DarkGray
+    $wpDest = Join-Path $outDir 'wallpaper'
+    if (Test-Path -LiteralPath $wpDest) { Remove-Item -LiteralPath $wpDest -Recurse -Force }
+    Copy-Item -Path $wallpaperSrc -Destination $outDir -Recurse -Force
+}
+
 # ---------------------------------------------------------------------------
 # گزارش حجم نهایی
 # ---------------------------------------------------------------------------
@@ -124,3 +133,12 @@ Write-Host "==> publish کامل شد" -ForegroundColor Green
 Write-Host ("    فایل‌ها : {0}" -f $files.Count)
 Write-Host ("    حجم    : {0:N1} MB" -f $sizeMb)
 Write-Host ("    اجرا    : {0}" -f (Join-Path $outDir 'CleanC.UI.exe')) -ForegroundColor Green
+
+# ایجاد آرشیو فشرده ZIP برای تحویل
+$zipPath = Join-Path $root "CleanC-Release-win-x64.zip"
+Write-Host "==> فشرده‌سازی خروجی به $zipPath ..." -ForegroundColor Cyan
+if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
+Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force
+$zipSizeMb = (Get-Item -LiteralPath $zipPath).Length / 1MB
+Write-Host ("==> آرشیو نهایی ایجاد شد: {0} ({1:N1} MB)" -f $zipPath, $zipSizeMb) -ForegroundColor Green
+

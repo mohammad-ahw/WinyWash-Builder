@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>管理者として実行中</value></data>
@@ -10,20 +10,20 @@
   <data name="NavDashboard" xml:space="preserve"><value>最適化ダッシュボード</value></data>
   <data name="NavTools" xml:space="preserve"><value>Windows ツール群</value></data>
   <data name="HeroCategory" xml:space="preserve"><value>システムの健全性とパフォーマンス</value></data>
-  <data name="HeroTitleReady" xml:space="preserve"><value>最適化の準備が完了しています</value></data>
-  <data name="HeroSubtitleReady" xml:space="preserve"><value>1クリックで一時ファイルを消去し、メモリを解放して不要なプロセスを停止します。</value></data>
-  <data name="HeroTitleOptimized" xml:space="preserve"><value>システムの最適化が完了しました</value></data>
-  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>キャッシュが整理され、メモリが解放され快適になりました。</value></data>
-  <data name="CleanableSpace" xml:space="preserve"><value>解放可能容量:</value></data>
-  <data name="LastCleanup" xml:space="preserve"><value>前回のクリーンアップ:</value></data>
-  <data name="TotalFreed" xml:space="preserve"><value>累計解放容量:</value></data>
-  <data name="QuickBoost" xml:space="preserve"><value>クイックシステムブースト</value></data>
-  <data name="QuickBoostSub" xml:space="preserve"><value>ジャンク削除、RAM最適化、DNSフラッシュ、バックグラウンド処理停止</value></data>
-  <data name="AdvancedCleanTitle" xml:space="preserve"><value>高度なディスククリーンアップ</value></data>
+  <data name="HeroTitleReady" xml:space="preserve"><value>システムは最適化の準備ができています</value></data>
+  <data name="HeroSubtitleReady" xml:space="preserve"><value>不要なファイル、キャッシュ、RAMを順次クリーンアップ</value></data>
+  <data name="HeroTitleOptimized" xml:space="preserve"><value>システムは高速で最適な状態です</value></data>
+  <data name="HeroSubtitleOptimized" xml:space="preserve"><value>すべての一時ファイルが消去され、メモリが解放されました。</value></data>
+  <data name="CleanableSpace" xml:space="preserve"><value>クリーンアップ可能</value></data>
+  <data name="LastCleanup" xml:space="preserve"><value>最後のクリーンアップ</value></data>
+  <data name="TotalFreed" xml:space="preserve"><value>合計解放済み</value></data>
+  <data name="QuickBoost" xml:space="preserve"><value>クイックブースト＆システム最適化</value></data>
+  <data name="QuickBoostSub" xml:space="preserve"><value>一時ファイル、RAM、レジストリ、サービスの順次クリーンアップ</value></data>
+  <data name="AdvancedCleanTitle" xml:space="preserve"><value>クリーンアップと最適化項目のカスタマイズ</value></data>
   <data name="AdvancedCleanSub" xml:space="preserve"><value>スキャン項目と不要ファイルカテゴリの詳細選択</value></data>
   <data name="SettingsTitle" xml:space="preserve"><value>設定</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>外観、言語、トレイ動作、レポート出力の管理</value></data>
-  <data name="LanguageTitle" xml:space="preserve"><value>表示言語 (Language)</value></data>
+  <data name="LanguageTitle" xml:space="preserve"><value>言語設定</value></data>
   <data name="LanguageSub" xml:space="preserve"><value>言語に合わせたレイアウト方向とフォント表示を自動調整します。</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>テーマ</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>Windows設定に従うか、ライト/ダークに固定します。</value></data>
@@ -61,4 +61,4 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub プロジェクトページ</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>診断情報をコピー</value></data>
   <data name="BackToTools" xml:space="preserve"><value>ツール一覧に戻る</value></data>
-</root>
+<data name="BackButton" xml:space="preserve"><value>戻る</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>システムヘルススコア</value></data><data name="RamTitle" xml:space="preserve"><value>メモリ (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>プロセッサ (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>ネットワークトラフィック監視</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>最近のクリーンアップ履歴</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>ストレージ内訳</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>詳細なシステム仕様</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>バッテリー状態と電源</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>アプリ＆ブロートウェアアンインストーラー</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>インターネット速度・品質テスト</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windowsの個人用設定と視覚効果</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update 管理</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>スタートアップ管理</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>ドライバ管理</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>ディスクのメンテナンスとTRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNSマネージャー</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>コンテキストメニュー管理</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>ディープストレージクリーナー</value></data></root>

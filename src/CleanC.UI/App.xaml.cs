@@ -16,6 +16,20 @@ namespace CleanC.UI
 
         public App()
         {
+            try
+            {
+                var culture = (System.Globalization.CultureInfo)System.Globalization.CultureInfo.CurrentCulture.Clone();
+                culture.NumberFormat.NumberDecimalSeparator = ".";
+                culture.NumberFormat.PercentDecimalSeparator = ".";
+                culture.NumberFormat.CurrencyDecimalSeparator = ".";
+                culture.DateTimeFormat.DateSeparator = ".";
+                System.Globalization.CultureInfo.DefaultThreadCurrentCulture = culture;
+                System.Globalization.CultureInfo.DefaultThreadCurrentUICulture = culture;
+                System.Threading.Thread.CurrentThread.CurrentCulture = culture;
+                System.Threading.Thread.CurrentThread.CurrentUICulture = culture;
+            }
+            catch { }
+
             this.InitializeComponent();
 
             // C6 — ریشه‌ی ترکیب DI همین ابتدا ساخته می‌شود تا خطای ثبت سرویس‌ها

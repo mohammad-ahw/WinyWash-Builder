@@ -110,128 +110,113 @@ namespace CleanC.Core.Services
                 }
 
                 // -------------------------------------------------------------
-                // 2. Check Windows Update Agent (WUA COM API)
-                //    Search both Mandatory (BrowseOnly=0) and Optional (BrowseOnly=1)
+                // 2. Check Windows Update Agent (WUA COM API) with 12s timeout
                 // -------------------------------------------------------------
                 try
                 {
-                    Type? sessionType = Type.GetTypeFromProgID("Microsoft.Update.Session");
-                    if (sessionType != null)
+                    var comSearchTask = Task.Run(() =>
                     {
-                        dynamic? session = Activator.CreateInstance(sessionType);
-                        if (session != null)
+                        var comList = new List<PendingUpdateItem>();
+                        try
                         {
-                            dynamic searcher = session.CreateUpdateSearcher();
-
-                            // 2A. Search Mandatory / Quality / Security updates
-                            try
+                            Type? sessionType = Type.GetTypeFromProgID("Microsoft.Update.Session");
+                            if (sessionType != null)
                             {
-                                dynamic searchResult = searcher.Search("IsInstalled=0 and IsHidden=0 and BrowseOnly=0");
-                                int count = searchResult.Updates.Count;
-                                for (int i = 0; i < count; i++)
+                                dynamic? session = Activator.CreateInstance(sessionType);
+                                if (session != null)
                                 {
-                                    dynamic update = searchResult.Updates.Item(i);
-                                    string title = update.Title?.ToString() ?? "آپدیت ویندوز";
-                                    if (!seenTitles.Add(title)) continue;
+                                    dynamic searcher = session.CreateUpdateSearcher();
 
-                                    string desc = update.Description?.ToString() ?? "";
-                                    long size = 0;
-                                    try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
-
-                                    string kb = "";
+                                    // 2A. Search Mandatory
                                     try
                                     {
-                                        int kbCount = update.KBArticleIDs.Count;
-                                        if (kbCount > 0)
+                                        dynamic searchResult = searcher.Search("IsInstalled=0 and IsHidden=0 and BrowseOnly=0");
+                                        int count = searchResult.Updates.Count;
+                                        for (int i = 0; i < count; i++)
                                         {
-                                            kb = "KB" + update.KBArticleIDs.Item(0).ToString();
+                                            dynamic update = searchResult.Updates.Item(i);
+                                            string title = update.Title?.ToString() ?? "آپدیت ویندوز";
+                                            string desc = update.Description?.ToString() ?? "";
+                                            long size = 0;
+                                            try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex) { CcLog.Ignore(__ex); }
+                                            string kb = "";
+                                            try
+                                            {
+                                                if (update.KBArticleIDs.Count > 0)
+                                                    kb = "KB" + update.KBArticleIDs.Item(0).ToString();
+                                            } catch (Exception __ex) { CcLog.Ignore(__ex); }
+
+                                            bool isNextGen = title.Contains("Windows 11, version", StringComparison.OrdinalIgnoreCase) ||
+                                                             title.Contains("Feature update", StringComparison.OrdinalIgnoreCase);
+
+                                            comList.Add(new PendingUpdateItem
+                                            {
+                                                Title = title,
+                                                KbArticleId = kb,
+                                                SizeBytes = size,
+                                                Description = desc,
+                                                IsOptional = false,
+                                                IsNextGenFeatureUpdate = isNextGen,
+                                                CategoryName = isNextGen ? "ارتقای نسل سیستم‌عامل" : "آپدیت کیفی و امنیتی"
+                                            });
                                         }
                                     }
-                                    catch (Exception __ex)
-                                    {
-                                        CcLog.Ignore(__ex);
-                                    }
+                                    catch (Exception __ex) { CcLog.Ignore(__ex); }
 
-                                    bool isNextGen = title.Contains("Windows 11, version", StringComparison.OrdinalIgnoreCase) ||
-                                                     title.Contains("Feature update", StringComparison.OrdinalIgnoreCase);
-
-                                    list.Add(new PendingUpdateItem
-                                    {
-                                        Title = title,
-                                        KbArticleId = kb,
-                                        SizeBytes = size,
-                                        Description = desc,
-                                        IsOptional = false,
-                                        IsNextGenFeatureUpdate = isNextGen,
-                                        CategoryName = isNextGen ? "ارتقای نسل سیستم‌عامل" : "آپدیت کیفی و امنیتی"
-                                    });
-                                }
-                            }
-                            catch (Exception __ex)
-                            {
-                                CcLog.Ignore(__ex);
-                            }
-
-                            // 2B. Search Optional / Preview / Driver updates (BrowseOnly=1)
-                            try
-                            {
-                                dynamic optResult = searcher.Search("IsInstalled=0 and IsHidden=0 and BrowseOnly=1");
-                                int countOpt = optResult.Updates.Count;
-                                for (int i = 0; i < countOpt; i++)
-                                {
-                                    dynamic update = optResult.Updates.Item(i);
-                                    string title = update.Title?.ToString() ?? "آپدیت اختیاری ویندوز";
-                                    if (!seenTitles.Add(title)) continue;
-
-                                    string desc = update.Description?.ToString() ?? "";
-                                    long size = 0;
-                                    try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
-
-                                    string kb = "";
+                                    // 2B. Search Optional
                                     try
                                     {
-                                        int kbCount = update.KBArticleIDs.Count;
-                                        if (kbCount > 0)
+                                        dynamic optResult = searcher.Search("IsInstalled=0 and IsHidden=0 and BrowseOnly=1");
+                                        int countOpt = optResult.Updates.Count;
+                                        for (int i = 0; i < countOpt; i++)
                                         {
-                                            kb = "KB" + update.KBArticleIDs.Item(0).ToString();
+                                            dynamic update = optResult.Updates.Item(i);
+                                            string title = update.Title?.ToString() ?? "آپدیت اختیاری ویندوز";
+                                            string desc = update.Description?.ToString() ?? "";
+                                            long size = 0;
+                                            try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex) { CcLog.Ignore(__ex); }
+                                            string kb = "";
+                                            try
+                                            {
+                                                if (update.KBArticleIDs.Count > 0)
+                                                    kb = "KB" + update.KBArticleIDs.Item(0).ToString();
+                                            } catch (Exception __ex) { CcLog.Ignore(__ex); }
+
+                                            bool isDriver = false;
+                                            try { isDriver = (Convert.ToInt32(update.Type) == 2); } catch (Exception __ex) { CcLog.Ignore(__ex); }
+                                            bool isNextGen = title.Contains("Windows 11, version", StringComparison.OrdinalIgnoreCase) ||
+                                                             title.Contains("Feature update", StringComparison.OrdinalIgnoreCase);
+
+                                            comList.Add(new PendingUpdateItem
+                                            {
+                                                Title = title,
+                                                KbArticleId = kb,
+                                                SizeBytes = size,
+                                                Description = desc,
+                                                IsOptional = true,
+                                                IsNextGenFeatureUpdate = isNextGen,
+                                                CategoryName = isNextGen ? "ارتقای نسل جدید (اختیاری)" : (isDriver ? "درایور سخت‌افزار (اختیاری)" : "آپدیت اختیاری ویندوز")
+                                            });
                                         }
                                     }
-                                    catch (Exception __ex)
-                                    {
-                                        CcLog.Ignore(__ex);
-                                    }
-
-                                    bool isDriver = false;
-                                    try { isDriver = (Convert.ToInt32(update.Type) == 2); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
-
-                                    bool isNextGen = title.Contains("Windows 11, version", StringComparison.OrdinalIgnoreCase) ||
-                                                     title.Contains("Feature update", StringComparison.OrdinalIgnoreCase);
-
-                                    list.Add(new PendingUpdateItem
-                                    {
-                                        Title = title,
-                                        KbArticleId = kb,
-                                        SizeBytes = size,
-                                        Description = desc,
-                                        IsOptional = true,
-                                        IsNextGenFeatureUpdate = isNextGen,
-                                        CategoryName = isNextGen ? "ارتقای نسل جدید (اختیاری)" : (isDriver ? "درایور سخت‌افزار (اختیاری)" : "آپدیت اختیاری ویندوز")
-                                    });
+                                    catch (Exception __ex) { CcLog.Ignore(__ex); }
                                 }
                             }
-                            catch (Exception __ex)
-                            {
-                                CcLog.Ignore(__ex);
-                            }
+                        }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
+                        return comList;
+                    });
+
+                    if (await Task.WhenAny(comSearchTask, Task.Delay(12000)) == comSearchTask)
+                    {
+                        var comUpdates = await comSearchTask;
+                        foreach (var u in comUpdates)
+                        {
+                            if (seenTitles.Add(u.Title))
+                                list.Add(u);
                         }
                     }
                 }
