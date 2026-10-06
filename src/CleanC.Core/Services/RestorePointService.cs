@@ -69,7 +69,7 @@ namespace CleanC.Core.Services
                         if (returnCode == 0)
                         {
                             PruneOldRestorePoints(2);
-                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه‌های قدیمی‌تر به صورت خودکار پاکسازی شدند).");
+                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند).");
                         }
                     }
                     catch (Exception __ex)
@@ -95,7 +95,7 @@ namespace CleanC.Core.Services
                         if (ps.ExitCode == 0)
                         {
                             PruneOldRestorePoints(2);
-                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه‌های قدیمی‌تر به صورت خودکار پاکسازی شدند).");
+                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند).");
                         }
                         else
                         {

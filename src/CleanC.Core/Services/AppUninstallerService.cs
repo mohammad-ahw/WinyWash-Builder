@@ -302,12 +302,12 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// اجرای فرمان حذف. اول QuietUninstallString (بی‌صدا) ترجیح داده می‌شود،
-        /// بعد UninstallString. اگر فایل اجرایی مسیر مطلقِ ناموجود باشد، اجرا نمی‌شود.
+        /// اجرای فرمان حذف. اول QuietUninstallString (بی صدا) ترجیح داده می شود،
+        /// بعد UninstallString. اگر فایل اجرایی مسیر مطلقِ ناموجود باشد، اجرا نمی شود.
         /// </summary>
         private static (string fileName, string arguments) ResolveUninstallCommand(InstalledAppInfo app)
         {
-            // Quiet اول — حذف بی‌صدا بدون پنجره‌ای که کاربر منتظرش نیست
+            // Quiet اول — حذف بی صدا بدون پنجره ای که کاربر منتظرش نیست
             string cmd = !string.IsNullOrWhiteSpace(app.QuietUninstallString)
                 ? app.QuietUninstallString
                 : app.UninstallString;
@@ -320,8 +320,8 @@ namespace CleanC.Core.Services
         {
             if (string.IsNullOrWhiteSpace(fileName)) return false;
 
-            // مسیر مطلق باید واقعاً وجود داشته باشد؛ در غیر این صورت اجرای آن یا شکست می‌خورد
-            // یا (در UseShellExecute) چیز دیگری را باز می‌کند
+            // مسیر مطلق باید واقعاً وجود داشته باشد؛ در غیر این صورت اجرای آن یا شکست می خورد
+            // یا (در UseShellExecute) چیز دیگری را باز می کند
             if (Path.IsPathRooted(fileName))
             {
                 try
@@ -340,7 +340,7 @@ namespace CleanC.Core.Services
             {
                 if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
                 {
-                    // PackageFullName داخل بولکوی PowerShell قرار می‌گیرد؛ آپاستریک را دوبل می‌کنیم
+                    // PackageFullName داخل بولکوی PowerShell قرار می گیرد؛ آپاستریک را دوبل می کنیم
                     string escaped = app.PackageFullName.Replace("'", "''");
                     var psi = new ProcessStartInfo
                     {
@@ -414,7 +414,7 @@ namespace CleanC.Core.Services
                 catch
                 {
                     // بعضی uninstallerها با UseShellExecute قابل ردیابی نیستند؛
-                    // در این حالت فرض می‌کنیم اجرا شده و کاربر پنجره را می‌بیند
+                    // در این حالت فرض می کنیم اجرا شده و کاربر پنجره را می بیند
                     await Task.Delay(3000);
                     return true;
                 }

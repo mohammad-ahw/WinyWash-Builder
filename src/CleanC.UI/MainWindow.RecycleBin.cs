@@ -1,7 +1,7 @@
 // src/CleanC.UI/MainWindow.RecycleBin.cs
-// F8 — پنل مدیریت سطل بازیافت: پیش‌نمایش آیتم‌به‌آیتم + بازگردانی/حذف قطعی.
-// منطق واقعی فایل‌سیستم در CleanC.Core/Services/RecycleBinService.cs است؛
-// این فایل فقط لایه‌ی نمایش و کنترل رویدادهاست.
+// F8 — پنل مدیریت سطل بازیافت: پیش نمایش آیتم به آیتم + بازگردانی/حذف قطعی.
+// منطق واقعی فایل سیستم در CleanC.Core/Services/RecycleBinService.cs است؛
+// این فایل فقط لایه ی نمایش و کنترل رویدادهاست.
 
 using System;
 using System.Collections.Generic;
@@ -41,7 +41,7 @@ namespace CleanC.UI
                 RecycleBinSelectAllCheck.IsChecked = false;
                 UpdateRecycleBinSelectedCount();
 
-                // پویش درایوها و (در صورت نیاز) محاسبه‌ی حجم پوشه‌ها سنگین است
+                // پویش درایوها و (در صورت نیاز) محاسبه ی حجم پوشه ها سنگین است
                 List<RecycleBinItem> items = await Task.Run(RecycleBinService.ListItems);
 
                 RecycleBinLoadingPanel.Visibility = Visibility.Collapsed;
@@ -111,7 +111,7 @@ namespace CleanC.UI
                 TextTrimming = TextTrimming.CharacterEllipsis
             });
 
-            // مسیر اصلی (همیشه چپ‌به‌راست تا مسیرهای انگلیسی خراب دیده نشوند)
+            // مسیر اصلی (همیشه چپ به راست تا مسیرهای انگلیسی خراب دیده نشوند)
             info.Children.Add(new TextBlock
             {
                 Text = item.OriginalPath,
@@ -138,7 +138,7 @@ namespace CleanC.UI
             Grid.SetColumn(info, 1);
             grid.Children.Add(info);
 
-            // اکشن‌های هر سطر
+            // اکشن های هر سطر
             var actions = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center };
 
             var restoreBtn = new Button
@@ -221,9 +221,9 @@ namespace CleanC.UI
             UpdateRecycleBinSelectedCount();
         }
 
-        // ── اکشن‌های گروهی ────────────────────────────────────────────────
+        // ── اکشن های گروهی ────────────────────────────────────────────────
         // C8: handlerها به الگوی SafeInvoker برده شدند؛ چون از فاز ۱۳ استثناهای
-        // خارج از catch دیگر خفه نمی‌شوند و کل برنامه را می‌کشند.
+        // خارج از catch دیگر خفه نمی شوند و کل برنامه را می کشند.
 
         private void RecycleBinRestoreSelectedBtn_Click(object sender, RoutedEventArgs e)
             => SafeInvoker.Run(RecycleBinRestoreSelectedBtn_Async(sender, e));
@@ -233,7 +233,7 @@ namespace CleanC.UI
             var selected = GetSelectedRecycleBinItems();
             if (selected.Count == 0)
             {
-                ShowInfoBar("سطل بازیافت", "ابتدا دست‌کم یک شیء را انتخاب کنید.", InfoBarSeverity.Informational);
+                ShowInfoBar("سطل بازیافت", "ابتدا دست کم یک شیء را انتخاب کنید.", InfoBarSeverity.Informational);
                 return;
             }
 
@@ -265,14 +265,14 @@ namespace CleanC.UI
             var selected = GetSelectedRecycleBinItems();
             if (selected.Count == 0)
             {
-                ShowInfoBar("سطل بازیافت", "ابتدا دست‌کم یک شیء را انتخاب کنید.", InfoBarSeverity.Informational);
+                ShowInfoBar("سطل بازیافت", "ابتدا دست کم یک شیء را انتخاب کنید.", InfoBarSeverity.Informational);
                 return;
             }
 
             long total = selected.Sum(i => i.SizeBytes);
             bool confirmed = await ConfirmRecycleBinAsync(
-                "حذف قطعی اشیاء انتخاب‌شده",
-                $"{selected.Count} شیء با حجم {SystemStats.FormatBytes(total)} برای همیشه حذف می‌شود.\nاین عملیات قابل بازگشت نیست.",
+                "حذف قطعی اشیاء انتخاب شده",
+                $"{selected.Count} شیء با حجم {SystemStats.FormatBytes(total)} برای همیشه حذف می شود.\nاین عملیات قابل بازگشت نیست.",
                 "حذف قطعی");
 
             if (!confirmed) return;
@@ -308,7 +308,7 @@ namespace CleanC.UI
             long total = items.Sum(i => i.SizeBytes);
             bool confirmed = await ConfirmRecycleBinAsync(
                 "خالی کردن کل سطل بازیافت",
-                $"{items.Count} شیء با حجم {SystemStats.FormatBytes(total)} برای همیشه حذف می‌شود.\nپس از خالی کردن، هیچ شیء قابل بازگردانی نخواهد بود.",
+                $"{items.Count} شیء با حجم {SystemStats.FormatBytes(total)} برای همیشه حذف می شود.\nپس از خالی کردن، هیچ شیء قابل بازگردانی نخواهد بود.",
                 "خالی کردن");
 
             if (!confirmed) return;
@@ -327,7 +327,7 @@ namespace CleanC.UI
             await LoadRecycleBinPageAsync();
         }
 
-        // ── اکشن‌های تک‌شیئی ──────────────────────────────────────────────
+        // ── اکشن های تک شیئی ──────────────────────────────────────────────
 
         private void RecycleBinItemRestoreBtn_Click(object sender, RoutedEventArgs e)
             => SafeInvoker.Run(RecycleBinItemRestoreBtn_Async(sender, e));
@@ -370,7 +370,7 @@ namespace CleanC.UI
 
             bool confirmed = await ConfirmRecycleBinAsync(
                 "حذف قطعی شیء",
-                $"«{item.FileName}» ({item.FormattedSize}) برای همیشه حذف می‌شود.\nاین عملیات قابل بازگشت نیست.",
+                $"«{item.FileName}» ({item.FormattedSize}) برای همیشه حذف می شود.\nاین عملیات قابل بازگشت نیست.",
                 "حذف قطعی");
 
             if (!confirmed) return;

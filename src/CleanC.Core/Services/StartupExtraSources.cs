@@ -11,17 +11,17 @@ using Microsoft.Win32;
 namespace CleanC.Core.Services
 {
     /// <summary>
-    /// A10 — منابعِ استارت‌آپ که قبلاً هیچ‌کدام اسکن نمی‌شدند:
+    /// A10 — منابعِ استارت آپ که قبلاً هیچ کدام اسکن نمی شدند:
     ///
-    ///  1. <c>RunOnce</c> (HKCU و HKLM) — کلیدهایی که یک‌بار اجرا و بعد پاک می‌شوند.
-    ///  2. <c>StartupTask</c> برنامه‌های MSIX/UWP — مثل Spotify/Teams/OneDrive نسخه‌ی Store،
-    ///     که در رجیستریِ Run ظاهر نمی‌شوند و فقط در
+    ///  1. <c>RunOnce</c> (HKCU و HKLM) — کلیدهایی که یک بار اجرا و بعد پاک می شوند.
+    ///  2. <c>StartupTask</c> برنامه های MSIX/UWP — مثل Spotify/Teams/OneDrive نسخه ی Store،
+    ///     که در رجیستریِ Run ظاهر نمی شوند و فقط در
     ///     <c>AppModel\SystemAppData\&lt;PackageFamilyName&gt;\&lt;AppId&gt;</c>
-    ///     با مقدارهای <c>State</c> / <c>UserEnabledStartupOnce</c> / <c>LastDisabledTime</c> ثبت شده‌اند.
-    ///  3. تسک‌های Task Scheduler با تریگر <c>At logon time</c> یا <c>At system start up</c>
-    ///     (روی همین سیستم ۸۲ تسک از این جنس پیدا شد که هیچ‌کدام در لیست نبودند).
+    ///     با مقدارهای <c>State</c> / <c>UserEnabledStartupOnce</c> / <c>LastDisabledTime</c> ثبت شده اند.
+    ///  3. تسک های Task Scheduler با تریگر <c>At logon time</c> یا <c>At system start up</c>
+    ///     (روی همین سیستم ۸۲ تسک از این جنس پیدا شد که هیچ کدام در لیست نبودند).
     ///
-    /// همه با همان مدلِ <see cref="StartupItem"/> برمی‌گردند تا UI و جریان غیرفعال‌سازی یکسان بماند.
+    /// همه با همان مدلِ <see cref="StartupItem"/> برمی گردند تا UI و جریان غیرفعال سازی یکسان بماند.
     /// </summary>
     public static class StartupExtraSources
     {
@@ -34,8 +34,8 @@ namespace CleanC.Core.Services
             @"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\SystemAppData";
 
         /// <summary>
-        /// هر سه منبع را اسکن می‌کند. جست‌وجوی تسک‌ها (schtasks حدود چند ثانیه طول می‌کشد)
-        /// هم‌زمان با بقیه انجام می‌شود تا بارِ صفحه‌ی Startup Manager زیاد نشود.
+        /// هر سه منبع را اسکن می کند. جست وجوی تسک ها (schtasks حدود چند ثانیه طول می کشد)
+        /// هم زمان با بقیه انجام می شود تا بارِ صفحه ی Startup Manager زیاد نشود.
         /// </summary>
         public static void Scan(List<StartupItem> list)
         {
@@ -117,7 +117,7 @@ namespace CleanC.Core.Services
 
                             // فقط زیرکلیدهایی StartupTask هستند که State و یکی از
                             // UserEnabledStartupOnce / LastDisabledTime را داشته باشند؛
-                            // بقیه‌ی زیرکلیدهای هر پکیج (HAM، SplashScreen، ...) ارتباطی با استارت‌آپ ندارند.
+                            // بقیه ی زیرکلیدهای هر پکیج (HAM، SplashScreen، ...) ارتباطی با استارت آپ ندارند.
                             object? stateValue = appKey.GetValue("State");
                             bool isStartupTask = stateValue != null &&
                                 (appKey.GetValue("UserEnabledStartupOnce") != null
@@ -137,7 +137,7 @@ namespace CleanC.Core.Services
                             {
                                 Id = $"{LocationUwp}_{keyPath}",
                                 Name = friendly,
-                                // برای نمایش، خانواده‌ی پکیج را نگه می‌داریم
+                                // برای نمایش، خانواده ی پکیج را نگه می داریم
                                 Command = packageFamily,
                                 Location = LocationUwp,
                                 ServiceKey = keyPath,
@@ -156,7 +156,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// ساختن یک نام قابل‌خواندن از شناسه‌ی پکیج (مثل
+        /// ساختن یک نام قابل خواندن از شناسه ی پکیج (مثل
         /// <c>OneMSI_Dragon_Center_UWP</c> یا <c>9E2F88E3.TWITTER_wgeqdkkx372wm!App</c>).
         /// </summary>
         private static string FriendlyPackageName(string packageFamilyName, string appId)
@@ -167,10 +167,10 @@ namespace CleanC.Core.Services
 
             name = name.Replace('_', ' ').Trim();
 
-            // پسوندِ هشِ خانواده‌ی پکیج را حذف کن (۱۰+ کاراکتر alphanumeric در انتها)
+            // پسوندِ هشِ خانواده ی پکیج را حذف کن (۱۰+ کاراکتر alphanumeric در انتها)
             name = System.Text.RegularExpressions.Regex.Replace(name, @"\s+[A-Za-z0-9]{10,}$", "").Trim();
 
-            // شناسه‌ی ناشر مثل «9E2F88E3.» را هم حذف کن
+            // شناسه ی ناشر مثل «9E2F88E3.» را هم حذف کن
             name = System.Text.RegularExpressions.Regex.Replace(name, @"^[0-9A-Fa-f]{8}\.\s*", "").Trim();
 
             if (string.IsNullOrWhiteSpace(name))
@@ -185,7 +185,7 @@ namespace CleanC.Core.Services
         }
 
         // ====================================================================
-        // 3) تسک‌های Task Scheduler با تریگر Logon/Boot
+        // 3) تسک های Task Scheduler با تریگر Logon/Boot
         // ====================================================================
         private static void ScanScheduledTasks(List<StartupItem> list)
         {
@@ -203,7 +203,7 @@ namespace CleanC.Core.Services
 
                     var fields = ParseCsvLine(line);
 
-                    // ساختارِ schtasks برای هر پوشه یک خطِ تکراریِ هدر چاپ می‌کند
+                    // ساختارِ schtasks برای هر پوشه یک خطِ تکراریِ هدر چاپ می کند
                     if (fields.Count > 0 && fields[0] == "HostName")
                     {
                         columns.Clear();
@@ -221,7 +221,7 @@ namespace CleanC.Core.Services
                     if (string.IsNullOrWhiteSpace(taskPath)) continue;
                     if (!IsStartupTrigger(schedule)) continue;
 
-                    // تسک‌های خودِ ویندوز نه در Task Manager دیده می‌شوند و نه جای غیرفعال کردن دارند
+                    // تسک های خودِ ویندوز نه در Task Manager دیده می شوند و نه جای غیرفعال کردن دارند
                     if (taskPath.StartsWith(@"\Microsoft\Windows\", StringComparison.OrdinalIgnoreCase)) continue;
                     if (string.IsNullOrWhiteSpace(action)) continue;
 
@@ -235,7 +235,7 @@ namespace CleanC.Core.Services
                         Location = LocationTask,
                         ServiceKey = taskPath,
                         IsScheduledTask = true,
-                        // تسک‌های \Microsoft\ و \Google\ و ... عموماً آپدیتر هستند
+                        // تسک های \Microsoft\ و \Google\ و ... عموماً آپدیتر هستند
                         IsNonEssential = !taskPath.StartsWith(@"\Microsoft\", StringComparison.OrdinalIgnoreCase),
                         IsDisabled = state.Equals("Disabled", StringComparison.OrdinalIgnoreCase),
                         IsVpnOrProxy = StartupOptimizerService.IsVpnApp(displayName, action),
@@ -246,7 +246,7 @@ namespace CleanC.Core.Services
             catch (Exception ex) { CcLog.Ignore(ex, "Startup.ScheduledTasks"); }
         }
 
-        /// <summary>فقط تریگرهایی که واقعاً «شروعِ ویندوز» را معنا می‌کنند.</summary>
+        /// <summary>فقط تریگرهایی که واقعاً «شروعِ ویندوز» را معنا می کنند.</summary>
         private static bool IsStartupTrigger(string scheduleType)
         {
             if (string.IsNullOrWhiteSpace(scheduleType)) return false;
@@ -255,9 +255,9 @@ namespace CleanC.Core.Services
             if (s.StartsWith("At logon", StringComparison.OrdinalIgnoreCase)) return true;
             if (s.StartsWith("At system start", StringComparison.OrdinalIgnoreCase)) return true;
 
-            // نسخه‌های محلی‌سازی‌شده‌ی خروجی schtasks
+            // نسخه های محلی سازی شده ی خروجی schtasks
             if (s.Contains("ورود", StringComparison.Ordinal)) return true;
-            if (s.Contains("راه‌اندازی", StringComparison.Ordinal) || s.Contains("راه اندازی", StringComparison.Ordinal)) return true;
+            if (s.Contains("راه اندازی", StringComparison.Ordinal) || s.Contains("راه اندازی", StringComparison.Ordinal)) return true;
 
             return false;
         }
@@ -269,7 +269,7 @@ namespace CleanC.Core.Services
             return fields[idx];
         }
 
-        /// <summary>پارسر CSV با پشتیبانی از نقل‌قول دوتایی («"») و کاما داخل فیلد.</summary>
+        /// <summary>پارسر CSV با پشتیبانی از نقل قول دوتایی («"») و کاما داخل فیلد.</summary>
         private static List<string> ParseCsvLine(string line)
         {
             var fields = new List<string>();
@@ -301,11 +301,11 @@ namespace CleanC.Core.Services
         }
 
         // ====================================================================
-        // اجرای schtasks — مشترک بین اسکن و غیرفعال/فعال‌سازی
+        // اجرای schtasks — مشترک بین اسکن و غیرفعال/فعال سازی
         // ====================================================================
 
         /// <summary>
-        /// schtasks را اجرا می‌کند. فقط stdout هدایت می‌شود (نه stderr) تا بافر پر نشود و dead-lock نشود.
+        /// schtasks را اجرا می کند. فقط stdout هدایت می شود (نه stderr) تا بافر پر نشود و dead-lock نشود.
         /// </summary>
         public static bool RunSchtasks(string arguments, out string output)
         {

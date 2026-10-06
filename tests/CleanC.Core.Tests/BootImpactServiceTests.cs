@@ -4,9 +4,9 @@ using CleanC.Core.Services;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های واحدِ F6 (امتیاز تأثیر روی بوت).
-    /// تست اینجا «تئوری» است: فقط منطقِ محاسبه و نرمال‌سازی نام فایل
-    /// بدون دست زدن به رجیستری/رویدادِ ویندوز بررسی می‌شود.
+    /// تست های واحدِ F6 (امتیاز تأثیر روی بوت).
+    /// تست اینجا «تئوری» است: فقط منطقِ محاسبه و نرمال سازی نام فایل
+    /// بدون دست زدن به رجیستری/رویدادِ ویندوز بررسی می شود.
     /// </summary>
     public class BootImpactServiceTests
     {
@@ -15,7 +15,7 @@ namespace CleanC.Core.Tests
         [InlineData(@"\Device\HarddiskVolume3\Windows\System32\foo.exe", "foo.exe")]
         // مسیر عادی + آرگومان
         [InlineData(@"C:\Program Files\Bar\foo.exe --flag", "foo.exe")]
-        // نقل‌قول‌دار و آرگومان
+        // نقل قول دار و آرگومان
         [InlineData("\"C:\\a\\foo.exe\" -x", "foo.exe")]
         // فقط نام، بدون مسیر
         [InlineData("foo.exe", "foo.exe")]
@@ -88,7 +88,7 @@ namespace CleanC.Core.Tests
         [Fact]
         public void AssignImpact_AlwaysProducesValidScore_EvenOnOddInputs()
         {
-            // نه استثنا پرتاب می‌شود، نه امتیاز از دامنه ۱..۱۰۰ بیرون می‌زند
+            // نه استثنا پرتاب می شود، نه امتیاز از دامنه ۱..۱۰۰ بیرون می زند
             var empty = new StartupItem();
             BootImpactService.AssignImpact(empty, new Dictionary<string, BootImpact>());
             Assert.InRange(empty.ImpactScore, 1, 100);

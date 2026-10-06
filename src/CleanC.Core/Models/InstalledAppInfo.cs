@@ -10,8 +10,8 @@ namespace CleanC.Core.Models
         public string InstallDate { get; set; } = string.Empty;
         public DateTime? ParsedInstallDate { get; set; }
         public string InstalledDateFormatted => ParsedInstallDate.HasValue 
-            ? ParsedInstallDate.Value.ToString("yyyy/MM/dd") 
-            : (!string.IsNullOrEmpty(InstallDate) ? InstallDate : "نامشخص");
+            ? ParsedInstallDate.Value.ToString("yyyy.MM.dd") 
+            : (!string.IsNullOrEmpty(InstallDate) ? InstallDate.Replace('/', '.') : "نامشخص");
 
         public long EstimatedSizeBytes { get; set; }
         public string FormattedSize => EstimatedSizeBytes > 0 ? SystemStats.FormatBytes(EstimatedSizeBytes) : string.Empty;

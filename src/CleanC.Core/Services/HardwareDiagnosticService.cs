@@ -13,7 +13,7 @@ namespace CleanC.Core.Services
         public string Id { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Category { get; set; } = "سخت‌افزار";
+        public string Category { get; set; } = "سخت افزار";
         public string ActionText { get; set; } = "اعمال تغییر";
         public string IconGlyph { get; set; } = "\uE7F4";
         public bool IsApplied { get; set; }
@@ -60,9 +60,9 @@ namespace CleanC.Core.Services
                         list.Add(new AttentionDecisionItem
                         {
                             Id = "bloatware_apps",
-                            Title = $"{bloatCandidates.Count} برنامه غیرضروری، تبلیغاتی یا کم‌استفاده شناسایی شد",
-                            Description = $"برنامه‌های تبلیغاتی و بلااستفاده پیش‌فرض که حدود {SystemStats.FormatBytes(totalBloatBytes)} از فضای دیسک و منابع سیستم را درگیر کرده‌اند.",
-                            Category = "مدیریت نرم‌افزارها",
+                            Title = $"{bloatCandidates.Count} برنامه غیرضروری، تبلیغاتی یا کم استفاده شناسایی شد",
+                            Description = $"برنامه های تبلیغاتی و بلااستفاده پیش فرض که حدود {SystemStats.FormatBytes(totalBloatBytes)} از فضای دیسک و منابع سیستم را درگیر کرده اند.",
+                            Category = "مدیریت نرم افزارها",
                             ActionText = "بررسی و حذف",
                             IconGlyph = "\uE74D",
                             IntParameter = bloatCandidates.Count
@@ -99,9 +99,9 @@ namespace CleanC.Core.Services
                             {
                                 Id = "ssd_critical_space",
                                 Title = $"کاهش بحرانی فضای درایو ویندوز ({freeGb} GB معادل {freePercent:0}% آزاد)",
-                                Description = "پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول‌های فلش می‌شود. توصیه می‌شود پاکسازی و دستور TRIM انجام شود.",
+                                Description = "پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول های فلش می شود. توصیه می شود پاکسازی و دستور TRIM انجام شود.",
                                 Category = "حافظه و دیسک",
-                                ActionText = "بهینه‌سازی TRIM دیسک",
+                                ActionText = "بهینه سازی TRIM دیسک",
                                 IconGlyph = "\uEDA2"
                             });
                         }
@@ -120,10 +120,10 @@ namespace CleanC.Core.Services
                         list.Add(new AttentionDecisionItem
                         {
                             Id = "gpu_hags",
-                            Title = "شتاب‌دهنده سخت‌افزاری گرافیک (HAGS) فعال نیست",
-                            Description = "با فعال‌سازی Hardware Accelerated GPU Scheduling، پردازش زمان‌بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم‌ها کاهش می‌یابد.",
+                            Title = "شتاب دهنده سخت افزاری گرافیک (HAGS) فعال نیست",
+                            Description = "با فعال سازی Hardware Accelerated GPU Scheduling، پردازش زمان بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم ها کاهش می یابد.",
                             Category = "کارت گرافیک و گیمینگ",
-                            ActionText = "فعال‌سازی HAGS",
+                            ActionText = "فعال سازی HAGS",
                             IconGlyph = "\uE790"
                         });
                     }
@@ -175,7 +175,7 @@ namespace CleanC.Core.Services
                 {
                     Id = "refresh_rate",
                     Title = $"ارتقای نرخ نوسازی مانیتور از {currentHz}Hz به {maxHz}Hz",
-                    Description = $"مانیتور شما با رزولوشن {width}×{height} از فرکانس بالاتر {maxHz}Hz پشتیبانی می‌کند که روانی و سرعت تصویر را ۲ برابر خواهد کرد.",
+                    Description = $"مانیتور شما با رزولوشن {width}×{height} از فرکانس بالاتر {maxHz}Hz پشتیبانی می کند که روانی و سرعت تصویر را ۲ برابر خواهد کرد.",
                     Category = "نمایشگر و مانیتور",
                     ActionText = $"ارتقا به {maxHz}Hz",
                     IconGlyph = "\uE7F4",

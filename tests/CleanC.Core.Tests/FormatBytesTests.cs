@@ -4,7 +4,7 @@ using CleanC.Core.Models;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های فرمت‌بندی حجم — مرزهای عددی که قبلاً باعث خروجی غلط یا استثنا می‌شدند.
+    /// تست های فرمت بندی حجم — مرزهای عددی که قبلاً باعث خروجی غلط یا استثنا می شدند.
     /// </summary>
     public class FormatBytesTests
     {
@@ -15,7 +15,7 @@ namespace CleanC.Core.Tests
         [InlineData(long.MinValue)]
         public void NonPositiveValues_AreAllReportedAsZero(long bytes)
         {
-            // واحد صفر برای همه‌ی مقادیر غیرمثبت باید یکسان باشد
+            // واحد صفر برای همه ی مقادیر غیرمثبت باید یکسان باشد
             Assert.Equal(SystemStats.FormatBytes(0), SystemStats.FormatBytes(bytes));
         }
 
@@ -44,7 +44,7 @@ namespace CleanC.Core.Tests
         [Fact]
         public void VeryLargeValues_AreClampedInsteadOfOverflowingTheUnitArray()
         {
-            // digitGroups اینجا ۶ است در حالی که آرایه‌ی واحدها فقط ۵ خانه دارد
+            // digitGroups اینجا ۶ است در حالی که آرایه ی واحدها فقط ۵ خانه دارد
             Assert.StartsWith("8388608", SystemStats.FormatBytes(long.MaxValue));
         }
     }

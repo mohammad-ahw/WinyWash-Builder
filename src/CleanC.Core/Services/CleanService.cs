@@ -22,14 +22,14 @@ namespace CleanC.Core.Services
                 {
                     if (!item.IsChecked) continue;
 
-                    progress?.Invoke($"در حال پاک‌سازی: {item.Title}...");
+                    progress?.Invoke($"در حال پاک سازی: {item.Title}...");
                     long freed = CleanCategory(item);
                     totalFreed += freed;
                     result.CleanedItems.Add(item.Title);
                 }
 
                 // Automatic RAM boost + DNS flush as part of clean
-                progress?.Invoke("بهینه‌سازی حافظه و رفرش شبکه...");
+                progress?.Invoke("بهینه سازی حافظه و رفرش شبکه...");
                 var boost = await OptimizerService.BoostRamAsync();
                 totalFreed += boost.FreedBytes;
                 OptimizerService.FlushDns();
@@ -40,8 +40,8 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// یک دسته زائد را پاک می‌کند و «فقط» فضایی که واقعاً آزاد شده را برمی‌گرداند.
-        /// هرگز مقدار تخمینی اسکن را به‌جای نتیجه واقعی گزارش نمی‌کند.
+        /// یک دسته زائد را پاک می کند و «فقط» فضایی که واقعاً آزاد شده را برمی گرداند.
+        /// هرگز مقدار تخمینی اسکن را به جای نتیجه واقعی گزارش نمی کند.
         /// </summary>
         public static long CleanCategory(JunkCategory item)
         {
@@ -52,11 +52,11 @@ namespace CleanC.Core.Services
             {
                 try
                 {
-                    // D5: تأیید خالی کردن سطل بازیافت را به خود ویندوز می‌سپاریم
-                    // (SHERB_NOCONFIRMATION حذف شد) تا کاربر قبل از پاکسازی دائمی بداند چه می‌کند.
+                    // D5: تأیید خالی کردن سطل بازیافت را به خود ویندوز می سپاریم
+                    // (SHERB_NOCONFIRMATION حذف شد) تا کاربر قبل از پاکسازی دائمی بداند چه می کند.
                     int hr = Win32.SHEmptyRecycleBin(IntPtr.Zero, null,
                         Win32.SHERB_NOPROGRESSUI | Win32.SHERB_NOSOUND);
-                    // فقط در صورت موفقیت (S_OK) فضای تخمینی را به‌عنوان آزادشده بپذیر
+                    // فقط در صورت موفقیت (S_OK) فضای تخمینی را به عنوان آزادشده بپذیر
                     return hr == 0 ? item.Bytes : 0;
                 }
                 catch
@@ -69,7 +69,7 @@ namespace CleanC.Core.Services
             {
                 try
                 {
-                    // کلیدهای رجیستری فضای دیسک آزاد نمی‌کنند؛ صفر برمی‌گردانیم تا گزارش دروغ نباشد
+                    // کلیدهای رجیستری فضای دیسک آزاد نمی کنند؛ صفر برمی گردانیم تا گزارش دروغ نباشد
                     RegistryCleanerService.CleanOrphanedRegistry();
                     return 0;
                 }
@@ -87,7 +87,7 @@ namespace CleanC.Core.Services
             {
                 if (string.IsNullOrWhiteSpace(path)) continue;
 
-                // پوشه‌های رهاشده فقط با بازبینی کامل LeftoverCleaner حذف می‌شوند
+                // پوشه های رهاشده فقط با بازبینی کامل LeftoverCleaner حذف می شوند
                 if (item.GroupId == "leftovers" && !LeftoverCleanerService.IsSafeToDelete(path)) continue;
 
                 if (Directory.Exists(path))
@@ -136,7 +136,7 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// مسیرهایی که هرگز نباید پاک شوند: ریشه درایوها، ویندوز، Program Files،
-        /// ریشه پروفایل کاربر، پوشه Users و پوشه‌های شخصی (Documents/Desktop/...).
+        /// ریشه پروفایل کاربر، پوشه Users و پوشه های شخصی (Documents/Desktop/...).
         /// </summary>
         private static bool IsProtectedSystemPath(string path)
         {
@@ -158,7 +158,7 @@ namespace CleanC.Core.Services
                     userDir,
                     Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                     Path.Combine(Path.GetPathRoot(userDir) ?? "C:\\", "Users"),
-                    // پوشه‌های شخصی: داخل اینها فایل کاربر است، نه زائد سیستم
+                    // پوشه های شخصی: داخل اینها فایل کاربر است، نه زائد سیستم
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                     Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                     Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
@@ -190,7 +190,7 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// جلوگیری از پیروی junction/symlink: اگر مسیر یک reparse point باشد،
-        /// حذف recursive می‌تواند کل هدف را از بین ببرد.
+        /// حذف recursive می تواند کل هدف را از بین ببرد.
         /// </summary>
         private static bool IsReparsePoint(FileAttributes attributes)
             => (attributes & FileAttributes.ReparsePoint) != 0;
@@ -245,8 +245,8 @@ namespace CleanC.Core.Services
                         {
                             sub.Attributes = FileAttributes.Normal;
                         }
-                        // فقط زمانی حذف می‌شود که واقعاً خالی مانده باشد؛
-                        // قبلاً Delete(true) بود که شرط «خالی بودن» را دور می‌زد
+                        // فقط زمانی حذف می شود که واقعاً خالی مانده باشد؛
+                        // قبلاً Delete(true) بود که شرط «خالی بودن» را دور می زد
                         sub.Delete(false);
                     }
                     catch

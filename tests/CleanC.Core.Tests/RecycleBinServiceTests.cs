@@ -1,5 +1,5 @@
 // tests/CleanC.Core.Tests/RecycleBinServiceTests.cs
-// پوشش F8 — پارس فایل اطلاعاتی $I و کمک‌تابع‌های نام‌گذاری سطل بازیافت.
+// پوشش F8 — پارس فایل اطلاعاتی $I و کمک تابع های نام گذاری سطل بازیافت.
 
 using System;
 using System.IO;
@@ -149,14 +149,14 @@ namespace CleanC.Core.Tests
             finally
             {
                 try { Directory.Delete(dir, true); }
-                catch (Exception) { /* پاک‌سازی تستی */ }
+                catch (Exception) { /* پاک سازی تستی */ }
             }
         }
 
         [Fact]
         public void ListItems_OnRealMachine_DoesNotThrow()
         {
-            // سطل بازیافت واقعی سیستم تست را می‌خوانیم؛ خطاهای دسترسی باید بلعیده شوند
+            // سطل بازیافت واقعی سیستم تست را می خوانیم؛ خطاهای دسترسی باید بلعیده شوند
             var items = RecycleBinService.ListItems();
 
             Assert.NotNull(items);
@@ -182,7 +182,7 @@ namespace CleanC.Core.Tests
             finally
             {
                 try { Directory.Delete(dir, true); }
-                catch (Exception) { /* پاک‌سازی تستی */ }
+                catch (Exception) { /* پاک سازی تستی */ }
             }
         }
     }

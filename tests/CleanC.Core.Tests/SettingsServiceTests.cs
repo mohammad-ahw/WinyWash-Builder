@@ -5,8 +5,8 @@ using CleanC.Core.Services;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های سرویس تنظیمات — مهم‌ترین بخش این است که هیچ‌وقت استثنا پرتاب نکند
-    /// و داده‌ی خراب (JSON ناقص، مقدار خارج از دامنه) به حالت پیش‌فرض برگردد
+    /// تست های سرویس تنظیمات — مهم ترین بخش این است که هیچ وقت استثنا پرتاب نکند
+    /// و داده ی خراب (JSON ناقص، مقدار خارج از دامنه) به حالت پیش فرض برگردد
     /// نه اینکه برنامه را با تنظیمات نامعتبر بالا بیاورد.
     /// </summary>
     public class SettingsServiceTests : IDisposable
@@ -17,13 +17,13 @@ namespace CleanC.Core.Tests
 
         public SettingsServiceTests()
         {
-            // FilePath و LogDirectory هر دو استاتیک‌اند؛ مسیر واقعی کاربر هرگز نباید لمس شود
+            // FilePath و LogDirectory هر دو استاتیک اند؛ مسیر واقعی کاربر هرگز نباید لمس شود
             _originalSettingsPath = SettingsService.FilePath;
             _originalLogDir = CcLog.LogDirectory;
             _tempDir = Path.Combine(Path.GetTempPath(), "cleanc-settings-" + Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_tempDir);
             SettingsService.FilePath = Path.Combine(_tempDir, "settings.json");
-            // لاگ‌هایی که حین تست (مثلاً JSON خراب) تولید می‌شوند هم باید در پوشه‌ی موقت بمانند
+            // لاگ هایی که حین تست (مثلاً JSON خراب) تولید می شوند هم باید در پوشه ی موقت بمانند
             CcLog.LogDirectory = Path.Combine(_tempDir, "logs");
         }
 
@@ -32,7 +32,7 @@ namespace CleanC.Core.Tests
             SettingsService.FilePath = _originalSettingsPath;
             CcLog.LogDirectory = _originalLogDir;
             try { Directory.Delete(_tempDir, recursive: true); }
-            catch { /* پوشه‌ی موقت ممکن است هنوز توسط فرآیند دیگری در اختیار باشد */ }
+            catch { /* پوشه ی موقت ممکن است هنوز توسط فرآیند دیگری در اختیار باشد */ }
         }
 
         [Fact]
@@ -229,7 +229,7 @@ namespace CleanC.Core.Tests
 
             var settings = SettingsService.Load();
 
-            // اسکنرها id را با حروف کوچک/مختلف می‌سازند؛ نباید کلید از دست برود
+            // اسکنرها id را با حروف کوچک/مختلف می سازند؛ نباید کلید از دست برود
             Assert.True(settings.JunkSelections.ContainsKey("tempfiles"));
             Assert.False(settings.JunkSelections["TEMPFILES"]);
         }

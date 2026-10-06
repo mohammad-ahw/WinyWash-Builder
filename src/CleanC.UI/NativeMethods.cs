@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 namespace CleanC.UI
 {
     /// <summary>
-    /// Win32 interop مربوط به لایه‌ی برنامه (single-instance، پنجره و ...)
+    /// Win32 interop مربوط به لایه ی برنامه (single-instance، پنجره و ...)
     /// </summary>
     internal static class NativeMethods
     {
@@ -28,20 +28,20 @@ namespace CleanC.UI
         private static extern IntPtr GetForegroundWindow();
 
         /// <summary>
-        /// F5 — آیا پنجره‌ی اصلی همین حالا فوکوس دارد؟
-        /// نوتیفیکیشن ویندوزی فقط زمانی می‌فرستیم که کاربر پنجره را نمی‌بیند،
+        /// F5 — آیا پنجره ی اصلی همین حالا فوکوس دارد؟
+        /// نوتیفیکیشن ویندوزی فقط زمانی می فرستیم که کاربر پنجره را نمی بیند،
         /// وگرنه InfoBar داخلی خودش کافی است.
         /// </summary>
         internal static bool IsWindowFocused(IntPtr hWnd)
         {
             if (hWnd == IntPtr.Zero) return false;
             try { return GetForegroundWindow() == hWnd; }
-            catch { return true; /* در صورت شکست، اعلان داخلی همچنان نمایش داده می‌شود */ }
+            catch { return true; /* در صورت شکست، اعلان داخلی همچنان نمایش داده می شود */ }
         }
 
         /// <summary>
-        /// پنجره‌ی بازِ CleanC را از حالت minimize درمی‌آورد و به جلو می‌آورد.
-        /// در صورت نبود پنجره بی‌اثر برمی‌گردد.
+        /// پنجره ی بازِ CleanC را از حالت minimize درمی آورد و به جلو می آورد.
+        /// در صورت نبود پنجره بی اثر برمی گردد.
         /// </summary>
         internal static void ActivateExistingInstance()
         {
@@ -57,13 +57,13 @@ namespace CleanC.UI
             }
             catch
             {
-                // فعال‌سازی پنجره هرگز نباید مانع اجرای برنامه شود
+                // فعال سازی پنجره هرگز نباید مانع اجرای برنامه شود
             }
         }
 
         /// <summary>
         /// آیا پنجره در حالت minimize است؟
-        /// WinAppSDK نسخه‌ی فعلی AppWindow.PresenterState ندارد، پس مستقیم از Win32 می‌پرسیم.
+        /// WinAppSDK نسخه ی فعلی AppWindow.PresenterState ندارد، پس مستقیم از Win32 می پرسیم.
         /// </summary>
         internal static bool IsWindowMinimized(IntPtr hWnd)
         {

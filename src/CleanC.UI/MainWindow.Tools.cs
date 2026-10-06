@@ -108,7 +108,7 @@ namespace CleanC.UI
             // 5. Windows OS Card
             var osChips = new List<string> { specs.OsArchitecture, $"Build {specs.OsBuild}" };
             if (!string.IsNullOrEmpty(specs.OsUptimeFormatted)) osChips.Add($"روشن: {specs.OsUptimeFormatted}");
-            cards.Add(CreateSpecCard("\uE8A9", "سیستم‌عامل", $"{specs.OsName}", osChips));
+            cards.Add(CreateSpecCard("\uE8A9", "سیستم عامل", $"{specs.OsName}", osChips));
 
             // 6. Windows Activation Status Card
             if (specs.Activation != null)
@@ -183,7 +183,7 @@ namespace CleanC.UI
             var dp = new Windows.ApplicationModel.DataTransfer.DataPackage();
             dp.SetText(text);
             Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
-            ShowInfoBar("کپی گزارش مشخصات", "مشخصات جامع سیستم با فرمت استاندارد در کلیپ‌بورد کپی شد.", InfoBarSeverity.Success);
+            ShowInfoBar("کپی گزارش مشخصات", "مشخصات جامع سیستم با فرمت استاندارد در کلیپ بورد کپی شد.", InfoBarSeverity.Success);
         }
 
         private void RefreshSpecsPage_Click(object sender, RoutedEventArgs e)
@@ -192,7 +192,7 @@ namespace CleanC.UI
         private async Task RefreshSpecsPage_ClickAsync(object sender, RoutedEventArgs e)
         {
             await LoadSystemSpecsPageAsync(forceRefresh: true);
-            ShowInfoBar("بروزرسانی مشخصات", "مشخصات سخت‌افزار و سنسورهای سیستم بروزرسانی شدند.", InfoBarSeverity.Informational);
+            ShowInfoBar("بروزرسانی مشخصات", "مشخصات سخت افزار و سنسورهای سیستم بروزرسانی شدند.", InfoBarSeverity.Informational);
         }
 
         private Border CreateSpecCard(string glyph, string category, string value, List<string>? chips, Windows.UI.Color? iconBgColor = null, string extra = "")
@@ -303,7 +303,7 @@ namespace CleanC.UI
             var titleStack = new StackPanel { Spacing = 2 };
             titleStack.Children.Add(new TextBlock
             {
-                Text = "مدیریت درایوهای سیستم‌عامل (This PC Drives)",
+                Text = "مدیریت درایوهای سیستم عامل (This PC Drives)",
                 FontWeight = Microsoft.UI.Text.FontWeights.Bold,
                 FontSize = 14
             });
@@ -462,30 +462,30 @@ namespace CleanC.UI
                 Background = GetThemeBrush("AppCardBackgroundBrush"),
                 BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(12),
-                Padding = new Thickness(20),
-                Margin = new Thickness(0, 14, 0, 0)
+                CornerRadius = new CornerRadius(10),
+                Padding = new Thickness(16, 12, 16, 12),
+                Margin = new Thickness(0, 10, 0, 0)
             };
 
-            var mainStack = new StackPanel { Spacing = 14 };
+            var mainStack = new StackPanel { Spacing = 10 };
 
-            // Header
+            // Header Row
             var headerGrid = new Grid();
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            var titleStack = new StackPanel { Spacing = 3 };
+            var titleStack = new StackPanel { Spacing = 2 };
             titleStack.Children.Add(new TextBlock
             {
-                Text = "مدیریت و تغییر پلن مصرف انرژی (Windows Power Plan)",
-                FontWeight = Microsoft.UI.Text.FontWeights.Bold,
-                FontSize = 14
+                Text = "طرح مصرف انرژی ویندوز (Power Plan)",
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                FontSize = 13.5
             });
 
             var status = PowerPlanService.GetPowerStatus();
             var subText = new TextBlock
             {
-                Text = $"پلن فعال فعلی: {status.ActiveSchemeName} | اعمال بیدرنگ با دستورات رسمی powercfg بدون نیاز به ری‌استارت",
+                Text = $"اعمال آنی powercfg بدون نیاز به ریستارت | پلن فعلی: {status.ActiveSchemeName}",
                 FontSize = 11,
                 Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
             };
@@ -495,11 +495,11 @@ namespace CleanC.UI
 
             var activeBadge = new Border
             {
-                Background = GetThemeBrush("AppCardSecondaryBrush"),
-                BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                Background = GetThemeBrush("AppAccentTintBrush"),
+                BorderBrush = GetThemeBrush("AppAccentBorderBrush"),
                 BorderThickness = new Thickness(1),
                 CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(10, 4, 10, 4),
+                Padding = new Thickness(10, 3, 10, 3),
                 VerticalAlignment = VerticalAlignment.Center
             };
             var badgeText = new TextBlock
@@ -515,68 +515,92 @@ namespace CleanC.UI
 
             mainStack.Children.Add(headerGrid);
 
-            // 4 Plans Grid
-            var plansGrid = new Grid { ColumnSpacing = 10, RowSpacing = 10 };
-            plansGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            plansGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-            plansGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            plansGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
+            // 4 Plans Horizontal Segmented Bar (1 Row, 4 Columns)
+            var plansGrid = new Grid { ColumnSpacing = 8 };
+            for (int col = 0; col < 4; col++)
+            {
+                plansGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+            }
 
             var plans = new[]
             {
-                ("ultimate", "حداکثر کارایی (Ultimate Performance)", "حذف کامل تأخیر کلاک و آزادسازی تمام پتانسیل سخت‌افزار", "\uE7E8"),
-                ("high", "کارایی بالا (High Performance)", "اولویت سرعت و عملکرد بدون حالت خواب سریع قطعات", "\uE945"),
-                ("balanced", "متعادل (Balanced - پیش‌فرض)", "توازن هوشمند بین مصرف بهینه انرژی و سرعت پردازش", "\uE953"),
-                ("saver", "ذخیره انرژی (Power Saver)", "کاهش فرکانس کلاک پردازنده جهت افزایش دوام شارژ باتری", "\uEC0A")
+                ("ultimate", "حداکثر کارایی", "Ultimate", "\uE7E8"),
+                ("high", "کارایی بالا", "High", "\uE945"),
+                ("balanced", "متعادل", "Balanced", "\uE953"),
+                ("saver", "ذخیره انرژی", "Power Saver", "\uEC0A")
+            };
+
+            var planButtons = new List<(string key, Button btn, TextBlock titleBlock, FontIcon iconBlock, Border activeIndicator)>();
+
+            Action updatePlanSelectionVisuals = () =>
+            {
+                var cur = PowerPlanService.GetPowerStatus();
+                string curKey = cur.ActiveSchemeKey?.ToLowerInvariant() ?? "";
+                foreach (var item in planButtons)
+                {
+                    bool isSelected = curKey.Contains(item.key) || item.key.Contains(curKey);
+                    item.btn.Background = isSelected ? GetThemeBrush("AppAccentTintBrush") : GetThemeBrush("AppCardSecondaryBrush");
+                    item.btn.BorderBrush = isSelected ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("AppCardBorderBrush");
+                    item.activeIndicator.Visibility = isSelected ? Visibility.Visible : Visibility.Collapsed;
+                }
             };
 
             for (int i = 0; i < plans.Length; i++)
             {
-                var (key, title, desc, icon) = plans[i];
+                var (key, title, subtitle, icon) = plans[i];
                 var planBtn = new Button
                 {
                     HorizontalAlignment = HorizontalAlignment.Stretch,
-                    HorizontalContentAlignment = HorizontalAlignment.Stretch,
-                    Padding = new Thickness(14, 12, 14, 12),
+                    HorizontalContentAlignment = HorizontalAlignment.Center,
+                    Padding = new Thickness(8, 8, 8, 8),
                     CornerRadius = new CornerRadius(8),
                     Background = GetThemeBrush("AppCardSecondaryBrush"),
                     BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                     BorderThickness = new Thickness(1)
                 };
 
-                var pGrid = new Grid();
-                pGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                pGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                var itemStack = new StackPanel { Spacing = 3, HorizontalAlignment = HorizontalAlignment.Center };
 
                 var pIcon = new FontIcon
                 {
                     Glyph = icon,
-                    FontSize = 18,
+                    FontSize = 15,
                     Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
-                    Margin = new Thickness(0, 0, 12, 0),
-                    VerticalAlignment = VerticalAlignment.Center
+                    HorizontalAlignment = HorizontalAlignment.Center
                 };
-                Grid.SetColumn(pIcon, 0);
-                pGrid.Children.Add(pIcon);
+                itemStack.Children.Add(pIcon);
 
-                var pTextStack = new StackPanel { Spacing = 2 };
-                pTextStack.Children.Add(new TextBlock
+                var pTitle = new TextBlock
                 {
                     Text = title,
                     FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                    FontSize = 12
-                });
-                pTextStack.Children.Add(new TextBlock
-                {
-                    Text = desc,
-                    FontSize = 10.5,
-                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
-                    TextWrapping = TextWrapping.Wrap
-                });
-                Grid.SetColumn(pTextStack, 1);
-                pGrid.Children.Add(pTextStack);
+                    FontSize = 11.5,
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                itemStack.Children.Add(pTitle);
 
-                planBtn.Content = pGrid;
+                var pSub = new TextBlock
+                {
+                    Text = subtitle,
+                    FontSize = 9.5,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
+                    HorizontalAlignment = HorizontalAlignment.Center
+                };
+                itemStack.Children.Add(pSub);
+
+                var dot = new Border
+                {
+                    Width = 6,
+                    Height = 6,
+                    CornerRadius = new CornerRadius(3),
+                    Background = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    Margin = new Thickness(0, 2, 0, 0),
+                    Visibility = Visibility.Collapsed
+                };
+                itemStack.Children.Add(dot);
+
+                planBtn.Content = itemStack;
 
                 string captureKey = key;
                 string captureTitle = title;
@@ -589,22 +613,22 @@ namespace CleanC.UI
                     {
                         var newStatus = PowerPlanService.GetPowerStatus();
                         badgeText.Text = $"⚡ {newStatus.ActiveSchemeName}";
-                        subText.Text = $"پلن فعال فعلی: {newStatus.ActiveSchemeName} | اعمال بیدرنگ با دستورات رسمی powercfg بدون نیاز به ری‌استارت";
+                        subText.Text = $"اعمال آنی powercfg بدون نیاز به ریستارت | پلن فعلی: {newStatus.ActiveSchemeName}";
+                        updatePlanSelectionVisuals();
                         ShowInfoBar("تغییر پلن انرژی", $"پلن انرژی ویندوز با موفقیت به «{captureTitle}» تغییر یافت.", InfoBarSeverity.Success);
                     }
                     else
                     {
-                        ShowInfoBar("خطا در تغییر پلن", "امکان تغییر پلن انرژی وجود ندارد (ممکن است نیازمند دسترسی مدیر باشد).", InfoBarSeverity.Error);
+                        ShowInfoBar("خطا در تغییر پلن", "امکان تغییر پلن انرژی وجود ندارد (نیازمند دسترسی Administrator).", InfoBarSeverity.Error);
                     }
                 };
 
-                int r = i / 2;
-                int c = i % 2;
-                Grid.SetRow(planBtn, r);
-                Grid.SetColumn(planBtn, c);
+                Grid.SetColumn(planBtn, i);
                 plansGrid.Children.Add(planBtn);
+                planButtons.Add((key, planBtn, pTitle, pIcon, dot));
             }
 
+            updatePlanSelectionVisuals();
             mainStack.Children.Add(plansGrid);
             card.Child = mainStack;
             return card;
@@ -732,21 +756,21 @@ namespace CleanC.UI
             {
                 _allInstalledApps = await AppUninstallerService.GetInstalledAppsAsync();
                 long totalSize = _allInstalledApps.Sum(a => a.EstimatedSizeBytes);
-                UninstallerSummaryText.Text = $"تعداد کل: {_allInstalledApps.Count} نرم‌افزار  •  حجم کل: {SystemStats.FormatBytes(totalSize)}";
+                UninstallerSummaryText.Text = $"تعداد کل: {_allInstalledApps.Count} نرم افزار  •  حجم کل: {SystemStats.FormatBytes(totalSize)}";
                 FilterAndRenderApps();
             }
             catch (Exception ex)
             {
                 UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
                 UninstallerAppsStack.Visibility = Visibility.Visible;
-                UninstallerSummaryText.Text = $"خطا در بارگذاری برنامه‌ها: {ex.Message}";
+                UninstallerSummaryText.Text = $"خطا در بارگذاری برنامه ها: {ex.Message}";
             }
         }
 
         private void FilterAndRenderApps()
         {
-            // فیلد به local منتقل می‌شود تا null-analysis رزرو شود (بعد از هر فراخوانی
-            // متد، حالت null فیلدها ریست می‌شود و کامپایلر هشدار CS8604 می‌دهد)
+            // فیلد به local منتقل می شود تا null-analysis رزرو شود (بعد از هر فراخوانی
+            // متد، حالت null فیلدها ریست می شود و کامپایلر هشدار CS8604 می دهد)
             var apps = _allInstalledApps;
             if (UninstallerAppsStack == null || UninstallerSearchBox == null || UninstallerSortBox == null || apps == null)
                 return;
@@ -935,7 +959,7 @@ namespace CleanC.UI
                     bool launched = AppUninstallerService.LaunchUninstall(app);
                     if (launched)
                     {
-                        ShowInfoBar("حذف نرم‌افزار", $"آنیستالر رسمی {app.DisplayName} با موفقیت اجرا گردید.", InfoBarSeverity.Informational);
+                        ShowInfoBar("حذف نرم افزار", $"آنیستالر رسمی {app.DisplayName} با موفقیت اجرا گردید.", InfoBarSeverity.Informational);
                     }
                     else
                     {
@@ -949,13 +973,13 @@ namespace CleanC.UI
                 UninstallerAppsStack.Children.Add(itemBorder);
             }
 
-            // حالت خالی: یا جستجوی بی‌نتیجه، یا لیست نصب‌شده‌ها واقعاً خالی است
+            // حالت خالی: یا جستجوی بی نتیجه، یا لیست نصب شده ها واقعاً خالی است
             if (filtered.Count == 0)
             {
                 UninstallerAppsStack.Children.Add(CreateEmptyStateMessage(
                     string.IsNullOrEmpty(query)
-                        ? "هیچ نرم‌افزاری روی سیستم شناسایی نشد."
-                        : $"هیچ نرم‌افزاری مطابق با «{query}» پیدا نشد.",
+                        ? "هیچ نرم افزاری روی سیستم شناسایی نشد."
+                        : $"هیچ نرم افزاری مطابق با «{query}» پیدا نشد.",
                     "\uE721"));
             }
 
@@ -971,8 +995,8 @@ namespace CleanC.UI
                 UninstallerBatchBar.Visibility = Visibility.Visible;
                 long totalBytes = selected.Sum(a => a.EstimatedSizeBytes);
                 string sizeStr = totalBytes > 0 ? $" ({SystemStats.FormatBytes(totalBytes)})" : "";
-                UninstallerSelectedCountText.Text = $"{selected.Count} نرم‌افزار انتخاب گردیده{sizeStr}";
-                UninstallerBatchDeleteBtnText.Text = $"حذف {selected.Count} برنامه انتخاب‌شده";
+                UninstallerSelectedCountText.Text = $"{selected.Count} نرم افزار انتخاب گردیده{sizeStr}";
+                UninstallerBatchDeleteBtnText.Text = $"حذف {selected.Count} برنامه انتخاب شده";
             }
             else
             {
@@ -1010,10 +1034,10 @@ namespace CleanC.UI
 
             var confirmDialog = new ContentDialog
             {
-                Title = "تأیید حذف گروهی نرم‌افزارها",
+                Title = "تأیید حذف گروهی نرم افزارها",
                 Content = new TextBlock
                 {
-                    Text = $"آیا از حذف {selected.Count} برنامه انتخاب‌شده اطمینان دارید؟ به منظور جلوگیری از تداخل فرآیندهای ویندوز، حذف هر برنامه به ترتیب (FIFO) و با باز شدن ایمن آنیستالر انجام خواهد شد.",
+                    Text = $"آیا از حذف {selected.Count} برنامه انتخاب شده اطمینان دارید؟ به منظور جلوگیری از تداخل فرآیندهای ویندوز، حذف هر برنامه به ترتیب (FIFO) و با باز شدن ایمن آنیستالر انجام خواهد شد.",
                     FontSize = 13,
                     TextWrapping = TextWrapping.Wrap,
                     LineHeight = 20
@@ -1041,7 +1065,7 @@ namespace CleanC.UI
             }
 
             UninstallerBatchDeleteBtn.IsEnabled = true;
-            ShowInfoBar("پایان عملیات حذف", $"تمام برنامه‌های انتخاب‌شده ({total} مورد) در صف آنیستال قرار گرفتند.", InfoBarSeverity.Success);
+            ShowInfoBar("پایان عملیات حذف", $"تمام برنامه های انتخاب شده ({total} مورد) در صف آنیستال قرار گرفتند.", InfoBarSeverity.Success);
             await LoadAppUninstallerPageAsync();
         }
 
@@ -1074,13 +1098,12 @@ namespace CleanC.UI
 
             SpeedGaugeValueText.Text = "0";
             SpeedGaugeMBsText.Text = "در حال اتصال به سرور...";
-            SpeedGaugePhaseText.Text = "در حال آماده‌سازی و سنجش تاخیر...";
+            SpeedGaugePhaseText.Text = "در حال آماده سازی و سنجش تاخیر...";
             SpeedPingValText.Text = "-- ms";
             SpeedDownloadValText.Text = "-- Mbps";
             SpeedUploadValText.Text = "-- Mbps";
             SpeedGaugeRing.IsIndeterminate = false;
             SpeedGaugeRing.Value = 0;
-            if (SpeedExperienceCard != null) SpeedExperienceCard.Visibility = Visibility.Collapsed;
 
             try
             {
@@ -1091,7 +1114,7 @@ namespace CleanC.UI
                         if (curResult != null && !string.IsNullOrEmpty(curResult.ClientIp))
                         {
                             SpeedIpChipText.Text = curResult.ClientIp;
-                            SpeedIspChipText.Text = !string.IsNullOrEmpty(curResult.IspName) ? curResult.IspName : "ارائه‌دهنده فعال";
+                            SpeedIspChipText.Text = !string.IsNullOrEmpty(curResult.IspName) ? curResult.IspName : "ارائه دهنده فعال";
                             string loc = $"{curResult.City}, {curResult.Country}".Trim(',', ' ');
                             string flag = !string.IsNullOrEmpty(curResult.FlagEmoji) ? curResult.FlagEmoji + " " : "";
                             SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? $"{flag}{loc}" : "سرور ابری جهانی";
@@ -1153,16 +1176,6 @@ namespace CleanC.UI
                     SpeedUploadValText.Text = result.UploadSpeedMbps > 0 ? $"{result.UploadSpeedMbpsInt} Mbps ({result.UploadSpeedMBsInt} MB/s)" : "--";
                     SpeedGaugeRing.Value = 100;
 
-                    // Experience Ratings
-                    if (SpeedExperienceCard != null)
-                    {
-                        SpeedExperienceCard.Visibility = Visibility.Visible;
-                        if (SpeedExpWebText != null) SpeedExpWebText.Text = result.WebBrowsingRating;
-                        if (SpeedExpVideoText != null) SpeedExpVideoText.Text = result.VideoStreamingRating;
-                        if (SpeedExpGamingText != null) SpeedExpGamingText.Text = result.GamingRating;
-                        if (SpeedExpCallText != null) SpeedExpCallText.Text = result.VideoCallingRating;
-                    }
-
                     if (LauncherSpeedTestBadge != null)
                     {
                         LauncherSpeedTestBadge.Text = $"دانلود: {result.DownloadSpeedMbpsInt} Mbps ({result.DownloadSpeedMBsInt} MB/s)";
@@ -1197,57 +1210,57 @@ namespace CleanC.UI
             var current = WindowsPersonalizationService.GetCurrentSettings();
 
             // 1. Transparency
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE2B1", "شفافیت شیشه‌ای ویندوز (Transparency)", "فعال‌سازی افکت شیشه‌ای در تسک‌بار، استارت و پنجره‌های ویندوز", current.IsTransparencyEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE2B1", "شفافیت شیشه ای ویندوز (Transparency)", "فعال سازی افکت شیشه ای در تسک بار، استارت و پنجره های ویندوز", current.IsTransparencyEnabled, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetTransparency(isOn);
-                ShowInfoBar("شفافیت ویندوز", isOn ? "افکت شیشه‌ای فعال شد." : "افکت شیشه‌ای غیرفعال شد.", InfoBarSeverity.Success);
+                ShowInfoBar("شفافیت ویندوز", isOn ? "افکت شیشه ای فعال شد." : "افکت شیشه ای غیرفعال شد.", InfoBarSeverity.Success);
             }));
 
             // 2. Auto Accent Color
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE790", "رنگ Accent هوشمند والپیپر", "استخراج و هماهنگ‌سازی خودکار رنگ اصلی ویندوز از تصویر دسکتاپ", current.IsAutoColorizationEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE790", "رنگ Accent هوشمند والپیپر", "استخراج و هماهنگ سازی خودکار رنگ اصلی ویندوز از تصویر دسکتاپ", current.IsAutoColorizationEnabled, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetAutoColorization(isOn);
                 ShowInfoBar("رنگ ویندوز", isOn ? "هماهنگی خودکار رنگ با والپیپر فعال شد." : "هماهنگی خودکار غیرفعال شد.", InfoBarSeverity.Success);
             }));
 
             // 3. Dark Mode
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE706", "تم تاریک ویندوز (Dark Mode)", "اعمال پوسته تیره روی محیط ویندوز و نرم‌افزارهای سیستمی", current.IsDarkModeEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE706", "تم تاریک ویندوز (Dark Mode)", "اعمال پوسته تیره روی محیط ویندوز و نرم افزارهای سیستمی", current.IsDarkModeEnabled, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetWindowsDarkMode(isOn);
                 ShowInfoBar("تم ویندوز", isOn ? "حالت تاریک فعال شد." : "حالت روشن فعال شد.", InfoBarSeverity.Success);
             }));
 
             // 4. Performance Visual Effects
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE9A1", "حالت عملکرد و چابکی بالا (Best Performance)", "کاهش انیمیشن‌های اضافی ویندوز برای افزایش سرعت پاسخ‌دهی سیستم", current.IsBestPerformanceFx, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE9A1", "حالت عملکرد و چابکی بالا (Best Performance)", "کاهش انیمیشن های اضافی ویندوز برای افزایش سرعت پاسخ دهی سیستم", current.IsBestPerformanceFx, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetVisualEffectsPerformance(isOn);
-                ShowInfoBar("افکت‌های بصری", isOn ? "تنظیمات روی حداکثر کارایی قرار گرفت." : "تنظیمات روی حالت پیش‌فرض قرار گرفت.", InfoBarSeverity.Success);
+                ShowInfoBar("افکت های بصری", isOn ? "تنظیمات روی حداکثر کارایی قرار گرفت." : "تنظیمات روی حالت پیش فرض قرار گرفت.", InfoBarSeverity.Success);
             }));
 
             // 5. Show File Extensions
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8E5", "نمایش پسوند فایل‌ها در ویندوز", "نمایش پسوند نام فایل‌ها (مانند .exe, .pdf, .docx) در File Explorer", current.IsShowFileExtensionsEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8E5", "نمایش پسوند فایل ها در ویندوز", "نمایش پسوند نام فایل ها (مانند .exe, .pdf, .docx) در File Explorer", current.IsShowFileExtensionsEnabled, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetShowFileExtensions(isOn);
-                ShowInfoBar("نمایش پسوندها", isOn ? "نمایش پسوند فایل‌ها فعال شد." : "پسوند فایل‌ها پنهان شد.", InfoBarSeverity.Success);
+                ShowInfoBar("نمایش پسوندها", isOn ? "نمایش پسوند فایل ها فعال شد." : "پسوند فایل ها پنهان شد.", InfoBarSeverity.Success);
             }));
 
             // 6. Show Hidden Files
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8B7", "نمایش فایل‌ها و پوشه‌های مخفی", "آشکارسازی فایل‌ها و پوشه‌های پنهان سیستمی در فایل اکسپلورر", current.IsShowHiddenFilesEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8B7", "نمایش فایل ها و پوشه های مخفی", "آشکارسازی فایل ها و پوشه های پنهان سیستمی در فایل اکسپلورر", current.IsShowHiddenFilesEnabled, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetShowHiddenFiles(isOn);
-                ShowInfoBar("فایل‌های مخفی", isOn ? "فایل‌های مخفی آشکار شدند." : "فایل‌های مخفی پنهان شدند.", InfoBarSeverity.Success);
+                ShowInfoBar("فایل های مخفی", isOn ? "فایل های مخفی آشکار شدند." : "فایل های مخفی پنهان شدند.", InfoBarSeverity.Success);
             }));
 
             // 7. Classic Context Menu
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8BD", "منوی راست‌کلیک کلاسیک ویندوز ۱۱", "بازگشت منوی راست‌کلیک کامل و سنتی بدون نیاز به فشردن Show more options", current.IsClassicContextMenuEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE8BD", "منوی راست کلیک کلاسیک ویندوز ۱۱", "بازگشت منوی راست کلیک کامل و سنتی بدون نیاز به فشردن Show more options", current.IsClassicContextMenuEnabled, default, (isOn) =>
             {
                 WindowsPersonalizationService.SetClassicContextMenu(isOn);
-                ShowInfoBar("منوی راست‌کلیک", isOn ? "منوی راست‌کلیک کلاسیک فعال شد." : "منوی راست‌کلیک مدرن ویندوز ۱۱ فعال شد.", InfoBarSeverity.Success);
+                ShowInfoBar("منوی راست کلیک", isOn ? "منوی راست کلیک کلاسیک فعال شد." : "منوی راست کلیک مدرن ویندوز ۱۱ فعال شد.", InfoBarSeverity.Success);
             }));
 
             // 8. Fast Startup (Hiberboot) Optimization
             var fastStatus = FastStartupService.GetStatus();
-            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE7E8", "بوت سریع ویندوز (Fast Startup / Hiberboot)", "خاموش‌سازی حالت هایبرید ویندوز جهت ریست کامل درایورها هنگام خاموشی، پیشگیری از خطای کارت شبکه و کاهش استهلاک SSD", fastStatus.IsFastStartupEnabled, default, (isOn) =>
+            PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE7E8", "بوت سریع ویندوز (Fast Startup / Hiberboot)", "خاموش سازی حالت هایبرید ویندوز جهت ریست کامل درایورها هنگام خاموشی، پیشگیری از خطای کارت شبکه و کاهش استهلاک SSD", fastStatus.IsFastStartupEnabled, default, (isOn) =>
             {
                 bool ok = FastStartupService.SetFastStartup(isOn);
                 if (ok)
@@ -1262,7 +1275,7 @@ namespace CleanC.UI
 
             // 9. Hibernation & hiberfil.sys Disk Cleanup
             string hiberDesc = fastStatus.IsHibernationEnabled
-                ? $"فعال است (حجم اشغال‌شده توسط hiberfil.sys: {fastStatus.FormattedHiberfilSize}) - غیرفعال‌سازی فضای عظیمی را روی درایو C آزاد می‌کند."
+                ? $"فعال است (حجم اشغال شده توسط hiberfil.sys: {fastStatus.FormattedHiberfilSize}) - غیرفعال سازی فضای عظیمی را روی درایو C آزاد می کند."
                 : "غیرفعال است (فایل hiberfil.sys حذف شده و فضای درایو C آزاد است).";
 
             PersonalizationCardsContainer.Children.Add(CreateToggleCard("\uE9A6", "خواب زمستانی و پاکسازی hiberfil.sys", hiberDesc, fastStatus.IsHibernationEnabled, default, async (isOn) =>
@@ -1280,7 +1293,7 @@ namespace CleanC.UI
             }));
 
             // 10. Windows Security & Defender (Shortcut to Tamper Protection & Antivirus)
-            PersonalizationCardsContainer.Children.Add(CreateActionCard("\uE838", "امنیت و آنتی‌ویروس ویندوز (Windows Security & Defender)", "دسترسی مستقیم به تنظیمات محافظت بلادرنگ، فایروال و Tamper Protection", "تنظیمات امنیت", default, () =>
+            PersonalizationCardsContainer.Children.Add(CreateActionCard("\uE838", "امنیت و آنتی ویروس ویندوز (Windows Security & Defender)", "دسترسی مستقیم به تنظیمات محافظت بلادرنگ، فایروال و Tamper Protection", "تنظیمات امنیت", default, () =>
             {
                 try
                 {
@@ -1410,8 +1423,8 @@ namespace CleanC.UI
             headerGrid.Children.Add(iconBg);
 
             var titleStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
-            titleStack.Children.Add(new TextBlock { Text = "پیکربندی شیشه‌ای ویندوز (Windows Glass / Blur Preset)", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
-            titleStack.Children.Add(new TextBlock { Text = "پیکربندی پیشرفته شفافیت ویندوز (افکت effect=1، شفافیت نوار آدرس و رنگ‌های RGB تم تیره و روشن)", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") });
+            titleStack.Children.Add(new TextBlock { Text = "پیکربندی شیشه ای و بلور ویندوز", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
+            titleStack.Children.Add(new TextBlock { Text = "تنظیمات پیشرفته شفافیت پنجره ها، نوار آدرس و حاشیه ها با اعمال بلادرنگ", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") });
             Grid.SetColumn(titleStack, 1);
             headerGrid.Children.Add(titleStack);
 
@@ -1422,39 +1435,21 @@ namespace CleanC.UI
 
             var optionsStack = new StackPanel { Spacing = 8, Margin = new Thickness(46, 0, 0, 0) };
 
-            var chkClearAddress = new CheckBox { Content = "شفاف‌سازی کامل نوار آدرس اکسپلورر (clearAddress=true)", IsChecked = cfg.ClearAddress, FontSize = 11.5 };
-            var chkClearBarBg = new CheckBox { Content = "شفاف‌سازی نوار ابزار و تب‌ها (clearBarBg=true)", IsChecked = cfg.ClearBarBg, FontSize = 11.5 };
-            var chkClearWinUI = new CheckBox { Content = "شفاف‌سازی پس‌زمینه اجزای WinUI (clearWinUIBg=true)", IsChecked = cfg.ClearWinUIBg, FontSize = 11.5 };
-            var chkShowLine = new CheckBox { Content = "نمایش خط حاشیه پنجره (showLine=true)", IsChecked = cfg.ShowLine, FontSize = 11.5 };
+            var chkClearAddress = new CheckBox { Content = "شفاف سازی کامل نوار آدرس فایل اکسپلورر", IsChecked = cfg.ClearAddress, FontSize = 11.5 };
+            var chkClearBarBg = new CheckBox { Content = "شفاف سازی نوار ابزار و تب ها", IsChecked = cfg.ClearBarBg, FontSize = 11.5 };
+            var chkClearWinUI = new CheckBox { Content = "شفاف سازی پس زمینه کنترل های مدرن WinUI", IsChecked = cfg.ClearWinUIBg, FontSize = 11.5 };
+            var chkShowLine = new CheckBox { Content = "نمایش حاشیه و خط تفکیک دور پنجره ها", IsChecked = cfg.ShowLine, FontSize = 11.5 };
 
             optionsStack.Children.Add(chkClearAddress);
             optionsStack.Children.Add(chkClearBarBg);
             optionsStack.Children.Add(chkClearWinUI);
             optionsStack.Children.Add(chkShowLine);
 
-            // Preset values summary text
-            var summaryBorder = new Border
-            {
-                Background = GetThemeBrush("AppCardSecondaryBrush"),
-                CornerRadius = new CornerRadius(6),
-                Padding = new Thickness(10, 8, 10, 8),
-                Margin = new Thickness(0, 4, 0, 4),
-                Child = new TextBlock
-                {
-                    Text = "[config] effect=1 | clearAddress=true | clearBarBg=true | clearWinUIBg=true | showLine=true\n[light] r=255, g=255, b=255, a=200  |  [dark] r=0, g=0, b=0, a=120",
-                    FontSize = 10.5,
-                    FontFamily = new Microsoft.UI.Xaml.Media.FontFamily("Consolas"),
-                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
-                    FlowDirection = FlowDirection.LeftToRight
-                }
-            };
-            optionsStack.Children.Add(summaryBorder);
-
             // Action buttons
-            var btnRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+            var btnRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, Margin = new Thickness(0, 4, 0, 0) };
             var saveBtn = new Button
             {
-                Content = "ذخیره و اعمال تنظیمات کانفیگ",
+                Content = "ذخیره و اعمال تنظیمات",
                 Style = (Style)Application.Current.Resources["AccentButtonStyle"],
                 Height = 30, FontSize = 11.5, CornerRadius = new CornerRadius(6)
             };
@@ -1466,12 +1461,12 @@ namespace CleanC.UI
                 cfg.ShowLine = chkShowLine.IsChecked == true;
                 WindowsPersonalizationService.SaveGlassConfig(cfg);
                 WindowsPersonalizationService.BroadcastSettingsChange();
-                ShowInfoBar("تنظیمات شیشه‌ای", "تنظیمات glass_config.ini با مقادیر انتخابی ذخیره و در ویندوز اعمال شد.", InfoBarSeverity.Success);
+                ShowInfoBar("تنظیمات شیشه ای", "تنظیمات شفافیت با موفقیت ذخیره و در ویندوز اعمال شد.", InfoBarSeverity.Success);
             };
 
             var resetBtn = new Button
             {
-                Content = "بازنشانی به پیش‌فرض",
+                Content = "بازنشانی به پیش فرض",
                 Height = 30, FontSize = 11.5, CornerRadius = new CornerRadius(6),
                 Background = GetThemeBrush("AppCardSecondaryBrush"),
                 BorderBrush = GetThemeBrush("AppCardBorderBrush")
@@ -1485,7 +1480,7 @@ namespace CleanC.UI
                 chkShowLine.IsChecked = true;
                 WindowsPersonalizationService.SaveGlassConfig(cfg);
                 WindowsPersonalizationService.BroadcastSettingsChange();
-                ShowInfoBar("بازنشانی تنظیمات", "تنظیمات به مقادیر پیش‌فرض بازنشانی شد.", InfoBarSeverity.Informational);
+                ShowInfoBar("بازنشانی تنظیمات", "تنظیمات به مقادیر پیش فرض بازنشانی شد.", InfoBarSeverity.Informational);
             };
 
             btnRow.Children.Add(saveBtn);
@@ -1530,7 +1525,7 @@ namespace CleanC.UI
             headerGrid.Children.Add(iconBg);
 
             var titleStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center };
-            titleStack.Children.Add(new TextBlock { Text = "گالری والپیپرهای CleanC و تصویر پس‌زمینه ویندوز", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
+            titleStack.Children.Add(new TextBlock { Text = "گالری والپیپرهای CleanC و تصویر پس زمینه ویندوز", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
             var wallpapers = WindowsPersonalizationService.GetCleanCWallpapers();
             titleStack.Children.Add(new TextBlock { Text = $"انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({wallpapers.Count} والپیپر گلچین 4K)", FontSize = 11, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") });
             Grid.SetColumn(titleStack, 1);
@@ -1542,10 +1537,10 @@ namespace CleanC.UI
             var optionsStack = new StackPanel { Spacing = 10, Margin = new Thickness(46, 0, 0, 0) };
 
             string curWp = WindowsPersonalizationService.GetCurrentWindowsWallpaper();
-            string wpName = !string.IsNullOrEmpty(curWp) ? Path.GetFileName(curWp) : "والپیپر پیش‌فرض سیستم";
+            string wpName = !string.IsNullOrEmpty(curWp) ? Path.GetFileName(curWp) : "والپیپر پیش فرض سیستم";
             var curText = new TextBlock
             {
-                Text = $"تصویر فعلی پس‌زمینه: {wpName}",
+                Text = $"تصویر فعلی پس زمینه: {wpName}",
                 FontSize = 11.5,
                 Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
             };
@@ -1568,8 +1563,8 @@ namespace CleanC.UI
                     bool ok = WindowsPersonalizationService.SetDesktopWallpaper(chosen);
                     if (ok)
                     {
-                        curText.Text = $"تصویر فعلی پس‌زمینه: {Path.GetFileName(chosen)}";
-                        ShowInfoBar("والپیپر دسکتاپ", $"تصویر پس‌زمینه دسکتاپ به «{Path.GetFileName(chosen)}» تغییر یافت.", InfoBarSeverity.Success);
+                        curText.Text = $"تصویر فعلی پس زمینه: {Path.GetFileName(chosen)}";
+                        ShowInfoBar("والپیپر دسکتاپ", $"تصویر پس زمینه دسکتاپ به «{Path.GetFileName(chosen)}» تغییر یافت.", InfoBarSeverity.Success);
                     }
                     else
                     {
@@ -1736,7 +1731,7 @@ namespace CleanC.UI
                     string ext = Path.GetExtension(exe).ToLowerInvariant();
                     if (ext == ".png" || ext == ".jpg" || ext == ".ico") return exe;
 
-                    // B3: هش قطعی به‌جای GetHashCode — جزئیات در StableHash32
+                    // B3: هش قطعی به جای GetHashCode — جزئیات در StableHash32
                     string hash = StableHash32(exe + appName);
                     string cacheDir = Path.Combine(Path.GetTempPath(), "CleanC", "Icons");
                     string iconPath = Path.Combine(cacheDir, $"{hash}.png");
@@ -1764,11 +1759,11 @@ namespace CleanC.UI
         private static bool _iconCachePurged;
 
         /// <summary>
-        /// B3 — پاک‌سازی یک‌باره‌ی کش آیکون‌های قدیمی.
+        /// B3 — پاک سازی یک باره ی کش آیکون های قدیمی.
         ///
-        /// نسخه‌های قبلی با هش randomize‌شده‌ی <c>GetHashCode()</c> فایل می‌ساختند که
-        /// هیچ‌وقت دوباره پیدا نمی‌شد؛ در نتیجه پوشه‌ی کش انباشته می‌شد.
-        /// فایل‌های بالای ۷ روز امن حذف می‌شوند چون در صورت نیاز بازسازی می‌شوند.
+        /// نسخه های قبلی با هش randomize شده ی <c>GetHashCode()</c> فایل می ساختند که
+        /// هیچ وقت دوباره پیدا نمی شد؛ در نتیجه پوشه ی کش انباشته می شد.
+        /// فایل های بالای ۷ روز امن حذف می شوند چون در صورت نیاز بازسازی می شوند.
         /// </summary>
         private static void PurgeStaleIconCache(string cacheDir)
         {
@@ -1811,9 +1806,9 @@ namespace CleanC.UI
         /// <summary>
         /// B3 — هش FNV-1a (32 بیت) قطعی برای نام فایل کش آیکون.
         ///
-        /// دلیل رد شدن از GetHashCode: در .NET Core رشته‌ها per-process randomize
-        /// می‌شوند (یعنی کش هر بار از نو ساخته می‌شد) و <c>Math.Abs(int.MinValue)</c>
-        /// همیشه <c>OverflowException</c> پرتاب می‌کند.
+        /// دلیل رد شدن از GetHashCode: در .NET Core رشته ها per-process randomize
+        /// می شوند (یعنی کش هر بار از نو ساخته می شد) و <c>Math.Abs(int.MinValue)</c>
+        /// همیشه <c>OverflowException</c> پرتاب می کند.
         /// </summary>
         private static string StableHash32(string input)
         {
@@ -1832,9 +1827,9 @@ namespace CleanC.UI
         private async Task LoadStartupManagerPageAsync()
         {
             StartupCardsContainer.Children.Clear();
-            // اسکنِ تسک‌های زمان‌بندی‌شده چند ثانیه طول می‌کشد؛ از همین‌جا پیام بده
+            // اسکنِ تسک های زمان بندی شده چند ثانیه طول می کشد؛ از همین جا پیام بده
             // (این صفحه اسپینرِ مخصوص خودش را ندارد)
-            StartupManagerSummaryText.Text = "در حال دریافت فهرست برنامه‌های استارتاپ...";
+            StartupManagerSummaryText.Text = "در حال دریافت فهرست برنامه های استارتاپ...";
 
             var rawItems = await Task.Run(() => StartupOptimizerService.GetStartupItems());
             // Sort: Enabled apps first (IsDisabled == false), then disabled apps (IsDisabled == true)
@@ -1853,7 +1848,7 @@ namespace CleanC.UI
             {
                 StartupCardsContainer.Children.Add(new TextBlock
                 {
-                    Text = "هیچ برنامه‌ای در استارتاپ ویندوز یافت نشد.",
+                    Text = "هیچ برنامه ای در استارتاپ ویندوز یافت نشد.",
                     FontSize = 13,
                     Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
                     HorizontalAlignment = HorizontalAlignment.Center,
@@ -1874,7 +1869,7 @@ namespace CleanC.UI
                         Margin = new Thickness(4, 12, 4, 6),
                         Child = new TextBlock
                         {
-                            Text = "برنامه‌های غیرفعال در شروع ویندوز",
+                            Text = "برنامه های غیرفعال در شروع ویندوز",
                             FontSize = 11.5,
                             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                             Foreground = GetThemeBrush("TextFillColorTertiaryBrush")
@@ -1961,8 +1956,8 @@ namespace CleanC.UI
                 var nameText = new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5, VerticalAlignment = VerticalAlignment.Center };
                 topRow.Children.Add(nameText);
 
-                // F6: امتیاز واقعی تأثیر روی بوت (اندازه‌گیری‌شده از رویدادهای ویندوز
-                // یا تخمین بر اساس دسته‌بندی) به‌جای هیوریستیک ثابت
+                // F6: امتیاز واقعی تأثیر روی بوت (اندازه گیری شده از رویدادهای ویندوز
+                // یا تخمین بر اساس دسته بندی) به جای هیوریستیک ثابت
                 var impactBadge = new Border
                 {
                     Background = GetThemeBrush("AppCardSecondaryBrush"),
@@ -2024,7 +2019,7 @@ namespace CleanC.UI
                 {
                     textStack.Children.Add(new TextBlock
                     {
-                        Text = $"تأخیر اندازه‌گیری‌شده در بالا آمدن ویندوز: {item.ImpactMs} میلی‌ثانیه",
+                        Text = $"تأخیر اندازه گیری شده در بالا آمدن ویندوز: {item.ImpactMs} میلی ثانیه",
                         FontSize = 10.5,
                         Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
                         TextTrimming = TextTrimming.CharacterEllipsis
@@ -2044,8 +2039,8 @@ namespace CleanC.UI
                     Margin = new Thickness(12, 0, 0, 0)
                 };
                 var capturedCard = card;
-                // اگر غیرفعال/فعال‌سازی شکست بخورد (دسترسی نداشتن، قفل بودن، تسک ویندوزی و...)
-                // باید کلید به حالت قبلی برگردد؛ وگرنه UI دروغ می‌گوید
+                // اگر غیرفعال/فعال سازی شکست بخورد (دسترسی نداشتن، قفل بودن، تسک ویندوزی و...)
+                // باید کلید به حالت قبلی برگردد؛ وگرنه UI دروغ می گوید
                 bool toggleGuard = false;
                 toggle.Toggled += (s, e) =>
                 {
@@ -2067,7 +2062,7 @@ namespace CleanC.UI
                         }
                         item.IsDisabled = true;
                         capturedCard.Opacity = 0.5;
-                        ShowInfoBar("استارتاپ ویندوز", $"برنامه {item.Name} غیرفعال شد و از اجرای خودکار آن جلوگیری می‌شود.", InfoBarSeverity.Informational);
+                        ShowInfoBar("استارتاپ ویندوز", $"برنامه {item.Name} غیرفعال شد و از اجرای خودکار آن جلوگیری می شود.", InfoBarSeverity.Informational);
                     }
                     else
                     {
@@ -2100,17 +2095,50 @@ namespace CleanC.UI
         private async Task RefreshStartupManager_ClickAsync(object sender, RoutedEventArgs e)
         {
             await LoadStartupManagerPageAsync();
-            ShowInfoBar("استارتاپ ویندوز", "لیست برنامه‌های استارتاپ بروزرسانی شد.", InfoBarSeverity.Informational);
+            ShowInfoBar("استارتاپ ویندوز", "لیست برنامه های استارتاپ بروزرسانی شد.", InfoBarSeverity.Informational);
         }
 
         // ====================================================================
         // Tool 6: Windows Update Manager
         // ====================================================================
 
+        private DispatcherTimer? _updateIconRotationTimer;
+
+        private void StartUpdateIconRotation()
+        {
+            if (_updateIconRotationTimer == null)
+            {
+                _updateIconRotationTimer = new DispatcherTimer
+                {
+                    Interval = TimeSpan.FromMilliseconds(25)
+                };
+                _updateIconRotationTimer.Tick += (s, e) =>
+                {
+                    if (UpdateStatusIconRotate != null)
+                    {
+                        UpdateStatusIconRotate.Angle = (UpdateStatusIconRotate.Angle + 12) % 360;
+                    }
+                    if (LauncherUpdateIconRotate != null)
+                    {
+                        LauncherUpdateIconRotate.Angle = (LauncherUpdateIconRotate.Angle + 12) % 360;
+                    }
+                };
+            }
+            _updateIconRotationTimer.Start();
+        }
+
+        private void StopUpdateIconRotation()
+        {
+            _updateIconRotationTimer?.Stop();
+            if (UpdateStatusIconRotate != null) UpdateStatusIconRotate.Angle = 0;
+            if (LauncherUpdateIconRotate != null) LauncherUpdateIconRotate.Angle = 0;
+        }
+
         private async Task LoadWindowsUpdatePageAsync()
         {
             RefreshWindowsUpdateStatus();
 
+            StartUpdateIconRotation();
             UpdatesLoadingSpinner.Visibility = Visibility.Visible;
             UpdatesLoadingSpinner.IsActive = true;
             PendingUpdatesContainer.Children.Clear();
@@ -2118,26 +2146,7 @@ namespace CleanC.UI
             PendingUpdatesCountText.Text = "در حال بررسی...";
 
             if (CheckUpdatesBtn != null) CheckUpdatesBtn.IsEnabled = false;
-            if (CheckUpdatesBtnSpinner != null)
-            {
-                CheckUpdatesBtnSpinner.Visibility = Visibility.Visible;
-                CheckUpdatesBtnSpinner.IsActive = true;
-            }
-            if (CheckUpdatesBtnIcon != null) CheckUpdatesBtnIcon.Visibility = Visibility.Collapsed;
             if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = "در حال بررسی...";
-
-            if (UpdateStatusIconSpinner != null)
-            {
-                UpdateStatusIconSpinner.Visibility = Visibility.Visible;
-                UpdateStatusIconSpinner.IsActive = true;
-            }
-            if (UpdateStatusIcon != null) UpdateStatusIcon.Visibility = Visibility.Collapsed;
-
-            if (LauncherWindowsUpdateSpinner != null)
-            {
-                LauncherWindowsUpdateSpinner.Visibility = Visibility.Visible;
-                LauncherWindowsUpdateSpinner.IsActive = true;
-            }
             if (LauncherWindowsUpdateBadge != null)
             {
                 LauncherWindowsUpdateBadge.Text = "در حال بررسی...";
@@ -2153,7 +2162,7 @@ namespace CleanC.UI
 
                 if (LauncherWindowsUpdateBadge != null)
                 {
-                    LauncherWindowsUpdateBadge.Text = updates.Count == 0 ? "سیستم به‌روز است ✓" : $"{updates.Count} آپدیت در انتظار";
+                    LauncherWindowsUpdateBadge.Text = updates.Count == 0 ? "سیستم به روز است ✓" : $"{updates.Count} آپدیت در انتظار";
                 }
 
                 if (updates.Count == 0)
@@ -2174,31 +2183,13 @@ namespace CleanC.UI
                 UpdatesLoadingSpinner.Visibility = Visibility.Collapsed;
                 UpdatesLoadingSpinner.IsActive = false;
                 PendingUpdatesCountText.Text = "خطا در بررسی";
-                ShowInfoBar("بروزرسانی ویندوز", $"خطا در جستجوی آپدیت‌ها: {ex.Message}", InfoBarSeverity.Warning);
+                ShowInfoBar("بروزرسانی ویندوز", $"خطا در جستجوی آپدیت ها: {ex.Message}", InfoBarSeverity.Warning);
             }
             finally
             {
+                StopUpdateIconRotation();
                 if (CheckUpdatesBtn != null) CheckUpdatesBtn.IsEnabled = true;
-                if (CheckUpdatesBtnSpinner != null)
-                {
-                    CheckUpdatesBtnSpinner.Visibility = Visibility.Collapsed;
-                    CheckUpdatesBtnSpinner.IsActive = false;
-                }
-                if (CheckUpdatesBtnIcon != null) CheckUpdatesBtnIcon.Visibility = Visibility.Visible;
-                if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = "بررسی آپدیت‌های جدید";
-
-                if (UpdateStatusIconSpinner != null)
-                {
-                    UpdateStatusIconSpinner.Visibility = Visibility.Collapsed;
-                    UpdateStatusIconSpinner.IsActive = false;
-                }
-                if (UpdateStatusIcon != null) UpdateStatusIcon.Visibility = Visibility.Visible;
-
-                if (LauncherWindowsUpdateSpinner != null)
-                {
-                    LauncherWindowsUpdateSpinner.Visibility = Visibility.Collapsed;
-                    LauncherWindowsUpdateSpinner.IsActive = false;
-                }
+                if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = "بررسی آپدیت های جدید";
             }
         }
 
@@ -2208,15 +2199,15 @@ namespace CleanC.UI
 
             if (status.IsPaused)
             {
-                UpdateStatusHeadlineText.Text = $"آپدیت‌های سیستم‌عامل تا تاریخ {status.PauseExpiryDate} متوقف هستند";
-                UpdatePauseDetailText.Text = $"توقف رسمی ۵ هفته‌ای فعال است. دریافت هرگونه بسته و آپدیت خودکار تا {status.PauseExpiryDate} به تعویق افتاده است.";
+                UpdateStatusHeadlineText.Text = $"آپدیت های سیستم عامل تا تاریخ {status.PauseExpiryDate} متوقف هستند";
+                UpdatePauseDetailText.Text = $"توقف رسمی ۵ هفته ای فعال است. دریافت هرگونه بسته و آپدیت خودکار تا {status.PauseExpiryDate} به تعویق افتاده است.";
                 PauseUpdatesBtn.IsEnabled = false;
                 ResumeUpdatesBtn.IsEnabled = true;
             }
             else
             {
-                UpdateStatusHeadlineText.Text = "وضعیت بروزرسانی‌ها: فعال و استاندارد ویندوز";
-                UpdatePauseDetailText.Text = "توقف موقت فعال نیست. ویندوز مجاز به بررسی و دانلود دوره‌ای آپدیت‌ها است.";
+                UpdateStatusHeadlineText.Text = "وضعیت بروزرسانی ها: فعال و استاندارد ویندوز";
+                UpdatePauseDetailText.Text = "توقف موقت فعال نیست. ویندوز مجاز به بررسی و دانلود دوره ای آپدیت ها است.";
                 PauseUpdatesBtn.IsEnabled = true;
                 ResumeUpdatesBtn.IsEnabled = false;
             }
@@ -2361,7 +2352,7 @@ namespace CleanC.UI
         private async Task CheckUpdatesBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             await LoadWindowsUpdatePageAsync();
-            ShowInfoBar("بروزرسانی ویندوز", "لیست آپدیت‌های در انتظار با موفقیت بررسی گردید.", InfoBarSeverity.Informational);
+            ShowInfoBar("بروزرسانی ویندوز", "لیست آپدیت های در انتظار با موفقیت بررسی گردید.", InfoBarSeverity.Informational);
         }
 
         private void PauseUpdatesBtn_Click(object sender, RoutedEventArgs e)
@@ -2370,7 +2361,7 @@ namespace CleanC.UI
             if (ok)
             {
                 RefreshWindowsUpdateStatus();
-                ShowInfoBar("توقف آپدیت‌ها", "دریافت آپدیت‌های سیستم‌عامل به مدت ۵ هفته متوقف شد.", InfoBarSeverity.Success);
+                ShowInfoBar("توقف آپدیت ها", "دریافت آپدیت های سیستم عامل به مدت ۵ هفته متوقف شد.", InfoBarSeverity.Success);
             }
             else
             {
@@ -2384,11 +2375,11 @@ namespace CleanC.UI
             if (ok)
             {
                 RefreshWindowsUpdateStatus();
-                ShowInfoBar("ادامه آپدیت‌ها", "توقف برداشته شد و روند عادی آپدیت‌ها از سر گرفته شد.", InfoBarSeverity.Success);
+                ShowInfoBar("ادامه آپدیت ها", "توقف برداشته شد و روند عادی آپدیت ها از سر گرفته شد.", InfoBarSeverity.Success);
             }
             else
             {
-                ShowInfoBar("خطا", "امکان لغو توقف آپدیت‌ها میسر نشد.", InfoBarSeverity.Warning);
+                ShowInfoBar("خطا", "امکان لغو توقف آپدیت ها میسر نشد.", InfoBarSeverity.Warning);
             }
         }
 
@@ -2675,7 +2666,7 @@ namespace CleanC.UI
             {
                 DriversBatchBar.Visibility = Visibility.Visible;
                 DriversSelectedCountText.Text = $"{selectedCount} درایور انتخاب شده است";
-                DriversBatchDeleteBtnText.Text = $"حذف {selectedCount} درایور انتخاب‌شده";
+                DriversBatchDeleteBtnText.Text = $"حذف {selectedCount} درایور انتخاب شده";
             }
             else
             {
@@ -2711,8 +2702,8 @@ namespace CleanC.UI
             var dialog = new ContentDialog
             {
                 XamlRoot = this.Content.XamlRoot,
-                Title = "حذف دسته‌جمعی درایورهای انتخاب‌شده",
-                Content = $"آیا از حذف {selected.Count} بسته درایور انتخاب‌شده اطمینان دارید؟\nاین عملیات با بررسی ایمنی انجام خواهد شد.",
+                Title = "حذف دسته جمعی درایورهای انتخاب شده",
+                Content = $"آیا از حذف {selected.Count} بسته درایور انتخاب شده اطمینان دارید؟\nاین عملیات با بررسی ایمنی انجام خواهد شد.",
                 PrimaryButtonText = "حذف درایورها",
                 CloseButtonText = "انصراف",
                 DefaultButton = ContentDialogButton.Primary
@@ -2733,7 +2724,7 @@ namespace CleanC.UI
             }
 
             DriversBatchDeleteBtn.IsEnabled = true;
-            ShowInfoBar("نتیجه حذف دسته‌ای درایورها", $"{successCount} بسته درایور حذف شد. ({failCount} بسته در استفاده فعال سیستم بودند)", InfoBarSeverity.Success);
+            ShowInfoBar("نتیجه حذف دسته ای درایورها", $"{successCount} بسته درایور حذف شد. ({failCount} بسته در استفاده فعال سیستم بودند)", InfoBarSeverity.Success);
             await LoadDriversPageAsync(forceRefresh: true);
         }
 
@@ -2777,7 +2768,7 @@ namespace CleanC.UI
             var dialog = new ContentDialog
             {
                 XamlRoot = this.Content.XamlRoot,
-                Title = "پاکسازی دسته‌جمعی درایورهای قدیمی DriverStore",
+                Title = "پاکسازی دسته جمعی درایورهای قدیمی DriverStore",
                 Content = $"تعداد {duplicates.Count} بسته درایور قدیمی و تکراری شناسایی شده است.\n\nپیش از شروع پاکسازی، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.\nآیا مایل به شروع فرآیند پاکسازی هستید؟",
                 PrimaryButtonText = "شروع پاکسازی ایمن",
                 CloseButtonText = "انصراف",
@@ -2820,7 +2811,7 @@ namespace CleanC.UI
         private async Task CheckDriverUpdatesBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             CheckDriverUpdatesBtn.IsEnabled = false;
-            ShowInfoBar("بررسی درایورها", "در حال جستجوی آپدیت‌های درایور از سرور مایکروسافت...", InfoBarSeverity.Informational);
+            ShowInfoBar("بررسی درایورها", "در حال جستجوی آپدیت های درایور از سرور مایکروسافت...", InfoBarSeverity.Informational);
 
             var updates = await DriverManagerService.CheckDriverUpdatesAsync();
             CheckDriverUpdatesBtn.IsEnabled = true;
@@ -2848,7 +2839,7 @@ namespace CleanC.UI
             }
             else
             {
-                ShowInfoBar("بروزرسانی درایورها", "تمامی درایورهای سخت‌افزاری شما بروز و آپدیت هستند.", InfoBarSeverity.Success);
+                ShowInfoBar("بروزرسانی درایورها", "تمامی درایورهای سخت افزاری شما بروز و آپدیت هستند.", InfoBarSeverity.Success);
             }
         }
 
@@ -2858,7 +2849,7 @@ namespace CleanC.UI
         private async Task RefreshDrivers_ClickAsync(object sender, RoutedEventArgs e)
         {
             await LoadDriversPageAsync(forceRefresh: true);
-            ShowInfoBar("بروزرسانی درایورها", "لیست درایورها و بسته‌های سخت‌افزاری بروزرسانی شد.", InfoBarSeverity.Informational);
+            ShowInfoBar("بروزرسانی درایورها", "لیست درایورها و بسته های سخت افزاری بروزرسانی شد.", InfoBarSeverity.Informational);
         }
 
         private void DriversSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
@@ -2948,7 +2939,7 @@ namespace CleanC.UI
                         CornerRadius = new CornerRadius(5),
                         Padding = new Thickness(8, 2, 8, 2)
                     };
-                    badge.Child = new TextBlock { Text = "تحریم‌شکن تخصصی", FontSize = 10, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = GetThemeBrush("AccentFillColorDefaultBrush") };
+                    badge.Child = new TextBlock { Text = "تحریم شکن تخصصی", FontSize = 10, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = GetThemeBrush("AccentFillColorDefaultBrush") };
                     titleRow.Children.Add(badge);
                 }
                 textStack.Children.Add(titleRow);
@@ -3059,13 +3050,13 @@ namespace CleanC.UI
             PrivacyCardsContainer.Children.Add(CreateToggleCard(
                 "\uE895",
                 "قطع کامل سرویس تلمتری و گزارش DiagTrack",
-                "غیرفعال‌سازی سرویس Connected User Experiences و توقف ارسال بسته‌های تشخیصی و لاگ به سرورهای مایکروسافت",
+                "غیرفعال سازی سرویس Connected User Experiences و توقف ارسال بسته های تشخیصی و لاگ به سرورهای مایکروسافت",
                 isDiagDisabled,
                 default,
                 (isOn) =>
                 {
                     TelemetryOptimizerService.SetDiagTrackDisabled(isOn);
-                    ShowInfoBar("تلمتری DiagTrack", isOn ? "سرویس تلمتری قطع و غیرفعال شد." : "سرویس تلمتری به حالت پیش‌فرض ویندوز بازگشت.", InfoBarSeverity.Success);
+                    ShowInfoBar("تلمتری DiagTrack", isOn ? "سرویس تلمتری قطع و غیرفعال شد." : "سرویس تلمتری به حالت پیش فرض ویندوز بازگشت.", InfoBarSeverity.Success);
                 }));
 
             // 2. Bing Search in Start Menu
@@ -3073,21 +3064,21 @@ namespace CleanC.UI
             PrivacyCardsContainer.Children.Add(CreateToggleCard(
                 "\uE721",
                 "حذف جستجوی وب بینگ از استارت منو (Bing Search)",
-                "جلوگیری از ارسال متن‌های تایپ‌شده شما در منوی استارت به وب و افزایش چشمگیر سرعت باز شدن و جستجوی فایل‌ها",
+                "جلوگیری از ارسال متن های تایپ شده شما در منوی استارت به وب و افزایش چشمگیر سرعت باز شدن و جستجوی فایل ها",
                 isBingDisabled,
                 default,
                 (isOn) =>
                 {
                     TelemetryOptimizerService.SetBingSearchDisabled(isOn);
-                    ShowInfoBar("جستجوی استارت منو", isOn ? "سرچ وب بینگ غیرفعال شد (جستجوی محلی فوق‌سریع)." : "جستجوی وب در استارت فعال شد.", InfoBarSeverity.Success);
+                    ShowInfoBar("جستجوی استارت منو", isOn ? "سرچ وب بینگ غیرفعال شد (جستجوی محلی فوق سریع)." : "جستجوی وب در استارت فعال شد.", InfoBarSeverity.Success);
                 }));
 
             // 3. Advertising ID
             bool isAdvDisabled = TelemetryOptimizerService.IsAdvertisingIdDisabled();
             PrivacyCardsContainer.Children.Add(CreateToggleCard(
                 "\uE719",
-                "غیرفعال‌سازی شناسه تبلیغاتی ویندوز (Advertising ID)",
-                "جلوگیری از ساخت و ردگیری پروفایل کاربری تبلیغاتی توسط برنامه‌ها و مایکروسافت استور",
+                "غیرفعال سازی شناسه تبلیغاتی ویندوز (Advertising ID)",
+                "جلوگیری از ساخت و ردگیری پروفایل کاربری تبلیغاتی توسط برنامه ها و مایکروسافت استور",
                 isAdvDisabled,
                 default,
                 (isOn) =>
@@ -3100,28 +3091,28 @@ namespace CleanC.UI
             bool isActDisabled = TelemetryOptimizerService.IsActivityHistoryDisabled();
             PrivacyCardsContainer.Children.Add(CreateToggleCard(
                 "\uE81C",
-                "توقف ثبت تاریخچه فعالیت‌ها و فایل‌ها (Activity History)",
-                "توقف ذخیره و همگام‌سازی سوابق باز کردن برنامه‌ها، اسناد و مرور وب توسط ویندوز",
+                "توقف ثبت تاریخچه فعالیت ها و فایل ها (Activity History)",
+                "توقف ذخیره و همگام سازی سوابق باز کردن برنامه ها، اسناد و مرور وب توسط ویندوز",
                 isActDisabled,
                 default,
                 (isOn) =>
                 {
                     TelemetryOptimizerService.SetActivityHistoryDisabled(isOn);
-                    ShowInfoBar("تاریخچه فعالیت‌ها", isOn ? "ثبت فعالیت‌ها متوقف و غیرفعال شد." : "ثبت سوابق فعالیت‌ها فعال شد.", InfoBarSeverity.Success);
+                    ShowInfoBar("تاریخچه فعالیت ها", isOn ? "ثبت فعالیت ها متوقف و غیرفعال شد." : "ثبت سوابق فعالیت ها فعال شد.", InfoBarSeverity.Success);
                 }));
 
             // 5. Tailored Experiences & Feedback Tracking
             bool isFeedDisabled = TelemetryOptimizerService.IsFeedbackTrackingDisabled();
             PrivacyCardsContainer.Children.Add(CreateToggleCard(
                 "\uE9E9",
-                "قطع نظرسنجی‌ها و تجربیات شخصی‌سازی مایکروسافت",
-                "جلوگیری از نمایش پاپ‌آپ‌های ارزیابی و توقف پایش نحوه استفاده از ابزارهای ویندوز",
+                "قطع نظرسنجی ها و تجربیات شخصی سازی مایکروسافت",
+                "جلوگیری از نمایش پاپ آپ های ارزیابی و توقف پایش نحوه استفاده از ابزارهای ویندوز",
                 isFeedDisabled,
                 default,
                 (isOn) =>
                 {
                     TelemetryOptimizerService.SetFeedbackTrackingDisabled(isOn);
-                    ShowInfoBar("بازخورد مایکروسافت", isOn ? "نظرسنجی‌ها و پایش تجربیات قطع شدند." : "پایش تجربیات فعال شد.", InfoBarSeverity.Success);
+                    ShowInfoBar("بازخورد مایکروسافت", isOn ? "نظرسنجی ها و پایش تجربیات قطع شدند." : "پایش تجربیات فعال شد.", InfoBarSeverity.Success);
                 }));
         }
 
@@ -3142,7 +3133,7 @@ namespace CleanC.UI
         {
             int count = await TelemetryOptimizerService.RestoreDefaultPrivacySettingsAsync();
             LoadPrivacyPage();
-            ShowInfoBar("حریم خصوصی ویندوز ۱۱", "تنظیمات به حالت استاندارد و پیش‌فرض اولیه ویندوز بازگردانی شدند.", InfoBarSeverity.Informational);
+            ShowInfoBar("حریم خصوصی ویندوز ۱۱", "تنظیمات به حالت استاندارد و پیش فرض اولیه ویندوز بازگردانی شدند.", InfoBarSeverity.Informational);
         }
     }
 }

@@ -122,9 +122,9 @@ namespace CleanC.Cli
                 Console.WriteLine($" [DISK] {stats.DiskFreeFormatted} آزاد از {stats.DiskTotalFormatted} ({stats.DiskPercent}% پر)");
                 Console.WriteLine($" [CPU]  {stats.CpuPercent}%\n");
 
-                Console.WriteLine(" 1. بهینه‌سازی سریع ۱-کلیکی (پاکسازی فایل‌های موقت + بوست رم)");
+                Console.WriteLine(" 1. بهینه سازی سریع ۱-کلیکی (پاکسازی فایل های موقت + بوست رم)");
                 Console.WriteLine(" 2. آزادسازی و بوست حافظه رم (Empty Working Set)");
-                Console.WriteLine(" 3. تخلیه کش آدرس‌های شبکه (Flush DNS)");
+                Console.WriteLine(" 3. تخلیه کش آدرس های شبکه (Flush DNS)");
                 Console.WriteLine(" 4. اجرای محیط گرافیکی ویندوز ۱۱ (GUI)");
                 Console.WriteLine(" 5. خروج");
                 Console.WriteLine("-------------------------------------------------");
@@ -147,7 +147,7 @@ namespace CleanC.Cli
                         break;
 
                     case "2":
-                        Console.WriteLine("\n[..] در حال آزادسازی رم پردازه‌ها...");
+                        Console.WriteLine("\n[..] در حال آزادسازی رم پردازه ها...");
                         var boost = await OptimizerService.BoostRamAsync();
                         Console.ForegroundColor = ConsoleColor.Green;
                         Console.WriteLine($"[OK] مقدار {boost.FormattedFreed} از حافظه رم آزاد شد. (تعداد {boost.ProcessCount} پردازش)");

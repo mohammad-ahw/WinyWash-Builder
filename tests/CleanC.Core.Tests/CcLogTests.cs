@@ -4,8 +4,8 @@ using CleanC.Core.Diagnostics;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های لاگ مرکزیِ خطاهای نادیده‌گرفته‌شده.
-    /// هر تست پوشه‌ی خروجی را به یک مسیر موقت منتقل می‌کند تا روی داده‌ی واقعی کاربر اثر نگذارد.
+    /// تست های لاگ مرکزیِ خطاهای نادیده گرفته شده.
+    /// هر تست پوشه ی خروجی را به یک مسیر موقت منتقل می کند تا روی داده ی واقعی کاربر اثر نگذارد.
     /// </summary>
     public class CcLogTests : IDisposable
     {
@@ -71,7 +71,7 @@ namespace CleanC.Core.Tests
         {
             try
             {
-                // مسیر نامعتبر → باید بی‌صدا رد شود، نه اینکه خودِ لاگ crash کند
+                // مسیر نامعتبر → باید بی صدا رد شود، نه اینکه خودِ لاگ crash کند
                 CcLog.LogDirectory = "\0not-a-path";
                 CcLog.Ignore(new AccessViolationException("cannot write"));
                 CcLog.Flush();

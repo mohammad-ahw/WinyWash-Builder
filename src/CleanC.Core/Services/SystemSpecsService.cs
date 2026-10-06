@@ -255,13 +255,13 @@ namespace CleanC.Core.Services
                         try
                         {
                             var pc = new System.Globalization.PersianCalendar();
-                            string shamsi = $"{pc.GetYear(dt):0000}/{pc.GetMonth(dt):00}/{pc.GetDayOfMonth(dt):00}";
-                            string miladi = dt.ToString("yyyy/MM/dd");
+                            string shamsi = $"{pc.GetYear(dt):0000}.{pc.GetMonth(dt):00}.{pc.GetDayOfMonth(dt):00}";
+                            string miladi = dt.ToString("yyyy.MM.dd");
                             specs.OsInstallDate = $"{shamsi} ({miladi})";
                         }
                         catch
                         {
-                            specs.OsInstallDate = dt.ToString("yyyy/MM/dd");
+                            specs.OsInstallDate = dt.ToString("yyyy.MM.dd");
                         }
                     }
                 }
@@ -276,7 +276,7 @@ namespace CleanC.Core.Services
                 TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
                 DateTime bootTime = DateTime.Now - uptime;
                 string daysStr = uptime.Days > 0 ? $"{uptime.Days} روز و " : "";
-                specs.OsUptimeFormatted = $"{daysStr}{uptime.Hours} ساعت و {uptime.Minutes} دقیقه (روشن‌شده در {bootTime:HH:mm})";
+                specs.OsUptimeFormatted = $"{daysStr}{uptime.Hours} ساعت و {uptime.Minutes} دقیقه (روشن شده در {bootTime:HH:mm})";
             }
             catch (Exception __ex)
             {
@@ -434,7 +434,7 @@ namespace CleanC.Core.Services
                     {
                         case 1:
                             info.IsActivated = true;
-                            info.StatusText = "فعال‌شده با لایسنس معتبر (Licensed)";
+                            info.StatusText = "فعال شده با لایسنس معتبر (Licensed)";
                             break;
                         case 2:
                             info.IsActivated = false;
@@ -450,11 +450,11 @@ namespace CleanC.Core.Services
                             break;
                         case 5:
                             info.IsActivated = false;
-                            info.StatusText = "فعال‌نشده / نیازمند فعال‌سازی (Notification)";
+                            info.StatusText = "فعال نشده / نیازمند فعال سازی (Notification)";
                             break;
                         case 6:
                             info.IsActivated = false;
-                            info.StatusText = "مهلت فعال‌سازی تمدید شده (Extended Grace)";
+                            info.StatusText = "مهلت فعال سازی تمدید شده (Extended Grace)";
                             break;
                         default:
                             info.IsActivated = false;
@@ -868,9 +868,9 @@ namespace CleanC.Core.Services
         {
             var sb = new StringBuilder();
             sb.AppendLine("==================================================");
-            sb.AppendLine("         گزارش مشخصات سیستم و سخت‌افزار (CleanC)     ");
+            sb.AppendLine("         گزارش مشخصات سیستم و سخت افزار (CleanC)     ");
             sb.AppendLine("==================================================");
-            sb.AppendLine($"تاریخ گزارش: {DateTime.Now:yyyy/MM/dd HH:mm:ss}");
+            sb.AppendLine($"تاریخ گزارش: {DateTime.Now:yyyy.MM.dd HH:mm:ss}");
             sb.AppendLine();
 
             sb.AppendLine("[پردازنده مرکزی - CPU]");
@@ -882,7 +882,7 @@ namespace CleanC.Core.Services
 
             sb.AppendLine("[حافظه رم - RAM]");
             sb.AppendLine($"  ظرفیت کل: {specs.TotalRamFormatted} ({specs.RamType})");
-            sb.AppendLine($"  اسلات‌های فعال: {specs.RamSlotsUsed}");
+            sb.AppendLine($"  اسلات های فعال: {specs.RamSlotsUsed}");
             sb.AppendLine($"  سرعت باس: {specs.RamSpeedMhz} MHz");
             if (!string.IsNullOrEmpty(specs.RamManufacturer)) sb.AppendLine($"  سازنده: {specs.RamManufacturer}");
             sb.AppendLine();
@@ -894,7 +894,7 @@ namespace CleanC.Core.Services
             sb.AppendLine($"  تاریخ بایوس: {specs.BiosReleaseDate}");
             sb.AppendLine();
 
-            sb.AppendLine("[کارت‌های گرافیک - GPU]");
+            sb.AppendLine("[کارت های گرافیک - GPU]");
             if (specs.Gpus.Count > 0)
             {
                 foreach (var gpu in specs.Gpus)
@@ -910,7 +910,7 @@ namespace CleanC.Core.Services
             }
             sb.AppendLine();
 
-            sb.AppendLine("[حافظه‌های ذخیره‌سازی]");
+            sb.AppendLine("[حافظه های ذخیره سازی]");
             foreach (var disk in specs.Disks)
             {
                 sb.AppendLine($"  - {disk.Model} ({disk.DiskType} {disk.BusType}) - {disk.SizeFormatted}");
@@ -920,7 +920,7 @@ namespace CleanC.Core.Services
 
             if (specs.HasBattery)
             {
-                sb.AppendLine("[باتری لپ‌تاپ]");
+                sb.AppendLine("[باتری لپ تاپ]");
                 sb.AppendLine($"  سلامت باتری: {specs.BatteryHealthPercent}%");
                 sb.AppendLine($"  ظرفیت اولیه کارخانه: {specs.BatteryDesignCapacityMWh} mWh");
                 sb.AppendLine($"  ظرفیت شارژ فعلی: {specs.BatteryFullChargeCapacityMWh} mWh");
@@ -928,7 +928,7 @@ namespace CleanC.Core.Services
                 sb.AppendLine();
             }
 
-            sb.AppendLine("[سیستم‌عامل و پایداری]");
+            sb.AppendLine("[سیستم عامل و پایداری]");
             sb.AppendLine($"  ویندوز: {specs.OsName} ({specs.OsArchitecture})");
             sb.AppendLine($"  شماره ساخت: Build {specs.OsBuild}");
             sb.AppendLine($"  تاریخ نصب: {specs.OsInstallDate}");

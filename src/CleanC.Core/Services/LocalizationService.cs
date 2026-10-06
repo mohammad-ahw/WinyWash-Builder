@@ -289,6 +289,21 @@ namespace CleanC.Core.Services
                          ?? _languages.First();
 
             _current = target;
+
+            try
+            {
+                var culture = (CultureInfo)CultureInfo.GetCultureInfo(target.Code).Clone();
+                culture.NumberFormat.NumberDecimalSeparator = ".";
+                culture.NumberFormat.PercentDecimalSeparator = ".";
+                culture.NumberFormat.CurrencyDecimalSeparator = ".";
+                culture.DateTimeFormat.DateSeparator = ".";
+                CultureInfo.DefaultThreadCurrentCulture = culture;
+                CultureInfo.DefaultThreadCurrentUICulture = culture;
+                Thread.CurrentThread.CurrentCulture = culture;
+                Thread.CurrentThread.CurrentUICulture = culture;
+            }
+            catch { }
+
             LanguageChanged?.Invoke();
         }
 

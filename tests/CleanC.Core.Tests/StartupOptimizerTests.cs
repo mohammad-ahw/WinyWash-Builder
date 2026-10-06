@@ -4,7 +4,7 @@ using CleanC.Core.Services;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های دسته‌بندی آیتم‌های Startup — صرفاً منطق خالص بدون دست زدن به رجیستری.
+    /// تست های دسته بندی آیتم های Startup — صرفاً منطق خالص بدون دست زدن به رجیستری.
     /// </summary>
     public class StartupOptimizerTests
     {

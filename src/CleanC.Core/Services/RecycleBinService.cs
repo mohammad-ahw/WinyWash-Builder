@@ -1,11 +1,11 @@
 // src/CleanC.Core/Services/RecycleBinService.cs
-// F8 — مدیریت سطل بازیافت با پیش‌نمایش آیتم‌به‌آیتم.
+// F8 — مدیریت سطل بازیافت با پیش نمایش آیتم به آیتم.
 //
-// ویندوز برای هر شیءِ دور‌ریخته‌شده دو فایل می‌سازد:
+// ویندوز برای هر شیءِ دور ریخته شده دو فایل می سازد:
 //   $I<random> : فایل اطلاعات (مسیر اصلی، حجم، زمان حذف)
 //   $R<random> : خودِ داده (فایل یا پوشه)
-// پارس کردن $I (بدون COM و بدون دیالوگ سیستم) هم قابل‌تست است
-// و هم اجازه می‌دهد حذف/بازگردانی کاملاً کنترل‌شده انجام شود.
+// پارس کردن $I (بدون COM و بدون دیالوگ سیستم) هم قابل تست است
+// و هم اجازه می دهد حذف/بازگردانی کاملاً کنترل شده انجام شود.
 //
 // فرمت $I:
 //   نسخه ۱ (ویندوز XP):  0..8 نسخه | 8..528 مسیر (۲۶۰ کاراکتر UTF-16) | 528..536 حجم (int64)
@@ -24,7 +24,7 @@ namespace CleanC.Core.Services
 {
     public class RecycleBinItem
     {
-        /// <summary>مسیر کامل فایل $I؛ به‌عنوان شناسه‌ی یکتا در UI استفاده می‌شود.</summary>
+        /// <summary>مسیر کامل فایل $I؛ به عنوان شناسه ی یکتا در UI استفاده می شود.</summary>
         public string Id { get; set; } = string.Empty;
         public string InfoPath { get; set; } = string.Empty;
         public string PayloadPath { get; set; } = string.Empty;
@@ -41,12 +41,12 @@ namespace CleanC.Core.Services
 
     public static class RecycleBinService
     {
-        /// <summary>سقف پیمایش هنگام محاسبه‌ی حجم پوشه‌ها تا لود صفحه طولانی نشود.</summary>
+        /// <summary>سقف پیمایش هنگام محاسبه ی حجم پوشه ها تا لود صفحه طولانی نشود.</summary>
         private const int DirectoryWalkEntryCap = 50_000;
 
         // ── پارس فایل اطلاعاتی ─────────────────────────────────────────────
 
-        /// <summary>پارس بافر فایل $I. اگر ساختار نامعتبر باشد null برمی‌گرداند.</summary>
+        /// <summary>پارس بافر فایل $I. اگر ساختار نامعتبر باشد null برمی گرداند.</summary>
         public static RecycleBinItem? ParseInfoFile(byte[]? buffer)
         {
             if (buffer == null || buffer.Length < 16) return null;
@@ -80,7 +80,7 @@ namespace CleanC.Core.Services
             }
             else
             {
-                // نسخه‌ی ناشناخته (احتمال خرابی داده)
+                // نسخه ی ناشناخته (احتمال خرابی داده)
                 return null;
             }
 
@@ -102,7 +102,7 @@ namespace CleanC.Core.Services
             return Encoding.Unicode.GetString(buffer, offset, byteCount);
         }
 
-        /// <summary>نام آخرین بخش مسیر؛ برای پوشه‌های ریشه‌ای مقادیر خالی نمی‌دهد.</summary>
+        /// <summary>نام آخرین بخش مسیر؛ برای پوشه های ریشه ای مقادیر خالی نمی دهد.</summary>
         public static string GetFileName(string path)
         {
             if (string.IsNullOrWhiteSpace(path)) return string.Empty;
@@ -112,7 +112,7 @@ namespace CleanC.Core.Services
             return string.IsNullOrEmpty(name) ? path : name;
         }
 
-        // ── فهرست‌سازی ─────────────────────────────────────────────────────
+        // ── فهرست سازی ─────────────────────────────────────────────────────
 
         private static IEnumerable<string> GetRecycleBinRoots(string sid)
         {
@@ -138,7 +138,7 @@ namespace CleanC.Core.Services
             catch (Exception ex) { CcLog.Ignore(ex, "RecycleBin.Sid"); return string.Empty; }
         }
 
-        /// <summary>همه‌ی اشیاء سطل بازیافت کاربر جاری را برمی‌گرداند (مرتب‌شده بر اساس تازگی حذف).</summary>
+        /// <summary>همه ی اشیاء سطل بازیافت کاربر جاری را برمی گرداند (مرتب شده بر اساس تازگی حذف).</summary>
         public static List<RecycleBinItem> ListItems()
         {
             var result = new List<RecycleBinItem>();
@@ -165,7 +165,7 @@ namespace CleanC.Core.Services
                             item.IsDirectory = Directory.Exists(item.PayloadPath);
                             item.PayloadExists = item.IsDirectory || File.Exists(item.PayloadPath);
 
-                            // حجم پوشه معمولاً در $I صفر ثبت می‌شود؛ در صورت نبود، خودمان می‌سنجیم
+                            // حجم پوشه معمولاً در $I صفر ثبت می شود؛ در صورت نبود، خودمان می سنجیم
                             if (item.IsDirectory && item.SizeBytes == 0)
                                 item.SizeBytes = ComputeDirectorySize(item.PayloadPath);
 
@@ -186,7 +186,7 @@ namespace CleanC.Core.Services
             return result.OrderByDescending(i => i.DeletedAt).ToList();
         }
 
-        /// <summary>حجم واقعی پوشه با سقف پیمایش؛ در صورت برخورد به سقف، همان مقدار جزئی برمی‌گردد.</summary>
+        /// <summary>حجم واقعی پوشه با سقف پیمایش؛ در صورت برخورد به سقف، همان مقدار جزئی برمی گردد.</summary>
         public static long ComputeDirectorySize(string path)
         {
             long total = 0;
@@ -226,13 +226,13 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// بازگردانی شیء به مسیر اصلی. اگر در مقصد نام تکراری وجود داشته باشد،
-        /// نام یکتا ساخته می‌شود؛ پوشه‌ی مقصد در صورت نبود ساخته می‌شود.
+        /// نام یکتا ساخته می شود؛ پوشه ی مقصد در صورت نبود ساخته می شود.
         /// </summary>
         public static bool Restore(RecycleBinItem item, out string error)
         {
             error = string.Empty;
-            if (item == null) { error = "شیء انتخاب‌نشده است."; return false; }
-            if (!item.PayloadExists) { error = "داده‌ی شیء دیگر در سطل موجود نیست."; return false; }
+            if (item == null) { error = "شیء انتخاب نشده است."; return false; }
+            if (!item.PayloadExists) { error = "داده ی شیء دیگر در سطل موجود نیست."; return false; }
 
             try
             {
@@ -278,7 +278,7 @@ namespace CleanC.Core.Services
         public static bool Delete(RecycleBinItem item, out string error)
         {
             error = string.Empty;
-            if (item == null) { error = "شیء انتخاب‌نشده است."; return false; }
+            if (item == null) { error = "شیء انتخاب نشده است."; return false; }
 
             try
             {
@@ -296,7 +296,7 @@ namespace CleanC.Core.Services
             }
         }
 
-        /// <summary>خالی کردن کامل سطل؛ تعداد اشیاء حذف‌شده را برمی‌گرداند.</summary>
+        /// <summary>خالی کردن کامل سطل؛ تعداد اشیاء حذف شده را برمی گرداند.</summary>
         public static int EmptyAll(out string error)
         {
             error = string.Empty;
@@ -324,7 +324,7 @@ namespace CleanC.Core.Services
         /// </summary>
         public static string MakeUniquePath(string path)
         {
-            // اگر مقصد خالی است، همان نام اصلی برگردانده می‌شود
+            // اگر مقصد خالی است، همان نام اصلی برگردانده می شود
             if (!File.Exists(path) && !Directory.Exists(path)) return path;
 
             string dir = Path.GetDirectoryName(path) ?? string.Empty;

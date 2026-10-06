@@ -4,8 +4,8 @@ using CleanC.Core.Services;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های ایمنی حذف پوشه‌های رهاشده.
-    /// مهم‌ترین ضامن این است که یک باگ در اسکنر هرگز به حذف دسته‌ایِ پوشه‌های
+    /// تست های ایمنی حذف پوشه های رهاشده.
+    /// مهم ترین ضامن این است که یک باگ در اسکنر هرگز به حذف دسته ایِ پوشه های
     /// سیستمی یا شخصی منجر نشود.
     /// </summary>
     public class LeftoverCleanerSafetyTests
@@ -41,7 +41,7 @@ namespace CleanC.Core.Tests
             Directory.CreateDirectory(dir);
             try
             {
-                // پسوند بی‌ربط تا قاعده‌ی «اسناد شخصی» فعال نشود
+                // پسوند بی ربط تا قاعده ی «اسناد شخصی» فعال نشود
                 File.WriteAllText(Path.Combine(dir, "dummy.xyz"), "x");
 
                 Assert.True(LeftoverCleanerService.IsSafeToDelete(dir));
@@ -65,7 +65,7 @@ namespace CleanC.Core.Tests
                 File.WriteAllText(Path.Combine(dir, "dummy.xyz"), "x");
                 Assert.True(LeftoverCleanerService.IsSafeToDelete(dir));
 
-                // وجود .git یعنی پروژه‌ی کاربر — دیگر حذف‌پذیر نیست
+                // وجود .git یعنی پروژه ی کاربر — دیگر حذف پذیر نیست
                 Directory.CreateDirectory(Path.Combine(dir, ".git"));
                 Assert.False(LeftoverCleanerService.IsSafeToDelete(dir));
             }

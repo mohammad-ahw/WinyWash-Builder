@@ -4,7 +4,7 @@ using CleanC.Core.Services;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست اسکن کش مرورگرهای کروم‌محور — فقط پروفایل‌های مجاز و فقط کش‌های شناخته‌شده.
+    /// تست اسکن کش مرورگرهای کروم محور — فقط پروفایل های مجاز و فقط کش های شناخته شده.
     /// </summary>
     public class ChromiumCachePathsTests
     {

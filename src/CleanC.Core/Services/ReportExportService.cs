@@ -11,7 +11,7 @@ using CleanC.Core.Models;
 
 namespace CleanC.Core.Services
 {
-    /// <summary>یک سطر از تاریخچه‌ی پاکسازی برای خروجی CSV.</summary>
+    /// <summary>یک سطر از تاریخچه ی پاکسازی برای خروجی CSV.</summary>
     public sealed class CleanupHistoryRow
     {
         public string Date { get; set; } = string.Empty;
@@ -19,10 +19,10 @@ namespace CleanC.Core.Services
     }
 
     /// <summary>
-    /// ساختِ خروجی‌های گزارش:
-    /// - گزارش مارک‌داون (.md) متناسب برای بافت پرامپت هوش مصنوعی (LLM Context)
-    /// - مشخصات سلسله‌مراتبی فنی سیستم (.txt) با سبک حرفه‌ای (مشابه llmfit)
-    /// - خروجی اطلاعات عیب‌یابی برای باگ‌ها
+    /// ساختِ خروجی های گزارش:
+    /// - گزارش مارک داون (.md) متناسب برای بافت پرامپت هوش مصنوعی (LLM Context)
+    /// - مشخصات سلسله مراتبی فنی سیستم (.txt) با سبک حرفه ای (مشابه llmfit)
+    /// - خروجی اطلاعات عیب یابی برای باگ ها
     /// </summary>
     public static class ReportExportService
     {
@@ -94,7 +94,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// ساخت گزارش مارک‌داون (.md) ساختاریافته به عنوان بافت کامل برای هوش مصنوعی (Claude / ChatGPT / Gemini)
+        /// ساخت گزارش مارک داون (.md) ساختاریافته به عنوان بافت کامل برای هوش مصنوعی (Claude / ChatGPT / Gemini)
         /// </summary>
         public static string BuildAiReportMarkdown(DetailedSystemSpecs? specs, IReadOnlyList<CleanupReportItem>? cleanupItems, long freedBytes, string? osFlight = null)
         {
@@ -228,7 +228,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// ساخت گزارش مشخصات جامع و سلسله‌مراتبی (.txt) با فرمت دقیق مشابه llmfit / Speccy
+        /// ساخت گزارش مشخصات جامع و سلسله مراتبی (.txt) با فرمت دقیق مشابه llmfit / Speccy
         /// </summary>
         public static string BuildSystemSpecsTxt(DetailedSystemSpecs? specs)
         {

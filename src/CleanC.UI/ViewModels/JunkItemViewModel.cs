@@ -15,7 +15,7 @@ namespace CleanC.UI.ViewModels
         {
             Category = category;
             _isChecked = category.IsChecked;
-            _statusText = "در صف بهینه‌سازی";
+            _statusText = "در صف بهینه سازی";
         }
 
         public string Id => Category.Id;

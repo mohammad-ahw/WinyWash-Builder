@@ -5,10 +5,10 @@
 
     چرا این اسکریپت لازم است؟
       `dotnet publish` بدون مشخص کردن Runtime، کل گراف RID (لینوکس، مک،
-      browser-wasm، win-arm64 و ...) را بازیابی می‌کند. خروجی ~300MB می‌شود
+      browser-wasm، win-arm64 و ...) را بازیابی می کند. خروجی ~300MB می شود
       در حالی که فقط پوشه win-x64 حدود 40MB آن لازم است.
-      این اسکریپت publish را به win-x64 محدود می‌کند و پوشه‌های بی‌استفاده
-      را پاک می‌کند.
+      این اسکریپت publish را به win-x64 محدود می کند و پوشه های بی استفاده
+      را پاک می کند.
 
     نمونه استفاده:
         .\publish.ps1
@@ -32,10 +32,10 @@ param(
     # آیا runtime هم داخل خروجی باشد؟ (برای کاربران بدون .NET باید true باشد)
     [bool]$SelfContained = $true,
 
-    # فایل‌های آماده‌سازی شده (ReadyToRun) سریع‌تر بالا می‌آیند ولی حجم را زیاد می‌کنند
+    # فایل های آماده سازی شده (ReadyToRun) سریع تر بالا می آیند ولی حجم را زیاد می کنند
     [switch]$NoReadyToRun,
 
-    # نگه داشتن فایل‌های pdb برای دیباگ
+    # نگه داشتن فایل های pdb برای دیباگ
     [switch]$Symbols
 )
 
@@ -56,7 +56,7 @@ Write-Host "    Runtime       : $Runtime"
 Write-Host "    SelfContained : $SelfContained"
 Write-Host "    Output        : $outDir"
 
-# خروجی قبلی کاملاً حذف می‌شود تا فایل‌های RID قدیمی باقی نمانند
+# خروجی قبلی کاملاً حذف می شود تا فایل های RID قدیمی باقی نمانند
 if (Test-Path -LiteralPath $outDir) {
     Write-Host "==> حذف خروجی قبلی..." -ForegroundColor DarkGray
     Remove-Item -LiteralPath $outDir -Recurse -Force
@@ -84,7 +84,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 # ---------------------------------------------------------------------------
-# پاک‌سازی RIDهای اضافی: اگر به هر دلیلی RID غیر هدف بازیابی شد، حذفش کن
+# پاک سازی RIDهای اضافی: اگر به هر دلیلی RID غیر هدف بازیابی شد، حذفش کن
 # ---------------------------------------------------------------------------
 $targetNative = switch ($Runtime) {
     'win-x64'   { @('win', 'win-x64') }
@@ -101,13 +101,13 @@ if (Test-Path -LiteralPath $runtimeRoot) {
         }
     }
 
-    # پوشه runtimes اگر خالی شد کلاً حذف می‌شود
+    # پوشه runtimes اگر خالی شد کلاً حذف می شود
     if (-not (Get-ChildItem -LiteralPath $runtimeRoot | Select-Object -First 1)) {
         Remove-Item -LiteralPath $runtimeRoot -Recurse -Force
     }
 }
 
-# فایل‌های pdb فقط با -Symbols نگه داشته می‌شوند
+# فایل های pdb فقط با -Symbols نگه داشته می شوند
 if (-not $Symbols) {
     Get-ChildItem -LiteralPath $outDir -Filter '*.pdb' -File -ErrorAction SilentlyContinue |
         Remove-Item -Force
@@ -130,15 +130,17 @@ $sizeMb = ($files | Measure-Object -Property Length -Sum).Sum / 1MB
 
 Write-Host ""
 Write-Host "==> publish کامل شد" -ForegroundColor Green
-Write-Host ("    فایل‌ها : {0}" -f $files.Count)
-Write-Host ("    حجم    : {0:N1} MB" -f $sizeMb)
+Write-Host ("    فایل ها : {0}" -f $files.Count)
+$sizeMbStr = $sizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
+Write-Host "    حجم    : $sizeMbStr MB"
 Write-Host ("    اجرا    : {0}" -f (Join-Path $outDir 'CleanC.UI.exe')) -ForegroundColor Green
 
 # ایجاد آرشیو فشرده ZIP برای تحویل
 $zipPath = Join-Path $root "CleanC-Release-win-x64.zip"
-Write-Host "==> فشرده‌سازی خروجی به $zipPath ..." -ForegroundColor Cyan
+Write-Host "==> فشرده سازی خروجی به $zipPath ..." -ForegroundColor Cyan
 if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
 Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force
 $zipSizeMb = (Get-Item -LiteralPath $zipPath).Length / 1MB
-Write-Host ("==> آرشیو نهایی ایجاد شد: {0} ({1:N1} MB)" -f $zipPath, $zipSizeMb) -ForegroundColor Green
+$zipSizeMbStr = $zipSizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
+Write-Host "==> آرشیو نهایی ایجاد شد: $zipPath ($zipSizeMbStr MB)" -ForegroundColor Green
 

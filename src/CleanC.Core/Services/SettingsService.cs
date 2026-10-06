@@ -9,8 +9,8 @@ using CleanC.Core.Diagnostics;
 namespace CleanC.Core.Services
 {
     /// <summary>
-    /// تنظیمات پایدار برنامه: تم، رفتار تری‌آیکون، هندسه‌ی پنجره، نمای آخر و انتخاب‌های اسکن.
-    /// در %LOCALAPPDATA%\CleanC\settings.json نگهداری می‌شود.
+    /// تنظیمات پایدار برنامه: تم، رفتار تری آیکون، هندسه ی پنجره، نمای آخر و انتخاب های اسکن.
+    /// در %LOCALAPPDATA%\CleanC\settings.json نگهداری می شود.
     /// </summary>
     public sealed class AppSettings
     {
@@ -20,10 +20,10 @@ namespace CleanC.Core.Services
         /// <summary>کد زبان برنامه یا "Auto" برای تشخیص خودکار از ساعت/منطقه ویندوز</summary>
         public string Language { get; set; } = "Auto";
 
-        /// <summary>بستن پنجره به‌جای خروج، برنامه را در تری‌آیکون نگه می‌دارد.</summary>
+        /// <summary>بستن پنجره به جای خروج، برنامه را در تری آیکون نگه می دارد.</summary>
         public bool CloseToTray { get; set; } = true;
 
-        /// <summary>کوچک‌نمایی پنجره آن را در تری‌آیکون پنهان می‌کند.</summary>
+        /// <summary>کوچک نمایی پنجره آن را در تری آیکون پنهان می کند.</summary>
         public bool MinimizeToTray { get; set; }
 
         /// <summary>در اجراهای بعدی اندازه و موقعیت پنجره بازیابی شود.</summary>
@@ -32,10 +32,10 @@ namespace CleanC.Core.Services
         /// <summary>نمای آخر (داشبورد / ابزارها / تنظیمات) در اجراهای بعدی بازیابی شود.</summary>
         public bool SaveLastView { get; set; } = true;
 
-        /// <summary>تیک خوردن/ندوردن آیتم‌های اسکن پاکسازی بین اجراها حفظ شود.</summary>
+        /// <summary>تیک خوردن/ندوردن آیتم های اسکن پاکسازی بین اجراها حفظ شود.</summary>
         public bool SaveScanSelections { get; set; } = true;
 
-        // هندسه‌ی پنجره در پیکسل فیزیکی (همان چیزی که AppWindow برمی‌گرداند)
+        // هندسه ی پنجره در پیکسل فیزیکی (همان چیزی که AppWindow برمی گرداند)
         public int WindowWidth { get; set; } = 1080;
         public int WindowHeight { get; set; } = 800;
         public int WindowX { get; set; } = int.MinValue;
@@ -44,34 +44,34 @@ namespace CleanC.Core.Services
         /// <summary>"dashboard" | "tools" | "settings"</summary>
         public string LastView { get; set; } = "dashboard";
 
-        /// <summary>شناسه‌ی آیتم زباله‌دان → آیا در اسکن تیک بخورد.</summary>
+        /// <summary>شناسه ی آیتم زباله دان → آیا در اسکن تیک بخورد.</summary>
         public Dictionary<string, bool> JunkSelections { get; set; } = new();
 
         /// <summary>
-        /// F3 — رفتار حذفِ فایل‌های شخصی کاربر (تکراری/حجیم/دانلودها/دسکتاپ):
-        /// "RecycleBin" (پیش‌فرض) | "Quarantine" | "Permanent".
-        /// کش و زباله‌ها همیشه قطعی حذف می‌شوند چون هدفشان آزادسازی فضاست.
+        /// F3 — رفتار حذفِ فایل های شخصی کاربر (تکراری/حجیم/دانلودها/دسکتاپ):
+        /// "RecycleBin" (پیش فرض) | "Quarantine" | "Permanent".
+        /// کش و زباله ها همیشه قطعی حذف می شوند چون هدفشان آزادسازی فضاست.
         /// </summary>
         public string DeleteMode { get; set; } = "RecycleBin";
 
         /// <summary>
-        /// B4 — تاریخچه‌ی اعلان‌ها؛ باقی‌مانده‌ی ری‌استارت‌ها (سقف در Normalize).
-        /// Severity به‌صورت رشته ذخیره می‌شود تا JSON ساده بماند.
+        /// B4 — تاریخچه ی اعلان ها؛ باقی مانده ی ری استارت ها (سقف در Normalize).
+        /// Severity به صورت رشته ذخیره می شود تا JSON ساده بماند.
         /// </summary>
         public List<NotificationHistoryEntry> NotificationHistory { get; set; } = new();
 
-        /// <summary>آیا مکان‌یابی معتبری ذخیره شده و ارزش بازیابی دارد.</summary>
+        /// <summary>آیا مکان یابی معتبری ذخیره شده و ارزش بازیابی دارد.</summary>
         [JsonIgnore]
         public bool HasSavedPlacement =>
             WindowWidth >= 660 && WindowHeight >= 550 &&
             WindowX != int.MinValue && WindowY != int.MinValue;
 
-        /// <summary>نگاشت تم ذخیره‌شده به ElementTheme (پیش‌فرض: از تنظیمات سیستم).</summary>
+        /// <summary>نگاشت تم ذخیره شده به ElementTheme (پیش فرض: از تنظیمات سیستم).</summary>
         [JsonIgnore]
         public bool IsDarkRequested => string.Equals(Theme, "Dark", StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>یک رکورد از تاریخچه‌ی اعلان‌ها (B4) — در settings.json نگه داشته می‌شود.</summary>
+    /// <summary>یک رکورد از تاریخچه ی اعلان ها (B4) — در settings.json نگه داشته می شود.</summary>
     public sealed class NotificationHistoryEntry
     {
         public string Title { get; set; } = string.Empty;
@@ -82,8 +82,8 @@ namespace CleanC.Core.Services
     }
 
     /// <summary>
-    /// بارگذاری/ذخیره‌ی <see cref="AppSettings"/> به‌صورت اتمیک و thread-safe.
-    /// هیچ خطای دیسک به بالا پرتاب نمی‌شود؛ خطاها در ignored.log ثبت می‌شوند.
+    /// بارگذاری/ذخیره ی <see cref="AppSettings"/> به صورت اتمیک و thread-safe.
+    /// هیچ خطای دیسک به بالا پرتاب نمی شود؛ خطاها در ignored.log ثبت می شوند.
     /// </summary>
     public static class SettingsService
     {
@@ -143,7 +143,7 @@ namespace CleanC.Core.Services
                     string? dir = Path.GetDirectoryName(path);
                     if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
 
-                    // نوشتن در فایل موقت و جایگزینی اتمیک تا نیمه‌نوشته‌ها خراب نشوند
+                    // نوشتن در فایل موقت و جایگزینی اتمیک تا نیمه نوشته ها خراب نشوند
                     string tmp = path + ".tmp";
                     File.WriteAllText(tmp, JsonSerializer.Serialize(settings, JsonOptions));
                     File.Move(tmp, path, overwrite: true);
@@ -157,8 +157,8 @@ namespace CleanC.Core.Services
 
         private static void Normalize(AppSettings settings)
         {
-            // دی‌سریالایز کردن مقایسه‌گر پیش‌فرض می‌سازد؛ برای id های غیرحساس به حروف بهتر است
-            // یک دیکشنری با مقایسه‌گر نادیده‌گرفتن حروف بسازیم.
+            // دی سریالایز کردن مقایسه گر پیش فرض می سازد؛ برای id های غیرحساس به حروف بهتر است
+            // یک دیکشنری با مقایسه گر نادیده گرفتن حروف بسازیم.
             var normalized = new Dictionary<string, bool>(StringComparer.OrdinalIgnoreCase);
             if (settings.JunkSelections != null)
             {
@@ -185,11 +185,11 @@ namespace CleanC.Core.Services
 
             if (string.IsNullOrWhiteSpace(settings.Language)) settings.Language = "Auto";
 
-            // F3 — مقدار نامعتبر حذف به پیش‌فرض برمی‌گردد
+            // F3 — مقدار نامعتبر حذف به پیش فرض برمی گردد
             settings.DeleteMode = SafeDeleteService.ModeToString(SafeDeleteService.ParseMode(settings.DeleteMode));
 
-            // B4 — تاریخچه‌ی اعلان‌ها: سقف ۵۰ مورد، مرتب‌سازی جدیدترین اول،
-            // حذف رکوردهای خالی و کوتاه‌کردن پیام‌های خیلی بلند.
+            // B4 — تاریخچه ی اعلان ها: سقف ۵۰ مورد، مرتب سازی جدیدترین اول،
+            // حذف رکوردهای خالی و کوتاه کردن پیام های خیلی بلند.
             const int MaxNotifications = 50;
             settings.NotificationHistory = (settings.NotificationHistory ?? new List<NotificationHistoryEntry>())
                 .Where(e => e != null &&

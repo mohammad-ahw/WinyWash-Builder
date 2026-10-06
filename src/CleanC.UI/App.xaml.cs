@@ -32,15 +32,15 @@ namespace CleanC.UI
 
             this.InitializeComponent();
 
-            // C6 — ریشه‌ی ترکیب DI همین ابتدا ساخته می‌شود تا خطای ثبت سرویس‌ها
-            // در همان لحظه‌ی اجرا دیده شود، نه وسط کارِ کاربر.
+            // C6 — ریشه ی ترکیب DI همین ابتدا ساخته می شود تا خطای ثبت سرویس ها
+            // در همان لحظه ی اجرا دیده شود، نه وسط کارِ کاربر.
             AppServices.EnsureBuilt();
 
             this.UnhandledException += (sender, e) =>
             {
-                // C9 — عمداً Handed=false مانده: ادامه‌ی اجرا با state ناسازگار باعث
-                // خراب‌شدنِ بی‌صدای داده (تنظیمات/آمار/رجیستری) می‌شود. لاگ ثبت می‌شود
-                // و برنامه متوقف می‌شود تا خطا دفن نشود.
+                // C9 — عمداً Handed=false مانده: ادامه ی اجرا با state ناسازگار باعث
+                // خراب شدنِ بی صدای داده (تنظیمات/آمار/رجیستری) می شود. لاگ ثبت می شود
+                // و برنامه متوقف می شود تا خطا دفن نشود.
                 LogCrash("UnhandledException", e.Exception ?? new Exception(e.Message));
                 Debug.WriteLine($"[App UnhandledException] {e.Message}");
             };
@@ -48,7 +48,7 @@ namespace CleanC.UI
 
         /// <summary>
         /// ثبت خطای غیرمنتظره در %LOCALAPPDATA%\CleanC\crash.log
-        /// همه‌ی catchهای برنامه باید از اینجا استفاده کنند تا خطاها سکوت نشوند.
+        /// همه ی catchهای برنامه باید از اینجا استفاده کنند تا خطاها سکوت نشوند.
         /// </summary>
         public static void LogCrash(string context, Exception ex)
         {
@@ -63,13 +63,13 @@ namespace CleanC.UI
             }
             catch
             {
-                // لاگ‌کردن هرگز نباید خودش باعث crash شود
+                // لاگ کردن هرگز نباید خودش باعث crash شود
             }
         }
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
-            // اگر نمونه‌ای از قبل در حال اجراست، همان را به جلو بیاور و از ساخت پنجره دوم جلوگیری کن
+            // اگر نمونه ای از قبل در حال اجراست، همان را به جلو بیاور و از ساخت پنجره دوم جلوگیری کن
             _singleInstanceMutex = new Mutex(true, "Local\\CleanC.SingleInstance", out bool createdNew);
             if (!createdNew)
             {

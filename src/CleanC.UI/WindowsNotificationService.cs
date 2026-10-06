@@ -1,10 +1,10 @@
 // src/CleanC.UI/WindowsNotificationService.cs
-// F5 — نوتیفیکیشن‌های واقعی ویندوز: toast (WinAppSDK AppNotification) + badge عدد سلامت.
+// F5 — نوتیفیکیشن های واقعی ویندوز: toast (WinAppSDK AppNotification) + badge عدد سلامت.
 //
-// چون CleanC unpackaged و با دسترسی administrator اجرا می‌شود، ثبت AUMID در HKCU
-// (Software\Classes\AppUserModelId) الزامی است و فعال‌سازی (کلیک روی toast) ممکن است
-// به خاطر UIPI کار نکند. برای همین همه‌ی مسیرها try/catch دارند و در صورت شکست،
-// لایه‌ی قابل‌اعتماد پشتیبان (balloon تری‌آیکون) استفاده می‌شود.
+// چون CleanC unpackaged و با دسترسی administrator اجرا می شود، ثبت AUMID در HKCU
+// (Software\Classes\AppUserModelId) الزامی است و فعال سازی (کلیک روی toast) ممکن است
+// به خاطر UIPI کار نکند. برای همین همه ی مسیرها try/catch دارند و در صورت شکست،
+// لایه ی قابل اعتماد پشتیبان (balloon تری آیکون) استفاده می شود.
 
 using System;
 using System.IO;
@@ -17,7 +17,7 @@ using Windows.UI.Notifications;
 
 namespace CleanC.UI
 {
-    /// <summary>شدت نوتیفیکیشن ویندوزی — معادل سطح‌های InfoBarSeverity.</summary>
+    /// <summary>شدت نوتیفیکیشن ویندوزی — معادل سطح های InfoBarSeverity.</summary>
     public enum WinNotifySeverity
     {
         Info,
@@ -27,7 +27,7 @@ namespace CleanC.UI
 
     public sealed class WindowsNotificationService : IDisposable
     {
-        /// <summary>AUMID ثبت‌شده در HKCU برای اپ‌های unpackaged.</summary>
+        /// <summary>AUMID ثبت شده در HKCU برای اپ های unpackaged.</summary>
         public const string AumId = "CleanC.App";
 
         private readonly string _iconUri;
@@ -45,8 +45,8 @@ namespace CleanC.UI
         public bool IsToastAvailable => _toastAvailable;
 
         /// <summary>
-        /// ثبت AUMID در رجیستری و سپس ثبت سرویس toast. هیچ استثنایی بیرون نمی‌رود؛
-        /// در صورت شکست <see cref="IsToastAvailable"/> می‌ماند روی false.
+        /// ثبت AUMID در رجیستری و سپس ثبت سرویس toast. هیچ استثنایی بیرون نمی رود؛
+        /// در صورت شکست <see cref="IsToastAvailable"/> می ماند روی false.
         /// </summary>
         public void TryRegister()
         {
@@ -65,7 +65,7 @@ namespace CleanC.UI
             }
         }
 
-        /// <summary>نمایش یک toast ویندوزی؛ در صورت شکست false برمی‌گرداند تا فراخواننده fallback کند.</summary>
+        /// <summary>نمایش یک toast ویندوزی؛ در صورت شکست false برمی گرداند تا فراخواننده fallback کند.</summary>
         public bool TryShowToast(string title, string message, WinNotifySeverity severity)
         {
             if (_disposed || !_toastAvailable || string.IsNullOrWhiteSpace(message)) return false;
@@ -88,13 +88,13 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// عدد سلامت را روی آیکون تسک‌بار نشان می‌دهد (badge).
-        /// مقدار کمتر از صورت badge را پاک می‌کند.
+        /// عدد سلامت را روی آیکون تسک بار نشان می دهد (badge).
+        /// مقدار کمتر از صورت badge را پاک می کند.
         /// چون اپ unpackaged است و میانبر Start Menu با AUMID ما ندارد، این API ممکن است
-        /// COMException بدهد؛ در آن صورت برای همیشه غیرفعال می‌شود تا هر فریمِ تغییرِ
+        /// COMException بدهد؛ در آن صورت برای همیشه غیرفعال می شود تا هر فریمِ تغییرِ
         /// سلامت یک استثنای بیهوده در لاگ ننویسد.
         /// </summary>
-        /// <param name="value">عدد سلامت (۰–۱۰۰)؛ مقادیر کمتر از صورت badge را پاک می‌کنند.</param>
+        /// <param name="value">عدد سلامت (۰–۱۰۰)؛ مقادیر کمتر از صورت badge را پاک می کنند.</param>
         /// <returns>true یعنی badge اعمال شد؛ false یعنی در دسترس نیست و باید جایگزین دیگری استفاده شود.</returns>
         public bool TrySetBadge(int value)
         {
@@ -124,7 +124,7 @@ namespace CleanC.UI
             }
         }
 
-        /// <summary>HKCU\Software\Classes\AppUserModelId\CleanC.App — بدون این، toast unpackaged ثبت نمی‌شود.</summary>
+        /// <summary>HKCU\Software\Classes\AppUserModelId\CleanC.App — بدون این، toast unpackaged ثبت نمی شود.</summary>
         private void RegisterAumId()
         {
             using var key = Registry.CurrentUser.CreateSubKey(

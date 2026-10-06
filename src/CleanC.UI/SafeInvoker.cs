@@ -9,9 +9,9 @@ namespace CleanC.UI
     /// C8 — جای امن برای event handlerهای async.
     ///
     /// یک <c>async void</c> معمولی اگر استثنا پرتاب کند، آن استثنا از تهِ زنجیره به
-    /// <c>Application.UnhandledException</c> می‌رسد؛ یعنی کل برنامه باید یک تصمیم
-    /// سراسری برای همه‌ی خطاها بگیرد. این کلاس هر handler را «جدا» نگه می‌دارد:
-    /// خطای هر دکمه فقط با همان دکمه log می‌شود و بقیه‌ی UI از کار نمی‌افتد.
+    /// <c>Application.UnhandledException</c> می رسد؛ یعنی کل برنامه باید یک تصمیم
+    /// سراسری برای همه ی خطاها بگیرد. این کلاس هر handler را «جدا» نگه می دارد:
+    /// خطای هر دکمه فقط با همان دکمه log می شود و بقیه ی UI از کار نمی افتد.
     ///
     /// الگوی استفاده:
     /// <code>
@@ -23,7 +23,7 @@ namespace CleanC.UI
     internal static class SafeInvoker
     {
         /// <summary>
-        /// اجرای ناهمگامِ handler و ثبت خطای احتمالی با همان شناسه‌ی handler.
+        /// اجرای ناهمگامِ handler و ثبت خطای احتمالی با همان شناسه ی handler.
         /// </summary>
         public static async Task RunAsync(string name, Task task)
         {
@@ -38,7 +38,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// همان <see cref="RunAsync"/>؛ نام handler را از محل فراخوانی برمی‌دارد.
+        /// همان <see cref="RunAsync"/>؛ نام handler را از محل فراخوانی برمی دارد.
         /// </summary>
         public static void Run(Task task, [CallerMemberName] string name = "handler")
             => _ = RunAsync(name, task);

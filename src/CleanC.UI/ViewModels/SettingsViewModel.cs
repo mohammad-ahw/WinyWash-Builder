@@ -1,8 +1,8 @@
 // src/CleanC.UI/ViewModels/SettingsViewModel.cs
-// C6 — ViewModel صفحه‌ی «تنظیمات برنامه» با CommunityToolkit.Mvvm.
-// وضعیت در VM زندگی می‌کند، نوشتن در تنظیمات از مسیر ISettingsStore انجام می‌شود،
+// C6 — ViewModel صفحه ی «تنظیمات برنامه» با CommunityToolkit.Mvvm.
+// وضعیت در VM زندگی می کند، نوشتن در تنظیمات از مسیر ISettingsStore انجام می شود،
 // و اثراتِ سمت رابط کاربری (اعمال تم، InfoBar هشدار حذف قطعی) از طریق رویداد به
-// MainWindow می‌رسد تا VM وابسته به WinUI نشود.
+// MainWindow می رسد تا VM وابسته به WinUI نشود.
 
 using System;
 using CleanC.Core.Services;
@@ -14,7 +14,7 @@ namespace CleanC.UI.ViewModels
     {
         private readonly ISettingsStore _store;
 
-        // محافظ hydration: تا وقتی داریم مقادیر را از تنظیمات می‌خوانیم،
+        // محافظ hydration: تا وقتی داریم مقادیر را از تنظیمات می خوانیم،
         // هیچ رویدادِ ذخیره/اعمالِ جانبی نباید منتشر شود.
         private bool _loading;
 
@@ -22,8 +22,8 @@ namespace CleanC.UI.ViewModels
         {
             _store = store;
 
-            // مقادیر پیش‌فرضِ کنترل‌ها تا فراخوانی Hydrate (که صفحه همان ابتدا انجام می‌دهد).
-            // _loading روشن است تا این مقداردهی، تنظیماتِ خوانده‌شده از دیسک را بازنویسی نکند.
+            // مقادیر پیش فرضِ کنترل ها تا فراخوانی Hydrate (که صفحه همان ابتدا انجام می دهد).
+            // _loading روشن است تا این مقداردهی، تنظیماتِ خوانده شده از دیسک را بازنویسی نکند.
             _loading = true;
             Theme = "System";
             DeleteMode = "RecycleBin";
@@ -33,10 +33,10 @@ namespace CleanC.UI.ViewModels
             _loading = false;
         }
 
-        /// <summary>لایه‌ی نمایش با این رویداد ذخیره‌ی تنظیمات را debounce می‌کند.</summary>
+        /// <summary>لایه ی نمایش با این رویداد ذخیره ی تنظیمات را debounce می کند.</summary>
         public event Action? PersistRequested;
 
-        /// <summary>تغییر تم باید در لایه‌ی نمایش روی ElementTheme اعمال شود.</summary>
+        /// <summary>تغییر تم باید در لایه ی نمایش روی ElementTheme اعمال شود.</summary>
         public event Action<string>? ThemeChangeRequested;
 
         /// <summary>تغییر رفتار حذف — برای نشان دادن هشدار حالت Permanent.</summary>
@@ -45,8 +45,8 @@ namespace CleanC.UI.ViewModels
         /// <summary>تغییر زبان برنامه.</summary>
         public event Action<string>? LanguageChangeRequested;
 
-        // ── وضعیت‌های قابل مشاهده ──────────────────────────────────────
-        // از syntax «partial property» استفاده می‌شود (نه فیلد) تا کدِ تولیدیِ
+        // ── وضعیت های قابل مشاهده ──────────────────────────────────────
+        // از syntax «partial property» استفاده می شود (نه فیلد) تا کدِ تولیدیِ
         // MVVM Toolkit برای WinUI/CsWinRT سازگار با AOT باشد و هشدار MVVMTK0045 ندهد.
 
         [ObservableProperty]
@@ -73,7 +73,7 @@ namespace CleanC.UI.ViewModels
         [ObservableProperty]
         public partial bool SaveScanSelections { get; set; }
 
-        // ── حالت‌های محاسبه‌شده برای RadioButton ها (x:Bind OneWay) ─────
+        // ── حالت های محاسبه شده برای RadioButton ها (x:Bind OneWay) ─────
 
         public bool IsThemeSystem => string.Equals(Theme, "System", StringComparison.OrdinalIgnoreCase);
         public bool IsThemeLight => string.Equals(Theme, "Light", StringComparison.OrdinalIgnoreCase);
@@ -83,7 +83,7 @@ namespace CleanC.UI.ViewModels
         public bool IsDeleteQuarantine => string.Equals(DeleteMode, "Quarantine", StringComparison.OrdinalIgnoreCase);
         public bool IsDeletePermanent => string.Equals(DeleteMode, "Permanent", StringComparison.OrdinalIgnoreCase);
 
-        /// <summary>پر کردن VM از تنظیماتِ ذخیره‌شده؛ هیچ ذخیره/اعمالِ جانبی رخ نمی‌دهد.</summary>
+        /// <summary>پر کردن VM از تنظیماتِ ذخیره شده؛ هیچ ذخیره/اعمالِ جانبی رخ نمی دهد.</summary>
         public void Hydrate()
         {
             _loading = true;
@@ -105,7 +105,7 @@ namespace CleanC.UI.ViewModels
                 _loading = false;
             }
 
-            // سرویس‌ها باید با تنظیماتِ خوانده‌شده همگام شوند (حتی در اولین اجرا)
+            // سرویس ها باید با تنظیماتِ خوانده شده همگام شوند (حتی در اولین اجرا)
             SafeDeleteService.DefaultMode = SafeDeleteService.ParseMode(DeleteMode);
         }
 

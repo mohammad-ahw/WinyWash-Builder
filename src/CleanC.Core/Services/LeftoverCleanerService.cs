@@ -506,7 +506,7 @@ namespace CleanC.Core.Services
         // ====================================================================
 
         /// <summary>
-        /// ریشه‌های مجازی که اسکنر فقط یک سطح داخل آنها را بررسی می‌کند.
+        /// ریشه های مجازی که اسکنر فقط یک سطح داخل آنها را بررسی می کند.
         /// هر مسیر حذف باید دقیقاً یک سطح زیر یکی از اینها باشد.
         /// </summary>
         private static string[] GetAllowedRoots()
@@ -526,7 +526,7 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// بازبینی مجدد یک مسیر پیش از حذف. اسکن و حذف ممکن است با فاصله انجام شوند،
-        /// پس همه شرط‌های ایمنی باید دوباره اعمال شوند.
+        /// پس همه شرط های ایمنی باید دوباره اعمال شوند.
         /// </summary>
         public static bool IsSafeToDelete(string fullPath)
         {
@@ -557,10 +557,10 @@ namespace CleanC.Core.Services
                 var di = new DirectoryInfo(full);
                 if ((di.Attributes & FileAttributes.ReparsePoint) != 0) return false;
 
-                // پوشه شخصی / پروژه گیت هرگز حذف نمی‌شود
+                // پوشه شخصی / پروژه گیت هرگز حذف نمی شود
                 if (HasPersonalOrProjectFiles(full)) return false;
 
-                // اگر هنوز در Program Files یا LocalAppData\Programs نصب است، باقی می‌ماند
+                // اگر هنوز در Program Files یا LocalAppData\Programs نصب است، باقی می ماند
                 if (ExistsInProgramFiles(dirName) || ExistsInLocalAppDataPrograms(dirName)) return false;
 
                 return true;
@@ -572,8 +572,8 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// پوشه‌های رهاشده را حذف می‌کند و «فقط فضایی که واقعاً آزاد شده» را برمی‌گرداند.
-        /// هر مسیر پیش از حذف دوباره بررسی ایمنی می‌شود.
+        /// پوشه های رهاشده را حذف می کند و «فقط فضایی که واقعاً آزاد شده» را برمی گرداند.
+        /// هر مسیر پیش از حذف دوباره بررسی ایمنی می شود.
         /// </summary>
         public static long DeleteLeftoverFolders(IEnumerable<LeftoverFolderItem> items)
         {
@@ -587,7 +587,7 @@ namespace CleanC.Core.Services
                 {
                     if (!IsSafeToDelete(item.FullPath)) continue;
 
-                    // اندازه واقعی را همین الان بگیر، نه مقدار ذخیره‌شده از زمان اسکن
+                    // اندازه واقعی را همین الان بگیر، نه مقدار ذخیره شده از زمان اسکن
                     long size = GetDirectorySizeSafe(item.FullPath);
                     if (size <= 0) continue;
 
@@ -596,7 +596,7 @@ namespace CleanC.Core.Services
                 }
                 catch
                 {
-                    // پوشه خالی نیست/قفل است → چیزی گزارش نمی‌شود
+                    // پوشه خالی نیست/قفل است → چیزی گزارش نمی شود
                 }
             }
 

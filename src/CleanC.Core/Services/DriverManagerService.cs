@@ -99,12 +99,12 @@ namespace CleanC.Core.Services
                         // Add error device to the list
                         list.Insert(0, new DriverItem
                         {
-                            PublishedName = "سخت‌افزار معیوب",
+                            PublishedName = "سخت افزار معیوب",
                             OriginalName = devName,
                             ProviderName = "System Device",
                             ClassName = "Device Error",
                             DriverVersion = $"Error Code {errCode}",
-                            DriverDate = DateTime.Now.ToString("yyyy/MM/dd"),
+                            DriverDate = DateTime.Now.ToString("yyyy.MM.dd"),
                             HasError = true,
                             ErrorCode = errCode,
                             StatusDescription = GetErrorCodeDescription(errCode)
@@ -134,7 +134,7 @@ namespace CleanC.Core.Services
                 try
                 {
                     // 1. Defective / Error device removal
-                    if (isErrorDevice || publishedName == "سخت‌افزار معیوب" || !publishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase))
+                    if (isErrorDevice || publishedName == "سخت افزار معیوب" || !publishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase))
                     {
                         string target = !string.IsNullOrEmpty(deviceName) ? deviceName : publishedName;
                         var psiDev = new ProcessStartInfo("pnputil.exe", $"/remove-device /deviceid \"{target.Trim()}\" /force")
@@ -150,7 +150,7 @@ namespace CleanC.Core.Services
                             pDev.WaitForExit(8000);
                             return (true, $"دستگاه معیوب '{target}' با موفقیت از سیستم حذف و جدا شد.");
                         }
-                        return (false, "عدم توانایی در اجرای ابزار جداسازی سخت‌افزار.");
+                        return (false, "عدم توانایی در اجرای ابزار جداسازی سخت افزار.");
                     }
 
                     string infName = publishedName.Trim();
@@ -362,14 +362,14 @@ namespace CleanC.Core.Services
             return code switch
             {
                 1 => "دستگاه به درستی پیکربندی نشده است (Code 1)",
-                10 => "دستگاه امکان راه‌اندازی ندارد (Code 10)",
+                10 => "دستگاه امکان راه اندازی ندارد (Code 10)",
                 14 => "سیستم برای استفاده نیازمند ریستارت است (Code 14)",
                 22 => "دستگاه توسط ویندوز غیرفعال شده است (Code 22)",
-                28 => "درایور این سخت‌افزار نصب نشده است (Code 28)",
-                31 => "ویندوز نمی‌تواند درایور را بارگذاری کند (Code 31)",
-                39 => "درایور آسیب‌دیده یا مفقود شده است (Code 39)",
-                43 => "سخت‌افزار به دلیل گزارش خطا متوقف شده است (Code 43)",
-                _ => $"کد خطای سخت‌افزاری ({code})"
+                28 => "درایور این سخت افزار نصب نشده است (Code 28)",
+                31 => "ویندوز نمی تواند درایور را بارگذاری کند (Code 31)",
+                39 => "درایور آسیب دیده یا مفقود شده است (Code 39)",
+                43 => "سخت افزار به دلیل گزارش خطا متوقف شده است (Code 43)",
+                _ => $"کد خطای سخت افزاری ({code})"
             };
         }
     }

@@ -35,7 +35,7 @@ namespace CleanC.Core.Services
 
             if (oldLetter == "C" || newLetter == "C")
             {
-                return (false, "تغییر حرف درایو سیستم‌عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست.");
+                return (false, "تغییر حرف درایو سیستم عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست.");
             }
 
             if (oldLetter == newLetter)

@@ -1,5 +1,5 @@
 // tests/CleanC.Core.Tests/SafeDeleteServiceTests.cs
-// تست‌های F3 — حذف امنِ فایل‌های شخصی: سطل بازیافت / قرنطینه / قطعی.
+// تست های F3 — حذف امنِ فایل های شخصی: سطل بازیافت / قرنطینه / قطعی.
 
 using System;
 using System.IO;
@@ -15,7 +15,7 @@ namespace CleanC.Core.Tests
 
         public SafeDeleteServiceTests()
         {
-            // ریشه‌ی قرنطینه هیچ‌وقت نباید به داده‌ی واقعی کاربر بزند
+            // ریشه ی قرنطینه هیچ وقت نباید به داده ی واقعی کاربر بزند
             _root = Path.Combine(Path.GetTempPath(), "cleanc-tests", Guid.NewGuid().ToString("N"));
             _work = Path.Combine(Path.GetTempPath(), "cleanc-tests", Guid.NewGuid().ToString("N"));
             Directory.CreateDirectory(_work);
@@ -42,7 +42,7 @@ namespace CleanC.Core.Tests
             }
             catch
             {
-                // پاک‌سازی محیط تست در برابر قفل‌بودن فایل شکست می‌خورد؛ مهم نیست
+                // پاک سازی محیط تست در برابر قفل بودن فایل شکست می خورد؛ مهم نیست
             }
         }
 
@@ -94,7 +94,7 @@ namespace CleanC.Core.Tests
 
             Assert.Equal(SafeDeleteOutcome.Quarantined, result.Outcome);
             Assert.True(result.IsSuccess);
-            Assert.False(result.FreesSpace, "جابه‌جایی نباید فضا را آزاد نشان دهد");
+            Assert.False(result.FreesSpace, "جابه جایی نباید فضا را آزاد نشان دهد");
             Assert.False(File.Exists(file));
         }
 
@@ -110,7 +110,7 @@ namespace CleanC.Core.Tests
             Assert.Equal(2, batch.QuarantinedCount);
             Assert.Equal(0, batch.PermanentCount);
             Assert.Equal(0, batch.FreedBytes);
-            Assert.True(batch.MovedBytes >= size, "حجم جابه‌جا شده باید ثبت شود");
+            Assert.True(batch.MovedBytes >= size, "حجم جابه جا شده باید ثبت شود");
         }
 
         [Fact]
@@ -203,7 +203,7 @@ namespace CleanC.Core.Tests
                 string file2 = NewFile("two.txt");
                 SafeDeleteService.DeleteFile(file2, SafeDeleteMode.Quarantine);
 
-                // هر ریشه فقط نشستِ خودش را می‌بیند
+                // هر ریشه فقط نشستِ خودش را می بیند
                 Assert.Single(SafeDeleteService.ListQuarantineSessions());
                 Assert.Equal(otherRoot, SafeDeleteService.QuarantineRoot);
             }
@@ -291,7 +291,7 @@ namespace CleanC.Core.Tests
             Assert.Equal(SafeDeleteOutcome.Quarantined, result.Outcome);
         }
 
-        // ── متن‌های گزارش ────────────────────────────────────────────────
+        // ── متن های گزارش ────────────────────────────────────────────────
 
         [Theory]
         [InlineData(SafeDeleteMode.RecycleBin, "سطل بازیافت")]
@@ -315,7 +315,7 @@ namespace CleanC.Core.Tests
             string text = SafeDeleteService.DescribeBatch(batch);
 
             Assert.Contains("سطل بازیافت", text);
-            Assert.Contains("جابه‌جا شد", text);
+            Assert.Contains("جابه جا شد", text);
             Assert.DoesNotContain("فضا آزاد", text);
         }
 

@@ -25,12 +25,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 1: Recommended items (موارد پیشنهادی)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی فایل‌های موقت و موارد توصیه‌شده...");
+                progressCallback?.Invoke("در حال ارزیابی فایل های موقت و موارد توصیه شده...");
                 var grpRec = new JunkGroup
                 {
                     Id = "recommended",
                     Title = "موارد پیشنهادی (Recommended items)",
-                    Description = "فایل‌های زائد و موقتی که پاکسازی آنها ۱۰۰٪ ایمن است",
+                    Description = "فایل های زائد و موقتی که پاکسازی آنها ۱۰۰٪ ایمن است",
                     IconGlyph = "\uE8B7"
                 };
 
@@ -41,8 +41,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "tempFiles",
                     GroupId = "recommended",
-                    Title = "فایل‌های موقت سیستم و کاربر",
-                    Description = "فایل‌های موقت، کش برنامه‌ها و پردازه‌ها در مسیرهای Temp",
+                    Title = "فایل های موقت سیستم و کاربر",
+                    Description = "فایل های موقت، کش برنامه ها و پردازه ها در مسیرهای Temp",
                     Path = tempDir,
                     TargetPaths = tempPaths,
                     Bytes = tempBytes,
@@ -56,7 +56,7 @@ namespace CleanC.Core.Services
                     Id = "recycleBin",
                     GroupId = "recommended",
                     Title = "سطل بازیافت (Recycle Bin)",
-                    Description = "فایل‌های حذف‌شده موجود در سطل بازیافت تمام درایوها",
+                    Description = "فایل های حذف شده موجود در سطل بازیافت تمام درایوها",
                     Path = "RecycleBin",
                     TargetPaths = new List<string> { "RecycleBin" },
                     Bytes = binBytes,
@@ -75,8 +75,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "crashLogs",
                     GroupId = "recommended",
-                    Title = "گزارش‌های خطا و کرش‌دامپ‌ها",
-                    Description = "لاگ‌های گزارش خرابی، فایل‌های WER و دامپ‌های حافظه",
+                    Title = "گزارش های خطا و کرش دامپ ها",
+                    Description = "لاگ های گزارش خرابی، فایل های WER و دامپ های حافظه",
                     Path = crashPaths[0],
                     TargetPaths = crashPaths,
                     Bytes = crashBytes,
@@ -94,7 +94,7 @@ namespace CleanC.Core.Services
                         Id = "edgeCache",
                         GroupId = "recommended",
                         Title = "حافظه کش مایکروسافت اج (Microsoft Edge)",
-                        Description = "کش صفحات وب، تصاویر و کدهای ذخیره‌شده مرورگر اج",
+                        Description = "کش صفحات وب، تصاویر و کدهای ذخیره شده مرورگر اج",
                         Path = edgePaths.FirstOrDefault() ?? Path.Combine(edgeUserData, @"Default\Cache"),
                         TargetPaths = edgePaths,
                         Bytes = edgeBytes,
@@ -113,7 +113,7 @@ namespace CleanC.Core.Services
                         Id = "chromeCache",
                         GroupId = "recommended",
                         Title = "حافظه کش گوگل کروم (Google Chrome)",
-                        Description = "کش صفحات وب، تصاویر و کدهای کامپایل‌شده مرورگر کروم",
+                        Description = "کش صفحات وب، تصاویر و کدهای کامپایل شده مرورگر کروم",
                         Path = chromePaths.FirstOrDefault() ?? Path.Combine(chromeUserData, @"Default\Cache"),
                         TargetPaths = chromePaths,
                         Bytes = chromeBytes,
@@ -132,8 +132,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "updateCache",
                             GroupId = "recommended",
-                            Title = "کش نصبی آپدیت‌های ویندوز",
-                            Description = "فایل‌های بسته‌های نصب‌شده Windows Update",
+                            Title = "کش نصبی آپدیت های ویندوز",
+                            Description = "فایل های بسته های نصب شده Windows Update",
                             Path = updateCachePath,
                             TargetPaths = new List<string> { updateCachePath },
                             Bytes = updateBytes,
@@ -157,7 +157,7 @@ namespace CleanC.Core.Services
                         Id = "deliveryOpt",
                         GroupId = "recommended",
                         Title = "کش توزیع دانلود ویندوز (Delivery Optimization)",
-                        Description = "فایل‌های موقت بسته‌های دانلود آپدیت‌ها و استور مایکروسافت",
+                        Description = "فایل های موقت بسته های دانلود آپدیت ها و استور مایکروسافت",
                         Path = doPaths[0],
                         TargetPaths = doPaths,
                         Bytes = doBytes,
@@ -182,8 +182,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "thumbnailCache",
                             GroupId = "recommended",
-                            Title = "حافظه کش بندانگشتی‌ها (Thumbnail Cache)",
-                            Description = "پیش‌نمایش ذخیره‌شده فایل‌ها و تصاویر در فایل اکسپلورر",
+                            Title = "حافظه کش بندانگشتی ها (Thumbnail Cache)",
+                            Description = "پیش نمایش ذخیره شده فایل ها و تصاویر در فایل اکسپلورر",
                             Path = explorerCacheDir,
                             TargetPaths = thumbFiles,
                             Bytes = thumbBytes,
@@ -197,12 +197,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 2: Other system items (سایر موارد سیستمی)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی شیدرهای گرافیکی و حافظه‌های سیستمی...");
+                progressCallback?.Invoke("در حال ارزیابی شیدرهای گرافیکی و حافظه های سیستمی...");
                 var grpSys = new JunkGroup
                 {
                     Id = "system",
                     Title = "سایر موارد سیستمی (Other system items)",
-                    Description = "شیدرهای گرافیکی دایرکت‌ایکس و گزارش‌های سیستمی",
+                    Description = "شیدرهای گرافیکی دایرکت ایکس و گزارش های سیستمی",
                     IconGlyph = "\uE770"
                 };
 
@@ -221,7 +221,7 @@ namespace CleanC.Core.Services
                     Id = "directxCache",
                     GroupId = "system",
                     Title = "کش شیدرهای گرافیکی (DirectX Shader Cache)",
-                    Description = "شیدرهای رندر گرافیکی ذخیره‌شده بازی‌ها و کارت گرافیک",
+                    Description = "شیدرهای رندر گرافیکی ذخیره شده بازی ها و کارت گرافیک",
                     Path = d3dPaths[0],
                     TargetPaths = d3dPaths,
                     Bytes = d3dBytes,
@@ -242,8 +242,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "windowsWidgets",
                         GroupId = "system",
-                        Title = "ویجت‌های ویندوز (Windows Widgets)",
-                        Description = "داده‌های آفلاین و کش ویجت‌های ویندوز ۱۱",
+                        Title = "ویجت های ویندوز (Windows Widgets)",
+                        Description = "داده های آفلاین و کش ویجت های ویندوز ۱۱",
                         Path = widgetPaths[0],
                         TargetPaths = widgetPaths,
                         Bytes = widgetsBytes,
@@ -262,8 +262,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "networkCerts",
                     GroupId = "system",
-                    Title = "کش گواهی‌ها و شبکه ویندوز",
-                    Description = "فایل‌های موقت ارتباطی شبکه و ابزارهای سیستم",
+                    Title = "کش گواهی ها و شبکه ویندوز",
+                    Description = "فایل های موقت ارتباطی شبکه و ابزارهای سیستم",
                     Path = inetPaths[0],
                     TargetPaths = inetPaths,
                     Bytes = inetBytes,
@@ -281,7 +281,7 @@ namespace CleanC.Core.Services
                             Id = "orphanedRegistry",
                             GroupId = "system",
                             Title = "مسیرها و کلیدهای نامعتبر رجیستری (Orphaned Registry)",
-                            Description = $"{deadMui} مسیر نامعتبر از برنامه‌های حذف‌شده در MuiCache رجیستری",
+                            Description = $"{deadMui} مسیر نامعتبر از برنامه های حذف شده در MuiCache رجیستری",
                             Path = "Registry",
                             TargetPaths = new List<string>(),
                             Bytes = deadMui * 1024,
@@ -299,12 +299,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 3: Other application items (Dynamic Probing)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال پویش نرم‌افزارهای نصب‌شده کاربر...");
+                progressCallback?.Invoke("در حال پویش نرم افزارهای نصب شده کاربر...");
                 var grpApps = new JunkGroup
                 {
                     Id = "apps",
-                    Title = "سایر موارد برنامه‌ها (Other application items)",
-                    Description = "کش و لاگ‌های نرم‌افزارهای کشف‌شده در سیستم",
+                    Title = "سایر موارد برنامه ها (Other application items)",
+                    Description = "کش و لاگ های نرم افزارهای کشف شده در سیستم",
                     IconGlyph = "\uE71D"
                 };
 
@@ -317,8 +317,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "nodejsCache",
                         GroupId = "apps",
-                        Title = "کش پکیج‌های Node.js (npm)",
-                        Description = "بسته‌های موقت دانلودشده npm در سیستم",
+                        Title = "کش پکیج های Node.js (npm)",
+                        Description = "بسته های موقت دانلودشده npm در سیستم",
                         Path = npmPath,
                         TargetPaths = new List<string> { npmPath },
                         Bytes = npmBytes,
@@ -342,7 +342,7 @@ namespace CleanC.Core.Services
                         Id = "nvidiaCache",
                         GroupId = "apps",
                         Title = "کش درایور و شیدرهای انویدیا (NVIDIA)",
-                        Description = "فایل‌های موقت و شیدرهای رندر کارت گرافیک انویدیا",
+                        Description = "فایل های موقت و شیدرهای رندر کارت گرافیک انویدیا",
                         Path = nvPaths[0],
                         TargetPaths = nvPaths,
                         Bytes = nvBytes,
@@ -359,8 +359,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "onedriveLogs",
                         GroupId = "apps",
-                        Title = "لاگ‌ها و گزارش‌های OneDrive",
-                        Description = "فایل‌های عیب‌یابی و لاگ‌های هماهنگ‌سازی وان‌درایو",
+                        Title = "لاگ ها و گزارش های OneDrive",
+                        Description = "فایل های عیب یابی و لاگ های هماهنگ سازی وان درایو",
                         Path = onedrivePath,
                         TargetPaths = new List<string> { onedrivePath },
                         Bytes = odBytes,
@@ -377,8 +377,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "pipCache",
                         GroupId = "apps",
-                        Title = "کش پکیج‌های پایتون (Pip)",
-                        Description = "بسته‌های دانلودشده مخزن پایتون",
+                        Title = "کش پکیج های پایتون (Pip)",
+                        Description = "بسته های دانلودشده مخزن پایتون",
                         Path = pipPath,
                         TargetPaths = new List<string> { pipPath },
                         Bytes = pipBytes,
@@ -401,8 +401,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "vscodeCache",
                         GroupId = "apps",
-                        Title = "کش محیط برنامه‌نویسی VS Code",
-                        Description = "فایل‌های کش و داده‌های موقت ویرایشگر کد",
+                        Title = "کش محیط برنامه نویسی VS Code",
+                        Description = "فایل های کش و داده های موقت ویرایشگر کد",
                         Path = vscPaths[0],
                         TargetPaths = vscPaths,
                         Bytes = vscBytes,
@@ -424,8 +424,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "discordCache",
                         GroupId = "apps",
-                        Title = "کش پیام‌رسان دیسکورد (Discord)",
-                        Description = "تصاویر و رسانه‌های موقت دانلودشده در دیسکورد",
+                        Title = "کش پیام رسان دیسکورد (Discord)",
+                        Description = "تصاویر و رسانه های موقت دانلودشده در دیسکورد",
                         Path = discordPaths[0],
                         TargetPaths = discordPaths,
                         Bytes = discBytes,
@@ -442,8 +442,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "telegramCache",
                         GroupId = "apps",
-                        Title = "کش پیام‌رسان تلگرام (Telegram)",
-                        Description = "پروفایل‌ها و رسانه‌های موقت کش‌شده تلگرام",
+                        Title = "کش پیام رسان تلگرام (Telegram)",
+                        Description = "پروفایل ها و رسانه های موقت کش شده تلگرام",
                         Path = tgPath,
                         TargetPaths = new List<string> { tgPath },
                         Bytes = tgBytes,
@@ -464,8 +464,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "spotifyCache",
                         GroupId = "apps",
-                        Title = "کش نرم‌افزار اسپاتیفای (Spotify)",
-                        Description = "فایل‌های موقت موسیقی و کاور آلبوم‌ها",
+                        Title = "کش نرم افزار اسپاتیفای (Spotify)",
+                        Description = "فایل های موقت موسیقی و کاور آلبوم ها",
                         Path = spotPaths[0],
                         TargetPaths = spotPaths,
                         Bytes = spotBytes,
@@ -483,7 +483,7 @@ namespace CleanC.Core.Services
                 {
                     Id = "traces",
                     Title = "ردپای استفاده از کامپیوتر (Usage Traces)",
-                    Description = "لیست فایل‌های اخیر، پرش سریع و تاریخچه‌های سیستم",
+                    Description = "لیست فایل های اخیر، پرش سریع و تاریخچه های سیستم",
                     IconGlyph = "\uE81C"
                 };
 
@@ -494,8 +494,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "recentFiles",
                     GroupId = "traces",
-                    Title = "تاریخچه فایل‌های اخیر (Recent Items)",
-                    Description = "شورتکات‌های ثبت‌شده فایل‌های اخیراً باز شده در ویندوز",
+                    Title = "تاریخچه فایل های اخیر (Recent Items)",
+                    Description = "شورتکات های ثبت شده فایل های اخیراً باز شده در ویندوز",
                     Path = recentPath,
                     TargetPaths = new List<string> { recentPath },
                     Bytes = recentBytes,
@@ -513,8 +513,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "explorerJumpList",
                     GroupId = "traces",
-                    Title = "لیست‌های پرش اکسپلورر (Jump Lists)",
-                    Description = "میانبرهای برنامه‌های اخیر در تسک‌بار ویندوز",
+                    Title = "لیست های پرش اکسپلورر (Jump Lists)",
+                    Description = "میانبرهای برنامه های اخیر در تسک بار ویندوز",
                     Path = jumpPaths[0],
                     TargetPaths = jumpPaths,
                     Bytes = jumpBytes,
@@ -526,12 +526,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 5: Download Managers & Incomplete Files
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی دانلود منیجرها و فایل‌های ناقص...");
+                progressCallback?.Invoke("در حال ارزیابی دانلود منیجرها و فایل های ناقص...");
                 var grpDownloads = new JunkGroup
                 {
                     Id = "downloads",
-                    Title = "دانلود منیجرها و فایل‌های ناتمام (Download Managers)",
-                    Description = "چانک‌های موقت، تکه‌های دانلود ناقص و فایل‌های رهاشده",
+                    Title = "دانلود منیجرها و فایل های ناتمام (Download Managers)",
+                    Description = "چانک های موقت، تکه های دانلود ناقص و فایل های رهاشده",
                     IconGlyph = "\uE896"
                 };
 
@@ -546,8 +546,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "idmChunks",
                             GroupId = "downloads",
-                            Title = "فایل‌های موقت و چانک‌های ناتمام IDM",
-                            Description = "قطعات موقت دانلودهای متوقف‌شده، لغوشده و رهاشده در اینترنت دانلود منیجر",
+                            Title = "فایل های موقت و چانک های ناتمام IDM",
+                            Description = "قطعات موقت دانلودهای متوقف شده، لغوشده و رهاشده در اینترنت دانلود منیجر",
                             Path = idmDataDir,
                             TargetPaths = new List<string> { idmDataDir },
                             Bytes = idmBytes,
@@ -569,7 +569,7 @@ namespace CleanC.Core.Services
                     {
                         Id = "fdmTemp",
                         GroupId = "downloads",
-                        Title = "فایل‌های موقت Free Download Manager (FDM)",
+                        Title = "فایل های موقت Free Download Manager (FDM)",
                         Description = "کش و قطعات موقت دانلودهای ناتمام FDM",
                         Path = fdmPaths[0],
                         TargetPaths = fdmPaths,
@@ -632,7 +632,7 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 6: Leftover Folders of Uninstalled Apps
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال پویش پوشه‌های باقیمانده نرم‌افزارهای حذف‌شده...");
+                progressCallback?.Invoke("در حال پویش پوشه های باقیمانده نرم افزارهای حذف شده...");
                 try
                 {
                     var leftovers = LeftoverCleanerService.ScanLeftoverFolders();
@@ -641,8 +641,8 @@ namespace CleanC.Core.Services
                         var grpLeftovers = new JunkGroup
                         {
                             Id = "leftovers",
-                            Title = "پوشه‌های باقیمانده نرم‌افزارهای حذف‌شده (Leftovers)",
-                            Description = "پوشه‌های حجیم برنامه‌هایی که از سیستم حذف شده‌اند ولی داده‌هایشان باقی مانده است",
+                            Title = "پوشه های باقیمانده نرم افزارهای حذف شده (Leftovers)",
+                            Description = "پوشه های حجیم برنامه هایی که از سیستم حذف شده اند ولی داده هایشان باقی مانده است",
                             IconGlyph = "\uE74D"
                         };
 
@@ -672,12 +672,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 7: Live System Optimization & Performance Boost
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی گزینه‌های بهینه‌سازی زنده و پایداری...");
+                progressCallback?.Invoke("در حال ارزیابی گزینه های بهینه سازی زنده و پایداری...");
                 var grpBoost = new JunkGroup
                 {
                     Id = "system_boost",
-                    Title = "بهینه‌سازی زنده و پایداری سیستم (Performance & Boost)",
-                    Description = "آزادسازی رم، کش شبکه، پروسس‌های اضافی، استارتاپ، Debloat و پلن انرژی",
+                    Title = "بهینه سازی زنده و پایداری سیستم (Performance & Boost)",
+                    Description = "آزادسازی رم، کش شبکه، پروسس های اضافی، استارتاپ، Debloat و پلن انرژی",
                     IconGlyph = "\uE9D2"
                 };
 
@@ -686,7 +686,7 @@ namespace CleanC.Core.Services
                     Id = "ramBoost",
                     GroupId = "system_boost",
                     Title = "آزادسازی حافظه فعال رم (RAM Working Set)",
-                    Description = "تخلیه Working Set پردازه‌ها و آزادسازی فوری حافظه اشغال‌شده بدون بستن برنامه‌ها",
+                    Description = "تخلیه Working Set پردازه ها و آزادسازی فوری حافظه اشغال شده بدون بستن برنامه ها",
                     Path = "Memory",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -711,8 +711,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "backgroundHelpers",
                     GroupId = "system_boost",
-                    Title = "بستن پردازه‌ها و کمک‌کننده‌های اضافی در پس‌زمینه",
-                    Description = "توقف سرویس‌های جانبی، پروسه‌های گزارش‌گیری و آپدیترهای مقیم در پس‌زمینه",
+                    Title = "بستن پردازه ها و کمک کننده های اضافی در پس زمینه",
+                    Description = "توقف سرویس های جانبی، پروسه های گزارش گیری و آپدیترهای مقیم در پس زمینه",
                     Path = "Processes",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -724,8 +724,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "browserBoost",
                     GroupId = "system_boost",
-                    Title = "خاموش‌سازی تسک‌های پس‌زمینه مرورگرها (Edge / Chrome)",
-                    Description = "غیرفعال‌سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته‌شدن",
+                    Title = "خاموش سازی تسک های پس زمینه مرورگرها (Edge / Chrome)",
+                    Description = "غیرفعال سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته شدن",
                     Path = "Browsers",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -737,8 +737,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "startupOptimize",
                     GroupId = "system_boost",
-                    Title = "بهینه‌سازی استارتاپ ویندوز",
-                    Description = "غیرفعال‌سازی برنامه‌ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم",
+                    Title = "بهینه سازی استارتاپ ویندوز",
+                    Description = "غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم",
                     Path = "Startup",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -750,8 +750,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "bloatwareClean",
                     GroupId = "system_boost",
-                    Title = "حذف برنامه‌ها و بازی‌های تبلیغاتی پیش‌فرض (Debloat)",
-                    Description = "حذف نرم‌افزارها و بازی‌های تبلیغاتی پیش‌فرض و بررسی برنامه‌های کم‌استفاده",
+                    Title = "حذف برنامه ها و بازی های تبلیغاتی پیش فرض (Debloat)",
+                    Description = "حذف نرم افزارها و بازی های تبلیغاتی پیش فرض و بررسی برنامه های کم استفاده",
                     Path = "Bloatware",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -764,7 +764,7 @@ namespace CleanC.Core.Services
                     Id = "powerPlanBoost",
                     GroupId = "system_boost",
                     Title = "تنظیم پلن انرژی با کارایی بالا (High Performance Plan)",
-                    Description = "انتقال مدیریت توان ویندوز به پلن حداکثر کارایی سخت‌افزاری پردازنده",
+                    Description = "انتقال مدیریت توان ویندوز به پلن حداکثر کارایی سخت افزاری پردازنده",
                     Path = "PowerPlan",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -776,8 +776,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "fastStartup",
                     GroupId = "system_boost",
-                    Title = "کوتاه‌کردن زمان خاموش‌شدن سیستم (Fast Startup)",
-                    Description = "فعال‌سازی خاموش‌سازی و راه‌اندازی فوق‌سریع ویندوز",
+                    Title = "کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)",
+                    Description = "فعال سازی خاموش سازی و راه اندازی فوق سریع ویندوز",
                     Path = "FastStartup",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -790,7 +790,7 @@ namespace CleanC.Core.Services
                     Id = "gpuOptimize",
                     GroupId = "system_boost",
                     Title = "تخصیص هوشمند کارت گرافیک مجزا",
-                    Description = "هدایت بازی‌ها و برنامه‌های سنگین به پردازنده گرافیکی قدرتمند اصلی",
+                    Description = "هدایت بازی ها و برنامه های سنگین به پردازنده گرافیکی قدرتمند اصلی",
                     Path = "GPU",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -802,8 +802,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "winTweaks",
                     GroupId = "system_boost",
-                    Title = "بهینه‌سازی تنظیمات عملکرد و حریم خصوصی ویندوز",
-                    Description = "غیرفعال‌سازی تله‌متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز",
+                    Title = "بهینه سازی تنظیمات عملکرد و حریم خصوصی ویندوز",
+                    Description = "غیرفعال سازی تله متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز",
                     Path = "Tweaks",
                     TargetPaths = new List<string>(),
                     Bytes = 0,

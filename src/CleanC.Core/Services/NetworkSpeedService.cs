@@ -5,19 +5,19 @@ using System.Net.NetworkInformation;
 namespace CleanC.Core.Services
 {
     /// <summary>
-    /// نمونه‌گیری سرعت شبکه با کش‌زنی.
+    /// نمونه گیری سرعت شبکه با کش زنی.
     ///
-    /// چرا لازم است: لیست interfaceها هر بار گرفتنش هزینه‌بر است (چند ده میلی‌ثانیه)
-    /// و چند timer همزمان (تایمر آمار ۲٫۵ ثانیه‌ای + تایمر اسپارک‌لاین ۱٫۵ ثانیه‌ای)
-    /// باعث می‌شدند چندین بار در همان لحظه نمونه‌گیری شود و مقدار نادرست تولید شود.
+    /// چرا لازم است: لیست interfaceها هر بار گرفتنش هزینه بر است (چند ده میلی ثانیه)
+    /// و چند timer همزمان (تایمر آمار ۲٫۵ ثانیه ای + تایمر اسپارک لاین ۱٫۵ ثانیه ای)
+    /// باعث می شدند چندین بار در همان لحظه نمونه گیری شود و مقدار نادرست تولید شود.
     /// </summary>
     public static class NetworkSpeedService
     {
-        // کش لیست interfaceها — مگر اینکه کارت شبکه اضافه/حذف شود تغییر نمی‌کند
+        // کش لیست interfaceها — مگر اینکه کارت شبکه اضافه/حذف شود تغییر نمی کند
         private static NetworkInterface[]? _interfaces;
         private static DateTime _interfacesRefreshedUtc = DateTime.MinValue;
 
-        // کش نتیجه — جلوگیری از نمونه‌گیری‌های پشت‌سرهم در همان تیک تایمر
+        // کش نتیجه — جلوگیری از نمونه گیری های پشت سرهم در همان تیک تایمر
         private static (double Mbps, string TypeName) _cached = (0.0, "پایدار");
         private static DateTime _cachedAtUtc = DateTime.MinValue;
 
@@ -75,7 +75,7 @@ namespace CleanC.Core.Services
                     }
                     catch
                     {
-                        // interface مسدود/غیرفعال → از همین نمونه رد می‌شویم
+                        // interface مسدود/غیرفعال → از همین نمونه رد می شویم
                     }
                 }
 

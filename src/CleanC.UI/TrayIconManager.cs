@@ -124,13 +124,13 @@ namespace CleanC.UI
 
         private IntPtr _hIcon = IntPtr.Zero;
 
-        // D13 — هِدِر منوی تری با کش ۱ ثانیه‌ای؛ GetCurrentStats نباید داخل
-        // window-proc هر بار اجرا شود چون پیام‌های پنجره را معطل می‌کند.
+        // D13 — هِدِر منوی تری با کش ۱ ثانیه ای؛ GetCurrentStats نباید داخل
+        // window-proc هر بار اجرا شود چون پیام های پنجره را معطل می کند.
         private string _statusHeader = "CleanC";
         private DateTime _statusHeaderAtUtc = DateTime.MinValue;
 
         // onExit: خروج باید از مسیر MainWindow بگذرد تا تنظیمات ذخیره شود و
-        // جلوی بستنِ لغو‌شده‌ی Close-to-Tray گرفته شود؛ Application.Current.Exit این مسیر را دور می‌زند.
+        // جلوی بستنِ لغو شده ی Close-to-Tray گرفته شود؛ Application.Current.Exit این مسیر را دور می زند.
         public TrayIconManager(Window window, Action onRestore, Action onQuickBoost, Action onNavigateDns, Action onExit)
         {
             _window = window;
@@ -167,7 +167,7 @@ namespace CleanC.UI
                     uFlags = NIF_MESSAGE | NIF_TIP | (_hIcon != IntPtr.Zero ? NIF_ICON : 0),
                     uCallbackMessage = WM_TRAYICON,
                     hIcon = _hIcon,
-                    szTip = "CleanC - بهینه‌ساز هوشمند ویندوز"
+                    szTip = "CleanC - بهینه ساز هوشمند ویندوز"
                 };
 
                 Shell_NotifyIcon(NIM_ADD, ref nid);
@@ -195,8 +195,8 @@ namespace CleanC.UI
                         ShowTrayMenu();
                         return IntPtr.Zero;
 
-                    // D13 — دسترسی با کیبورد: وقتی آیکون تری با Enter/Space انتخاب می‌شود،
-                    // باید مثل کلیکِ ماوس پنجره فعال شود وگرنه تری با کیبورد غیرقابل‌دسترس است.
+                    // D13 — دسترسی با کیبورد: وقتی آیکون تری با Enter/Space انتخاب می شود،
+                    // باید مثل کلیکِ ماوس پنجره فعال شود وگرنه تری با کیبورد غیرقابل دسترس است.
                     case NIN_SELECT:
                     case NIN_KEYSELECT:
                         RestoreWindow();
@@ -221,7 +221,7 @@ namespace CleanC.UI
 
             try
             {
-                // D13 — آمار سیستم از کش ۱ ثانیه‌ای می‌آید (کلیکِ پشت‌سرهم روی تری
+                // D13 — آمار سیستم از کش ۱ ثانیه ای می آید (کلیکِ پشت سرهم روی تری
                 // نباید چند بار سیستم را اسکن کند)
                 DateTime nowUtc = DateTime.UtcNow;
                 if ((nowUtc - _statusHeaderAtUtc).TotalSeconds >= 1.0)
@@ -242,8 +242,8 @@ namespace CleanC.UI
                 AppendMenu(hMenu, MF_SEPARATOR, 0, "");
                 AppendMenu(hMenu, MF_STRING, IDM_RESTORE, "🪟 نمایش پنجره اصلی CleanC");
                 AppendMenu(hMenu, MF_STRING, IDM_BOOST_RAM, "🚀 آزادسازی آنی حافظه رم (RAM Boost)");
-                AppendMenu(hMenu, MF_STRING, IDM_QUICK_BOOST, "🧹 بهینه‌سازی کامل سیستم (Quick Boost)");
-                AppendMenu(hMenu, MF_STRING, IDM_DNS, "🌐 تغییر سریع DNS و تحریم‌شکن");
+                AppendMenu(hMenu, MF_STRING, IDM_QUICK_BOOST, "🧹 بهینه سازی کامل سیستم (Quick Boost)");
+                AppendMenu(hMenu, MF_STRING, IDM_DNS, "🌐 تغییر سریع DNS و تحریم شکن");
                 AppendMenu(hMenu, MF_SEPARATOR, 0, "");
                 AppendMenu(hMenu, MF_STRING, IDM_EXIT, "❌ خروج از CleanC");
 
@@ -339,7 +339,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F5 — به‌روزرسانی tooltip تری‌آیکون؛ جایگزین badge ویندوز وقتی
+        /// F5 — به روزرسانی tooltip تری آیکون؛ جایگزین badge ویندوز وقتی
         /// API آن برای اپ unpackaged در دسترس نباشد.
         /// </summary>
         public void UpdateTooltip(string text)
@@ -381,8 +381,8 @@ namespace CleanC.UI
 
                 RemoveWindowSubclass(_hwnd, _subclassProc, new IntPtr(1001));
 
-                // D13 — آیکونِ بارگذاری‌شده با LR_LOADFROMFILE یک handle دستی دارد
-                // و بدون DestroyIcon در GDI نشت می‌کند (حتی بعد از NIM_DELETE).
+                // D13 — آیکونِ بارگذاری شده با LR_LOADFROMFILE یک handle دستی دارد
+                // و بدون DestroyIcon در GDI نشت می کند (حتی بعد از NIM_DELETE).
                 if (_hIcon != IntPtr.Zero)
                 {
                     DestroyIcon(_hIcon);

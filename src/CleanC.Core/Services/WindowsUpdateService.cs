@@ -53,7 +53,7 @@ namespace CleanC.Core.Services
                         if (expiryDate > DateTime.UtcNow)
                         {
                             info.IsPaused = true;
-                            info.PauseExpiryDate = expiryDate.ToLocalTime().ToString("yyyy/MM/dd");
+                            info.PauseExpiryDate = expiryDate.ToLocalTime().ToString("yyyy.MM.dd");
                         }
                     }
                 }
@@ -157,7 +157,7 @@ namespace CleanC.Core.Services
                                                 Description = desc,
                                                 IsOptional = false,
                                                 IsNextGenFeatureUpdate = isNextGen,
-                                                CategoryName = isNextGen ? "ارتقای نسل سیستم‌عامل" : "آپدیت کیفی و امنیتی"
+                                                CategoryName = isNextGen ? "ارتقای نسل سیستم عامل" : "آپدیت کیفی و امنیتی"
                                             });
                                         }
                                     }
@@ -195,7 +195,7 @@ namespace CleanC.Core.Services
                                                 Description = desc,
                                                 IsOptional = true,
                                                 IsNextGenFeatureUpdate = isNextGen,
-                                                CategoryName = isNextGen ? "ارتقای نسل جدید (اختیاری)" : (isDriver ? "درایور سخت‌افزار (اختیاری)" : "آپدیت اختیاری ویندوز")
+                                                CategoryName = isNextGen ? "ارتقای نسل جدید (اختیاری)" : (isDriver ? "درایور سخت افزار (اختیاری)" : "آپدیت اختیاری ویندوز")
                                             });
                                         }
                                     }
@@ -349,7 +349,7 @@ namespace CleanC.Core.Services
                 if (string.IsNullOrEmpty(desc))
                 {
                     desc = !string.IsNullOrEmpty(buildFlightVer)
-                        ? $"ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {title} - بیلد {buildFlightVer}) شامل قابلیت‌های هوش مصنوعی و بهینه‌سازی‌های عمیق هسته سیستم‌عامل"
+                        ? $"ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {title} - بیلد {buildFlightVer}) شامل قابلیت های هوش مصنوعی و بهینه سازی های عمیق هسته سیستم عامل"
                         : $"ارتقای رسمی به نسخه جدید ویندوز ۱۱ ({title})";
                 }
 
@@ -362,7 +362,7 @@ namespace CleanC.Core.Services
                     Description = desc,
                     IsOptional = true,
                     IsNextGenFeatureUpdate = true,
-                    CategoryName = "ارتقای نسل سیستم‌عامل (Next-Gen OS Upgrade)",
+                    CategoryName = "ارتقای نسل سیستم عامل (Next-Gen OS Upgrade)",
                     BuildFlightVersion = buildFlightVer,
                     SupportUrl = "https://go.microsoft.com/fwlink/?linkid=2132062#windowsupdate=26100"
                 };
@@ -497,7 +497,7 @@ namespace CleanC.Core.Services
                     RunCommandSilent("net.exe", "start bits");
                     RunCommandSilent("net.exe", "start wuauserv");
 
-                    return (true, freed, $"کش آپدیت با موفقیت تخلیه گردید و سرویس‌ها نوسازی شدند. ({Models.SystemStats.FormatBytes(freed)} آزاد شد)");
+                    return (true, freed, $"کش آپدیت با موفقیت تخلیه گردید و سرویس ها نوسازی شدند. ({Models.SystemStats.FormatBytes(freed)} آزاد شد)");
                 }
                 catch (Exception ex)
                 {

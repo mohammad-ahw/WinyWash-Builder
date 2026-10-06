@@ -9,8 +9,8 @@ namespace CleanC.Core.Services
 {
     public class RegistryCleanerService
     {
-        // هم اسکن و هم پاکسازی از همین لیست استفاده می‌کنند تا عدد گزارش‌شده با عدد واقعی یکی باشد.
-        // به‌صورت method ساخته می‌شود تا handleهای ریشه در زمان بارگذاری نوع باز نمانند.
+        // هم اسکن و هم پاکسازی از همین لیست استفاده می کنند تا عدد گزارش شده با عدد واقعی یکی باشد.
+        // به صورت method ساخته می شود تا handleهای ریشه در زمان بارگذاری نوع باز نمانند.
         private static (RegistryKey Root, string Path)[] GetUninstallRoots() => new (RegistryKey, string)[]
         {
             (Registry.CurrentUser, @"Software\Microsoft\Windows\CurrentVersion\Uninstall"),
@@ -35,7 +35,7 @@ namespace CleanC.Core.Services
 
             cleaned += CleanDeadMuiEntries();
 
-            // هم HKCU و هم HKLM — بدون دسترسی Administrator پاکسازی HKLM سکوت می‌کند و چیزی شمرده نمی‌شود
+            // هم HKCU و هم HKLM — بدون دسترسی Administrator پاکسازی HKLM سکوت می کند و چیزی شمرده نمی شود
             foreach (var (root, path) in GetUninstallRoots())
             {
                 cleaned += CleanDeadUninstallKeys(root, path);
@@ -132,7 +132,7 @@ namespace CleanC.Core.Services
         // --------------------------------------------------------------------
 
         /// <summary>
-        /// کلیدهای Uninstall را جمع می‌کند که هم UninstallString دارند، هم مسیرشان
+        /// کلیدهای Uninstall را جمع می کند که هم UninstallString دارند، هم مسیرشان
         /// روی درایوی موجود است و هم فایل واقعاً وجود ندارد.
         /// </summary>
         private static List<string> CollectDeadUninstallKeys(RegistryKey root, string path)
@@ -212,18 +212,18 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// مسیر فایل آن‌اینستالر را از داخل UninstallString بیرون می‌کشد.
+        /// مسیر فایل آن اینستالر را از داخل UninstallString بیرون می کشد.
         ///
-        /// نکته‌ی امنیتی: خروجی فقط باید «مسیر مطلق» باشد. اگر چیزی مثل
+        /// نکته ی امنیتی: خروجی فقط باید «مسیر مطلق» باشد. اگر چیزی مثل
         /// `MsiExec.exe /X{GUID}` یا `cmd /c MsiExec.exe ...` استخراج شود،
-        /// رشته خالی برمی‌گردد تا کلید رجیستری «موجود» تلقی شود و حذف نگردد.
-        /// (حذف کلید معتبر بدتر از نگه‌داشتن کلید مرده است.)
+        /// رشته خالی برمی گردد تا کلید رجیستری «موجود» تلقی شود و حذف نگردد.
+        /// (حذف کلید معتبر بدتر از نگه داشتن کلید مرده است.)
         ///
-        /// فرمت‌های پوشش‌داده‌شده:
+        /// فرمت های پوشش داده شده:
         ///   "C:\Program Files\App\unins.exe" /S
-        ///   cmd /c "C:\Program Files\App\unins.exe"        ← نقل‌قول در وسط
+        ///   cmd /c "C:\Program Files\App\unins.exe"        ← نقل قول در وسط
         ///   C:\Program Files\App\unins.exe --silent
-        ///   MsiExec.exe /X{GUID}                            ← نام نسبی → رد می‌شود
+        ///   MsiExec.exe /X{GUID}                            ← نام نسبی → رد می شود
         /// </summary>
         private static string ExtractExePath(string raw)
         {
@@ -233,7 +233,7 @@ namespace CleanC.Core.Services
             {
                 raw = raw.Trim().Trim('"');
 
-                // ۱) اولین بازه‌ی نقل‌قولیِ موجود در رشته (پوشش پیشوندهای cmd/powershell)
+                // ۱) اولین بازه ی نقل قولیِ موجود در رشته (پوشش پیشوندهای cmd/powershell)
                 int firstQuote = raw.IndexOf('"');
                 if (firstQuote >= 0)
                 {
@@ -245,7 +245,7 @@ namespace CleanC.Core.Services
                     }
                 }
 
-                // ۲) بدون نقل‌قول: همه‌چیز تا انتهای `.exe`
+                // ۲) بدون نقل قول: همه چیز تا انتهای `.exe`
                 int exeIdx = raw.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
                 if (exeIdx > 0)
                 {
@@ -263,7 +263,7 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// فقط مسیرهای مطلق با درایوِ حاضر قابل قضاوت هستند.
-        /// نام نسبی (`MsiExec.exe`) یا پیشوند shell (`cmd /c ...`) این شرط را رد نمی‌کنند.
+        /// نام نسبی (`MsiExec.exe`) یا پیشوند shell (`cmd /c ...`) این شرط را رد نمی کنند.
         /// </summary>
         private static bool IsRootedExecutable(string path)
         {
@@ -271,7 +271,7 @@ namespace CleanC.Core.Services
             try
             {
                 if (!Path.IsPathRooted(path)) return false;
-                if (!path.Contains(':')) return false;          // UNC و مسیر نسبی رد می‌شود
+                if (!path.Contains(':')) return false;          // UNC و مسیر نسبی رد می شود
                 return true;
             }
             catch

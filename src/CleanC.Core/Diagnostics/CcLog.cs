@@ -8,15 +8,15 @@ using System.Threading;
 namespace CleanC.Core.Diagnostics
 {
     /// <summary>
-    /// لاگ مرکزی برای خطاهایی که عمداً نادیده گرفته می‌شوند (best-effort).
+    /// لاگ مرکزی برای خطاهایی که عمداً نادیده گرفته می شوند (best-effort).
     ///
-    /// چرا لازم است: تا پیش از این ۲۱۶ تا <c>catch { }</c> خالی در پروژه بود و هیچ‌کس
-    /// نمی‌فهمید عملیاتِ شکست‌خورده کدام بود. حالا هر خطای نادیده‌گرفته‌شده:
-    ///   ۱) در یک حلقه‌ی حافظه (۲۵۶ ردیف آخر) نگه داشته می‌شود،
-    ///   ۲) با حداکثر ۲ خط در ثانیه در %LOCALAPPDATA%\CleanC\logs\ignored.log می‌نویسد.
+    /// چرا لازم است: تا پیش از این ۲۱۶ تا <c>catch { }</c> خالی در پروژه بود و هیچ کس
+    /// نمی فهمید عملیاتِ شکست خورده کدام بود. حالا هر خطای نادیده گرفته شده:
+    ///   ۱) در یک حلقه ی حافظه (۲۵۶ ردیف آخر) نگه داشته می شود،
+    ///   ۲) با حداکثر ۲ خط در ثانیه در %LOCALAPPDATA%\CleanC\logs\ignored.log می نویسد.
     ///
-    /// سقفِ نرخ عمداً پایین است: بعضی از این catchها داخل حلقه‌های اسکن فایل اجرا
-    /// می‌شوند و نباید به خاطر لاگ، روی سرعت پاکسازی اثر بگذارند.
+    /// سقفِ نرخ عمداً پایین است: بعضی از این catchها داخل حلقه های اسکن فایل اجرا
+    /// می شوند و نباید به خاطر لاگ، روی سرعت پاکسازی اثر بگذارند.
     /// </summary>
     public static class CcLog
     {
@@ -31,18 +31,18 @@ namespace CleanC.Core.Diagnostics
         private static long _lastFlushTick;
 
         /// <summary>
-        /// پوشه‌ی خروجی. پیش‌فرض %LOCALAPPDATA%\CleanC\logs است و فقط برای تست‌ها
-        /// قابل تغییر است تا اجرای تست‌ها روی داده‌ی واقعی کاربر اثر نگذارد.
+        /// پوشه ی خروجی. پیش فرض %LOCALAPPDATA%\CleanC\logs است و فقط برای تست ها
+        /// قابل تغییر است تا اجرای تست ها روی داده ی واقعی کاربر اثر نگذارد.
         /// </summary>
         public static string LogDirectory { get; set; } = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "CleanC", "logs");
 
-        /// <summary>تعداد کل خطاهای نادیده‌گرفته‌شده در این اجرا.</summary>
+        /// <summary>تعداد کل خطاهای نادیده گرفته شده در این اجرا.</summary>
         public static long TotalIgnored => Interlocked.Read(ref _total);
 
         /// <summary>
-        /// ورودی استانداردِ داخل <c>catch</c>. هرگز استثنا پرتاب نمی‌کند.
+        /// ورودی استانداردِ داخل <c>catch</c>. هرگز استثنا پرتاب نمی کند.
         /// </summary>
         public static void Ignore(Exception? ex, string? context = null)
         {
@@ -51,7 +51,7 @@ namespace CleanC.Core.Diagnostics
         }
 
         /// <summary>
-        /// ثبت یک خطا. هرگز استثنا پرتاب نمی‌کند تا لاگ‌کردن خودش باعث crash نشود.
+        /// ثبت یک خطا. هرگز استثنا پرتاب نمی کند تا لاگ کردن خودش باعث crash نشود.
         /// </summary>
         public static void Report(string context, Exception ex)
         {
@@ -70,9 +70,9 @@ namespace CleanC.Core.Diagnostics
 
                 if (!capture) return;
 
-                // تاریخ باید میلادی/غیرفرهنگی باشد؛ روی سیستم‌های fa-IR قالب پیش‌فرض
-                // از تقویم جلالی استفاده می‌کند و لاگ را به «۱۴۰۵-۰۷-۱۳» تبدیل می‌کند
-                // که خواندنش در یک فایل عیب‌یابی گیج‌کننده است.
+                // تاریخ باید میلادی/غیرفرهنگی باشد؛ روی سیستم های fa-IR قالب پیش فرض
+                // از تقویم جلالی استفاده می کند و لاگ را به «۱۴۰۵-۰۷-۱۳» تبدیل می کند
+                // که خواندنش در یک فایل عیب یابی گیج کننده است.
                 string stamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff", CultureInfo.InvariantCulture);
                 string line = $"[{stamp}] #{total} {context}: " +
                               $"{ex.GetType().Name}: {ex.Message}";
@@ -92,21 +92,21 @@ namespace CleanC.Core.Diagnostics
             }
             catch
             {
-                // لاگ‌کردن هرگز نباید خودش باعث crash شود
+                // لاگ کردن هرگز نباید خودش باعث crash شود
             }
         }
 
-        /// <summary>نوشتن هر چیزِ مانده روی دیکس. بی‌خطر و بدون پرتاب استثنا.</summary>
+        /// <summary>نوشتن هر چیزِ مانده روی دیکس. بی خطر و بدون پرتاب استثنا.</summary>
         public static void Flush()
         {
             try { FlushCore(); }
             catch
             {
-                // لاگ‌کردن هرگز نباید خودش باعث crash شود
+                // لاگ کردن هرگز نباید خودش باعث crash شود
             }
         }
 
-        /// <summary>۲۵۶ خط آخرِ ثبت‌شده در این اجرا (برای دیباگ و صفحه‌ی عیب‌یابی).</summary>
+        /// <summary>۲۵۶ خط آخرِ ثبت شده در این اجرا (برای دیباگ و صفحه ی عیب یابی).</summary>
         public static IReadOnlyList<string> Recent()
         {
             lock (_gate) return _recent.ToArray();
@@ -126,7 +126,7 @@ namespace CleanC.Core.Diagnostics
             Directory.CreateDirectory(dir);
             string logPath = Path.Combine(dir, "ignored.log");
 
-            // حجم لاگ کنترل می‌شود تا پوشه CleanC به مرور زمان سنگین نشود (حداکثر ۱.۵ مگابایت)
+            // حجم لاگ کنترل می شود تا پوشه CleanC به مرور زمان سنگین نشود (حداکثر ۱.۵ مگابایت)
             try
             {
                 var fi = new FileInfo(logPath);

@@ -8,9 +8,9 @@ using CleanC.Core.Diagnostics;
 namespace CleanC.Core.Services
 {
     /// <summary>
-    /// اثر اندازه‌گیری‌شده‌ی یک برنامه روی بالا آمدن ویندوز.
+    /// اثر اندازه گیری شده ی یک برنامه روی بالا آمدن ویندوز.
     /// از رویداد <c>EventID=101</c> کانال <c>Microsoft-Windows-Diagnostics-Performance/Operational</c>
-    /// استخراج می‌شود؛ ویندوز برای هر برنامه‌ای که بوت را کند کرده باشد این رویداد را ثبت می‌کند.
+    /// استخراج می شود؛ ویندوز برای هر برنامه ای که بوت را کند کرده باشد این رویداد را ثبت می کند.
     /// </summary>
     public sealed class BootImpact
     {
@@ -21,18 +21,18 @@ namespace CleanC.Core.Services
     }
 
     /// <summary>
-    /// F6 — «امتیاز تأثیر» هر آیتم استارت‌آپ را می‌سازد.
+    /// F6 — «امتیاز تأثیر» هر آیتم استارت آپ را می سازد.
     ///
     /// دو منبع دارد:
-    ///  1. <b>اندازه‌گیری‌شده</b> — رویداد ۱۰۱ِ Diagnostics-Performance؛ اگر موجود باشد
-    ///     <see cref="StartupItem.ImpactMeasured"/> می‌شود و <see cref="StartupItem.ImpactMs"/>
+    ///  1. <b>اندازه گیری شده</b> — رویداد ۱۰۱ِ Diagnostics-Performance؛ اگر موجود باشد
+    ///     <see cref="StartupItem.ImpactMeasured"/> می شود و <see cref="StartupItem.ImpactMs"/>
     ///     برابرِ تأخیر واقعی بوت آن برنامه است.
-    ///  2. <b>تخمین</b> — اگر رویدادی برای آن فایل نباشد، از دسته‌بندی (Category) تخمین زده می‌شود.
+    ///  2. <b>تخمین</b> — اگر رویدادی برای آن فایل نباشد، از دسته بندی (Category) تخمین زده می شود.
     ///
     /// معنای امتیاز: «این آیتم چقدر روی بالا آمدن ویندوز اثر دارد؟»
     /// مقیاسِ مشترکِ هر دو منبع «تأخیر/۱۰۰» است:
     ///   ۱–۳۴ کم  •  ۳۵–۶۴ متوسط  •  ۶۵–۱۰۰ زیاد
-    /// پس مثلاً امتیاز ۷۵ یا از تأخیرِ ۷٫۵ ثانیه‌ای می‌آید یا از دسته‌بندیِ پرمصرف.
+    /// پس مثلاً امتیاز ۷۵ یا از تأخیرِ ۷٫۵ ثانیه ای می آید یا از دسته بندیِ پرمصرف.
     /// </summary>
     public static class BootImpactService
     {
@@ -54,8 +54,8 @@ namespace CleanC.Core.Services
         private static readonly Regex DegradationLine = new(@"Degradation Time\s*:\s*(\d+)\s*(?:msec|ms)?", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
-        /// همه‌ی رویدادهای اخیر را می‌خواند (کش‌شده برای ۱۵ دقیقه).
-        /// اگر دسترسی به کانال نبود یا خطا داد، دیکشنری خالی برمی‌گرداند
+        /// همه ی رویدادهای اخیر را می خواند (کش شده برای ۱۵ دقیقه).
+        /// اگر دسترسی به کانال نبود یا خطا داد، دیکشنری خالی برمی گرداند
         /// تا فراخواننده به حالت «تخمین» برگردد.
         /// </summary>
         public static IReadOnlyDictionary<string, BootImpact> GetBootImpacts()
@@ -109,7 +109,7 @@ namespace CleanC.Core.Services
 
                     if (sink.TryGetValue(key, out var existing))
                     {
-                        // چندین بوت = همان برنامه؛ بیشترین تأخیر را نگه می‌داریم
+                        // چندین بوت = همان برنامه؛ بیشترین تأخیر را نگه می داریم
                         existing.Samples++;
                         if (total > existing.TotalMs) existing.TotalMs = total;
                         if (degradation > existing.DegradationMs) existing.DegradationMs = degradation;
@@ -135,7 +135,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// از مسیرِ رویداد فقط نامِ فایل را نگه می‌داریم تا با هر شکلِ مسیرِ آیتمِ استارت‌آپ بخواند.
+        /// از مسیرِ رویداد فقط نامِ فایل را نگه می داریم تا با هر شکلِ مسیرِ آیتمِ استارت آپ بخواند.
         /// </summary>
         public static string NormalizeFileName(string pathOrName)
         {
@@ -144,7 +144,7 @@ namespace CleanC.Core.Services
 
             // ممکن است فرمان شامل آرگومان باشد:
             //   "C:\Program Files\Foo\bar.exe" --silent
-            // در آن صورت فقط خودِ فایلِ اجراپذیر را نگه می‌داریم.
+            // در آن صورت فقط خودِ فایلِ اجراپذیر را نگه می داریم.
             int exe = s.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
             if (exe < 0) exe = s.IndexOf(".com", StringComparison.OrdinalIgnoreCase);
             if (exe >= 0) s = s.Substring(0, exe + 4);
@@ -157,7 +157,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// امتیاز و برچسب تأثیر را روی آیتم می‌گذارد. هیچ‌وقت استثنا پرتاب نمی‌کند.
+        /// امتیاز و برچسب تأثیر را روی آیتم می گذارد. هیچ وقت استثنا پرتاب نمی کند.
         /// </summary>
         public static void AssignImpact(StartupItem item, IReadOnlyDictionary<string, BootImpact> impacts)
         {
@@ -170,7 +170,7 @@ namespace CleanC.Core.Services
                 if (key.Length != 0 && impacts.TryGetValue(key, out var hit))
                 {
                     item.ImpactMeasured = true;
-                    // Degradation Time = تأخیرِ اضافه‌شده (دقیقاً همان چیزی که غیرفعال‌کردن حذفش می‌کند)
+                    // Degradation Time = تأخیرِ اضافه شده (دقیقاً همان چیزی که غیرفعال کردن حذفش می کند)
                     measuredMs = hit.DegradationMs > 0 ? hit.DegradationMs : hit.TotalMs;
                     item.ImpactMs = measuredMs;
                 }
@@ -180,7 +180,7 @@ namespace CleanC.Core.Services
             if (item.ImpactMeasured)
             {
                 // هر ۱۰۰ms تأخیر ≈ ۱ واحد امتیاز. این بازه طوری انتخاب شده که
-                // با آستانه‌های برچسب هم‌خوان باشد:
+                // با آستانه های برچسب هم خوان باشد:
                 //   < 3500ms  → کم
                 //   3500–6500ms → متوسط
                 //   > 6500ms  → زیاد
@@ -201,8 +201,8 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// تخمین امتیاز بر اساس دسته‌بندی، وقتی رویدادی برای این فایل ثبت نشده است.
-        /// مقادیر عمداً روی همان مقیاسِ «تأخیر/۱۰۰» تنظیم شده‌اند
+        /// تخمین امتیاز بر اساس دسته بندی، وقتی رویدادی برای این فایل ثبت نشده است.
+        /// مقادیر عمداً روی همان مقیاسِ «تأخیر/۱۰۰» تنظیم شده اند
         /// (مثلاً ۷۵ یعنی «معادل ۷٫۵ ثانیه تأخیر بوت»).
         /// </summary>
         private static int EstimateFromCategory(string category)
@@ -210,9 +210,9 @@ namespace CleanC.Core.Services
             if (string.IsNullOrWhiteSpace(category)) return 40;
 
             string c = category;
-            if (c.Contains("ضروری", StringComparison.Ordinal)) return 85;           // سخت‌افزار و سیستم
+            if (c.Contains("ضروری", StringComparison.Ordinal)) return 85;           // سخت افزار و سیستم
             if (c.Contains("گیمینگ", StringComparison.Ordinal)) return 75;          // لانچر بازی
-            if (c.Contains("پیام‌رسان", StringComparison.Ordinal)) return 60;
+            if (c.Contains("پیام رسان", StringComparison.Ordinal)) return 60;
             if (c.Contains("دانلود", StringComparison.Ordinal) || c.Contains("ابری", StringComparison.Ordinal)) return 50;
             if (c.Contains("VPN", StringComparison.OrdinalIgnoreCase)) return 15;
             if (c.Contains("آپدیتر", StringComparison.Ordinal)) return 25;

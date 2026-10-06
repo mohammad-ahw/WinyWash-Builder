@@ -13,10 +13,10 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// مسیر اصلی (جدید): %ProgramData%\CleanC\Backups
-        /// دلیل جابجایی: %LOCALAPPDATA% داخل مسیر اسکن پاک‌سازهاست؛
-        /// نگه‌داشتن پرچم و بکاپ‌ها آنجا یعنی ممکن است توسط خود CleanC پاک شوند
+        /// دلیل جابجایی: %LOCALAPPDATA% داخل مسیر اسکن پاک سازهاست؛
+        /// نگه داشتن پرچم و بکاپ ها آنجا یعنی ممکن است توسط خود CleanC پاک شوند
         /// و «بازگردانی تغییرات» از کار بیفتد. ProgramData سراسری است و
-        /// عمری برابر با نصب نرم‌افزار دارد.
+        /// عمری برابر با نصب نرم افزار دارد.
         /// </summary>
         private static readonly string PreferredBackupDir = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "CleanC", "Backups");
@@ -47,7 +47,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// انتقال یک‌باره‌ی فایل‌های مسیر قدیمی به مسیر جدید (بدون حذف منبع).
+        /// انتقال یک باره ی فایل های مسیر قدیمی به مسیر جدید (بدون حذف منبع).
         /// </summary>
         private static void MigrateLegacyFiles(string from, string to)
         {
@@ -169,7 +169,7 @@ namespace CleanC.Core.Services
                         chromePolicy?.DeleteValue("BackgroundModeEnabled", false);
                     }
 
-                    // Remove flag file (هر دو مسیر — مهاجرتِ ناقص را هم جبران می‌کند)
+                    // Remove flag file (هر دو مسیر — مهاجرتِ ناقص را هم جبران می کند)
                     TryDeleteFlag(Path.Combine(ResolveBackupDir(), FlagFileName));
                     TryDeleteFlag(Path.Combine(LegacyBackupDir, FlagFileName));
                 }

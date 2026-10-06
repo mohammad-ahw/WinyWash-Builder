@@ -102,7 +102,7 @@ namespace CleanC.Core.Models
         public long FreedBytes { get; set; }
         public bool WasEmpty { get; set; }
 
-        // گامی که در میانه بهینه‌سازی شکست خورده و باید در گزارش با رنگ هشدار دیده شود
+        // گامی که در میانه بهینه سازی شکست خورده و باید در گزارش با رنگ هشدار دیده شود
         public bool IsFailed { get; set; }
         public string StatusSummary { get; set; } = string.Empty;
         public string FormattedFreed => SystemStats.FormatBytes(FreedBytes);

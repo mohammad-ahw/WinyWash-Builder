@@ -68,30 +68,30 @@ namespace CleanC.Core.Services
         // Borderline apps that should NEVER be deleted automatically without user prompt
         private static readonly Dictionary<string, (string Name, string Desc)> BorderlineSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "Microsoft.Paint", ("Microsoft Paint", "نرم‌افزار نقاشی پیش‌فرض ویندوز") },
-            { "Microsoft.XboxApp", ("Xbox App", "برنامه اصلی ایکس‌باکس و بازی‌های ویندوز") },
+            { "Microsoft.Paint", ("Microsoft Paint", "نرم افزار نقاشی پیش فرض ویندوز") },
+            { "Microsoft.XboxApp", ("Xbox App", "برنامه اصلی ایکس باکس و بازی های ویندوز") },
             { "Microsoft.XboxGamingOverlay", ("Xbox Game Bar", "نوار ابزار و ضبط ویدیوی بازی") },
-            { "Microsoft.XboxGameOverlay", ("Xbox Game Overlay", "پوشش درون‌بازی ایکس‌باکس") },
-            { "Microsoft.XboxIdentityProvider", ("Xbox Identity Provider", "سرویس ورود به اکانت مایکروسافت در بازی‌ها") },
-            { "Microsoft.XboxSpeechToTextOverlay", ("Xbox Speech To Text", "ابزار تبدیل گفتار به نوشتار ایکس‌باکس") },
-            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام‌سازی گوشی با ویندوز") }
+            { "Microsoft.XboxGameOverlay", ("Xbox Game Overlay", "پوشش درون بازی ایکس باکس") },
+            { "Microsoft.XboxIdentityProvider", ("Xbox Identity Provider", "سرویس ورود به اکانت مایکروسافت در بازی ها") },
+            { "Microsoft.XboxSpeechToTextOverlay", ("Xbox Speech To Text", "ابزار تبدیل گفتار به نوشتار ایکس باکس") },
+            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام سازی گوشی با ویندوز") }
         };
 
         // Known promotional pre-installed packages
         private static readonly Dictionary<string, (string Name, string Desc)> PromoBloatwareSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "king.com.CandyCrushSaga", ("Candy Crush Saga", "بازی تبلیغاتی پیش‌فرض ویندوز") },
-            { "king.com.CandyCrushSodaSaga", ("Candy Crush Soda", "بازی تبلیغاتی پیش‌فرض ویندوز") },
-            { "ByteDance.TikTok", ("TikTok", "برنامه تبلیغاتی تیک‌تاک") },
+            { "king.com.CandyCrushSaga", ("Candy Crush Saga", "بازی تبلیغاتی پیش فرض ویندوز") },
+            { "king.com.CandyCrushSodaSaga", ("Candy Crush Soda", "بازی تبلیغاتی پیش فرض ویندوز") },
+            { "ByteDance.TikTok", ("TikTok", "برنامه تبلیغاتی تیک تاک") },
             { "Disney", ("Disney+", "برنامه اشتراک دیزنی پلاس") },
-            { "Facebook", ("Facebook", "برنامه فیس‌بوک") },
+            { "Facebook", ("Facebook", "برنامه فیس بوک") },
             { "Instagram", ("Instagram", "برنامه اینستاگرام") },
             { "AmazonVideo.PrimeVideo", ("Amazon Prime Video", "برنامه تبلیغاتی آمازون پرایم") },
             { "Netflix", ("Netflix", "برنامه پخش فیلم نتفلیکس") },
-            { "SpotifyAB.SpotifyMusic", ("Spotify (پیش‌فرض)", "نسخه استور از پیش نصب‌شده اسپاتیفای") },
-            { "A949DE3C.MarchofEmpires", ("March of Empires", "بازی تبلیغاتی پیش‌فرض") },
-            { "A949DE3C.HiddenCityMysteryofShadows", ("Hidden City", "بازی تبلیغاتی پیش‌فرض") },
-            { "flaregamesGmbH.RoyalRevolt2", ("Royal Revolt 2", "بازی تبلیغاتی پیش‌فرض") }
+            { "SpotifyAB.SpotifyMusic", ("Spotify (پیش فرض)", "نسخه استور از پیش نصب شده اسپاتیفای") },
+            { "A949DE3C.MarchofEmpires", ("March of Empires", "بازی تبلیغاتی پیش فرض") },
+            { "A949DE3C.HiddenCityMysteryofShadows", ("Hidden City", "بازی تبلیغاتی پیش فرض") },
+            { "flaregamesGmbH.RoyalRevolt2", ("Royal Revolt 2", "بازی تبلیغاتی پیش فرض") }
         };
 
         // Non-essential Windows components that can be safely removed
@@ -99,14 +99,14 @@ namespace CleanC.Core.Services
         {
             { "Microsoft.549981C3F5F10", ("Cortana (کورتانا)", "دستیار صوتی قدیمی و غیرفعال مایکروسافت") },
             { "Microsoft.BingNews", ("Microsoft News (اخبار)", "فید اخبار و مقالات مایکروسافت") },
-            { "Microsoft.BingWeather", ("Weather (آب و هوا)", "برنامه هواشناسی پیش‌فرض ویندوز") },
+            { "Microsoft.BingWeather", ("Weather (آب و هوا)", "برنامه هواشناسی پیش فرض ویندوز") },
             { "Microsoft.Getstarted", ("Tips (نکات ویندوز)", "برنامه راهنما و پیشنهادات ویندوز") },
             { "Microsoft.GetHelp", ("Get Help (راهنمایی)", "ابزار پشتیبانی و راهنمایی مایکروسافت") },
-            { "Clipchamp.Clipchamp", ("Clipchamp (ویرایشگر ویدیو)", "ویرایشگر ویدیوی پیش‌فرض مایکروسافت") },
-            { "Microsoft.MicrosoftSolitaireCollection", ("Solitaire Collection", "بازی‌های ورق پیش‌فرض ویندوز") },
+            { "Clipchamp.Clipchamp", ("Clipchamp (ویرایشگر ویدیو)", "ویرایشگر ویدیوی پیش فرض مایکروسافت") },
+            { "Microsoft.MicrosoftSolitaireCollection", ("Solitaire Collection", "بازی های ورق پیش فرض ویندوز") },
             { "Microsoft.WindowsFeedbackHub", ("Feedback Hub", "مرکز ارسال بازخورد و باگ به مایکروسافت") },
             { "Microsoft.MixedReality.Portal", ("Mixed Reality Portal", "پورتال واقعیت ترکیبی ویندوز") },
-            { "Microsoft.Microsoft3DViewer", ("3D Viewer", "نمایشگر فایل‌های سه‌بعدی ویندوز") },
+            { "Microsoft.Microsoft3DViewer", ("3D Viewer", "نمایشگر فایل های سه بعدی ویندوز") },
             { "Microsoft.People", ("People (مخاطبین)", "برنامه مخاطبین قدیمی ویندوز") },
             { "Microsoft.BingSports", ("MSN Sports (ورزش)", "برنامه اخبار ورزشی مایکروسافت") },
             { "Microsoft.BingFinance", ("MSN Money (اقتصاد)", "برنامه اخبار مالی مایکروسافت") }
@@ -175,7 +175,7 @@ namespace CleanC.Core.Services
                             PackageFullName = packageFullName,
                             SizeBytes = size,
                             CategoryType = AppCategoryType.Bloatware,
-                            CategoryLabel = "تبلیغاتی / پیش‌فرض",
+                            CategoryLabel = "تبلیغاتی / پیش فرض",
                             Description = kvp.Value.Desc,
                             IsPackagedApp = true,
                             IsSelected = true
@@ -258,8 +258,8 @@ namespace CleanC.Core.Services
                                 UninstallString = uninstallString ?? string.Empty,
                                 SizeBytes = 250 * 1024 * 1024,
                                 CategoryType = AppCategoryType.OemTrial,
-                                CategoryLabel = "نرم‌افزار لپ‌تاپ / تریال",
-                                Description = "نرم‌افزار تبلیغاتی یا آزمایشی سازنده سیستم",
+                                CategoryLabel = "نرم افزار لپ تاپ / تریال",
+                                Description = "نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم",
                                 IsPackagedApp = false,
                                 IsSelected = true
                             });
@@ -306,7 +306,7 @@ namespace CleanC.Core.Services
                                         if (iDate < DateTime.Now.AddDays(-30))
                                         {
                                             isUnused = true;
-                                            desc = $"نصب شده در تاریخ {iDate:yyyy.MM.dd} ولی ثبت استفاده‌ای از آن نشده است";
+                                            desc = $"نصب شده در تاریخ {iDate:yyyy.MM.dd} ولی ثبت استفاده ای از آن نشده است";
                                         }
                                     }
                                 }
@@ -321,7 +321,7 @@ namespace CleanC.Core.Services
                                     UninstallString = uninstallString ?? string.Empty,
                                     SizeBytes = sizeBytes,
                                     CategoryType = AppCategoryType.LargeUnused,
-                                    CategoryLabel = "حجیم و کم‌استفاده",
+                                    CategoryLabel = "حجیم و کم استفاده",
                                     Description = desc,
                                     IsPackagedApp = false,
                                     IsSelected = false // Unused apps are unchecked by default for extra safety!

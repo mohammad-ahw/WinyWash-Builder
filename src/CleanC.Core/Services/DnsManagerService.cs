@@ -15,7 +15,7 @@ namespace CleanC.Core.Services
         public string PrimaryDns { get; set; } = string.Empty;
         public string SecondaryDns { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Category { get; set; } = "تحریم‌شکن"; // "تحریم‌شکن", "بین‌المللی", "امنیت"
+        public string Category { get; set; } = "تحریم شکن"; // "تحریم شکن", "بین المللی", "امنیت"
         public string IconGlyph { get; set; } = "\uE774";
         public bool IsDhcp { get; set; }
     }
@@ -27,31 +27,31 @@ namespace CleanC.Core.Services
             new DnsPreset
             {
                 Id = "shecan",
-                Name = "تحریم‌شکن شکن (Shecan)",
+                Name = "تحریم شکن شکن (Shecan)",
                 PrimaryDns = "178.22.122.100",
                 SecondaryDns = "185.51.200.2",
-                Description = "عبور مطمئن از تحریم‌های توسعه‌دهندگان، داکر، انویدیا، اوراکل و ادوبی",
-                Category = "تحریم‌شکن قانونی",
+                Description = "عبور مطمئن از تحریم های توسعه دهندگان، داکر، انویدیا، اوراکل و ادوبی",
+                Category = "تحریم شکن قانونی",
                 IconGlyph = "\uE774"
             },
             new DnsPreset
             {
                 Id = "electro",
-                Name = "تحریم‌شکن الکترو (Electro)",
+                Name = "تحریم شکن الکترو (Electro)",
                 PrimaryDns = "78.157.42.101",
                 SecondaryDns = "78.157.42.100",
-                Description = "مخصوص عبور از تحریم‌های گیمینگ، دیسکورد، اپیک‌گیمز و دانلود سریع",
-                Category = "تحریم‌شکن قانونی",
+                Description = "مخصوص عبور از تحریم های گیمینگ، دیسکورد، اپیک گیمز و دانلود سریع",
+                Category = "تحریم شکن قانونی",
                 IconGlyph = "\uE7FC"
             },
             new DnsPreset
             {
                 Id = "403online",
-                Name = "تحریم‌شکن ۴۰۳ آنلاین",
+                Name = "تحریم شکن ۴۰۳ آنلاین",
                 PrimaryDns = "10.202.10.202",
                 SecondaryDns = "10.202.10.102",
-                Description = "سرویس رفع تحریم سرویس‌های خارجی برای کاربران، استارتاپ‌ها و توسعه‌دهندگان",
-                Category = "تحریم‌شکن قانونی",
+                Description = "سرویس رفع تحریم سرویس های خارجی برای کاربران، استارتاپ ها و توسعه دهندگان",
+                Category = "تحریم شکن قانونی",
                 IconGlyph = "\uE895"
             },
             new DnsPreset
@@ -60,7 +60,7 @@ namespace CleanC.Core.Services
                 Name = "رادار بازی (Radar Game)",
                 PrimaryDns = "10.202.10.10",
                 SecondaryDns = "10.202.10.11",
-                Description = "کاهش پینگ و رفع اختلال اتصال به سرور بازی‌های آنلاین",
+                Description = "کاهش پینگ و رفع اختلال اتصال به سرور بازی های آنلاین",
                 Category = "گیمینگ و پینگ",
                 IconGlyph = "\uE7FC"
             },
@@ -70,8 +70,8 @@ namespace CleanC.Core.Services
                 Name = "کلودفلر (Cloudflare 1.1.1.1)",
                 PrimaryDns = "1.1.1.1",
                 SecondaryDns = "1.0.0.1",
-                Description = "سریع‌ترین و امن‌ترین دی‌ان‌اس عمومی جهان با حداقل تاخیر",
-                Category = "بین‌المللی",
+                Description = "سریع ترین و امن ترین دی ان اس عمومی جهان با حداقل تاخیر",
+                Category = "بین المللی",
                 IconGlyph = "\uEB55"
             },
             new DnsPreset
@@ -80,8 +80,8 @@ namespace CleanC.Core.Services
                 Name = "گوگل (Google Public DNS)",
                 PrimaryDns = "8.8.8.8",
                 SecondaryDns = "8.8.4.4",
-                Description = "پایدارترین دی‌ان‌اس جهانی با کش گسترده سرورها در سراسر دنیا",
-                Category = "بین‌المللی",
+                Description = "پایدارترین دی ان اس جهانی با کش گسترده سرورها در سراسر دنیا",
+                Category = "بین المللی",
                 IconGlyph = "\uE774"
             },
             new DnsPreset
@@ -90,18 +90,18 @@ namespace CleanC.Core.Services
                 Name = "ادگارد ضد تبلیغات (AdGuard DNS)",
                 PrimaryDns = "94.140.14.14",
                 SecondaryDns = "94.140.15.15",
-                Description = "مسدودسازی تبلیغات وب، ترکرها و پاپ‌آپ‌های مزاحم اینترنتی",
+                Description = "مسدودسازی تبلیغات وب، ترکرها و پاپ آپ های مزاحم اینترنتی",
                 Category = "امنیت و حریم خصوصی",
                 IconGlyph = "\uE8F8"
             },
             new DnsPreset
             {
                 Id = "dhcp",
-                Name = "خودکار شبکه (DHCP پیش‌فرض)",
+                Name = "خودکار شبکه (DHCP پیش فرض)",
                 PrimaryDns = "",
                 SecondaryDns = "",
-                Description = "تنظیم دریافت خودکار آدرس DNS از مودم یا ارائه‌دهنده اینترنت",
-                Category = "پیش‌فرض سیستم",
+                Description = "تنظیم دریافت خودکار آدرس DNS از مودم یا ارائه دهنده اینترنت",
+                Category = "پیش فرض سیستم",
                 IconGlyph = "\uE777",
                 IsDhcp = true
             }
@@ -229,7 +229,7 @@ namespace CleanC.Core.Services
 
                     FlushDns();
 
-                    return (true, "تنظیمات DNS تمامی کارت‌های شبکه به حالت خودکار (DHCP) بازگردانده شد.");
+                    return (true, "تنظیمات DNS تمامی کارت های شبکه به حالت خودکار (DHCP) بازگردانده شد.");
                 }
                 catch (Exception ex)
                 {

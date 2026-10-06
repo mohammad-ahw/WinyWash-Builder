@@ -20,8 +20,8 @@ namespace CleanC.Core.Services
         private static string _cachedGpuSummary = string.Empty;
         private static bool _hardwareInitialized = false;
 
-        // 3. Drive C: — TotalSize عملاً ثابت است و AvailableFreeSpace هر چند ثانیه یک‌بار کافی است.
-        //    قبلاً هر تیک تایمر (۲٫۵ ثانیه) مستقیم درایو را چک می‌کردیم.
+        // 3. Drive C: — TotalSize عملاً ثابت است و AvailableFreeSpace هر چند ثانیه یک بار کافی است.
+        //    قبلاً هر تیک تایمر (۲٫۵ ثانیه) مستقیم درایو را چک می کردیم.
         private static long _cachedDiskTotalBytes;
         private static long _cachedDiskFreeBytes;
         private static DateTime _diskFreeCachedAtUtc = DateTime.MinValue;
@@ -49,7 +49,7 @@ namespace CleanC.Core.Services
             // 2. CPU via GetSystemTimes
             stats.CpuPercent = GetCpuUsage();
 
-            // 3. Drive C: (با کش کوتاه‌مدت — جزئیات در فیلدهای بالا)
+            // 3. Drive C: (با کش کوتاه مدت — جزئیات در فیلدهای بالا)
             try
             {
                 var now = DateTime.UtcNow;
@@ -161,7 +161,7 @@ namespace CleanC.Core.Services
 
                 if (_firstCpuSample)
                 {
-                    // فقط baseline ذخیره می‌شود؛ عدد واقعی از نمونه دوم (تیک بعدی) به دست می‌آید
+                    // فقط baseline ذخیره می شود؛ عدد واقعی از نمونه دوم (تیک بعدی) به دست می آید
                     _prevIdleTime = idleTime;
                     _prevKernelTime = kernelTime;
                     _prevUserTime = userTime;

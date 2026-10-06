@@ -1,8 +1,8 @@
 // src/CleanC.UI/SettingsStore.cs
-// C6 — لایه‌ی instance برای تنظیمات: به‌جای فراخوانی مستقیم‌های استاتیکِ SettingsService،
-// یک سرویسِ قابلِ تزریق (ISettingsStore) داریم که debounce ذخیره را هم خودش مدیریت می‌کند.
-// برنامه‌ی میزبان (MainWindow) با OnSaveRequested می‌تواند قبل از نوشتن فایل،
-// داده‌ی زنده‌ی خودش (مثل موقعیت پنجره) را در AppSettings ثبت کند.
+// C6 — لایه ی instance برای تنظیمات: به جای فراخوانی مستقیم های استاتیکِ SettingsService،
+// یک سرویسِ قابلِ تزریق (ISettingsStore) داریم که debounce ذخیره را هم خودش مدیریت می کند.
+// برنامه ی میزبان (MainWindow) با OnSaveRequested می تواند قبل از نوشتن فایل،
+// داده ی زنده ی خودش (مثل موقعیت پنجره) را در AppSettings ثبت کند.
 
 using System;
 using CleanC.Core.Diagnostics;
@@ -13,22 +13,22 @@ namespace CleanC.UI
 {
     public interface ISettingsStore
     {
-        /// <summary>تنظیماتِ زنده‌ی برنامه؛ همان شیئی که همه‌ی صفحات می‌خوانند/می‌نویسند.</summary>
+        /// <summary>تنظیماتِ زنده ی برنامه؛ همان شیئی که همه ی صفحات می خوانند/می نویسند.</summary>
         AppSettings Current { get; }
 
         /// <summary>مسیر فایل settings.json در دیسک.</summary>
         string FilePath { get; }
 
-        /// <summary>قبل از نوشتن فایل اجرا می‌شود (ثبت موقعیت پنجره و …).</summary>
+        /// <summary>قبل از نوشتن فایل اجرا می شود (ثبت موقعیت پنجره و …).</summary>
         Action? OnSaveRequested { get; set; }
 
-        /// <summary>جایگزین کردن کل تنظیمات (دکمه‌ی بازنشانی همه‌ی تنظیمات).</summary>
+        /// <summary>جایگزین کردن کل تنظیمات (دکمه ی بازنشانی همه ی تنظیمات).</summary>
         void Replace(AppSettings settings);
 
-        /// <summary>شروع debounce ذخیره؛ با هر فراخوانی تایمر از نو شمرده می‌شود.</summary>
+        /// <summary>شروع debounce ذخیره؛ با هر فراخوانی تایمر از نو شمرده می شود.</summary>
         void ScheduleSave();
 
-        /// <summary>ذخیره‌ی فوری در دیسک.</summary>
+        /// <summary>ذخیره ی فوری در دیسک.</summary>
         void SaveNow();
     }
 

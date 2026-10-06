@@ -78,7 +78,7 @@ namespace CleanC.UI
                     DeepStorageEmptyFoldersCountText.Text = $"{_deepScanResult.EmptyFolders.Count} پوشه خالی";
 
                 if (DeepStorageMessCountText != null)
-                    DeepStorageMessCountText.Text = $"{_deepScanResult.MessItems.Count} فایل نامرتب";
+                    DeepStorageMessCountText.Text = $"{_deepScanResult.MessItems.Count} فایل زائد و نامرتب";
                 if (DeepStorageMessSizeText != null)
                     DeepStorageMessSizeText.Text = $"{SystemStats.FormatBytes(_deepScanResult.TotalMessBytes)} فضا";
 
@@ -284,7 +284,7 @@ namespace CleanC.UI
                         VerticalAlignment = VerticalAlignment.Center,
                         Child = new TextBlock
                         {
-                            Text = file.IsOriginal ? "نسخه اصلی (نگه‌داری)" : "نسخه کپی (اضافی)",
+                            Text = file.IsOriginal ? "نسخه اصلی (نگه داری)" : "نسخه کپی (اضافی)",
                             FontSize = 10,
                             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                             Foreground = file.IsOriginal ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("TextFillColorTertiaryBrush")
@@ -305,7 +305,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.EmptyFolders.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ پوشه خالی بلااستفاده‌ای در دایرکتوری‌های انتخابی یافت نشد."));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ پوشه خالی بلااستفاده ای در دایرکتوری های انتخابی یافت نشد."));
                 return;
             }
 
@@ -385,7 +385,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.MessItems.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("دسکتاپ و پوشه دانلودهای شما کاملاً مرتب و سازماندهی‌شده است!"));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ فایل زائد، موقت یا نصاب رها شده ای یافت نشد. دیسک کاملاً پاکیزه است."));
                 return;
             }
 
@@ -479,7 +479,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.LargeFiles.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("فایل حجیم‌تر از ۵۰۰ مگابایت در پوشه‌های شخصی کاربر یافت نشد."));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("فایل حجیم تر از ۵۰۰ مگابایت در پوشه های شخصی کاربر یافت نشد."));
                 return;
             }
 
@@ -565,8 +565,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// کارت حالت خالی — برای همه‌ی لیست‌های ابزارها استفاده می‌شود (جستجوی بی‌نتیجه،
-        /// لیست خالی، پاکسازی بدون مورد و ...). glyph پیش‌فرض نماد «همه‌چیز مرتب است».
+        /// کارت حالت خالی — برای همه ی لیست های ابزارها استفاده می شود (جستجوی بی نتیجه،
+        /// لیست خالی، پاکسازی بدون مورد و ...). glyph پیش فرض نماد «همه چیز مرتب است».
         /// </summary>
         private Border CreateEmptyStateMessage(string message, string glyph = "\uE73E")
         {
@@ -655,9 +655,9 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// D5 — تأیید حذف گروهی پیش از انتقال انتخاب‌ها به سطل بازیافت.
-        /// تعداد و حجم موارد انتخاب‌شده را نشان می‌دهد؛ اگر چیزی انتخاب نشده باشد
-        /// همان پیام قبلی InfoBar را نمایش می‌دهد و بدون باز کردن دیالوگ برمی‌گردد.
+        /// D5 — تأیید حذف گروهی پیش از انتقال انتخاب ها به سطل بازیافت.
+        /// تعداد و حجم موارد انتخاب شده را نشان می دهد؛ اگر چیزی انتخاب نشده باشد
+        /// همان پیام قبلی InfoBar را نمایش می دهد و بدون باز کردن دیالوگ برمی گردد.
         /// </summary>
         private async Task<bool> ConfirmDeepStorageBatchDeleteAsync()
         {
@@ -670,11 +670,11 @@ namespace CleanC.UI
                 case "duplicates":
                     count = _deepScanResult!.Duplicates.SelectMany(g => g.Files).Count(f => f.IsSelectedForDeletion);
                     bytes = _deepScanResult.Duplicates.SelectMany(g => g.Files).Where(f => f.IsSelectedForDeletion).Sum(f => f.SizeBytes);
-                    title = "پاکسازی فایل‌های تکراری";
+                    title = "پاکسازی فایل های تکراری";
                     break;
                 case "empty_folders":
                     count = _deepScanResult!.EmptyFolders.Count(f => f.IsSelected);
-                    title = "پاکسازی پوشه‌های خالی";
+                    title = "پاکسازی پوشه های خالی";
                     break;
                 case "mess":
                     count = _deepScanResult!.MessItems.Count(m => m.IsSelected);
@@ -684,7 +684,7 @@ namespace CleanC.UI
                 case "large_files":
                     count = _deepScanResult!.LargeFiles.Count(l => l.IsSelected);
                     bytes = _deepScanResult.LargeFiles.Where(l => l.IsSelected).Sum(l => l.SizeBytes);
-                    title = "پاکسازی فایل‌های حجیم";
+                    title = "پاکسازی فایل های حجیم";
                     break;
             }
 
@@ -696,14 +696,14 @@ namespace CleanC.UI
             }
 
             string sizeInfo = bytes > 0 ? $" مجموع حجم: {SystemStats.FormatBytes(bytes)}،" : "";
-            // F3 — دیالوگ دقیقاً همان رفتاری را وعده می‌دهد که واقعاً رخ می‌دهد
+            // F3 — دیالوگ دقیقاً همان رفتاری را وعده می دهد که واقعاً رخ می دهد
             string modeNote = SafeDeleteService.DescribeMode(SafeDeleteService.DefaultMode);
             var dialog = new ContentDialog
             {
                 Title = "تأیید حذف گروهی",
                 Content = new TextBlock
                 {
-                    Text = $"{count} مورد انتخاب شده{sizeInfo} {modeNote}. ادامه می‌دهید؟",
+                    Text = $"{count} مورد انتخاب شده{sizeInfo} {modeNote}. ادامه می دهید؟",
                     FontSize = 13,
                     TextWrapping = TextWrapping.Wrap,
                     LineHeight = 20
@@ -784,8 +784,8 @@ namespace CleanC.UI
 
                 if (deletedCount > 0)
                 {
-                    // فقط فضایی که واقعاً آزاد شده در آمار می‌نشیند؛ اقلامی که فقط
-                    // به سطل رفته‌اند جابه‌جا شده‌اند نه آزاد، پس آمار را خراب نمی‌کنیم.
+                    // فقط فضایی که واقعاً آزاد شده در آمار می نشیند؛ اقلامی که فقط
+                    // به سطل رفته اند جابه جا شده اند نه آزاد، پس آمار را خراب نمی کنیم.
                     if (freedBytes > 0)
                     {
                         _cumulativeFreedBytes += freedBytes;
@@ -858,7 +858,7 @@ namespace CleanC.UI
                 }
                 if (DeepStorageBatchDeleteBtnText != null)
                 {
-                    DeepStorageBatchDeleteBtnText.Text = "حذف ایمن موارد انتخاب‌شده";
+                    DeepStorageBatchDeleteBtnText.Text = "حذف ایمن موارد انتخاب شده";
                 }
             }
         }
@@ -869,7 +869,7 @@ namespace CleanC.UI
         private async Task CleanDockerBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (CleanDockerBtn != null) CleanDockerBtn.IsEnabled = false;
-            ShowInfoBar("پاکسازی Docker", "در حال پاکسازی کش، کانتینرها و ایمیج‌های استفاده‌نشده...", InfoBarSeverity.Informational);
+            ShowInfoBar("پاکسازی Docker", "در حال پاکسازی کش، کانتینرها و ایمیج های استفاده نشده...", InfoBarSeverity.Informational);
             try
             {
                 var res = await DeepStorageCleanService.CleanDockerCacheAsync();
@@ -887,7 +887,7 @@ namespace CleanC.UI
         private async Task CleanDevCachesBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (CleanDevCachesBtn != null) CleanDevCachesBtn.IsEnabled = false;
-            ShowInfoBar("کش توسعه‌دهندگان", "در حال اسکن و پاکسازی کش‌های npm، pip، NuGet و VS Code...", InfoBarSeverity.Informational);
+            ShowInfoBar("کش توسعه دهندگان", "در حال اسکن و پاکسازی کش های npm، pip، NuGet و VS Code...", InfoBarSeverity.Informational);
             try
             {
                 var res = await DeepStorageCleanService.CleanDevCachesAsync();
@@ -901,7 +901,7 @@ namespace CleanC.UI
                     UpdateCumulativeChipsUI();
                     RenderCleanupHistory();
                 }
-                ShowInfoBar("کش توسعه‌دهندگان", res.Message, res.Success ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+                ShowInfoBar("کش توسعه دهندگان", res.Message, res.Success ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
             }
             finally
             {
@@ -915,7 +915,7 @@ namespace CleanC.UI
         private async Task CompactWslBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (CompactWslBtn != null) CompactWslBtn.IsEnabled = false;
-            ShowInfoBar("تراکم دیسک WSL2", "در حال خاموش‌سازی و فشرده‌سازی دیسک‌های مجازی WSL2...", InfoBarSeverity.Informational);
+            ShowInfoBar("تراکم دیسک WSL2", "در حال خاموش سازی و فشرده سازی دیسک های مجازی WSL2...", InfoBarSeverity.Informational);
             try
             {
                 var res = await DeepStorageCleanService.CompactWsl2DiskAsync();
@@ -933,7 +933,7 @@ namespace CleanC.UI
         private async Task CleanDismBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (CleanDismBtn != null) CleanDismBtn.IsEnabled = false;
-            ShowInfoBar("پاکسازی DISM", "در حال پاکسازی فروشگاه قطعات سیستم و بسته‌های جایگزین‌شده (WinSxS)... این عملیات ممکن است چند دقیقه طول بکشد.", InfoBarSeverity.Informational);
+            ShowInfoBar("پاکسازی DISM", "در حال پاکسازی فروشگاه قطعات سیستم و بسته های جایگزین شده (WinSxS)... این عملیات ممکن است چند دقیقه طول بکشد.", InfoBarSeverity.Informational);
             try
             {
                 var res = await DeepStorageCleanService.CleanDismComponentsAsync();

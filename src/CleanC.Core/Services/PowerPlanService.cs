@@ -15,6 +15,24 @@ namespace CleanC.Core.Services
         public string ActiveSchemeName { get; set; } = string.Empty;
         public string ActiveSchemeGuid { get; set; } = string.Empty;
         public bool IsHighPerformanceOrUltimate { get; set; }
+        public string ActiveSchemeKey
+        {
+            get
+            {
+                if (ActiveSchemeGuid.Equals("e9a42b02-d5df-448d-aa00-03f14749eb61", StringComparison.OrdinalIgnoreCase) ||
+                    ActiveSchemeName.Contains("Ultimate", StringComparison.OrdinalIgnoreCase))
+                    return "ultimate";
+                if (ActiveSchemeGuid.Equals("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", StringComparison.OrdinalIgnoreCase) ||
+                    ActiveSchemeName.Contains("High", StringComparison.OrdinalIgnoreCase) ||
+                    ActiveSchemeName.Contains("حداکثر کارایی", StringComparison.OrdinalIgnoreCase))
+                    return "high";
+                if (ActiveSchemeGuid.Equals("a1841308-3541-4fab-bc81-f71556f20b4a", StringComparison.OrdinalIgnoreCase) ||
+                    ActiveSchemeName.Contains("Saver", StringComparison.OrdinalIgnoreCase) ||
+                    ActiveSchemeName.Contains("ذخیره انرژی", StringComparison.OrdinalIgnoreCase))
+                    return "saver";
+                return "balanced";
+            }
+        }
     }
 
     public class PowerSchemeInfo
@@ -42,10 +60,10 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// کش پلن برق فعال.
-        /// <c>GetPowerStatus</c> هر ۲٫۵ ثانیه (تایمر آمار داشبورد) صدا زده می‌شود و بدون کش،
-        /// هر بار یک پروسه‌ی <c>powercfg.exe</c> بالا می‌آورد (چند ده میلی‌ثانیه + مصرف CPU
-        /// و افت فریم UI). پلن برق به‌ندرت عوض می‌شود؛ بنابراین نتیجه را ۳۰ ثانیه نگه می‌داریم
-        /// و فقط بعد از تغییر واقعی (SetActiveScheme) تازه‌سازی می‌کنیم.
+        /// <c>GetPowerStatus</c> هر ۲٫۵ ثانیه (تایمر آمار داشبورد) صدا زده می شود و بدون کش،
+        /// هر بار یک پروسه ی <c>powercfg.exe</c> بالا می آورد (چند ده میلی ثانیه + مصرف CPU
+        /// و افت فریم UI). پلن برق به ندرت عوض می شود؛ بنابراین نتیجه را ۳۰ ثانیه نگه می داریم
+        /// و فقط بعد از تغییر واقعی (SetActiveScheme) تازه سازی می کنیم.
         /// </summary>
         private static readonly TimeSpan SchemeCacheTtl = TimeSpan.FromSeconds(30);
         private static readonly object SchemeLock = new();
@@ -117,7 +135,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// اجرای واقعی <c>powercfg /getactivescheme</c>. فقط از داخل GetActiveScheme صدا زده می‌شود.
+        /// اجرای واقعی <c>powercfg /getactivescheme</c>. فقط از داخل GetActiveScheme صدا زده می شود.
         /// </summary>
         private static (string Guid, string Name) ReadActiveSchemeFromPowercfg()
         {
@@ -160,15 +178,15 @@ namespace CleanC.Core.Services
                 // If currently connected to AC power and not already in High/Ultimate performance
                 if (status.IsOnAcPower && !status.IsHighPerformanceOrUltimate)
                 {
-                    string deviceType = status.IsLaptop ? "لپ‌تاپ شما به شارژر متصل است" : "سیستم دسکتاپ شما با برق مستقیم کار می‌کند";
+                    string deviceType = status.IsLaptop ? "لپ تاپ شما به شارژر متصل است" : "سیستم دسکتاپ شما با برق مستقیم کار می کند";
 
                     return new AttentionDecisionItem
                     {
                         Id = "power_plan",
-                        Title = "فعال‌سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)",
+                        Title = "فعال سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)",
                         Description = $"{deviceType}. برای حذف تأخیر کلاک پردازنده و پایدار ماندن حداکثر توان پردازشی، پلن High Performance فعال شود؟",
                         Category = "انرژی و پردازنده",
-                        ActionText = "فعال‌سازی High Performance",
+                        ActionText = "فعال سازی High Performance",
                         IconGlyph = "\uE945"
                     };
                 }

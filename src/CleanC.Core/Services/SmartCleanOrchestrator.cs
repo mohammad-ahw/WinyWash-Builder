@@ -46,7 +46,7 @@ namespace CleanC.Core.Services
                 StepId = "probe_init",
                 Phase = "probe",
                 Title = "در حال ارزیابی و پویش هوشمند موارد انتخابی...",
-                Description = "بررسی متوالی فایل‌های موقت، کش‌ها و فضاهای قابل آزادسازی",
+                Description = "بررسی متوالی فایل های موقت، کش ها و فضاهای قابل آزادسازی",
                 ProgressPercent = 5,
                 InitialItems = itemsToClean
             });
@@ -54,7 +54,7 @@ namespace CleanC.Core.Services
             await Task.Delay(300);
 
             // =================================================================
-            // PHASE 1: Sequential Probing (دونه‌دونه تیک خوردن تمام سرفصل‌ها)
+            // PHASE 1: Sequential Probing (دونه دونه تیک خوردن تمام سرفصل ها)
             // =================================================================
             for (int i = 0; i < totalCount; i++)
             {
@@ -97,14 +97,14 @@ namespace CleanC.Core.Services
                 StepId = "intermission",
                 Phase = "probe",
                 Title = "تمام موارد با موفقیت ارزیابی شدند؛ در حال شروع پاکسازی...",
-                Description = "آزادسازی فضای دیسک، حذف کش‌ها و تخلیه فایل‌های موقت",
+                Description = "آزادسازی فضای دیسک، حذف کش ها و تخلیه فایل های موقت",
                 ProgressPercent = 48
             });
 
             await Task.Delay(500);
 
             // =================================================================
-            // PHASE 2: Sequential Deletion & Animated Removal (دونه‌دونه حذف شدن)
+            // PHASE 2: Sequential Deletion & Animated Removal (دونه دونه حذف شدن)
             // =================================================================
             for (int i = 0; i < totalCount; i++)
             {
@@ -116,7 +116,7 @@ namespace CleanC.Core.Services
                 {
                     StepId = "item_clean_start",
                     Phase = "clean",
-                    Title = $"در حال پاک‌سازی: {item.Title}...",
+                    Title = $"در حال پاک سازی: {item.Title}...",
                     Description = item.Description,
                     TargetItem = item,
                     ItemStatusText = "در حال حذف...",
@@ -137,7 +137,7 @@ namespace CleanC.Core.Services
                 {
                     StepId = "item_clean_done",
                     Phase = "clean",
-                    Title = $"پاک‌سازی شد: {item.Title}",
+                    Title = $"پاک سازی شد: {item.Title}",
                     Description = item.Description,
                     TargetItem = item,
                     ItemStatusText = "پاکسازی شد ✓",
@@ -158,7 +158,7 @@ namespace CleanC.Core.Services
                 StepId = "ram_boost",
                 Phase = "boost",
                 Title = "در حال آزادسازی حافظه رم و نوسازی شبکه...",
-                Description = "تخلیه Working Set پردازه‌ها و رفرش کش DNS",
+                Description = "تخلیه Working Set پردازه ها و رفرش کش DNS",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 86
             });
@@ -176,8 +176,8 @@ namespace CleanC.Core.Services
             {
                 StepId = "browser_opt",
                 Phase = "boost",
-                Title = "بهینه‌سازی پردازه‌های مخفی مرورگرها...",
-                Description = "توقف Startup Boost و تسک‌های پس‌زمینه Edge و Chrome",
+                Title = "بهینه سازی پردازه های مخفی مرورگرها...",
+                Description = "توقف Startup Boost و تسک های پس زمینه Edge و Chrome",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 90
             });
@@ -193,8 +193,8 @@ namespace CleanC.Core.Services
             {
                 StepId = "startup_opt",
                 Phase = "boost",
-                Title = "بهینه‌سازی استارتاپ ویندوز...",
-                Description = "غیرفعال‌سازی برنامه‌ها و لانچرهای سنگین استارتاپ",
+                Title = "بهینه سازی استارتاپ ویندوز...",
+                Description = "غیرفعال سازی برنامه ها و لانچرهای سنگین استارتاپ",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 94
             });
@@ -209,8 +209,8 @@ namespace CleanC.Core.Services
             {
                 StepId = "windows_tweaks",
                 Phase = "boost",
-                Title = "بهینه‌سازی تنظیمات کارایی ویندوز...",
-                Description = "غیرفعال‌سازی پیام‌های تبلیغاتی و پایش‌های غیرضروری",
+                Title = "بهینه سازی تنظیمات کارایی ویندوز...",
+                Description = "غیرفعال سازی پیام های تبلیغاتی و پایش های غیرضروری",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 97
             });
@@ -227,8 +227,8 @@ namespace CleanC.Core.Services
             {
                 StepId = "gpu_opt",
                 Phase = "boost",
-                Title = "بهینه‌سازی تخصیص پردازنده گرافیکی (GPU)...",
-                Description = "هدایت بازی‌ها و نرم‌افزارهای سنگین به کارت گرافیک مجزا",
+                Title = "بهینه سازی تخصیص پردازنده گرافیکی (GPU)...",
+                Description = "هدایت بازی ها و نرم افزارهای سنگین به کارت گرافیک مجزا",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 98
             });
@@ -244,7 +244,7 @@ namespace CleanC.Core.Services
                 StepId = "hardware_diag",
                 Phase = "boost",
                 Title = "بررسی نمایشگر و وضعیت توان سیستم...",
-                Description = "ارزیابی رفرش‌ریت مانیتور و پلن مصرف انرژی",
+                Description = "ارزیابی رفرش ریت مانیتور و پلن مصرف انرژی",
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 99
             });
@@ -257,15 +257,15 @@ namespace CleanC.Core.Services
             // =================================================================
             var descParts = new List<string>();
             descParts.Add($"مجموعاً {SystemStats.FormatBytes(cumulativeFreed)} از حافظه رم و دیسک آزاد شد.");
-            if (disabledStartups > 0) descParts.Add($"{disabledStartups} برنامه استارتاپ بهینه‌سازی شد.");
+            if (disabledStartups > 0) descParts.Add($"{disabledStartups} برنامه استارتاپ بهینه سازی شد.");
             if (gpuResult.ConfiguredAppsCount > 0) descParts.Add($"{gpuResult.ConfiguredAppsCount} برنامه به کارت گرافیک قدرتمند تخصیص یافت.");
-            if (browserTweaks > 0) descParts.Add("پردازه‌های پس‌زمینه مرورگرها متوقف شدند.");
+            if (browserTweaks > 0) descParts.Add("پردازه های پس زمینه مرورگرها متوقف شدند.");
 
             var finalResult = new CleanupStepResult
             {
                 StepId = "complete",
                 Phase = "complete",
-                Title = "بهینه‌سازی جامع سیستم با موفقیت به پایان رسید!",
+                Title = "بهینه سازی جامع سیستم با موفقیت به پایان رسید!",
                 Description = string.Join(" | ", descParts),
                 CumulativeFreedBytes = cumulativeFreed,
                 ProgressPercent = 100,

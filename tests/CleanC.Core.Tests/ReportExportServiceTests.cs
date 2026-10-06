@@ -5,9 +5,9 @@ using CleanC.Core.Services;
 namespace CleanC.Core.Tests
 {
     /// <summary>
-    /// تست‌های F7/D8 — ساخت خروجی TXT/CSV و نوشتن اتمیک با BOM.
-    /// نکته‌ی محوری: BOM نباید دوبار نوشته شود (یکی از WriteUtf8Bom می‌آید)
-    /// و متن فارسی/کاما/نقل‌قول باید سالم از CSV عبور کند.
+    /// تست های F7/D8 — ساخت خروجی TXT/CSV و نوشتن اتمیک با BOM.
+    /// نکته ی محوری: BOM نباید دوبار نوشته شود (یکی از WriteUtf8Bom می آید)
+    /// و متن فارسی/کاما/نقل قول باید سالم از CSV عبور کند.
     /// </summary>
     public class ReportExportServiceTests : IDisposable
     {
@@ -21,7 +21,7 @@ namespace CleanC.Core.Tests
 
         public void Dispose()
         {
-            try { Directory.Delete(_tempDir, true); } catch { /* پوشه‌ی موقت تست */ }
+            try { Directory.Delete(_tempDir, true); } catch { /* پوشه ی موقت تست */ }
         }
 
         [Theory]
@@ -84,7 +84,7 @@ namespace CleanC.Core.Tests
             ReportExportService.WriteUtf8Bom(path, "a,b\r\n1,2\r\n");
 
             byte[] bytes = File.ReadAllBytes(path);
-            // فقط و فقط یک BOM (EF BB BF) — BOM دوم باعث می‌شود Excel فایل را باز نکند
+            // فقط و فقط یک BOM (EF BB BF) — BOM دوم باعث می شود Excel فایل را باز نکند
             Assert.True(bytes.Length >= 3);
             Assert.Equal(0xEF, bytes[0]);
             Assert.Equal(0xBB, bytes[1]);

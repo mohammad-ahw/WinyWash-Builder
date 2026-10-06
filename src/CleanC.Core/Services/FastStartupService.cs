@@ -13,7 +13,7 @@ namespace CleanC.Core.Services
         public bool IsFastStartupEnabled { get; set; }
         public bool IsHibernationEnabled { get; set; }
         public long HiberfilSizeBytes { get; set; }
-        public string FormattedHiberfilSize => HiberfilSizeBytes > 0 ? SystemStats.FormatBytes(HiberfilSizeBytes) : "۰ بایت (حذف‌شده)";
+        public string FormattedHiberfilSize => HiberfilSizeBytes > 0 ? SystemStats.FormatBytes(HiberfilSizeBytes) : "۰ بایت (حذف شده)";
     }
 
     public static class FastStartupService
@@ -53,7 +53,7 @@ namespace CleanC.Core.Services
                     }
                     catch
                     {
-                        // اندازه واقعی خوانده نشد → صفر گزارش می‌شود، نه مقدار حدسی
+                        // اندازه واقعی خوانده نشد → صفر گزارش می شود، نه مقدار حدسی
                         status.HiberfilSizeBytes = 0;
                     }
                 }
@@ -63,7 +63,7 @@ namespace CleanC.Core.Services
                     status.HiberfilSizeBytes = 0;
                 }
 
-                // بدون هیبرنیشن، Fast Startup عملاً اجرا نمی‌شود (ویندوز HiberbootEnabled را نادیده می‌گیرد)
+                // بدون هیبرنیشن، Fast Startup عملاً اجرا نمی شود (ویندوز HiberbootEnabled را نادیده می گیرد)
                 if (!status.IsHibernationEnabled) status.IsFastStartupEnabled = false;
             }
             catch (Exception __ex)
@@ -114,7 +114,7 @@ namespace CleanC.Core.Services
 
                     if (!p.WaitForExit(10000))
                     {
-                        // طولانی‌تر از حد انتظار → فرآیند را متوقف کن تا جزء آویزان نماند
+                        // طولانی تر از حد انتظار → فرآیند را متوقف کن تا جزء آویزان نماند
                         try { p.Kill(); } catch (Exception __ex)
 {
     CcLog.Ignore(__ex);

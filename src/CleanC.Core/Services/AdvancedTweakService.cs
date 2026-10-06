@@ -95,10 +95,10 @@ namespace CleanC.Core.Services
                     return new AttentionDecisionItem
                     {
                         Id = "advanced_tweaks",
-                        Title = "بهینه‌سازی پیشرفته شبکه و پاسخ‌دهی سیستم (Advanced Tweaks)",
-                        Description = "حذف محدودیت عمدی ویندوز برای پکت‌های شبکه، غیرفعال‌سازی GameDVR و افزایش اولویت پردازشی برنامه‌ها.",
+                        Title = "بهینه سازی پیشرفته شبکه و پاسخ دهی سیستم (Advanced Tweaks)",
+                        Description = "حذف محدودیت عمدی ویندوز برای پکت های شبکه، غیرفعال سازی GameDVR و افزایش اولویت پردازشی برنامه ها.",
                         Category = "شبکه و کارایی",
-                        ActionText = "اعمال بهینه‌سازی‌ها",
+                        ActionText = "اعمال بهینه سازی ها",
                         IconGlyph = "\uE9D2"
                     };
                 }

@@ -33,7 +33,7 @@ namespace CleanC.UI
     public sealed partial class MainWindow : Window
     {
         private AppWindow _appWindow;
-        /// <summary>دسته‌ی پنجره — برای تشخیص minimize و سایر Win32 فراخوانی‌ها نگه داشته می‌شود.</summary>
+        /// <summary>دسته ی پنجره — برای تشخیص minimize و سایر Win32 فراخوانی ها نگه داشته می شود.</summary>
         private IntPtr _hWnd;
         private DispatcherTimer _statsTimer;
         private ObservableCollection<JunkItemViewModel> _activeCleaningItems = new();
@@ -50,16 +50,16 @@ namespace CleanC.UI
         private readonly DispatcherTimer _uninstallerSearchDebounce = new() { Interval = TimeSpan.FromMilliseconds(250) };
         private readonly DispatcherTimer _driversSearchDebounce = new() { Interval = TimeSpan.FromMilliseconds(250) };
         private TrayIconManager? _trayManager;
-        // F5 — نوتیفیکیشن ویندوزی (toast + badge)؛ وقتی پنجره فوکوس ندارد استفاده می‌شود
+        // F5 — نوتیفیکیشن ویندوزی (toast + badge)؛ وقتی پنجره فوکوس ندارد استفاده می شود
         private readonly WindowsNotificationService _windowsNotifications = new();
-        // صف InfoBar تا پیام‌های پشت‌سرهم روی هم نیفتند و همه دیده شوند
+        // صف InfoBar تا پیام های پشت سرهم روی هم نیفتند و همه دیده شوند
         private readonly Queue<(string Title, string Message, InfoBarSeverity Severity)> _infoBarQueue = new();
         private readonly List<FontIcon> _toolBackIcons = new();
         private List<CleanupReportItem>? _lastCleanupItems;
         private long _lastFreedBytes;
-        // F5 — آخرین عدد صحیحِ ست‌شده روی badge (برای جلوگیری از فراخوانی تکراری)
+        // F5 — آخرین عدد صحیحِ ست شده روی badge (برای جلوگیری از فراخوانی تکراری)
         private int _lastBadgeScore = -1;
-        // B4 — سقف تاریخچه‌ی اعلان‌ها (در ذخیره و نمایش یکسان نگه داشته می‌شود)
+        // B4 — سقف تاریخچه ی اعلان ها (در ذخیره و نمایش یکسان نگه داشته می شود)
         private const int NotificationHistoryCapacity = 50;
 
         // Dashboard V2 Aurora, Sparkline, and Gauge state
@@ -81,7 +81,7 @@ namespace CleanC.UI
         private long _lastCleanFreedBytes = 0;
         private DateTime _lastCleanDateTime = DateTime.MinValue;
         private readonly List<CleanupHistoryEntry> _cleanupHistory = new();
-        /// <summary>مقدار قابل پاکسازی آخرین اسکن (bytes) — از ScanResult واقعی پر می‌شود.</summary>
+        /// <summary>مقدار قابل پاکسازی آخرین اسکن (bytes) — از ScanResult واقعی پر می شود.</summary>
         private long _lastScanCleanableBytes = 0;
         private double _diskTotalGb = 0;
         private double _diskFreeGb = 0;
@@ -96,26 +96,26 @@ namespace CleanC.UI
         /// <summary>سه نمای اصلی نوار ناوبری بالای صفحه.</summary>
         private enum AppView { Dashboard, Tools, Settings }
 
-        // C6 — تنظیمات از کانتینر DI می‌آیند؛ `_settings` فقط یک نمایِ راحت روی همان شیء است
+        // C6 — تنظیمات از کانتینر DI می آیند؛ `_settings` فقط یک نمایِ راحت روی همان شیء است
         private AppSettings _settings => _settingsStore.Current;
         private readonly ISettingsStore _settingsStore;
-        /// <summary>ViewModel صفحه Settings (C6/MVVM)؛ state آن از طریق x:Bind به کنترل‌ها وصل است.</summary>
+        /// <summary>ViewModel صفحه Settings (C6/MVVM)؛ state آن از طریق x:Bind به کنترل ها وصل است.</summary>
         internal SettingsViewModel SettingsVm { get; }
-        /// <summary>هنگام مقداردهی اولیه‌ی کنترل‌های صفحه Settings نباید Toggled ذخیره انجام دهد.</summary>
+        /// <summary>هنگام مقداردهی اولیه ی کنترل های صفحه Settings نباید Toggled ذخیره انجام دهد.</summary>
         private bool _isLoadingSettings = false;
         private AppView _currentView = AppView.Dashboard;
         private bool _isExiting = false;
-        /// <summary>هشدار تری فقط یک‌بار در هر اجرا نمایش داده شود تا آزاردهنده نشود.</summary>
+        /// <summary>هشدار تری فقط یک بار در هر اجرا نمایش داده شود تا آزاردهنده نشود.</summary>
         private bool _trayHintShown = false;
 
         public MainWindow()
         {
-            // D2: تا پایان مقداردهی XAML و پر شدن کنترل‌ها، رویدادهای Toggled نباید
-            // تنظیماتِ خوانده‌شده را با مقدار پیش‌فرضِ XAML بازنویسی کنند.
+            // D2: تا پایان مقداردهی XAML و پر شدن کنترل ها، رویدادهای Toggled نباید
+            // تنظیماتِ خوانده شده را با مقدار پیش فرضِ XAML بازنویسی کنند.
             _isLoadingSettings = true;
 
-            // C6: سرویس‌ها و ViewModel از کانتینر DI می‌آیند (SettingsStore خودش تنظیمات را load می‌کند).
-            // قبل از InitializeComponent مقداردهی می‌شوند تا هیچ handler ای در حین parse به شیء null نرسد.
+            // C6: سرویس ها و ViewModel از کانتینر DI می آیند (SettingsStore خودش تنظیمات را load می کند).
+            // قبل از InitializeComponent مقداردهی می شوند تا هیچ handler ای در حین parse به شیء null نرسد.
             _settingsStore = AppServices.GetRequired<ISettingsStore>();
             _settingsStore.OnSaveRequested += CapturePlacementForSave;
             SettingsVm = AppServices.GetRequired<SettingsViewModel>();
@@ -134,18 +134,18 @@ namespace CleanC.UI
             LocalizationService.SetLanguage(_settings.Language);
             ApplyLanguage();
 
-            // D2: تنظیمات پایدار باید قبل از هر تصمیم UI (تم، هندسه‌ی پنجره، نمای آخر) خوانده شوند
+            // D2: تنظیمات پایدار باید قبل از هر تصمیم UI (تم، هندسه ی پنجره، نمای آخر) خوانده شوند
             PopulateSettingsUi();
 
-            // B4 — بازگرداندن تاریخچه‌ی اعلان‌های مانده از اجرای قبلی
+            // B4 — بازگرداندن تاریخچه ی اعلان های مانده از اجرای قبلی
             RenderPersistedNotificationHistory();
 
-            // اگر فایل تنظیمات از قبل وجود ندارد، همین حالا با مقادیر پیش‌فرض ساخته شود
-            // تا مسیر نمایش‌داده‌شده در صفحه Settings واقعی باشد و بار اول «بازنشانی» کار کند.
+            // اگر فایل تنظیمات از قبل وجود ندارد، همین حالا با مقادیر پیش فرض ساخته شود
+            // تا مسیر نمایش داده شده در صفحه Settings واقعی باشد و بار اول «بازنشانی» کار کند.
             if (!File.Exists(SettingsService.FilePath)) SaveSettingsNow();
 
-            // F3 — نشست‌های قرنطینه قدیمی‌تر از ۳۰ روز در پس‌زمینه پاک می‌شوند
-            // (خودِ فایل‌ها هم بیش از این نگه داشته نمی‌شوند تا دیسک اشغال نماند)
+            // F3 — نشست های قرنطینه قدیمی تر از ۳۰ روز در پس زمینه پاک می شوند
+            // (خودِ فایل ها هم بیش از این نگه داشته نمی شوند تا دیسک اشغال نماند)
             System.Threading.Tasks.Task.Run(() =>
             {
                 try { SafeDeleteService.PurgeOldSessions(30); }
@@ -171,7 +171,7 @@ namespace CleanC.UI
                 CcLog.Ignore(__ex);
             }
 
-            // Determine initial theme & apply cleanly (D2: از تنظیمات ذخیره‌شده، در حالت System از سیستم)
+            // Determine initial theme & apply cleanly (D2: از تنظیمات ذخیره شده، در حالت System از سیستم)
             var initialTheme = ResolveInitialTheme(_settings.Theme);
             ApplyTheme(initialTheme);
 
@@ -187,8 +187,8 @@ namespace CleanC.UI
                     {
                         StopAuroraAnimations();
 
-                        // D3: کوچک‌نمایی → پنهان شدن در تری‌آیکون.
-                        // فقط وقتی پنجره واقعاً minimize است مخفی می‌شود تا Alt+Tab زدن
+                        // D3: کوچک نمایی → پنهان شدن در تری آیکون.
+                        // فقط وقتی پنجره واقعاً minimize است مخفی می شود تا Alt+Tab زدن
                         // باعث پنهان شدن برنامه نشود.
                         if (!_isExiting && _settings.MinimizeToTray && NativeMethods.IsWindowMinimized(_hWnd))
                         {
@@ -235,7 +235,7 @@ namespace CleanC.UI
             uint dpi = CleanC.Core.Native.Win32.GetDpiForWindow(_hWnd);
             double dpiScale = (dpi > 0) ? (dpi / 96.0) : 1.0;
 
-            // D2: بازیابی اندازه و موقعیت ذخیره‌شده — فقط اگر روی یکی از نمایشگرهای فعلی معتبر باشد
+            // D2: بازیابی اندازه و موقعیت ذخیره شده — فقط اگر روی یکی از نمایشگرهای فعلی معتبر باشد
             if (_settings.SaveWindowPlacement &&
                 _settings.HasSavedPlacement &&
                 IsPlacementOnScreen(_settings.WindowX, _settings.WindowY, _settings.WindowWidth, _settings.WindowHeight))
@@ -269,7 +269,7 @@ namespace CleanC.UI
                 {
                     UpdateCaptionInsets();
 
-                    // D2: ثبت مکان‌یابی جدید با debounce تا پایان درگ/تغییر سایز
+                    // D2: ثبت مکان یابی جدید با debounce تا پایان درگ/تغییر سایز
                     if (!_isExiting && !NativeMethods.IsWindowMinimized(_hWnd) && _settings.SaveWindowPlacement)
                     {
                         CaptureWindowPlacement();
@@ -278,7 +278,7 @@ namespace CleanC.UI
                 }
             };
 
-            // D3: بستن پنجره به‌جای خروج، برنامه را در تری‌آیکون نگه می‌دارد
+            // D3: بستن پنجره به جای خروج، برنامه را در تری آیکون نگه می دارد
             _appWindow.Closing += (s, e) =>
             {
                 if (!_isExiting && _settings.CloseToTray)
@@ -288,7 +288,7 @@ namespace CleanC.UI
                     return;
                 }
 
-                // بستن واقعی: دیگر مکان‌یابی نگیر تا مختصاتِ حین تخریب پنجره
+                // بستن واقعی: دیگر مکان یابی نگیر تا مختصاتِ حین تخریب پنجره
                 // جایگزین آخرین مقدار معتبر نشود.
                 _isExiting = true;
             };
@@ -297,7 +297,7 @@ namespace CleanC.UI
             double initialDipWidth = _appWindow.Size.Width / dpiScale;
             UpdateResponsiveLayout(initialDipWidth);
 
-            // Set selected navigation item (D2: نمای آخر از تنظیمات بازیابی می‌شود)
+            // Set selected navigation item (D2: نمای آخر از تنظیمات بازیابی می شود)
             SwitchToView(ResolveLastView(), persist: false);
 
             LiveCleanListView.ItemsSource = _activeCleaningItems;
@@ -310,11 +310,11 @@ namespace CleanC.UI
             _statsTimer.Tick += (s, e) => RefreshSystemStats();
             _statsTimer.Start();
 
-            // B6: تایمرها هنگام بستن پنجره متوقف نمی‌شدند و تا لحظه‌ی مرگ پروسه
-            // (مثلاً وقتی آیکون تری باعث زنده ماندن برنامه می‌شود) به کار ادامه می‌دادند.
+            // B6: تایمرها هنگام بستن پنجره متوقف نمی شدند و تا لحظه ی مرگ پروسه
+            // (مثلاً وقتی آیکون تری باعث زنده ماندن برنامه می شود) به کار ادامه می دادند.
             Closed += (s, e) =>
             {
-                // D2: آخرین وضعیت پیش از توقف تایمرها روی دیسک نوشته می‌شود
+                // D2: آخرین وضعیت پیش از توقف تایمرها روی دیسک نوشته می شود
                 SaveSettingsNow();
                 StopBackgroundTimers();
             };
@@ -371,7 +371,7 @@ namespace CleanC.UI
             InitHeroAurora();
             InitSparklines();
 
-            // اسکن پس‌زمینه برای پر کردن چیپ «قابل آزادسازی» با داده واقعی
+            // اسکن پس زمینه برای پر کردن چیپ «قابل آزادسازی» با داده واقعی
             ScheduleHeroCleanableRefresh();
 
             // Initialize System Tray Integration
@@ -404,8 +404,8 @@ namespace CleanC.UI
             }
 
             // F5 — ثبت کانال نوتیفیکیشن ویندوزی (AUMID + AppNotificationManager).
-            // اگر ثبت شکست بخورد، سرویس نشان می‌دهد toast در دسترس نیست و
-            // همه‌ی مسیرها به balloon تری‌آیکون برمی‌گردند.
+            // اگر ثبت شکست بخورد، سرویس نشان می دهد toast در دسترس نیست و
+            // همه ی مسیرها به balloon تری آیکون برمی گردند.
             _windowsNotifications.TryRegister();
         }
 
@@ -446,7 +446,7 @@ namespace CleanC.UI
         private void UpdateTitleBarTheme(ElementTheme theme)
         {
             bool isDark = theme == ElementTheme.Dark;
-            // رنگ دکمه‌های caption باید دقیقاً از تم تیتل‌بار پیروی کند تا با DWM ضد نشود
+            // رنگ دکمه های caption باید دقیقاً از تم تیتل بار پیروی کند تا با DWM ضد نشود
             bool useLightCaptionButtons = isDark;
 
             // Sync Win32 DWM Immersive Dark Mode with HWND
@@ -505,8 +505,8 @@ namespace CleanC.UI
 
                 bool isDark = currentTheme == ElementTheme.Dark;
 
-                // D6: در High Contrast شفافیت و بلور مجاز نیست؛ Acrylic را خاموش می‌کنیم
-                // تا پس‌زمینه‌ی جامد و رنگ‌های سیستم جایگزین شوند.
+                // D6: در High Contrast شفافیت و بلور مجاز نیست؛ Acrylic را خاموش می کنیم
+                // تا پس زمینه ی جامد و رنگ های سیستم جایگزین شوند.
                 if (IsHighContrastEnabled())
                 {
                     _acrylicController?.Dispose();
@@ -597,11 +597,11 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// B6 — توقف همه‌ی تایمرها هنگام بسته شدن پنجره.
+        /// B6 — توقف همه ی تایمرها هنگام بسته شدن پنجره.
         ///
         /// بدون این، تایمر آمار داشبورد (۲٫۵ ثانیه) و تایمرهای debounce/toast
-        /// بعد از Close هم اجرا می‌ماندند — یعنی کار غیرضروری در لحظه‌ی خروج
-        /// و رشته‌هایی که به پنجره‌ی مرده وصل هستند.
+        /// بعد از Close هم اجرا می ماندند — یعنی کار غیرضروری در لحظه ی خروج
+        /// و رشته هایی که به پنجره ی مرده وصل هستند.
         /// </summary>
         private void StopBackgroundTimers()
         {
@@ -620,7 +620,7 @@ namespace CleanC.UI
 
         private void RefreshSystemStats()
         {
-            // وقتی داشبورد مخفی است، به‌روزرسانی کنترل‌های آن فقط باعث layout می‌شود
+            // وقتی داشبورد مخفی است، به روزرسانی کنترل های آن فقط باعث layout می شود
             if (DashboardView == null || DashboardView.Visibility != Visibility.Visible) return;
 
             try
@@ -645,8 +645,8 @@ namespace CleanC.UI
                 if (HeroLiveRamText != null) HeroLiveRamText.Text = $"{Math.Round(ramPercent).ToString("0", CultureInfo.InvariantCulture)}%";
                 if (HeroLiveCpuText != null) HeroLiveCpuText.Text = $"{Math.Round(cpuPercent).ToString("0", CultureInfo.InvariantCulture)}%";
 
-                // Bento RAM Card - Format: "14.94 / 16 GB"
-                CardRamText.Text = $"{usedRamGb.ToString("0.00", CultureInfo.InvariantCulture)} / {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
+                // Bento RAM Card - Format: "14.94 . 16 GB"
+                CardRamText.Text = $"{usedRamGb.ToString("0.00", CultureInfo.InvariantCulture)} . {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
                 CardRamProgress.Value = ramPercent;
                 if (CardRamAvailableText != null) CardRamAvailableText.Text = "فضای مصرفی در حال حاضر";
                 if (CardRamTotalBadge != null) CardRamTotalBadge.Text = $"مجموع: {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
@@ -663,7 +663,7 @@ namespace CleanC.UI
                 if (CardDiskTitle != null) CardDiskTitle.Text = "پایش ترافیک اینترنت";
                 if (CardDiskHealthText != null)
                 {
-                    CardDiskHealthText.Text = netMbps >= 0.3 ? "مصرف فعال" : "آماده‌به‌کار (Idle)";
+                    CardDiskHealthText.Text = netMbps >= 0.3 ? "مصرف فعال" : "آماده به کار (Idle)";
                 }
                 if (CardDiskText != null)
                 {
@@ -681,7 +681,7 @@ namespace CleanC.UI
                     else
                     {
                         CardDiskText.Text = "0.0 Mbps";
-                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = "بدون مصرف پس‌زمینه (شبکه پایدار)";
+                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = "بدون مصرف پس زمینه (شبکه پایدار)";
                     }
                 }
                 CardDiskProgress.Value = Math.Clamp(netMbps, 0, 100);
@@ -689,7 +689,7 @@ namespace CleanC.UI
                 // Bento CPU Card - Format: "18%"
                 CardCpuText.Text = $"{Math.Round(cpuPercent).ToString("0", CultureInfo.InvariantCulture)}%";
                 CardCpuProgress.Value = cpuPercent;
-                if (CardGpuSummaryText != null) CardGpuSummaryText.Text = "بار پردازشی هسته‌ها";
+                if (CardGpuSummaryText != null) CardGpuSummaryText.Text = "بار پردازشی هسته ها";
                 if (CardPowerText != null) CardPowerText.Text = !string.IsNullOrEmpty(stats.PowerSummary) ? stats.PowerSummary : "متصل به برق";
 
                 // Health Score calculation & gauge arc update
@@ -729,7 +729,7 @@ namespace CleanC.UI
                     if (ramPercent > 80)
                     {
                         HeroHealthTitle.Text = "مصرف حافظه رم بالاست";
-                        HeroHealthSubtitle.Text = "با ۱ کلیک فایل‌های موقت پاک، حافظه رم آزاد و پردازه‌های اضافی بسته می‌شوند.";
+                        HeroHealthSubtitle.Text = "با ۱ کلیک فایل های موقت پاک، حافظه رم آزاد و پردازه های اضافی بسته می شوند.";
                     }
                 }
             }
@@ -752,16 +752,16 @@ namespace CleanC.UI
             _isBusy = true;
 
             QuickBoostBtn.IsEnabled = false;
-            QuickBoostBtnText.Text = "در حال بهینه‌سازی سیستم...";
+            QuickBoostBtnText.Text = "در حال بهینه سازی سیستم...";
             QuickBoostBtnIcon.Glyph = "\uE895"; // sync icon
 
             // CleanupReportCard فقط بعد از اینکه مشخص شد واقعاً کاری برای انجام هست
-            // پنهان می‌شود تا در حالت «هیچ موردی انتخاب نشده» گزارش قبلی از بین نرود.
+            // پنهان می شود تا در حالت «هیچ موردی انتخاب نشده» گزارش قبلی از بین نرود.
             LiveCleanupCard.Visibility = Visibility.Visible;
             LiveCleanDoneIcon.Visibility = Visibility.Collapsed;
             LiveCleanSpinner.Visibility = Visibility.Visible;
-            LiveCleanStatusTitle.Text = "در حال آماده‌سازی و ارزیابی سرفصل‌های سیستم...";
-            LiveCleanPhaseSubtitle.Text = "بررسی متوالی فایل‌های موقت، کش‌ها و فضاهای ذخیره‌سازی";
+            LiveCleanStatusTitle.Text = "در حال آماده سازی و ارزیابی سرفصل های سیستم...";
+            LiveCleanPhaseSubtitle.Text = "بررسی متوالی فایل های موقت، کش ها و فضاهای ذخیره سازی";
             LiveFreedCounterText.Text = "+ 0 بایت آزاد شد";
             LiveCleanProgressBar.Value = 5;
 
@@ -773,15 +773,15 @@ namespace CleanC.UI
                 // 1. Gather scan items
                 if (_cachedScanResult == null)
                 {
-                    LiveCleanStatusTitle.Text = "در حال پویش سریع سرفصل‌های سیستم...";
+                    LiveCleanStatusTitle.Text = "در حال پویش سریع سرفصل های سیستم...";
                     _cachedScanResult = await SystemScanService.ScanAsync();
                     ApplyPersistedJunkSelections(_cachedScanResult);
                     RenderAdvancedGroups(_cachedScanResult);
-                    AdvancedCleanTotalText.Text = $"مجموع شناسایی‌شده: {_cachedScanResult.FormattedTotal}";
+                    AdvancedCleanTotalText.Text = $"مجموع شناسایی شده: {_cachedScanResult.FormattedTotal}";
                     UpdateHeroCleanable(_cachedScanResult.TotalBytes);
                 }
 
-                // A3: فقط مواردی که کاربر تیک زده پردازش می‌شوند.
+                // A3: فقط مواردی که کاربر تیک زده پردازش می شوند.
                 var allChecked = _cachedScanResult.Groups
                     .SelectMany(g => g.Items)
                     .Where(i => i.IsChecked)
@@ -792,12 +792,12 @@ namespace CleanC.UI
                     LiveCleanupCard.Visibility = Visibility.Collapsed;
                     ShowInfoBar(
                         "موردی انتخاب نشده",
-                        "برای شروع بهینه‌سازی، دست‌کم یکی از سرفصل‌ها را در بخش پاکسازی انتخاب کنید.",
+                        "برای شروع بهینه سازی، دست کم یکی از سرفصل ها را در بخش پاکسازی انتخاب کنید.",
                         InfoBarSeverity.Warning);
                     return;
                 }
 
-                // سرفصل‌های فایلی برای نمایش در لیست زنده‌ی تمیزکاری
+                // سرفصل های فایلی برای نمایش در لیست زنده ی تمیزکاری
                 var itemsToProcess = _cachedScanResult.Groups
                     .Where(g => g.Id != "system_boost")
                     .SelectMany(g => g.Items)
@@ -835,7 +835,7 @@ namespace CleanC.UI
                         IsLoading = false,
                         IsSuccess = false,
                         WasEmpty = (item.Bytes == 0),
-                        StatusText = item.Bytes > 0 ? item.FormattedBytes : "در صف بهینه‌سازی"
+                        StatusText = item.Bytes > 0 ? item.FormattedBytes : "در صف بهینه سازی"
                     };
                     _activeCleaningItems.Add(vm);
                 }
@@ -856,7 +856,7 @@ namespace CleanC.UI
                     double progressVal = 5.0 + ((double)i / totalCount * 70.0);
                     LiveCleanProgressBar.Value = progressVal;
                     LiveCleanStatusTitle.Text = $"در حال پردازش: {vm.Title}...";
-                    LiveCleanPhaseSubtitle.Text = $"مرحله {i + 1} از {totalCount}: پاکسازی و بهینه‌سازی متوالی";
+                    LiveCleanPhaseSubtitle.Text = $"مرحله {i + 1} از {totalCount}: پاکسازی و بهینه سازی متوالی";
 
                     // STEP 1: Spinner / Loading on this task
                     vm.IsLoading = true;
@@ -864,7 +864,7 @@ namespace CleanC.UI
                     vm.StatusText = "در حال بررسی و پاکسازی...";
                     await Task.Delay(60);
 
-                    // Background physical deletion — فقط واقعاً آزاد‌شده گزارش می‌شود
+                    // Background physical deletion — فقط واقعاً آزاد شده گزارش می شود
                     long freed = await Task.Run(() => CleanService.CleanCategory(item));
                     bool wasEmpty = freed <= 0;
                     totalFreedBytes += freed;
@@ -909,8 +909,8 @@ namespace CleanC.UI
                     await Task.Delay(20);
                 }
 
-                // F2: هر گام بعدی جداگانه محافظت می‌شود؛ شکستِ یک گام نباید کلِ بهینه‌سازی را
-                // قطع کند و باید در گزارش پایانی «ناموفق» گزارش شود نه اینکه بی‌صدا حذف شود.
+                // F2: هر گام بعدی جداگانه محافظت می شود؛ شکستِ یک گام نباید کلِ بهینه سازی را
+                // قطع کند و باید در گزارش پایانی «ناموفق» گزارش شود نه اینکه بی صدا حذف شود.
                 var failedSteps = new List<CleanupReportItem>();
 
                 void ReportStepFailure(string id, string title, string glyph, Exception ex, string why)
@@ -935,7 +935,7 @@ namespace CleanC.UI
                 {
                     LiveCleanProgressBar.Value = 82;
                     LiveCleanStatusTitle.Text = "در حال آزادسازی حافظه فعال رم (RAM)...";
-                    LiveCleanPhaseSubtitle.Text = "تخلیه Working Set و بهینه‌سازی تخصیص حافظه پردازه‌ها";
+                    LiveCleanPhaseSubtitle.Text = "تخلیه Working Set و بهینه سازی تخصیص حافظه پردازه ها";
                     await Task.Delay(60);
 
                     try
@@ -965,8 +965,8 @@ namespace CleanC.UI
                 if (IsBoostEnabled("dnsFlush") || IsBoostEnabled("backgroundHelpers"))
                 {
                     LiveCleanProgressBar.Value = 90;
-                    LiveCleanStatusTitle.Text = "در حال تخلیه کش DNS و نوسازی کانکشن‌ها...";
-                    LiveCleanPhaseSubtitle.Text = "رفرش جدول آدرس‌های شبکه و پاکسازی پردازه‌های زائد پس‌زمینه";
+                    LiveCleanStatusTitle.Text = "در حال تخلیه کش DNS و نوسازی کانکشن ها...";
+                    LiveCleanPhaseSubtitle.Text = "رفرش جدول آدرس های شبکه و پاکسازی پردازه های زائد پس زمینه";
                     await Task.Delay(50);
 
                     try
@@ -979,7 +979,7 @@ namespace CleanC.UI
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("dns_flush_fail", "تخلیه کش DNS و نوسازی کانکشن‌ها", "\uE774", ex, ex.Message);
+                        ReportStepFailure("dns_flush_fail", "تخلیه کش DNS و نوسازی کانکشن ها", "\uE774", ex, ex.Message);
                     }
                 }
 
@@ -988,7 +988,7 @@ namespace CleanC.UI
                 if (IsBoostEnabled("browserBoost"))
                 {
                     LiveCleanProgressBar.Value = 92;
-                    LiveCleanStatusTitle.Text = "در حال خاموش‌سازی تسک‌های پس‌زمینه مرورگرها...";
+                    LiveCleanStatusTitle.Text = "در حال خاموش سازی تسک های پس زمینه مرورگرها...";
                     LiveCleanPhaseSubtitle.Text = "توقف Startup Boost و فعالیت پنهان Edge و Chrome";
                     try
                     {
@@ -996,7 +996,7 @@ namespace CleanC.UI
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("browser_opt_fail", "توقف تسک‌های پس‌زمینه و Startup Boost مرورگرها", "\uE774", ex, ex.Message);
+                        ReportStepFailure("browser_opt_fail", "توقف تسک های پس زمینه و Startup Boost مرورگرها", "\uE774", ex, ex.Message);
                     }
                     await Task.Delay(50);
                 }
@@ -1008,8 +1008,8 @@ namespace CleanC.UI
                 if (IsBoostEnabled("orphanedRegistry") || IsBoostEnabled("leftovers"))
                 {
                     LiveCleanProgressBar.Value = 94;
-                    LiveCleanStatusTitle.Text = "در حال پاکسازی عمیق و پویش بقایای نرم‌افزارهای حذف‌شده...";
-                    LiveCleanPhaseSubtitle.Text = "اسکن پوشه‌های رهاشده در AppData و کلیدهای نامعتبر رجیستری";
+                    LiveCleanStatusTitle.Text = "در حال پاکسازی عمیق و پویش بقایای نرم افزارهای حذف شده...";
+                    LiveCleanPhaseSubtitle.Text = "اسکن پوشه های رهاشده در AppData و کلیدهای نامعتبر رجیستری";
                     await Task.Delay(50);
 
                     try
@@ -1024,7 +1024,7 @@ namespace CleanC.UI
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("deep_clean_leftovers_fail", "پاکسازی عمیق بقایای نرم‌افزارها", "\uE74D", ex, ex.Message);
+                        ReportStepFailure("deep_clean_leftovers_fail", "پاکسازی عمیق بقایای نرم افزارها", "\uE74D", ex, ex.Message);
                     }
                     totalFreedBytes += leftoverFreedBytes;
                     if (leftoverFreedBytes > 0) AnimateCountUp(totalFreedBytes);
@@ -1035,15 +1035,15 @@ namespace CleanC.UI
                 if (IsBoostEnabled("startupOptimize"))
                 {
                     LiveCleanProgressBar.Value = 95;
-                    LiveCleanStatusTitle.Text = "در حال بهینه‌سازی استارتاپ ویندوز...";
-                    LiveCleanPhaseSubtitle.Text = "غیرفعال‌سازی برنامه‌ها و لانچرهای سنگین شروع خودکار";
+                    LiveCleanStatusTitle.Text = "در حال بهینه سازی استارتاپ ویندوز...";
+                    LiveCleanPhaseSubtitle.Text = "غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار";
                     try
                     {
                         disabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("startup_opt_fail", "بهینه‌سازی استارتاپ ویندوز", "\uE7B5", ex, ex.Message);
+                        ReportStepFailure("startup_opt_fail", "بهینه سازی استارتاپ ویندوز", "\uE7B5", ex, ex.Message);
                     }
                     await Task.Delay(50);
                 }
@@ -1053,8 +1053,8 @@ namespace CleanC.UI
                 if (IsBoostEnabled("winTweaks"))
                 {
                     LiveCleanProgressBar.Value = 96;
-                    LiveCleanStatusTitle.Text = "در حال اعمال تنظیمات بهینه‌سازی ویندوز...";
-                    LiveCleanPhaseSubtitle.Text = "غیرفعال‌سازی پیشنهادات و سرویس‌های درگیرکننده پردازنده";
+                    LiveCleanStatusTitle.Text = "در حال اعمال تنظیمات بهینه سازی ویندوز...";
+                    LiveCleanPhaseSubtitle.Text = "غیرفعال سازی پیشنهادات و سرویس های درگیرکننده پردازنده";
                     try
                     {
                         winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
@@ -1062,7 +1062,7 @@ namespace CleanC.UI
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("win_tweaks_fail", "توقف تله‌متری و تنظیمات عملکرد ویندوز", "\uE770", ex, ex.Message);
+                        ReportStepFailure("win_tweaks_fail", "توقف تله متری و تنظیمات عملکرد ویندوز", "\uE770", ex, ex.Message);
                     }
                     await Task.Delay(50);
                 }
@@ -1073,7 +1073,7 @@ namespace CleanC.UI
                 {
                     LiveCleanProgressBar.Value = 97;
                     LiveCleanStatusTitle.Text = "در حال بررسی و اعمال Fast Startup...";
-                    LiveCleanPhaseSubtitle.Text = "کوتاه‌کردن زمان خاموش‌شدن سیستم (Fast Startup)";
+                    LiveCleanPhaseSubtitle.Text = "کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)";
                     try
                     {
                         var fsStatus = await Task.Run(FastStartupService.GetStatus);
@@ -1081,7 +1081,7 @@ namespace CleanC.UI
                         {
                             fastStartupReport = new CleanupReportItem
                             {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش‌شدن سریع ویندوز)",
+                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
                                 IconGlyph = "\uE7E8", WasEmpty = true, StatusSummary = "از قبل فعال بود ✓"
                             };
                         }
@@ -1089,16 +1089,16 @@ namespace CleanC.UI
                         {
                             fastStartupReport = new CleanupReportItem
                             {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش‌شدن سریع ویندوز)",
+                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
                                 IconGlyph = "\uE7E8", IsFailed = true,
-                                StatusSummary = "انجام نشد ✗ — هایبرنیشن خاموش است (فعال‌سازی آن فایل hiberfil.sys می‌سازد)"
+                                StatusSummary = "انجام نشد ✗ — هایبرنیشن خاموش است (فعال سازی آن فایل hiberfil.sys می سازد)"
                             };
                         }
                         else if (FastStartupService.SetFastStartup(true))
                         {
                             fastStartupReport = new CleanupReportItem
                             {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش‌شدن سریع ویندوز)",
+                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
                                 IconGlyph = "\uE7E8", WasEmpty = false, StatusSummary = "فعال شد ✓"
                             };
                         }
@@ -1106,7 +1106,7 @@ namespace CleanC.UI
                         {
                             fastStartupReport = new CleanupReportItem
                             {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش‌شدن سریع ویندوز)",
+                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
                                 IconGlyph = "\uE7E8", IsFailed = true,
                                 StatusSummary = "ناموفق ✗ — دسترسی Administrator لازم است"
                             };
@@ -1114,7 +1114,7 @@ namespace CleanC.UI
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("fast_startup", "Fast Startup (خاموش‌شدن سریع ویندوز)", "\uE7E8", ex, ex.Message);
+                        ReportStepFailure("fast_startup", "Fast Startup (خاموش شدن سریع ویندوز)", "\uE7E8", ex, ex.Message);
                     }
                     await Task.Delay(50);
                 }
@@ -1126,7 +1126,7 @@ namespace CleanC.UI
                 {
                     LiveCleanProgressBar.Value = 98;
                     LiveCleanStatusTitle.Text = "در حال تخصیص هوشمند کارت گرافیک...";
-                    LiveCleanPhaseSubtitle.Text = "هدایت برنامه‌های سنگین و بازی‌ها به پردازنده گرافیکی قدرتمند";
+                    LiveCleanPhaseSubtitle.Text = "هدایت برنامه های سنگین و بازی ها به پردازنده گرافیکی قدرتمند";
                     try
                     {
                         var gpuResult = await GpuOptimizerService.OptimizeGpuPreferencesAsync();
@@ -1166,11 +1166,11 @@ namespace CleanC.UI
                 if (IsBoostEnabled("bloatwareClean"))
                 {
                     LiveCleanProgressBar.Value = 99;
-                    LiveCleanStatusTitle.Text = "در حال حذف برنامه‌ها و بازی‌های تبلیغاتی (Debloat)...";
-                    LiveCleanPhaseSubtitle.Text = "پاکسازی Candy Crush و بازی‌های پیش‌فرض و بررسی برنامه‌های کم‌استفاده";
+                    LiveCleanStatusTitle.Text = "در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)...";
+                    LiveCleanPhaseSubtitle.Text = "پاکسازی Candy Crush و بازی های پیش فرض و بررسی برنامه های کم استفاده";
                     try
                     {
-                        // 1. حذف خودکار تبلیغات و بازی‌های بی‌استفاده قطعی
+                        // 1. حذف خودکار تبلیغات و بازی های بی استفاده قطعی
                         var (autoRemoved, autoFreed) = await BloatwareService.CleanAutomaticBloatwareAsync();
                         bloatRemovedCount = autoRemoved;
                         bloatFreedBytes = autoFreed;
@@ -1180,7 +1180,7 @@ namespace CleanC.UI
                             AnimateCountUp(totalFreedBytes);
                         }
 
-                        // 2. اسکن و پرسش تعاملی برای موارد ریسک‌دار/اختیاری (Paint، Xbox، برنامه‌های > 500MB با ۳۰ روز عدم استفاده)
+                        // 2. اسکن و پرسش تعاملی برای موارد ریسک دار/اختیاری (Paint، Xbox، برنامه های > 500MB با ۳۰ روز عدم استفاده)
                         var reviewCandidates = await BloatwareService.ScanBorderlineReviewAppsAsync();
                         if (reviewCandidates.Count > 0)
                         {
@@ -1196,7 +1196,7 @@ namespace CleanC.UI
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("bloatware_clean_fail", "حذف برنامه‌ها و بازی‌های تبلیغاتی", "\uE74C", ex, ex.Message);
+                        ReportStepFailure("bloatware_clean_fail", "حذف برنامه ها و بازی های تبلیغاتی", "\uE74C", ex, ex.Message);
                     }
                     await Task.Delay(40);
                 }
@@ -1220,7 +1220,7 @@ namespace CleanC.UI
                 var systemBoostGroup = new CleanupReportGroup
                 {
                     GroupId = "system_boost",
-                    Title = "بهینه‌سازی زنده سیستم و پایداری",
+                    Title = "بهینه سازی زنده سیستم و پایداری",
                     IconGlyph = "\uE9D2"
                 };
 
@@ -1246,7 +1246,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "dns_flush",
-                        Title = "تخلیه کش DNS و نوسازی کانکشن‌ها",
+                        Title = "تخلیه کش DNS و نوسازی کانکشن ها",
                         IconGlyph = "\uE774",
                         FreedBytes = 0,
                         WasEmpty = false,
@@ -1260,11 +1260,11 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "browser_opt",
-                        Title = "توقف تسک‌های پس‌زمینه و Startup Boost مرورگرها",
+                        Title = "توقف تسک های پس زمینه و Startup Boost مرورگرها",
                         IconGlyph = "\uE774",
                         FreedBytes = 0,
                         WasEmpty = false,
-                        StatusSummary = "بهینه‌سازی شد ✓"
+                        StatusSummary = "بهینه سازی شد ✓"
                     });
                 }
 
@@ -1274,7 +1274,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "startup_opt",
-                        Title = $"بهینه‌سازی استارتاپ ({disabledStartups} برنامه غیرضروری)",
+                        Title = $"بهینه سازی استارتاپ ({disabledStartups} برنامه غیرضروری)",
                         IconGlyph = "\uE7B5",
                         FreedBytes = 0,
                         WasEmpty = false,
@@ -1292,7 +1292,7 @@ namespace CleanC.UI
                         IconGlyph = "\uE790",
                         FreedBytes = 0,
                         WasEmpty = false,
-                        StatusSummary = $"{gpuConfiguredCount} برنامه بهینه‌سازی شد ✓"
+                        StatusSummary = $"{gpuConfiguredCount} برنامه بهینه سازی شد ✓"
                     });
                 }
 
@@ -1316,7 +1316,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "bloat_clean",
-                        Title = $"حذف خودکار برنامه‌ها و بازی‌های تبلیغاتی ({bloatRemovedCount} برنامه)",
+                        Title = $"حذف خودکار برنامه ها و بازی های تبلیغاتی ({bloatRemovedCount} برنامه)",
                         IconGlyph = "\uE74C",
                         FreedBytes = bloatFreedBytes,
                         WasEmpty = false,
@@ -1330,7 +1330,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "borderline_clean",
-                        Title = $"پاکسازی برنامه‌های اختیاری تاییدشده ({borderlineRemovedCount} برنامه)",
+                        Title = $"پاکسازی برنامه های اختیاری تاییدشده ({borderlineRemovedCount} برنامه)",
                         IconGlyph = "\uE74C",
                         FreedBytes = borderlineFreedBytes,
                         WasEmpty = false,
@@ -1344,7 +1344,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost",
                         Id = "win_tweaks",
-                        Title = "توقف تله‌متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز",
+                        Title = "توقف تله متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز",
                         IconGlyph = "\uE770",
                         FreedBytes = 0,
                         WasEmpty = false,
@@ -1371,7 +1371,7 @@ namespace CleanC.UI
                     });
                 }
 
-                // گام‌های ناموفقِ گام‌به‌گام — همیشه در انتهای گروه و با رنگ هشدار
+                // گام های ناموفقِ گام به گام — همیشه در انتهای گروه و با رنگ هشدار
                 systemBoostGroup.Items.AddRange(failedSteps);
 
                 reportGroups.Add(systemBoostGroup);
@@ -1380,7 +1380,7 @@ namespace CleanC.UI
                 LiveCleanProgressBar.Value = 100;
                 LiveCleanSpinner.Visibility = Visibility.Collapsed;
                 LiveCleanDoneIcon.Visibility = Visibility.Visible;
-                LiveCleanStatusTitle.Text = "بهینه‌سازی خودکار سیستم با موفقیت به پایان رسید!";
+                LiveCleanStatusTitle.Text = "بهینه سازی خودکار سیستم با موفقیت به پایان رسید!";
                 LiveCleanPhaseSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(totalFreedBytes)} آزاد گردید.";
                 _displayedFreedBytes = totalFreedBytes;
                 LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(totalFreedBytes)} آزاد شد";
@@ -1421,7 +1421,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                ShowInfoBar("خطا در بهینه‌سازی", ex.Message, InfoBarSeverity.Error);
+                ShowInfoBar("خطا در بهینه سازی", ex.Message, InfoBarSeverity.Error);
                 LiveCleanStatusTitle.Text = "خطا در عملیات پاکسازی";
                 LiveCleanSpinner.Visibility = Visibility.Collapsed;
             }
@@ -1429,7 +1429,7 @@ namespace CleanC.UI
             {
                 _isBusy = false;
                 QuickBoostBtn.IsEnabled = true;
-                QuickBoostBtnText.Text = "بهینه‌سازی و ارتقای سرعت سیستم";
+                QuickBoostBtnText.Text = "بهینه سازی و ارتقای سرعت سیستم";
                 QuickBoostBtnIcon.Glyph = "\uE777";
             }
         }
@@ -1441,7 +1441,7 @@ namespace CleanC.UI
             var stack = new StackPanel { Spacing = 10, Margin = new Thickness(0, 10, 0, 0) };
             stack.Children.Add(new TextBlock
             {
-                Text = "برنامه‌های زیر در ویندوز شناسایی شدند که ممکن است به آن‌ها نیاز داشته باشید (مانند Paint، سرویس‌های بازی Xbox یا نرم‌افزارهای حجیم با بیش از ۳۰ روز عدم استفاده). مواردی که مایل به حذف آن‌ها هستید را علامت بزنید:",
+                Text = "برنامه های زیر در ویندوز شناسایی شدند که ممکن است به آن ها نیاز داشته باشید (مانند Paint، سرویس های بازی Xbox یا نرم افزارهای حجیم با بیش از ۳۰ روز عدم استفاده). مواردی که مایل به حذف آن ها هستید را علامت بزنید:",
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 12.5,
                 LineHeight = 19
@@ -1525,10 +1525,10 @@ namespace CleanC.UI
 
             var dialog = new ContentDialog
             {
-                Title = "بررسی و بازبینی نرم‌افزارهای کم‌استفاده و پیش‌فرض",
+                Title = "بررسی و بازبینی نرم افزارهای کم استفاده و پیش فرض",
                 Content = stack,
-                PrimaryButtonText = "پاکسازی موارد انتخاب‌شده",
-                CloseButtonText = "صرف‌نظر و ادامه بهینه‌سازی",
+                PrimaryButtonText = "پاکسازی موارد انتخاب شده",
+                CloseButtonText = "صرف نظر و ادامه بهینه سازی",
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.Content.XamlRoot,
                 FlowDirection = FlowDirection.RightToLeft
@@ -1617,7 +1617,7 @@ namespace CleanC.UI
 
             var achTitleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 2 };
             achTitleStack.Children.Add(new TextBlock { Text = "خلاصه دستاوردهای ارتقای سرعت و آزادسازی سیستم", FontSize = 13.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
-            achTitleStack.Children.Add(new TextBlock { Text = "نتایج بهینه‌سازی زنده پردازنده، حافظه رم، استارتاپ و اتصالات شبکه", FontSize = 11, Foreground = neutralFg });
+            achTitleStack.Children.Add(new TextBlock { Text = "نتایج بهینه سازی زنده پردازنده، حافظه رم، استارتاپ و اتصالات شبکه", FontSize = 11, Foreground = neutralFg });
             Grid.SetColumn(achTitleStack, 1);
             achHeader.Children.Add(achTitleStack);
             achStack.Children.Add(achHeader);
@@ -1673,16 +1673,16 @@ namespace CleanC.UI
                 AddAchievementChip("\uE7B5", startupItem.Title, Windows.UI.Color.FromArgb(255, 245, 158, 11));
             }
 
-            AddAchievementChip("\uE774", "نوسازی کش DNS و سوکت‌های شبکه", Windows.UI.Color.FromArgb(255, 6, 182, 212));
+            AddAchievementChip("\uE774", "نوسازی کش DNS و سوکت های شبکه", Windows.UI.Color.FromArgb(255, 6, 182, 212));
 
             if (browserItem != null)
             {
-                AddAchievementChip("\uE774", "توقف تسک‌های پس‌زمینه Edge و Chrome", Windows.UI.Color.FromArgb(255, 139, 92, 246));
+                AddAchievementChip("\uE774", "توقف تسک های پس زمینه Edge و Chrome", Windows.UI.Color.FromArgb(255, 139, 92, 246));
             }
 
             if (winTweaksItem != null)
             {
-                AddAchievementChip("\uE770", "توقف تله‌متری و افزایش سرعت ویندوز", Windows.UI.Color.FromArgb(255, 236, 72, 153));
+                AddAchievementChip("\uE770", "توقف تله متری و افزایش سرعت ویندوز", Windows.UI.Color.FromArgb(255, 236, 72, 153));
             }
 
             if (gpuItem != null)
@@ -1783,21 +1783,21 @@ namespace CleanC.UI
                             int applied = await AdvancedTweakService.ApplyAdvancedTweaksAsync();
                             RegistryBackupService.MarkTweaksApplied();
                             MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "اعمال شد ✓");
-                            ShowInfoBar("بهینه‌سازی پیشرفته", "محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت.", InfoBarSeverity.Success);
+                            ShowInfoBar("بهینه سازی پیشرفته", "محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت.", InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "ssd_critical_space")
                         {
-                            actionBtn.Content = "در حال بهینه‌سازی...";
+                            actionBtn.Content = "در حال بهینه سازی...";
                             actionBtn.IsEnabled = false;
                             bool ok = await DiskMaintenanceService.OptimizeDriveTrimAsync("C");
                             MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "انجام شد ✓");
-                            ShowInfoBar("بهینه‌سازی SSD", "دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه‌سازی گردیدند.", InfoBarSeverity.Success);
+                            ShowInfoBar("بهینه سازی SSD", "دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه سازی گردیدند.", InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "gpu_hags")
                         {
                             bool ok = GpuOptimizerService.EnableHags();
                             MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فعال شد ✓");
-                            ShowInfoBar("شتاب‌دهنده گرافیک", "قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)", InfoBarSeverity.Success);
+                            ShowInfoBar("شتاب دهنده گرافیک", "قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)", InfoBarSeverity.Success);
                         }
                     };
                     Grid.SetColumn(actionBtn, 2);
@@ -1969,16 +1969,16 @@ namespace CleanC.UI
                 var candidates = await BloatwareService.ScanCandidateAppsAsync();
                 if (candidates.Count == 0)
                 {
-                    ShowInfoBar("برنامه‌ها", "هیچ برنامه غیرضروری یا کم‌استفاده‌ای یافت نشد.", InfoBarSeverity.Informational);
+                    ShowInfoBar("برنامه ها", "هیچ برنامه غیرضروری یا کم استفاده ای یافت نشد.", InfoBarSeverity.Informational);
                     MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, "بررسی شد ✓");
                     return;
                 }
 
                 var dialog = new ContentDialog
                 {
-                    Title = "مدیریت و حذف برنامه‌های غیرضروری و کم‌استفاده",
-                    PrimaryButtonText = "حذف موارد انتخاب‌شده",
-                    CloseButtonText = "نگه‌داشتن همه",
+                    Title = "مدیریت و حذف برنامه های غیرضروری و کم استفاده",
+                    PrimaryButtonText = "حذف موارد انتخاب شده",
+                    CloseButtonText = "نگه داشتن همه",
                     DefaultButton = ContentDialogButton.Primary,
                     XamlRoot = this.Content.XamlRoot
                 };
@@ -1988,7 +1988,7 @@ namespace CleanC.UI
 
                 var headerText = new TextBlock
                 {
-                    Text = "برنامه‌های زیر می‌توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:",
+                    Text = "برنامه های زیر می توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:",
                     FontSize = 12,
                     Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
                     TextWrapping = TextWrapping.Wrap,
@@ -2000,7 +2000,7 @@ namespace CleanC.UI
 
                 var selectAllCheck = new CheckBox
                 {
-                    Content = "انتخاب همه برنامه‌ها",
+                    Content = "انتخاب همه برنامه ها",
                     IsChecked = true,
                     FontSize = 12,
                     FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
@@ -2127,7 +2127,7 @@ namespace CleanC.UI
                             ReportGroupsContainer.Children.Insert(1, removedCard);
 
                             RefreshSystemStats();
-                            ShowInfoBar("پاکسازی نرم‌افزارها", $"{removed} برنامه با موفقیت حذف گردید ({SystemStats.FormatBytes(freedBytes)} فضا آزاد شد).", InfoBarSeverity.Success);
+                            ShowInfoBar("پاکسازی نرم افزارها", $"{removed} برنامه با موفقیت حذف گردید ({SystemStats.FormatBytes(freedBytes)} فضا آزاد شد).", InfoBarSeverity.Success);
                         }
                     }
                 }
@@ -2142,7 +2142,7 @@ namespace CleanC.UI
         {
             CleanupReportCard.Visibility = Visibility.Collapsed;
             HeroHealthTitle.Text = "سیستم در وضعیت بهینه و پرسرعت قرار دارد";
-            HeroHealthSubtitle.Text = "تمامی بهینه‌سازی‌ها با موفقیت اعمال شدند. وضعیت منابع سیستم عالی است.";
+            HeroHealthSubtitle.Text = "تمامی بهینه سازی ها با موفقیت اعمال شدند. وضعیت منابع سیستم عالی است.";
         }
 
         private void AnimateCountUp(long targetBytes)
@@ -2176,14 +2176,14 @@ namespace CleanC.UI
         {
             var dialog = new ContentDialog
             {
-                Title = "یافتن و مدیریت فایل‌های بسیار حجیم (Large Files Finder)",
+                Title = "یافتن و مدیریت فایل های بسیار حجیم (Large Files Finder)",
                 CloseButtonText = "بستن",
                 XamlRoot = this.Content.XamlRoot,
                 FlowDirection = FlowDirection.RightToLeft
             };
 
             var rootPanel = new StackPanel { Spacing = 12, MinWidth = 480, MaxHeight = 440 };
-            var statusText = new TextBlock { Text = "در حال اسکن فایل‌های بالای ۵۰۰ مگابایت در مسیرهای کاربری...", FontSize = 12.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var statusText = new TextBlock { Text = "در حال اسکن فایل های بالای ۵۰۰ مگابایت در مسیرهای کاربری...", FontSize = 12.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
             var spinner = new ProgressRing { IsActive = true, Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 16, 0, 16) };
 
             rootPanel.Children.Add(statusText);
@@ -2254,10 +2254,10 @@ namespace CleanC.UI
 
                 var delBtn = new Button { Content = "حذف", FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5), Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) };
 
-                // D5 — تأیید دومرحله‌ای حذف فایل حجیم.
-                // این دکمه داخل یک ContentDialog باز اجرا می‌شود و WinUI اجازه‌ی باز شدن
-                // هم‌زمان دیالوگ دوم را نمی‌دهد؛ پس کلیک اول دکمه را به حالت «تأیید»
-                // می‌برد و ۴ ثانیه فرصت انصراف می‌دهد.
+                // D5 — تأیید دومرحله ای حذف فایل حجیم.
+                // این دکمه داخل یک ContentDialog باز اجرا می شود و WinUI اجازه ی باز شدن
+                // هم زمان دیالوگ دوم را نمی دهد؛ پس کلیک اول دکمه را به حالت «تأیید»
+                // می برد و ۴ ثانیه فرصت انصراف می دهد.
                 bool armed = false;
                 DispatcherTimer? armTimer = null;
                 delBtn.Click += (s, ev) =>
@@ -2330,18 +2330,18 @@ namespace CleanC.UI
 
             var desc = new TextBlock
             {
-                Text = "مدیریت نقاط بازگردانی سیستم‌عامل و بازگرداندن تغییرات رجیستری و بهینه‌سازی‌ها با یک کلیک:",
+                Text = "مدیریت نقاط بازگردانی سیستم عامل و بازگرداندن تغییرات رجیستری و بهینه سازی ها با یک کلیک:",
                 FontSize = 12,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
             };
             stack.Children.Add(desc);
 
             // Section 1: Create Restore Point
-            var rpCard = CreateUndoSectionCard("\uE777", "ساخت نقطه بازگردانی ویندوز (Restore Point)", "ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه‌سازی‌ها یا تغییرات عمده.", "ایجاد Restore Point", async (btn) =>
+            var rpCard = CreateUndoSectionCard("\uE777", "ساخت نقطه بازگردانی ویندوز (Restore Point)", "ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه سازی ها یا تغییرات عمده.", "ایجاد Restore Point", async (btn) =>
             {
                 btn.Content = "در حال ایجاد...";
                 btn.IsEnabled = false;
-                var (ok, msg) = await RestorePointService.CreateRestorePointAsync($"CleanC Backup - {DateTime.Now:yyyy/MM/dd HH:mm}");
+                var (ok, msg) = await RestorePointService.CreateRestorePointAsync($"CleanC Backup - {DateTime.Now:yyyy.MM.dd HH:mm}");
                 btn.Content = ok ? "ایجاد شد ✓" : "تلاش مجدد";
                 btn.IsEnabled = !ok;
                 ShowInfoBar("نقطه بازگردانی", msg, ok ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
@@ -2349,25 +2349,25 @@ namespace CleanC.UI
             stack.Children.Add(rpCard);
 
             // Section 2: Undo Tweaks
-            var undoCard = CreateUndoSectionCard("\uE7A7", "بازگردانی تنظیمات بهینه‌شده به حالت اولیه (Undo)", "بازگرداندن تمام کلیدهای رجیستری و سرویس‌های تغییر یافته توسط CleanC به مقادیر پیش‌فرض ویندوز.", "بازگردانی تنظیمات", async (btn) =>
+            var undoCard = CreateUndoSectionCard("\uE7A7", "بازگردانی تنظیمات بهینه شده به حالت اولیه (Undo)", "بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز.", "بازگردانی تنظیمات", async (btn) =>
             {
                 btn.Content = "در حال بازگردانی...";
                 btn.IsEnabled = false;
                 int reverted = await RegistryBackupService.RollbackAllTweaksAsync();
                 btn.Content = "بازگردانده شد ✓";
-                ShowInfoBar("بازگردانی تغییرات", $"تعداد {reverted} مورد از تنظیمات و توئیک‌ها به حالت اولیه ویندوز بازگردانده شدند.", InfoBarSeverity.Success);
+                ShowInfoBar("بازگردانی تغییرات", $"تعداد {reverted} مورد از تنظیمات و توئیک ها به حالت اولیه ویندوز بازگردانده شدند.", InfoBarSeverity.Success);
             });
             stack.Children.Add(undoCard);
 
             // Section 3: Open Windows System Restore
-            var sysRestoreCard = CreateUndoSectionCard("\uE895", "ابزار بازیابی سیستم ویندوز (System Restore)", "اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ‌های قبلی.", "باز کردن System Restore", (btn) =>
+            var sysRestoreCard = CreateUndoSectionCard("\uE895", "ابزار بازیابی سیستم ویندوز (System Restore)", "اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی.", "باز کردن System Restore", (btn) =>
             {
                 RestorePointService.LaunchSystemRestoreWizard();
                 dialog.Hide();
             });
             stack.Children.Add(sysRestoreCard);
 
-            // Section 4: فایل‌های قرنطینه‌شده (F3)
+            // Section 4: فایل های قرنطینه شده (F3)
             stack.Children.Add(BuildQuarantineSection());
 
             dialog.Content = stack;
@@ -2439,14 +2439,14 @@ namespace CleanC.UI
                 _cachedScanResult = await SystemScanService.ScanAsync();
                 ApplyPersistedJunkSelections(_cachedScanResult);
                 RenderAdvancedGroups(_cachedScanResult);
-                AdvancedCleanTotalText.Text = $"مجموع شناسایی‌شده: {_cachedScanResult.FormattedTotal}";
+                AdvancedCleanTotalText.Text = $"مجموع شناسایی شده: {_cachedScanResult.FormattedTotal}";
                 UpdateHeroCleanable(_cachedScanResult.TotalBytes);
             }
         }
 
         /// <summary>
-        /// D2: تیک‌های ذخیره‌شده‌ی کاربر روی آیتم‌های تازه‌ی اسکن اعمال می‌شود.
-        /// آیتم‌هایی که کلیدشان در تنظیمات نیست، حالت پیش‌فرض خودشان (تیک‌خورده) را نگه می‌دارند.
+        /// D2: تیک های ذخیره شده ی کاربر روی آیتم های تازه ی اسکن اعمال می شود.
+        /// آیتم هایی که کلیدشان در تنظیمات نیست، حالت پیش فرض خودشان (تیک خورده) را نگه می دارند.
         /// </summary>
         private void ApplyPersistedJunkSelections(ScanResult scan)
         {
@@ -2471,7 +2471,7 @@ namespace CleanC.UI
             }
         }
 
-        /// <summary>D2: وضعیت تیک همه‌ی آیتم‌های اسکن در تنظیمات ثبت می‌شود.</summary>
+        /// <summary>D2: وضعیت تیک همه ی آیتم های اسکن در تنظیمات ثبت می شود.</summary>
         private void SavePersistedJunkSelections()
         {
             if (!_settings.SaveScanSelections || _cachedScanResult == null) return;
@@ -2498,7 +2498,7 @@ namespace CleanC.UI
             AdvancedGroupsContainer.Children.Clear();
 
             bool isDarkTheme = (Content is FrameworkElement root && root.ActualTheme == ElementTheme.Dark);
-            // رنگ متن فقط از تم می‌آید؛ والپیپر نباید روی خوانایی متن اثر بگذارد
+            // رنگ متن فقط از تم می آید؛ والپیپر نباید روی خوانایی متن اثر بگذارد
             bool useWhiteText = isDarkTheme;
             var itemPrimary = useWhiteText ? new SolidColorBrush(Colors.White) : new SolidColorBrush(ColorHelper.FromArgb(255, 15, 23, 42));
             var itemSecondary = useWhiteText ? new SolidColorBrush(ColorHelper.FromArgb(220, 241, 245, 249)) : new SolidColorBrush(ColorHelper.FromArgb(255, 30, 41, 59));
@@ -2542,7 +2542,7 @@ namespace CleanC.UI
 
                 var badge = new TextBlock
                 {
-                    Text = grp.Id == "system_boost" ? $"{grp.Items.Count} قابلیت بهینه‌سازی" : grp.FormattedTotal,
+                    Text = grp.Id == "system_boost" ? $"{grp.Items.Count} قابلیت بهینه سازی" : grp.FormattedTotal,
                     FontWeight = Microsoft.UI.Text.FontWeights.Bold,
                     FontSize = 13,
                     VerticalAlignment = VerticalAlignment.Center,
@@ -2658,14 +2658,14 @@ namespace CleanC.UI
             {
                 ElementTheme newTheme = root.ActualTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;
                 ApplyTheme(newTheme);
-                // D2: تم صریح انتخابی کاربر (نه System) ذخیره می‌شود
+                // D2: تم صریح انتخابی کاربر (نه System) ذخیره می شود
                 PersistThemeChoice(newTheme);
             }
         }
 
         /// <summary>
-        /// انتخاب صریح تم (دکمه‌ی تغییر تم در هدر) از مسیر VM در تنظیمات ثبت می‌شود؛
-        /// VM رادیوهای صفحه Settings را هم با raise کردن PropertyChanged همگام می‌کند.
+        /// انتخاب صریح تم (دکمه ی تغییر تم در هدر) از مسیر VM در تنظیمات ثبت می شود؛
+        /// VM رادیوهای صفحه Settings را هم با raise کردن PropertyChanged همگام می کند.
         /// </summary>
         private void PersistThemeChoice(ElementTheme theme)
         {
@@ -2684,8 +2684,8 @@ namespace CleanC.UI
 
         /// <summary>
         /// D6: آیا حالت High Contrast ویندوز فعال است؟
-        /// وقتی روشن باشد، رنگ‌های سفارشیِ برنامه روی رنگ‌های سیستم می‌نشینند
-        /// و خوانایی را خراب می‌کنند؛ بنابراین باید از بازنویسی brushها صرف‌نظر کرد.
+        /// وقتی روشن باشد، رنگ های سفارشیِ برنامه روی رنگ های سیستم می نشینند
+        /// و خوانایی را خراب می کنند؛ بنابراین باید از بازنویسی brushها صرف نظر کرد.
         /// </summary>
         private static bool IsHighContrastEnabled()
         {
@@ -2695,23 +2695,23 @@ namespace CleanC.UI
             }
             catch
             {
-                // دسترسی به تنظیمات دسترسی‌پذیری ممکن است در محیط‌های محدود شکست بخورد؛
-                // حالت عادی (بدون High Contrast) پیش‌فرض امن است.
+                // دسترسی به تنظیمات دسترسی پذیری ممکن است در محیط های محدود شکست بخورد؛
+                // حالت عادی (بدون High Contrast) پیش فرض امن است.
                 return false;
             }
         }
 
         /// <summary>
-        /// D6: المانی را که LiveSetting گرفته وادار به اعلامِ تغییر برای screen reader می‌کند.
-        /// بدون این فراخوانی، تغییر متن پیام‌ها از کنار خواننده‌ی صفحه می‌گذرد.
+        /// D6: المانی را که LiveSetting گرفته وادار به اعلامِ تغییر برای screen reader می کند.
+        /// بدون این فراخوانی، تغییر متن پیام ها از کنار خواننده ی صفحه می گذرد.
         /// </summary>
         private static void AnnounceForAccessibility(UIElement element)
         {
             try
             {
-                // WinUI 3 کارخانه‌ی عمومیِ UWP (AutomationPeer.CreatePeerForElement) را ندارد؛
-                // پس peer را از متد virtualِ خودِ المان می‌گیریم و رویداد زنده را بالا می‌بریم.
-                // اگر المان peer نداشته باشد (مثلاً یک Panel)، بی‌صدا رد می‌شویم.
+                // WinUI 3 کارخانه ی عمومیِ UWP (AutomationPeer.CreatePeerForElement) را ندارد؛
+                // پس peer را از متد virtualِ خودِ المان می گیریم و رویداد زنده را بالا می بریم.
+                // اگر المان peer نداشته باشد (مثلاً یک Panel)، بی صدا رد می شویم.
                 const System.Reflection.BindingFlags flags =
                     System.Reflection.BindingFlags.Instance |
                     System.Reflection.BindingFlags.Public |
@@ -2741,10 +2741,10 @@ namespace CleanC.UI
 
             try
             {
-                // D6: در High Contrast، صرف‌نظر از بازنویسی رنگ‌ها تا سیستم برنده شود.
+                // D6: در High Contrast، صرف نظر از بازنویسی رنگ ها تا سیستم برنده شود.
                 bool highContrast = IsHighContrastEnabled();
 
-                // والپیپر فقط برای نورپردازی Acrylic استفاده می‌شود؛ هرگز روی رنگ متن اثر نمی‌گذارد
+                // والپیپر فقط برای نورپردازی Acrylic استفاده می شود؛ هرگز روی رنگ متن اثر نمی گذارد
                 _isWallpaperDark = WallpaperService.IsWallpaperDark(forceRefresh: true);
                 bool isDarkTheme = targetTheme == ElementTheme.Dark;
                 bool useWhiteText = isDarkTheme;
@@ -2794,7 +2794,7 @@ namespace CleanC.UI
                 SwitchToView(_currentView, targetTheme, persist: false);
 
                 // 5. Explicitly apply adaptive foreground brushes to all UI elements
-                //    (D6: در High Contrast رنگ‌های سیستم باید برنده شوند)
+                //    (D6: در High Contrast رنگ های سیستم باید برنده شوند)
                 if (!highContrast)
                 {
                     ApplyAdaptiveForegrounds(primaryBrush, secondaryBrush, tertiaryBrush);
@@ -2808,7 +2808,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                // اگر اینجا سکوت کنیم، تم نیمه‌کاره می‌ماند؛ پس خطا را ثبت می‌کنیم
+                // اگر اینجا سکوت کنیم، تم نیمه کاره می ماند؛ پس خطا را ثبت می کنیم
                 App.LogCrash("ApplyTheme", ex);
             }
             finally
@@ -2825,7 +2825,7 @@ namespace CleanC.UI
                 if (AppTitleText != null) AppTitleText.Foreground = primary;
                 if (RefreshStatsIcon != null) RefreshStatsIcon.Foreground = primary;
 
-                // Hero Card (کارت Aurora در هر دو تم سطح تیره دارد؛ رنگ از ThemeResource می‌آید و دستکاری نمی‌شود)
+                // Hero Card (کارت Aurora در هر دو تم سطح تیره دارد؛ رنگ از ThemeResource می آید و دستکاری نمی شود)
 
                 // Bento RAM Card
                 if (CardRamTitle != null) CardRamTitle.Foreground = primary;
@@ -2861,7 +2861,7 @@ namespace CleanC.UI
         /// <summary>
         /// تعویض نمای اصلی (داشبورد / ابزارها / تنظیمات) + استایل نوار ناوبری.
         /// </summary>
-        /// <param name="persist">اگر true باشد نمای فعلی در تنظیمات ذخیره می‌شود (هنگام رفرش تم false می‌شود).</param>
+        /// <param name="persist">اگر true باشد نمای فعلی در تنظیمات ذخیره می شود (هنگام رفرش تم false می شود).</param>
         private void SwitchToView(AppView view, ElementTheme? overrideTheme = null, bool persist = true)
         {
             _currentView = view;
@@ -2870,10 +2870,15 @@ namespace CleanC.UI
             ToolsView.Visibility = view == AppView.Tools ? Visibility.Visible : Visibility.Collapsed;
             SettingsView.Visibility = view == AppView.Settings ? Visibility.Visible : Visibility.Collapsed;
 
+            if (view == AppView.Tools)
+            {
+                NavigateToToolPage(null);
+            }
+
             if (view == AppView.Dashboard)
             {
                 StartAuroraAnimations();
-                // مقدارها هنگام مخفی بودن به‌روز نمی‌شدند؛ بلافاصله تازه‌سازی کن
+                // مقدارها هنگام مخفی بودن به روز نمی شدند؛ بلافاصله تازه سازی کن
                 RefreshSystemStats();
             }
             else
@@ -2955,7 +2960,7 @@ namespace CleanC.UI
                 SettingsHeaderIcon.Foreground = isSettingsActive ? accentBrush : (useLightText ? new SolidColorBrush(ColorHelper.FromArgb(230, 255, 255, 255)) : new SolidColorBrush(ColorHelper.FromArgb(200, 20, 20, 20)));
             }
 
-            // D2: نمای فعال برای اجرای بعدی ذخیره می‌شود
+            // D2: نمای فعال برای اجرای بعدی ذخیره می شود
             if (persist && _settings.SaveLastView && !_isLoadingSettings)
             {
                 _settings.LastView = view switch
@@ -2994,17 +2999,17 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // D2: ذخیره‌ی تنظیمات (debounce) و مکان‌یابی پنجره
+        // D2: ذخیره ی تنظیمات (debounce) و مکان یابی پنجره
         // ====================================================================
 
-        /// <summary>کنترل‌های صفحه Settings را از تنظیمات پر می‌کند؛ اینجا Toggled نباید چیزی ذخیره کند.</summary>
+        /// <summary>کنترل های صفحه Settings را از تنظیمات پر می کند؛ اینجا Toggled نباید چیزی ذخیره کند.</summary>
         private void PopulateSettingsUi()
         {
             _isLoadingSettings = true;
             try
             {
-                // C6: state صفحه Settings از طریق ViewModel پر می‌شود و x:Bind آن را
-                // به رادیوها/سوییچ‌ها می‌رساند (هیچ ذخیره‌ای در حین hydration رخ نمی‌دهد).
+                // C6: state صفحه Settings از طریق ViewModel پر می شود و x:Bind آن را
+                // به رادیوها/سوییچ ها می رساند (هیچ ذخیره ای در حین hydration رخ نمی دهد).
                 SettingsVm.Hydrate();
 
                 if (LanguageComboBox != null)
@@ -3021,7 +3026,7 @@ namespace CleanC.UI
                     }
                 }
 
-                // F1 — وضعیت شروع خودکار از رجیستری خوانده می‌شود، نه از فایل تنظیمات
+                // F1 — وضعیت شروع خودکار از رجیستری خوانده می شود، نه از فایل تنظیمات
                 AutoStartToggle.IsOn = StartupOptimizerService.IsCleanCRegisteredAtStartup();
 
                 SettingsPathText.Text = Path.GetDirectoryName(SettingsService.FilePath) ?? string.Empty;
@@ -3057,8 +3062,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// قبل از نوشتن فایل تنظیمات صدا زده می‌شود (OnSaveRequested در SettingsStore)
-        /// و موقعیت فعلی پنجره را در تنظیماتِ زنده ثبت می‌کند.
+        /// قبل از نوشتن فایل تنظیمات صدا زده می شود (OnSaveRequested در SettingsStore)
+        /// و موقعیت فعلی پنجره را در تنظیماتِ زنده ثبت می کند.
         /// </summary>
         private void CapturePlacementForSave()
         {
@@ -3070,12 +3075,12 @@ namespace CleanC.UI
             CaptureWindowPlacement();
         }
 
-        /// <summary>ذخیره‌ی فوری؛ همیشه قبل از خروج و بستن پنجره صدا زده می‌شود.</summary>
+        /// <summary>ذخیره ی فوری؛ همیشه قبل از خروج و بستن پنجره صدا زده می شود.</summary>
         private void SaveSettingsNow()
         {
             try
             {
-                // try/catch و ثبت موقعیت پنجره داخل خود SettingsStore انجام می‌شود
+                // try/catch و ثبت موقعیت پنجره داخل خود SettingsStore انجام می شود
                 _settingsStore.SaveNow();
             }
             catch (Exception ex)
@@ -3123,8 +3128,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// آیا مستطیل ذخیره‌شده روی یکی از نمایشگرهای فعلی دست‌کم ۶۴ پیکسل دیده می‌شود؟
-        /// این چک جلوی باز شدن پنجره روی مانیتور قطع‌شده (یا خارج از صفحه) را می‌گیرد.
+        /// آیا مستطیل ذخیره شده روی یکی از نمایشگرهای فعلی دست کم ۶۴ پیکسل دیده می شود؟
+        /// این چک جلوی باز شدن پنجره روی مانیتور قطع شده (یا خارج از صفحه) را می گیرد.
         /// </summary>
         private static bool IsPlacementOnScreen(int x, int y, int width, int height)
         {
@@ -3147,10 +3152,10 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // D3: رفتار تری‌آیکون (مخفی‌سازی و خروج ایمن)
+        // D3: رفتار تری آیکون (مخفی سازی و خروج ایمن)
         // ====================================================================
 
-        /// <summary>پنهان کردن پنجره در تری‌آیکون؛ برنامه زنده می‌ماند و فقط HWND مخفی می‌شود.</summary>
+        /// <summary>پنهان کردن پنجره در تری آیکون؛ برنامه زنده می ماند و فقط HWND مخفی می شود.</summary>
         private void HideToTray()
         {
             try
@@ -3161,7 +3166,7 @@ namespace CleanC.UI
                 {
                     _trayHintShown = true;
                     _trayManager?.ShowBalloonNotification(
-                        "CleanC در تری‌آیکون",
+                        "CleanC در تری آیکون",
                         "برای بازگرداندن پنجره روی آیکون کنار ساعت کلیک کنید.");
                 }
             }
@@ -3172,7 +3177,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// خروج واقعی از برنامه. مسیر تری هم از همین‌جا می‌گذرد تا تنظیمات ذخیره شود
+        /// خروج واقعی از برنامه. مسیر تری هم از همین جا می گذرد تا تنظیمات ذخیره شود
         /// و لغوِ Close-to-Tray مانع بستن نشود.
         /// </summary>
         private void ExitApplication()
@@ -3186,7 +3191,7 @@ namespace CleanC.UI
 
         // ====================================================================
         // D2/C6: رویدادهای صفحه Settings
-        // state اصلی در SettingsViewModel است؛ اینجا فقط «نمایش» رخ می‌دهد
+        // state اصلی در SettingsViewModel است؛ اینجا فقط «نمایش» رخ می دهد
         // (اعمال تم و InfoBar هشدار حذف قطعی).
         // ====================================================================
 
@@ -3194,15 +3199,15 @@ namespace CleanC.UI
         {
             if (_isLoadingSettings || sender is not RadioButton radio) return;
 
-            // نوشتنِ مقدار با VM است؛ تمِ رابط کاربری از رویداد ThemeChangeRequested اعمال می‌شود
+            // نوشتنِ مقدار با VM است؛ تمِ رابط کاربری از رویداد ThemeChangeRequested اعمال می شود
             SettingsVm.Theme = ReferenceEquals(radio, ThemeDarkRadio) ? "Dark"
                              : ReferenceEquals(radio, ThemeLightRadio) ? "Light"
                              : "System";
         }
 
         /// <summary>
-        /// F1 — ثبت/حذف CleanC در آیتم‌های اجرای خودکار ویندوز (HKCU\...\Run).
-        /// منبع حقیقت رجیستری است؛ اگر نوشتن شکست بخورد، کلید برمی‌گردد تا UI با
+        /// F1 — ثبت/حذف CleanC در آیتم های اجرای خودکار ویندوز (HKCU\...\Run).
+        /// منبع حقیقت رجیستری است؛ اگر نوشتن شکست بخورد، کلید برمی گردد تا UI با
         /// وضعیت واقعی سیستم ناهمگام نماند.
         /// </summary>
         private void AutoStartToggle_Toggled(object sender, RoutedEventArgs e)
@@ -3229,7 +3234,7 @@ namespace CleanC.UI
                 ShowInfoBar(
                     "شروع همراه با ویندوز",
                     enabled
-                        ? "CleanC هنگام ورود به ویندوز به‌صورت خودکار اجرا می‌شود."
+                        ? "CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود."
                         : "اجرای خودکار CleanC غیرفعال شد.",
                     InfoBarSeverity.Success);
             }
@@ -3240,9 +3245,9 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F3 — اثرِ نمایشیِ تغییر رفتار حذفِ فایل‌های شخصی (از رویداد SettingsVm).
-        /// نوشتنِ تنظیم و همگام‌سازی <see cref="SafeDeleteService.DefaultMode"/> داخل VM است؛
-        /// اینجا فقط هشدار حالت Permanent نشان داده می‌شود.
+        /// F3 — اثرِ نمایشیِ تغییر رفتار حذفِ فایل های شخصی (از رویداد SettingsVm).
+        /// نوشتنِ تنظیم و همگام سازی <see cref="SafeDeleteService.DefaultMode"/> داخل VM است؛
+        /// اینجا فقط هشدار حالت Permanent نشان داده می شود.
         /// </summary>
         private void OnDeleteModeChangedInUi(string mode)
         {
@@ -3250,7 +3255,7 @@ namespace CleanC.UI
             {
                 ShowInfoBar(
                     "حذف قطعی فعال شد",
-                    "فایل‌های شخصی دیگر به سطل بازیافت نمی‌روند و قابل بازگردانی نخواهند بود. کش و زباله‌ها همچنان قطعی حذف می‌شوند.",
+                    "فایل های شخصی دیگر به سطل بازیافت نمی روند و قابل بازگردانی نخواهند بود. کش و زباله ها همچنان قطعی حذف می شوند.",
                     InfoBarSeverity.Warning);
             }
         }
@@ -3273,12 +3278,12 @@ namespace CleanC.UI
             _appWindow.Resize(new SizeInt32(1080, 800));
             CenterWindowOnScreen();
             SaveSettingsNow();
-            ShowInfoBar("اندازه‌ی پنجره بازنشانی شد", "پنجره با ابعاد پیش‌فرض ۱۰۸۰×۸۰۰ در مرکز صفحه قرار گرفت.", InfoBarSeverity.Informational);
+            ShowInfoBar("اندازه ی پنجره بازنشانی شد", "پنجره با ابعاد پیش فرض ۱۰۸۰×۸۰۰ در مرکز صفحه قرار گرفت.", InfoBarSeverity.Informational);
         }
 
         private void ResetAllSettingsBtn_Click(object sender, RoutedEventArgs e)
         {
-            // شیء تنظیمات در استور عوض می‌شود؛ PopulateSettingsUi دوباره VM را Hydrate می‌کند
+            // شیء تنظیمات در استور عوض می شود؛ PopulateSettingsUi دوباره VM را Hydrate می کند
             _settingsStore.Replace(new AppSettings());
             PopulateSettingsUi();
             SaveSettingsNow();
@@ -3286,7 +3291,7 @@ namespace CleanC.UI
             LocalizationService.SetLanguage(_settings.Language);
             ApplyLanguage();
             SwitchToView(AppView.Dashboard, persist: false);
-            ShowInfoBar("تنظیمات بازنشانی شد", "همه‌ی تنظیمات به حالت پیش‌فرض برگشت.", InfoBarSeverity.Success);
+            ShowInfoBar("تنظیمات بازنشانی شد", "همه ی تنظیمات به حالت پیش فرض برگشت.", InfoBarSeverity.Success);
         }
 
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -3310,10 +3315,10 @@ namespace CleanC.UI
 
         private void UpdateBackButtonsDirection(bool isRtl)
         {
-            string glyph = isRtl ? "\uE76C" : "\uE76B";
+            string glyph = isRtl ? "\uE72A" : "\uE72B";
             foreach (var icon in _toolBackIcons)
             {
-                icon.Glyph = glyph;
+                if (icon != null) icon.Glyph = glyph;
             }
         }
 
@@ -3339,7 +3344,7 @@ namespace CleanC.UI
                 Application.Current.Resources["ContentControlThemeFontFamily"] = ff;
 
                 // Update UI text strings
-                if (NavDashboardText != null) NavDashboardText.Text = LocalizationService.Get("NavDashboard", "داشبورد بهینه‌سازی");
+                if (NavDashboardText != null) NavDashboardText.Text = LocalizationService.Get("NavDashboard", "داشبورد بهینه سازی");
                 if (NavToolsText != null) NavToolsText.Text = LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز");
 
                 if (HeroHealthCategoryText != null) HeroHealthCategoryText.Text = LocalizationService.Get("HeroCategory", "وضعیت سلامت و کارایی سیستم");
@@ -3352,64 +3357,78 @@ namespace CleanC.UI
                 if (HeroHealthSubtitle != null)
                 {
                     HeroHealthSubtitle.Text = _isCleanedRecently
-                        ? LocalizationService.Get("HeroSubtitleOptimized", "تمام فایل‌های موقت پاکسازی و سرویس‌ها بهینه‌سازی شدند.")
-                        : LocalizationService.Get("HeroSubtitleReady", "با یک کلیک حافظه موقت و فایل‌های زائد را پاکسازی کنید.");
+                        ? LocalizationService.Get("HeroSubtitleOptimized", "تمام فایل های موقت پاکسازی و سرویس ها بهینه سازی شدند.")
+                        : LocalizationService.Get("HeroSubtitleReady", "با یک کلیک حافظه موقت و فایل های زائد را پاکسازی کنید.");
                 }
                 if (QuickBoostBtnText != null && !_isBusy)
                 {
-                    QuickBoostBtnText.Text = LocalizationService.Get("QuickBoost", "بهینه‌سازی و ارتقای سرعت سیستم");
+                    QuickBoostBtnText.Text = LocalizationService.Get("QuickBoost", "بهینه سازی و ارتقای سرعت سیستم");
                 }
 
                 // Bento Cards
                 if (CardRamTitle != null) CardRamTitle.Text = LocalizationService.Get("RamTitle", "مصرف رم (RAM)");
                 if (CardCpuTitle != null) CardCpuTitle.Text = LocalizationService.Get("CpuTitle", "پردازنده (CPU)");
                 if (CardDiskTitle != null) CardDiskTitle.Text = LocalizationService.Get("DiskBreakdownTitle", "فضای دیسک و درایوها (Storage)");
-                if (AdvancedCleanExpanderTitle != null) AdvancedCleanExpanderTitle.Text = LocalizationService.Get("AdvancedCleanTitle", "سفارشی‌سازی موارد پاکسازی و بهینه‌سازی");
+                if (AdvancedCleanExpanderTitle != null) AdvancedCleanExpanderTitle.Text = LocalizationService.Get("AdvancedCleanTitle", "سفارشی سازی موارد پاکسازی و بهینه سازی");
                 if (ToolsHeaderTitle != null) ToolsHeaderTitle.Text = LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز");
 
-                // All 11 Tool Back Buttons
-                string backStr = LocalizationService.Get("BackButton", "بازگشت");
-                var backButtons = new[]
-                {
-                    ToolBackText1, ToolBackText2, ToolBackText3, ToolBackText4,
-                    ToolBackText5, ToolBackText6, ToolBackText7, ToolBackText8,
-                    ToolBackText9, ToolBackText10, ToolBackText11
-                };
-                foreach (var tb in backButtons)
-                {
-                    if (tb != null) tb.Text = backStr;
-                }
+                // Launcher Tool Cards Localization
+                if (LauncherWindowsUpdateTitle != null) LauncherWindowsUpdateTitle.Text = LocalizationService.Get("LauncherWindowsUpdateTitle", "آپدیت ویندوز");
+                if (LauncherWindowsUpdateDesc != null) LauncherWindowsUpdateDesc.Text = LocalizationService.Get("LauncherWindowsUpdateDesc", "بررسی، توقف ۵ هفته ای و رفع گیر کردن دانلود");
+                if (LauncherUninstallerTitle != null) LauncherUninstallerTitle.Text = LocalizationService.Get("LauncherUninstallerTitle", "حذف نرم افزارها");
+                if (LauncherUninstallerDesc != null) LauncherUninstallerDesc.Text = LocalizationService.Get("LauncherUninstallerDesc", "لیست برنامه ها با آیکون اختصاصی و حذف آسان");
+                if (LauncherStartupTitle != null) LauncherStartupTitle.Text = LocalizationService.Get("LauncherStartupTitle", "برنامه های استارتاپ");
+                if (LauncherStartupDesc != null) LauncherStartupDesc.Text = LocalizationService.Get("LauncherStartupDesc", "مدیریت برنامه های شروع خودکار و سرعت بوت");
+                if (LauncherSpeedTestTitle != null) LauncherSpeedTestTitle.Text = LocalizationService.Get("LauncherSpeedTestTitle", "تست سرعت اینترنت");
+                if (LauncherSpeedTestDesc != null) LauncherSpeedTestDesc.Text = LocalizationService.Get("LauncherSpeedTestDesc", "سنجش دانلود واقعی، آپلود، پینگ و ISP");
+
+                if (ToolsSectionFrequentlyUsed != null) ToolsSectionFrequentlyUsed.Text = LocalizationService.Get("ToolsSectionFrequentlyUsed", "پرکاربرد");
+                if (ToolsSectionOtherTools != null) ToolsSectionOtherTools.Text = LocalizationService.Get("ToolsSectionOtherTools", "سایر ابزارها");
+
+                if (LauncherToolDeepStorageText != null) LauncherToolDeepStorageText.Text = LocalizationService.Get("LauncherToolDeepStorage", "پاکسازی عمیق دیسک");
+                if (LauncherToolSpecsText != null) LauncherToolSpecsText.Text = LocalizationService.Get("LauncherToolSpecs", "مشخصات سیستم");
+                if (LauncherToolPersonalizationText != null) LauncherToolPersonalizationText.Text = LocalizationService.Get("LauncherToolPersonalization", "استایل و گرافیک");
+                if (LauncherToolDriversText != null) LauncherToolDriversText.Text = LocalizationService.Get("LauncherToolDrivers", "مدیریت درایورها");
+                if (LauncherToolDnsText != null) LauncherToolDnsText.Text = LocalizationService.Get("LauncherToolDns", "تنظیم DNS و تحریم شکن");
+                if (LauncherToolPrivacyText != null) LauncherToolPrivacyText.Text = LocalizationService.Get("LauncherToolPrivacy", "حریم خصوصی و ضدجاسوسی");
+                if (LauncherToolRecycleBinText != null) LauncherToolRecycleBinText.Text = LocalizationService.Get("LauncherToolRecycleBin", "سطل بازیافت");
 
                 if (SettingsHeaderTitle != null) SettingsHeaderTitle.Text = LocalizationService.Get("SettingsTitle", "تنظیمات برنامه");
-                if (SettingsHeaderSubtitle != null) SettingsHeaderSubtitle.Text = LocalizationService.Get("SettingsSub", "شخصی‌سازی ظاهر، زبان، رفتار پس‌زمینه و تهیه گزارش");
-                if (SettingsLangTitle != null) SettingsLangTitle.Text = LocalizationService.Get("LanguageTitle", "زبان برنامه (Language)");
-                if (SettingsLangDesc != null) SettingsLangDesc.Text = LocalizationService.Get("LanguageSub", "انتخاب زبان رابط کاربری، جهت نوشتاری (RTL / LTR) و تایپوگرافی نیتیو سیستم‌عامل.");
+                if (SettingsHeaderSubtitle != null) SettingsHeaderSubtitle.Text = LocalizationService.Get("SettingsSub", "شخصی سازی ظاهر، زبان، رفتار پس زمینه و تهیه گزارش");
+                
+                string rawLang = LocalizationService.Get("LanguageTitle", "زبان برنامه");
+                if (!rawLang.Contains("(Language)", StringComparison.OrdinalIgnoreCase))
+                {
+                    rawLang = $"{rawLang} (Language)";
+                }
+                if (SettingsLangTitle != null) SettingsLangTitle.Text = rawLang;
+                if (SettingsLangDesc != null) SettingsLangDesc.Text = LocalizationService.Get("LanguageSub", "انتخاب زبان رابط کاربری، جهت نوشتاری (RTL / LTR) و تایپوگرافی نیتیو سیستم عامل.");
                 if (SettingsThemeTitle != null) SettingsThemeTitle.Text = LocalizationService.Get("ThemeTitle", "تم برنامه");
-                if (SettingsThemeDesc != null) SettingsThemeDesc.Text = LocalizationService.Get("ThemeSub", "«سیستم» از تم ویندوز پیروی می‌کند؛ دو حالت دیگر تم را ثابت نگه می‌دارند.");
+                if (SettingsThemeDesc != null) SettingsThemeDesc.Text = LocalizationService.Get("ThemeSub", "«سیستم» از تم ویندوز پیروی می کند؛ دو حالت دیگر تم را ثابت نگه می دارند.");
                 if (ThemeSystemRadio != null) ThemeSystemRadio.Content = LocalizationService.Get("ThemeSystem", "سیستم");
                 if (ThemeLightRadio != null) ThemeLightRadio.Content = LocalizationService.Get("ThemeLight", "روشن");
                 if (ThemeDarkRadio != null) ThemeDarkRadio.Content = LocalizationService.Get("ThemeDark", "تاریک");
 
-                if (SettingsTrayTitle != null) SettingsTrayTitle.Text = LocalizationService.Get("BackgroundBehaviorTitle", "اجرا در پس‌زمینه و نوار وظیفه");
-                if (SettingsTrayDesc != null) SettingsTrayDesc.Text = LocalizationService.Get("BackgroundBehaviorSub", "کنترل حضور برنامه در پس‌زمینه و دسترسی سریع از طریق آیکون کنار ساعت ویندوز.");
-                if (SettingsCloseToTrayText != null) SettingsCloseToTrayText.Text = LocalizationService.Get("CloseToTray", "با بستن پنجره خارج نشو؛ در پس‌زمینه (کنار ساعت) بمان");
-                if (SettingsMinToTrayText != null) SettingsMinToTrayText.Text = LocalizationService.Get("MinimizeToTray", "کوچک‌نمایی پنجره، برنامه را در کنار ساعت پنهان کند");
+                if (SettingsTrayTitle != null) SettingsTrayTitle.Text = LocalizationService.Get("BackgroundBehaviorTitle", "اجرا در پس زمینه و نوار وظیفه");
+                if (SettingsTrayDesc != null) SettingsTrayDesc.Text = LocalizationService.Get("BackgroundBehaviorSub", "کنترل حضور برنامه در پس زمینه و دسترسی سریع از طریق آیکون کنار ساعت ویندوز.");
+                if (SettingsCloseToTrayText != null) SettingsCloseToTrayText.Text = LocalizationService.Get("CloseToTray", "با بستن پنجره خارج نشو؛ در پس زمینه (کنار ساعت) بمان");
+                if (SettingsMinToTrayText != null) SettingsMinToTrayText.Text = LocalizationService.Get("MinimizeToTray", "کوچک نمایی پنجره، برنامه را در کنار ساعت پنهان کند");
 
                 if (SettingsExportTitle != null) SettingsExportTitle.Text = LocalizationService.Get("ExportReportTitle", "خروجی گزارش");
-                if (SettingsExportDesc != null) SettingsExportDesc.Text = LocalizationService.Get("ExportReportSub", "خروجی اطلاعات جامع سیستم جهت ارسال به هوش مصنوعی یا بررسی مشخصات سخت‌افزاری با فرمت متنی تمیز.");
+                if (SettingsExportDesc != null) SettingsExportDesc.Text = LocalizationService.Get("ExportReportSub", "خروجی اطلاعات جامع سیستم جهت ارسال به هوش مصنوعی یا بررسی مشخصات سخت افزاری با فرمت متنی تمیز.");
                 if (ExportAiReportText != null) ExportAiReportText.Text = LocalizationService.Get("ExportAiReport", "گزارش جامع برای هوش مصنوعی (.md)");
                 if (ExportSpecsTxtText != null) ExportSpecsTxtText.Text = LocalizationService.Get("ExportSpecsReport", "مشخصات کامل سیستم (.txt)");
 
                 if (SettingsAboutTitle != null) SettingsAboutTitle.Text = LocalizationService.Get("AboutTitle", "درباره CleanC");
-                if (SettingsAboutDesc != null) SettingsAboutDesc.Text = LocalizationService.Get("AboutSub", "برای گزارش باگ، اطلاعات عیب‌یابی را کپی و همراه با مشکل ارسال کنید.");
-                if (CheckAppUpdatesText != null) CheckAppUpdatesText.Text = LocalizationService.Get("CheckUpdates", "بررسی به‌روزرسانی");
+                if (SettingsAboutDesc != null) SettingsAboutDesc.Text = LocalizationService.Get("AboutSub", "برای گزارش باگ، اطلاعات عیب یابی را کپی و همراه با مشکل ارسال کنید.");
+                if (CheckAppUpdatesText != null) CheckAppUpdatesText.Text = LocalizationService.Get("CheckUpdates", "بررسی به روزرسانی");
                 if (OpenProjectPageText != null) OpenProjectPageText.Text = LocalizationService.Get("ProjectPage", "صفحه پروژه");
-                if (CopyDiagnosticsText != null) CopyDiagnosticsText.Text = LocalizationService.Get("CopyDiagnostics", "کپی اطلاعات عیب‌یابی");
+                if (CopyDiagnosticsText != null) CopyDiagnosticsText.Text = LocalizationService.Get("CopyDiagnostics", "کپی اطلاعات عیب یابی");
 
                 if (SettingsHeaderBtn != null) ToolTipService.SetToolTip(SettingsHeaderBtn, LocalizationService.Get("Settings", "تنظیمات برنامه (Settings)"));
                 if (UndoCenterBtn != null) ToolTipService.SetToolTip(UndoCenterBtn, LocalizationService.Get("RestoreCenter", "مرکز بازیابی و بازگشت تغییرات"));
                 if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "بروزرسانی وضعیت سیستم"));
-                if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان‌ها"));
+                if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها"));
             }
             catch (Exception ex)
             {
@@ -3446,8 +3465,8 @@ namespace CleanC.UI
         // ====================================================================
 
         /// <summary>
-        /// دیالوگ ذخیره‌ی فایل. <c>FileSavePicker</c> در WinUI 3 باید به دسته‌ی پنجره
-        /// وصل شود، وگرنه از پشت پنجره‌ی اصلی باز نمی‌شود.
+        /// دیالوگ ذخیره ی فایل. <c>FileSavePicker</c> در WinUI 3 باید به دسته ی پنجره
+        /// وصل شود، وگرنه از پشت پنجره ی اصلی باز نمی شود.
         /// </summary>
         private async Task<string?> PickSavePathAsync(string choiceLabel, string extension, string suggestedFileName)
         {
@@ -3491,7 +3510,7 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "ExportAiReport");
-                ShowInfoBar("خروجی گزارش", "ذخیره‌ی گزارش هوش مصنوعی انجام نشد.", InfoBarSeverity.Error);
+                ShowInfoBar("خروجی گزارش", "ذخیره ی گزارش هوش مصنوعی انجام نشد.", InfoBarSeverity.Error);
             }
         }
 
@@ -3505,7 +3524,7 @@ namespace CleanC.UI
 
             try
             {
-                // اگر هنوز صفحه‌ی مشخصات باز نشده، همین‌جا می‌گیریم
+                // اگر هنوز صفحه ی مشخصات باز نشده، همین جا می گیریم
                 var specs = _cachedSpecs ?? await SystemSpecsService.GetDetailedSpecsAsync();
                 _cachedSpecs = specs;
 
@@ -3516,7 +3535,7 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "ExportSpecsTxt");
-                ShowInfoBar("خروجی گزارش", "ذخیره‌ی گزارش مشخصات انجام نشد (مسیر در دسترس نیست).", InfoBarSeverity.Error);
+                ShowInfoBar("خروجی گزارش", "ذخیره ی گزارش مشخصات انجام نشد (مسیر در دسترس نیست).", InfoBarSeverity.Error);
             }
         }
 
@@ -3534,12 +3553,12 @@ namespace CleanC.UI
                 var items = await Task.Run(StartupOptimizerService.GetStartupItems);
                 string csv = ReportExportService.BuildStartupCsv(items);
                 ReportExportService.WriteUtf8Bom(path, csv);
-                ShowInfoBar("خروجی گزارش", $"فهرست {items.Count} آیتم استارت‌آپ در «{path}» ذخیره شد.", InfoBarSeverity.Success);
+                ShowInfoBar("خروجی گزارش", $"فهرست {items.Count} آیتم استارت آپ در «{path}» ذخیره شد.", InfoBarSeverity.Success);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "ExportStartupCsv");
-                ShowInfoBar("خروجی گزارش", "ذخیره‌ی فهرست استارت‌آپ انجام نشد.", InfoBarSeverity.Error);
+                ShowInfoBar("خروجی گزارش", "ذخیره ی فهرست استارت آپ انجام نشد.", InfoBarSeverity.Error);
             }
         }
 
@@ -3559,20 +3578,20 @@ namespace CleanC.UI
 
                 string csv = ReportExportService.BuildCleanupHistoryCsv(rows);
                 ReportExportService.WriteUtf8Bom(path, csv);
-                ShowInfoBar("خروجی گزارش", $"تاریخچه‌ی پاکسازی ({rows.Count} رکورد) در «{path}» ذخیره شد.", InfoBarSeverity.Success);
+                ShowInfoBar("خروجی گزارش", $"تاریخچه ی پاکسازی ({rows.Count} رکورد) در «{path}» ذخیره شد.", InfoBarSeverity.Success);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "ExportCleanupCsv");
-                ShowInfoBar("خروجی گزارش", "ذخیره‌ی تاریخچه‌ی پاکسازی انجام نشد.", InfoBarSeverity.Error);
+                ShowInfoBar("خروجی گزارش", "ذخیره ی تاریخچه ی پاکسازی انجام نشد.", InfoBarSeverity.Error);
             }
         }
 
         // ====================================================================
-        // D8 — درباره، به‌روزرسانی و عیب‌یابی
+        // D8 — درباره، به روزرسانی و عیب یابی
         // ====================================================================
 
-        /// <summary>مخزن پروژه — از remote واقعی git گرفته می‌شود، نه مقدار حدسی.</summary>
+        /// <summary>مخزن پروژه — از remote واقعی git گرفته می شود، نه مقدار حدسی.</summary>
         private const string ProjectPageUrl = "https://github.com/mohammad-ahw/CleanC";
         private const string ReleasesApiUrl = "https://api.github.com/repos/mohammad-ahw/CleanC/releases/latest";
 
@@ -3585,7 +3604,7 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "OpenProjectPage");
-                ShowInfoBar("درباره CleanC", "باز کردن صفحه‌ی پروژه ممکن نشد.", InfoBarSeverity.Warning);
+                ShowInfoBar("درباره CleanC", "باز کردن صفحه ی پروژه ممکن نشد.", InfoBarSeverity.Warning);
             }
         }
 
@@ -3597,46 +3616,46 @@ namespace CleanC.UI
                 var dp = new Windows.ApplicationModel.DataTransfer.DataPackage();
                 dp.SetText(text);
                 Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
-                ShowInfoBar("اطلاعات عیب‌یابی کپی شد", "حالا می‌توانی آن را در گزارش باگ جای‌گذاری کنی.", InfoBarSeverity.Success);
+                ShowInfoBar("اطلاعات عیب یابی کپی شد", "حالا می توانی آن را در گزارش باگ جای گذاری کنی.", InfoBarSeverity.Success);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "CopyDiagnostics");
-                ShowInfoBar("اطلاعات عیب‌یابی", "کپی کردن ممکن نشد.", InfoBarSeverity.Error);
+                ShowInfoBar("اطلاعات عیب یابی", "کپی کردن ممکن نشد.", InfoBarSeverity.Error);
             }
         }
 
-        // نام‌گذاری با «App»: متدِ هم‌نامِ CheckUpdatesBtn_Click برای بروزرسانیِ خودِ ویندوز در
-        // MainWindow.Tools.cs وجود دارد و این یکی مخصوص نسخه‌ی خودِ CleanC است.
+        // نام گذاری با «App»: متدِ هم نامِ CheckUpdatesBtn_Click برای بروزرسانیِ خودِ ویندوز در
+        // MainWindow.Tools.cs وجود دارد و این یکی مخصوص نسخه ی خودِ CleanC است.
         private void CheckAppUpdatesBtn_Click(object sender, RoutedEventArgs e)
             => SafeInvoker.Run(CheckAppUpdatesBtn_ClickAsync());
 
         private async Task CheckAppUpdatesBtn_ClickAsync()
         {
             string local = ReportExportService.GetVersion(typeof(MainWindow).Assembly);
-            ShowInfoBar("بررسی به‌روزرسانی", "در حال بررسی...", InfoBarSeverity.Informational);
+            ShowInfoBar("بررسی به روزرسانی", "در حال بررسی...", InfoBarSeverity.Informational);
 
             try
             {
                 using var client = new System.Net.Http.HttpClient();
                 client.Timeout = TimeSpan.FromSeconds(15);
-                // GitHub API بدون User-Agent درخواست را رد می‌کند
+                // GitHub API بدون User-Agent درخواست را رد می کند
                 client.DefaultRequestHeaders.UserAgent.ParseAdd("CleanC-UpdateCheck");
 
                 using var resp = await client.GetAsync(ReleasesApiUrl);
 
                 if (resp.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    ShowInfoBar("بررسی به‌روزرسانی",
-                        $"هنوز نسخه‌ای منتشر نشده (یا مخزن خصوصی است). نسخه‌ی فعلی: {local}",
+                    ShowInfoBar("بررسی به روزرسانی",
+                        $"هنوز نسخه ای منتشر نشده (یا مخزن خصوصی است). نسخه ی فعلی: {local}",
                         InfoBarSeverity.Informational);
                     return;
                 }
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    ShowInfoBar("بررسی به‌روزرسانی",
-                        $"نتوانستم منبع نسخه‌ها را بخوانم (کد {(int)resp.StatusCode}). نسخه‌ی فعلی: {local}",
+                    ShowInfoBar("بررسی به روزرسانی",
+                        $"نتوانستم منبع نسخه ها را بخوانم (کد {(int)resp.StatusCode}). نسخه ی فعلی: {local}",
                         InfoBarSeverity.Warning);
                     return;
                 }
@@ -3645,27 +3664,27 @@ namespace CleanC.UI
                 string? tag = ExtractJsonString(json, "tag_name");
                 if (string.IsNullOrWhiteSpace(tag))
                 {
-                    ShowInfoBar("بررسی به‌روزرسانی", $"پاسخ منبع نامعتبر بود. نسخه‌ی فعلی: {local}", InfoBarSeverity.Warning);
+                    ShowInfoBar("بررسی به روزرسانی", $"پاسخ منبع نامعتبر بود. نسخه ی فعلی: {local}", InfoBarSeverity.Warning);
                     return;
                 }
 
                 string remote = tag.TrimStart('v', 'V');
-                ShowInfoBar("بررسی به‌روزرسانی",
+                ShowInfoBar("بررسی به روزرسانی",
                     IsNewer(remote, local)
-                        ? $"نسخه‌ی جدیدتری منتشر شده: {remote} (نسخه‌ی فعلی: {local})"
-                        : $"به‌روز هستی؛ آخرین نسخه‌ی منتشرشده {remote} است.",
+                        ? $"نسخه ی جدیدتری منتشر شده: {remote} (نسخه ی فعلی: {local})"
+                        : $"به روز هستی؛ آخرین نسخه ی منتشرشده {remote} است.",
                     IsNewer(remote, local) ? InfoBarSeverity.Success : InfoBarSeverity.Informational);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "CheckUpdates");
-                ShowInfoBar("بررسی به‌روزرسانی",
-                    $"بررسی به‌روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخه‌ی فعلی: {local}",
+                ShowInfoBar("بررسی به روزرسانی",
+                    $"بررسی به روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخه ی فعلی: {local}",
                     InfoBarSeverity.Warning);
             }
         }
 
-        /// <summary>استخراج یک رشته‌ی ساده از JSON بدون وابستگی به کتابخانه‌ی جدا (فقط فیلدهای تخت).</summary>
+        /// <summary>استخراج یک رشته ی ساده از JSON بدون وابستگی به کتابخانه ی جدا (فقط فیلدهای تخت).</summary>
         private static string? ExtractJsonString(string json, string property)
         {
             if (string.IsNullOrEmpty(json)) return null;
@@ -3695,7 +3714,7 @@ namespace CleanC.UI
             return sb.ToString();
         }
 
-        /// <summary>مقایسه‌ی دو نسخه‌ی عددی‌شده؛ اگر قابل پارس نبود، فقط نامتناسب بودن را چک می‌کند.</summary>
+        /// <summary>مقایسه ی دو نسخه ی عددی شده؛ اگر قابل پارس نبود، فقط نامتناسب بودن را چک می کند.</summary>
         private static bool IsNewer(string remote, string local)
         {
             if (Version.TryParse(Normalize(remote), out var r) && Version.TryParse(Normalize(local), out var l))
@@ -3812,12 +3831,12 @@ namespace CleanC.UI
         // ====================================================================
 
         /// <summary>
-        /// کش نام پروسه‌های در حال اجرا.
+        /// کش نام پروسه های در حال اجرا.
         ///
         /// قبلاً این متد برای هر تیک تایمر (هر ۲٫۵ ثانیه) تا ۱۱ بار
-        /// <see cref="Process.GetProcessesByName(string)"/> صدا می‌زد؛ هرکدام یعنی
-        /// یک اسکن کامل لیست پروسه‌های سیستم. حالا فقط یک بار <c>Process.GetProcesses()</c>
-        /// می‌زنیم و نتیجه را ۲ ثانیه نگه می‌داریم.
+        /// <see cref="Process.GetProcessesByName(string)"/> صدا می زد؛ هرکدام یعنی
+        /// یک اسکن کامل لیست پروسه های سیستم. حالا فقط یک بار <c>Process.GetProcesses()</c>
+        /// می زنیم و نتیجه را ۲ ثانیه نگه می داریم.
         /// </summary>
         private static HashSet<string>? _runningProcessNames;
         private static DateTime _runningProcessNamesAtUtc = DateTime.MinValue;
@@ -3867,7 +3886,7 @@ namespace CleanC.UI
                 if (running.Contains("chrome")) return "مرورگر گوگل کروم";
                 if (running.Contains("firefox")) return "مرورگر فایرفاکس";
                 if (running.Contains("Discord")) return "دیسکورد (Discord)";
-                if (running.Contains("Telegram")) return "پیام‌رسان تلگرام";
+                if (running.Contains("Telegram")) return "پیام رسان تلگرام";
                 if (running.Contains("Spotify")) return "استریم اسپاتیفای";
                 if (running.Contains("DoSvc")) return "سرویس آپدیت ویندوز";
             }
@@ -3891,8 +3910,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// مقدار آزادشده یک نوبت پاکسازی را در تاریخچه روزانه ثبت می‌کند.
-        /// اگر امروز قبلاً رکورد داشته باشیم، جمع می‌شود (چند پاکسازی در یک روز).
+        /// مقدار آزادشده یک نوبت پاکسازی را در تاریخچه روزانه ثبت می کند.
+        /// اگر امروز قبلاً رکورد داشته باشیم، جمع می شود (چند پاکسازی در یک روز).
         /// </summary>
         private void RecordCleanupSession(long bytes)
         {
@@ -3902,7 +3921,7 @@ namespace CleanC.UI
             if (existing != null) existing.Bytes += bytes;
             else _cleanupHistory.Add(new CleanupHistoryEntry { Date = today, Bytes = bytes });
 
-            // نگه‌داشتن حداکثر ۹۰ روز؛ قدیمی‌تر حذف می‌شود
+            // نگه داشتن حداکثر ۹۰ روز؛ قدیمی تر حذف می شود
             if (_cleanupHistory.Count > 90)
                 _cleanupHistory.RemoveRange(0, _cleanupHistory.Count - 90);
         }
@@ -3944,7 +3963,7 @@ namespace CleanC.UI
             }
             catch
             {
-                // فایل خراب/غیرقابل‌خواندن → همه چیز صفر می‌ماند
+                // فایل خراب/غیرقابل خواندن → همه چیز صفر می ماند
             }
 
             UpdateCumulativeChipsUI();
@@ -4007,7 +4026,7 @@ namespace CleanC.UI
         // ====================================================================
 
         /// <summary>
-        /// نوار سه‌تکه دیسک (استفاده‌شده / قابل پاکسازی / آزاد) را با داده واقعی رندر می‌کند.
+        /// نوار سه تکه دیسک (استفاده شده / قابل پاکسازی / آزاد) را با داده واقعی رندر می کند.
         /// </summary>
         private void RenderDiskBreakdown(double totalGb, double freeGb, long cleanableBytes)
         {
@@ -4029,7 +4048,7 @@ namespace CleanC.UI
             double cleanPct = cleanableGb / totalGb * 100.0;
             double freePct = Math.Max(0, 100.0 - usedPct - cleanPct);
 
-            // تایمر هر ۲٫۵ ثانیه فراخوانی می‌کند؛ فقط وقتی عدد واقعاً تغییر کرده layout می‌دهیم
+            // تایمر هر ۲٫۵ ثانیه فراخوانی می کند؛ فقط وقتی عدد واقعاً تغییر کرده layout می دهیم
             string usedTxt = $"{usedPct:0.#}%";
             string cleanTxt = cleanableGb > 0.01 ? $"{cleanPct:0.#}%" : "—";
             string freeTxt = $"{freePct:0.#}%";
@@ -4055,7 +4074,7 @@ namespace CleanC.UI
 
         /// <summary>
         /// نمودار ۷ پاکسازی اخیر — آخرین ستون همیشه «امروز» است و فقط مقادیر
-        /// ثبت‌شده واقعی نمایش داده می‌شوند؛ روزهای بدون پاکسازی «—» می‌مانند.
+        /// ثبت شده واقعی نمایش داده می شوند؛ روزهای بدون پاکسازی «—» می مانند.
         /// </summary>
         private void RenderCleanupHistory()
         {
@@ -4081,7 +4100,7 @@ namespace CleanC.UI
                 values[i] = days[i] > 0 ? SystemStats.FormatBytes(days[i]) : "—";
             }
 
-            // ستون‌ها به ترتیب در Children قرار دارند: TextBlock مقدار، Border نوار، TextBlock برچسب
+            // ستون ها به ترتیب در Children قرار دارند: TextBlock مقدار، Border نوار، TextBlock برچسب
             var columns = new List<StackPanel>();
             foreach (var child in CleanupHistoryBars.Children)
             {
@@ -4115,7 +4134,7 @@ namespace CleanC.UI
             }
         }
 
-        /// <summary>مقدار «قابل پاکسازی» قهرمان را از اسکن واقعی آپدیت می‌کند.</summary>
+        /// <summary>مقدار «قابل پاکسازی» قهرمان را از اسکن واقعی آپدیت می کند.</summary>
         private void UpdateHeroCleanable(long cleanableBytes)
         {
             _lastScanCleanableBytes = Math.Max(0, cleanableBytes);
@@ -4129,8 +4148,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// بعد از پاکسازی، اسکن مجدد را در پس‌زمینه انجام می‌دهد تا عدد
-        /// «قابل پاکسازی» قهرمان به‌روز بماند (بدون بلاک کردن UI).
+        /// بعد از پاکسازی، اسکن مجدد را در پس زمینه انجام می دهد تا عدد
+        /// «قابل پاکسازی» قهرمان به روز بماند (بدون بلاک کردن UI).
         /// </summary>
         private void ScheduleHeroCleanableRefresh()
         {
@@ -4144,7 +4163,7 @@ namespace CleanC.UI
                 }
                 catch
                 {
-                    // اسکن ناموفق → مقدار قبلی حفظ می‌شود
+                    // اسکن ناموفق → مقدار قبلی حفظ می شود
                 }
             });
         }
@@ -4183,7 +4202,7 @@ namespace CleanC.UI
             StatusInfoBar.Severity = severity;
             StatusInfoBar.IsOpen = true;
 
-            // D6: اعلامِ زنده برای خواننده‌ی صفحه
+            // D6: اعلامِ زنده برای خواننده ی صفحه
             AnnounceForAccessibility(StatusInfoBar);
 
             _infoBarAutoDismissTimer.Stop();
@@ -4191,8 +4210,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F5 — نوتیفیکیشن ویندوزی فقط وقتی پنجره‌ی CleanC فوکوس ندارد؛
-        /// اول toast (WinAppSDK) و اگر ثبت نشده باشد، balloon تری‌آیکون با شدت واقعی.
+        /// F5 — نوتیفیکیشن ویندوزی فقط وقتی پنجره ی CleanC فوکوس ندارد؛
+        /// اول toast (WinAppSDK) و اگر ثبت نشده باشد، balloon تری آیکون با شدت واقعی.
         /// </summary>
         private void NotifyOutsideWindow(string title, string message, InfoBarSeverity severity)
         {
@@ -4230,7 +4249,7 @@ namespace CleanC.UI
                 return;
             }
 
-            // B4 — اعلان‌ها در settings.json هم نوشته می‌شوند تا بعد از ری‌استارت از بین نروند
+            // B4 — اعلان ها در settings.json هم نوشته می شوند تا بعد از ری استارت از بین نروند
             try
             {
                 _settings.NotificationHistory.Insert(0, new NotificationHistoryEntry
@@ -4254,13 +4273,13 @@ namespace CleanC.UI
             RenderNotificationHistory(title, message, severity, DateTime.Now);
         }
 
-        /// <summary>ری‌استارت تاریخچه‌ی اعلان‌ها از تنظیمات ذخیره‌شده؛ جدیدترین بالا.</summary>
+        /// <summary>ری استارت تاریخچه ی اعلان ها از تنظیمات ذخیره شده؛ جدیدترین بالا.</summary>
         private void RenderPersistedNotificationHistory()
         {
             if (NotificationHistoryStack == null) return;
             if (_settings.NotificationHistory == null || _settings.NotificationHistory.Count == 0) return;
 
-            // لیست ذخیره‌شده جدیدترین‌اول است و Insert(0) می‌کنیم → از قدیمی‌ترین شروع کن
+            // لیست ذخیره شده جدیدترین اول است و Insert(0) می کنیم → از قدیمی ترین شروع کن
             for (int i = _settings.NotificationHistory.Count - 1; i >= 0; i--)
             {
                 var entry = _settings.NotificationHistory[i];
@@ -4286,7 +4305,7 @@ namespace CleanC.UI
             var historyCard = BuildNotificationHistoryCard(title, message, severity, at);
             NotificationHistoryStack.Children.Insert(0, historyCard);
 
-            // سقف نمایش در UI (جدا از سقف ذخیره‌شده در تنظیمات)
+            // سقف نمایش در UI (جدا از سقف ذخیره شده در تنظیمات)
             while (NotificationHistoryStack.Children.Count > NotificationHistoryCapacity)
                 NotificationHistoryStack.Children.RemoveAt(NotificationHistoryStack.Children.Count - 1);
         }
@@ -4384,7 +4403,7 @@ namespace CleanC.UI
             if (NotificationHistoryStack == null) return;
             NotificationHistoryStack.Children.Clear();
 
-            // B4 — پاک کردنِ UI باید ذخیره‌شده را هم پاک کند وگرنه بعد از ری‌استارت برمی‌گردد
+            // B4 — پاک کردنِ UI باید ذخیره شده را هم پاک کند وگرنه بعد از ری استارت برمی گردد
             try
             {
                 _settings.NotificationHistory.Clear();
@@ -4612,7 +4631,7 @@ namespace CleanC.UI
                         {
                             UpdateAccentBrushes();
                             UpdateAuroraColors();
-                            // D6: تغییر رنگ سیستم می‌تواند روشن/خاموش شدن High Contrast باشد
+                            // D6: تغییر رنگ سیستم می تواند روشن/خاموش شدن High Contrast باشد
                             ConfigureSystemBackdrop();
                         });
                     };
@@ -4975,11 +4994,11 @@ namespace CleanC.UI
                 double usedRamGb = stats.UsedRamBytes / (1024.0 * 1024.0 * 1024.0);
                 float baseRam = totalRamGb > 0 ? (float)((usedRamGb / totalRamGb) * 100.0) : 50f;
                 float baseCpu = (float)stats.CpuPercent;
-                // نمونه واقعی شبکه؛ داده مصنوعی تولید نمی‌کنیم
+                // نمونه واقعی شبکه؛ داده مصنوعی تولید نمی کنیم
                 (double liveNetMbps, _) = GetCurrentNetworkSpeed();
                 float baseDisk = (float)Math.Max(0, liveNetMbps);
 
-                // تا رسیدن نمونه‌های زنده، خط تخت با مقدار فعلی (بدون موج جعلی)
+                // تا رسیدن نمونه های زنده، خط تخت با مقدار فعلی (بدون موج جعلی)
                 for (int i = 0; i < 24; i++)
                 {
                     _ramHistory[i] = Math.Clamp(baseRam, 2f, 98f);
@@ -5094,7 +5113,7 @@ namespace CleanC.UI
         {
             _currentHealthScore = Math.Clamp(score, 0, 100);
 
-            // F5 — عدد سلامت روی آیکون تسک‌بار (badge)؛ فقط وقتی عدد صحیح عوض می‌شود
+            // F5 — عدد سلامت روی آیکون تسک بار (badge)؛ فقط وقتی عدد صحیح عوض می شود
             // تا حین انیمیشن گیج، هر فریم یک فراخوانی COM نزنیم.
             int roundedScore = (int)Math.Round(_currentHealthScore);
             if (roundedScore != _lastBadgeScore)
@@ -5102,7 +5121,7 @@ namespace CleanC.UI
                 _lastBadgeScore = roundedScore;
 
                 // badge ویندوز برای اپ unpackaged ممکن است در دسترس نباشد؛
-                // در آن صورت عدد سلامت روی tooltip تری‌آیکون نشان داده می‌شود.
+                // در آن صورت عدد سلامت روی tooltip تری آیکون نشان داده می شود.
                 if (!_windowsNotifications.TrySetBadge(roundedScore))
                     _trayManager?.UpdateTooltip($"CleanC — سلامت سیستم: {roundedScore}%");
             }
@@ -5136,15 +5155,15 @@ namespace CleanC.UI
                     HealthScoreStatusPill.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 245, 165, 36));
                     HealthScoreStatusBadge.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(35, 245, 165, 36));
                     HealthScoreStatusBadge.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(70, 245, 165, 36));
-                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "سیستم نیازمند آزادسازی رم و بهینه‌سازی فایل‌ها";
+                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "سیستم نیازمند آزادسازی رم و بهینه سازی فایل ها";
                 }
                 else
                 {
-                    HealthScoreStatusPill.Text = "نیاز به بهینه‌سازی";
+                    HealthScoreStatusPill.Text = "نیاز به بهینه سازی";
                     HealthScoreStatusPill.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 239, 68, 68));
                     HealthScoreStatusBadge.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(35, 239, 68, 68));
                     HealthScoreStatusBadge.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(70, 239, 68, 68));
-                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "مصرف منابع بالا؛ اجرای پاکسازی سریع توصیه می‌شود";
+                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "مصرف منابع بالا؛ اجرای پاکسازی سریع توصیه می شود";
                 }
             }
 
@@ -5225,8 +5244,8 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// نمونه سرعت شبکه — منطق و کش‌زنی در NetworkSpeedService متمرکز است
-        /// تا دو تایمر همزمان باعث نمونه‌گیری مضاعف نشوند.
+        /// نمونه سرعت شبکه — منطق و کش زنی در NetworkSpeedService متمرکز است
+        /// تا دو تایمر همزمان باعث نمونه گیری مضاعف نشوند.
         /// </summary>
         private (double mbps, string typeName) GetCurrentNetworkSpeed()
             => NetworkSpeedService.Sample();

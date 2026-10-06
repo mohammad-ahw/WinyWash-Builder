@@ -42,10 +42,10 @@ namespace CleanC.Core.Services
                 {
                     EnableAndStartService("DiagTrack");
                     EnableAndStartService("dmwappushservice");
-                    // مقدار AllowTelemetry را حذف می‌کنیم تا Windows به پیش‌فرض edition خودش
+                    // مقدار AllowTelemetry را حذف می کنیم تا Windows به پیش فرض edition خودش
                     // (Home/Pro=Basic(1)، Enterprise/Education=0) برگردد.
-                    // قبلاً 3 (Full) می‌گذاشتیم که بدترین حالت تله‌متری است و عملاً
-                    // «خاموش کردن» را به «حداکثر تله‌متری» تبدیل می‌کرد.
+                    // قبلاً 3 (Full) می گذاشتیم که بدترین حالت تله متری است و عملاً
+                    // «خاموش کردن» را به «حداکثر تله متری» تبدیل می کرد.
                     using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection");
                     key?.DeleteValue("AllowTelemetry", false);
                 }

@@ -26,7 +26,9 @@ namespace CleanC.Core.Services
                     Path.Combine(userProfile, "Documents"),
                     Path.Combine(userProfile, "Videos"),
                     Path.Combine(userProfile, "Music"),
-                    Path.Combine(userProfile, "AppData", "Local", "Temp")
+                    Path.Combine(userProfile, "AppData", "Local", "Temp"),
+                    Path.Combine(userProfile, "AppData", "Local", "CrashDumps"),
+                    Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Temp")
                 }.Where(Directory.Exists).ToList();
 
                 var enumOptions = new EnumerationOptions
@@ -151,7 +153,7 @@ namespace CleanC.Core.Services
                                         });
                                     }
                                     // Old screenshots > 14 days old
-                                    else if ((lowerName.StartsWith("screenshot") || lowerName.StartsWith("اسکرین‌شات") || lowerName.StartsWith("capture")) && (now - file.LastWriteTime).TotalDays > 14)
+                                    else if ((lowerName.StartsWith("screenshot") || lowerName.StartsWith("اسکرین شات") || lowerName.StartsWith("capture")) && (now - file.LastWriteTime).TotalDays > 14)
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -161,6 +163,21 @@ namespace CleanC.Core.Services
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
                                             Category = StorageMessCategory.OldScreenshot
+                                        });
+                                    }
+                                }
+                                else if (dir.Contains("Temp", StringComparison.OrdinalIgnoreCase) || dir.Contains("CrashDumps", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    if ((now - file.LastWriteTime).TotalDays > 2)
+                                    {
+                                        messItems.Add(new StorageMessItem
+                                        {
+                                            FilePath = file.FullName,
+                                            FileName = file.Name,
+                                            DirectoryPath = file.DirectoryName ?? string.Empty,
+                                            SizeBytes = size,
+                                            LastModified = file.LastWriteTime,
+                                            Category = StorageMessCategory.TempJunk
                                         });
                                     }
                                 }
@@ -197,7 +214,7 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // 2. Compute Fast Hashes for Potential Duplicates
                 // -------------------------------------------------------------
-                progress?.Invoke("در حال تحلیل و مقایسه فایل‌های یکسان...");
+                progress?.Invoke("در حال تحلیل و مقایسه فایل های یکسان...");
 
                 var duplicateCandidates = filesBySize.Where(kvp => kvp.Value.Count > 1).ToList();
                 var duplicateGroups = new List<DuplicateFileGroup>();
@@ -289,7 +306,7 @@ namespace CleanC.Core.Services
             return string.Empty;
         }
 
-        // F3 — همه‌ی حذف‌های فایلِ شخصی از اینجا به SafeDeleteService می‌روند تا
+        // F3 — همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند تا
         // واقعاً به سطل بازیافت (یا قرنطینه) برسند و امکان بازگردانی داشته باشند.
 
         public static async Task<SafeDeleteBatchResult> DeleteDuplicateFilesAsync(IEnumerable<string> filePaths)
@@ -301,7 +318,7 @@ namespace CleanC.Core.Services
         {
             return await Task.Run(() =>
             {
-                // فقط پوشه‌ای که هنوز واقعاً خالی است حذف می‌شود
+                // فقط پوشه ای که هنوز واقعاً خالی است حذف می شود
                 var empty = folderPaths
                     .Where(p => Directory.Exists(p) && !Directory.EnumerateFileSystemEntries(p).Any())
                     .ToList();
@@ -341,7 +358,7 @@ namespace CleanC.Core.Services
                     if (p == null) return (false, "سرویس Docker روی سیستم نصب یا فعال نیست.");
                     p.WaitForExit(30000);
                     return p.ExitCode == 0
-                        ? (true, "کش داکر، ایمیج‌های بی‌استفاده و کانتینرهای متوقف‌شده با موفقیت پاکسازی شدند.")
+                        ? (true, "کش داکر، ایمیج های بی استفاده و کانتینرهای متوقف شده با موفقیت پاکسازی شدند.")
                         : (false, "خطا در پاکسازی کش Docker.");
                 }
                 catch
@@ -397,7 +414,7 @@ namespace CleanC.Core.Services
                     }
                 }
 
-                return (true, freed, $"کش‌های محیط‌های برنامه‌نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({SystemStats.FormatBytes(freed)} آزاد شد)");
+                return (true, freed, $"کش های محیط های برنامه نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({SystemStats.FormatBytes(freed)} آزاد شد)");
             });
         }
 
@@ -466,12 +483,12 @@ namespace CleanC.Core.Services
                         }
                     }
 
-                    return (true, $"تعداد {compacted} دیسک مجازی WSL2 با موفقیت بهینه‌سازی و متراکم شد.");
+                    return (true, $"تعداد {compacted} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد.");
                 }
                 catch (Exception ex)
                 {
                     CcLog.Ignore(ex);
-                    return (false, "خطا در متراکم‌سازی دیسک WSL2.");
+                    return (false, "خطا در متراکم سازی دیسک WSL2.");
                 }
             });
         }
@@ -491,7 +508,7 @@ namespace CleanC.Core.Services
                     if (p == null) return (false, "امکان اجرای ابزار DISM وجود ندارد.");
                     p.WaitForExit(90000);
                     return p.ExitCode == 0
-                        ? (true, "فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته‌های قدیمی حذف شدند.")
+                        ? (true, "فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته های قدیمی حذف شدند.")
                         : (false, "عملیات DISM با خطا یا نیاز به دسترسی Administrator پایان یافت.");
                 }
                 catch (Exception ex)

@@ -42,6 +42,7 @@ namespace CleanC.Core.Models
         OldArchive,
         DuplicateCopy,
         OldScreenshot,
+        TempJunk,
         LargeFile
     }
 
@@ -58,8 +59,9 @@ namespace CleanC.Core.Models
         {
             StorageMessCategory.OldInstaller => "فایل نصب قدیمی (Setup / Installer)",
             StorageMessCategory.OldArchive => "فایل فشرده (Zip / Rar)",
-            StorageMessCategory.DuplicateCopy => "نسخه کپی‌شده (Copy / Duplicated)",
-            StorageMessCategory.OldScreenshot => "اسکرین‌شات قدیمی",
+            StorageMessCategory.DuplicateCopy => "نسخه کپی شده (Copy / Duplicated)",
+            StorageMessCategory.OldScreenshot => "اسکرین شات قدیمی",
+            StorageMessCategory.TempJunk => "فایل موقت و زائد (Temp / Junk)",
             StorageMessCategory.LargeFile => "فایل بسیار حجیم (>200MB)",
             _ => "سایر"
         };

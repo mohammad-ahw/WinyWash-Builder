@@ -20,8 +20,8 @@ namespace CleanC.Core.Services
         public string OriginalValue { get; set; } = string.Empty;
         /// <summary>
         /// نوع مقدار رجیستری پیش از حذف (`String` یا `ExpandString`).
-        /// اگر ذخیره نشود، بازگردانی `REG_EXPAND_SZ` را به `REG_SZ` تنزل می‌دهد
-        /// و متغیرهایی مثل <c>%windir%</c> دیگر expand نمی‌شوند.
+        /// اگر ذخیره نشود، بازگردانی `REG_EXPAND_SZ` را به `REG_SZ` تنزل می دهد
+        /// و متغیرهایی مثل <c>%windir%</c> دیگر expand نمی شوند.
         /// </summary>
         public string OriginalKind { get; set; } = nameof(RegistryValueKind.String);
         public bool IsNonEssential { get; set; }
@@ -30,9 +30,9 @@ namespace CleanC.Core.Services
         public string Category { get; set; } = "برنامه کاربردی (اختیاری)";
 
         // ====================================================================
-        // A10: منابعی که قبلاً اصلاً دیده نمی‌شدند
+        // A10: منابعی که قبلاً اصلاً دیده نمی شدند
         // ====================================================================
-        /// <summary>آیا این مورد از `RunOnce` است؟ (یک‌بار اجرا می‌شود و بعد پاک می‌شود)</summary>
+        /// <summary>آیا این مورد از `RunOnce` است؟ (یک بار اجرا می شود و بعد پاک می شود)</summary>
         public bool IsRunOnce { get; set; }
         /// <summary>آیا این مورد یک تسکِ Task Scheduler با تریگر Logon/Boot است؟</summary>
         public bool IsScheduledTask { get; set; }
@@ -40,18 +40,18 @@ namespace CleanC.Core.Services
         public bool IsUwpStartupTask { get; set; }
 
         // ====================================================================
-        // F6: Impact Score — از لاگ واقعیِ بوت اندازه‌گیری می‌شود
+        // F6: Impact Score — از لاگ واقعیِ بوت اندازه گیری می شود
         // ====================================================================
-        /// <summary>امتیاز تأثیر روی بوت، از ۰ (بی‌اثر) تا ۱۰۰ (بحرانی).</summary>
+        /// <summary>امتیاز تأثیر روی بوت، از ۰ (بی اثر) تا ۱۰۰ (بحرانی).</summary>
         public int ImpactScore { get; set; }
         /// <summary>برچسب نمایشی: «کم» / «متوسط» / «زیاد».</summary>
         public string ImpactLabel { get; set; } = string.Empty;
         /// <summary>
         /// آیا امتیاز از لاگ `Microsoft-Windows-Diagnostics-Performance` آمده؟
-        /// اگر false باشد یعنی ویندوز هنوز برای این برنامه داده‌ای ثبت نکرده و امتیاز تخمینی است.
+        /// اگر false باشد یعنی ویندوز هنوز برای این برنامه داده ای ثبت نکرده و امتیاز تخمینی است.
         /// </summary>
         public bool ImpactMeasured { get; set; }
-        /// <summary>میلی‌ثانیه تأخیرِ واقعیِ ثبت‌شده در لاگ بوت (فقط وقتی <see cref="ImpactMeasured"/>).</summary>
+        /// <summary>میلی ثانیه تأخیرِ واقعیِ ثبت شده در لاگ بوت (فقط وقتی <see cref="ImpactMeasured"/>).</summary>
         public long ImpactMs { get; set; }
     }
 
@@ -127,14 +127,14 @@ namespace CleanC.Core.Services
             // 6. VPN Background Windows Services (Automatic Start)
             ScanVpnWindowsServices(list);
 
-            // 6.5. A10: RunOnce + StartupTaskهای MSIX + تسک‌های Logon/Boot
-            //      (قبل از ScanCleanCDisabledItems تا آیتم‌های غیرفعال‌شده توسط خودمان دوباره اضافه نشوند)
+            // 6.5. A10: RunOnce + StartupTaskهای MSIX + تسک های Logon/Boot
+            //      (قبل از ScanCleanCDisabledItems تا آیتم های غیرفعال شده توسط خودمان دوباره اضافه نشوند)
             StartupExtraSources.Scan(list);
 
             // 7. Items previously disabled and backed up by CleanC
             ScanCleanCDisabledItems(list);
 
-            // F6: امتیاز تأثیر روی بوت را برای همه‌ی موارد محاسبه کن
+            // F6: امتیاز تأثیر روی بوت را برای همه ی موارد محاسبه کن
             var impacts = BootImpactService.GetBootImpacts();
             foreach (var item in list)
             {
@@ -154,11 +154,11 @@ namespace CleanC.Core.Services
                 foreach (var item in items)
                 {
                     // Never silently disable VPNs or Chat apps during Quick Boost!
-                    if (item.IsVpnOrProxy || item.Category.Contains("پیام‌رسان")) continue;
+                    if (item.IsVpnOrProxy || item.Category.Contains("پیام رسان")) continue;
 
-                    // A10: RunOnce / تسک‌های زمان‌بندی‌شده / StartupTaskهای MSIX عمداً
-                    // وارد بهینه‌سازی خودکار نمی‌شوند؛ غیرفعال‌کردنشان باید دستی و آگاهانه باشد
-                    // چون برخلاف مقدارِ Run، خاموش‌کردنشان ممکن است سرویسی را از کار بیندازد.
+                    // A10: RunOnce / تسک های زمان بندی شده / StartupTaskهای MSIX عمداً
+                    // وارد بهینه سازی خودکار نمی شوند؛ غیرفعال کردنشان باید دستی و آگاهانه باشد
+                    // چون برخلاف مقدارِ Run، خاموش کردنشان ممکن است سرویسی را از کار بیندازد.
                     if (item.IsRunOnce || item.IsScheduledTask || item.IsUwpStartupTask) continue;
 
                     bool candidate = aggressive
@@ -185,7 +185,7 @@ namespace CleanC.Core.Services
             string serviceKey = item.ServiceKey;
             string originalValue = item.OriginalValue;
             // نوع مقدار (REG_SZ در برابر REG_EXPAND_SZ) باید قبل از حذف خوانده شود
-            // تا بازگردانی دقیق باشد؛ وگرنه متغیرهایی مثل %windir% expand نمی‌شوند.
+            // تا بازگردانی دقیق باشد؛ وگرنه متغیرهایی مثل %windir% expand نمی شوند.
             string originalKind = nameof(RegistryValueKind.String);
             bool disabled = false;
 
@@ -232,7 +232,7 @@ namespace CleanC.Core.Services
 
                     int currentStart = Convert.ToInt32(svcKey.GetValue("Start") ?? 3);
                     originalValue = currentStart.ToString();
-                    // از Automatic(2) به Manual(3) می‌بریم؛ اگر از قبل غیرفعال/دستی بود، کاری لازم نیست
+                    // از Automatic(2) به Manual(3) می بریم؛ اگر از قبل غیرفعال/دستی بود، کاری لازم نیست
                     if (currentStart == 3 || currentStart == 4) return false;
 
                     svcKey.SetValue("Start", 3, RegistryValueKind.DWord); // 3 = Manual (Demand start)
@@ -258,7 +258,7 @@ namespace CleanC.Core.Services
                     runKey.DeleteValue(item.Name, false);
                     disabled = runKey.GetValue(item.Name) == null;
                 }
-                // A10: تسک Logon/Boot — با schtasks غیرفعال می‌شود (نیازی به بکاپ نیست، همان enable مجدد کافی است)
+                // A10: تسک Logon/Boot — با schtasks غیرفعال می شود (نیازی به بکاپ نیست، همان enable مجدد کافی است)
                 else if (item.Location == "TaskScheduler")
                 {
                     if (string.IsNullOrWhiteSpace(serviceKey)) return false;
@@ -273,7 +273,7 @@ namespace CleanC.Core.Services
                         $@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\SystemAppData\{serviceKey}", true);
                     if (uwpKey == null) return false;
                     originalValue = Convert.ToInt32(uwpKey.GetValue("State") ?? 1).ToString();
-                    // 0 = Disabled (همان مقداری که Task Manager هم می‌نویسد)
+                    // 0 = Disabled (همان مقداری که Task Manager هم می نویسد)
                     uwpKey.SetValue("State", 0, RegistryValueKind.DWord);
                     disabled = Convert.ToInt32(uwpKey.GetValue("State") ?? -1) == 0;
                 }
@@ -290,7 +290,7 @@ namespace CleanC.Core.Services
                     if (bkKey != null)
                     {
                         // قالب v3: v3|Location|ServiceKey|OriginalValue|Command|OriginalKind
-                        // (v2 و قالب قدیمی فقط برای خواندن رکوردهای موجود پشتیبانی می‌شوند)
+                        // (v2 و قالب قدیمی فقط برای خواندن رکوردهای موجود پشتیبانی می شوند)
                         string entryData = $"v3|{item.Location}|{serviceKey}|{originalValue}|{item.Command}|{originalKind}";
                         bkKey.SetValue(item.Name, entryData, RegistryValueKind.String);
                     }
@@ -334,8 +334,8 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// اگر Command با یک نوع معتبر رجیستری تمام شده باشد، آن را برمی‌دارد
-        /// (چون خود Command ممکن است شامل «|» باشد، از انتها تشخیص می‌دهیم).
+        /// اگر Command با یک نوع معتبر رجیستری تمام شده باشد، آن را برمی دارد
+        /// (چون خود Command ممکن است شامل «|» باشد، از انتها تشخیص می دهیم).
         /// </summary>
         private static string TakeTrailingKind(ref string command)
         {
@@ -411,7 +411,7 @@ namespace CleanC.Core.Services
                         out string command, out string originalKind))
                     return false;
 
-                // نوع مقدار اصلی (REG_EXPAND_SZ در برابر REG_SZ) را حفظ می‌کنیم
+                // نوع مقدار اصلی (REG_EXPAND_SZ در برابر REG_SZ) را حفظ می کنیم
                 RegistryValueKind kind = ParseKind(originalKind);
 
                 if (location == "HKCU")
@@ -573,7 +573,7 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        // فایل‌های سیستمی پوشه Startup که هرگز نباید به‌عنوان آیتم اجرا نمایش داده شوند
+        // فایل های سیستمی پوشه Startup که هرگز نباید به عنوان آیتم اجرا نمایش داده شوند
         private static readonly string[] StartupFolderSystemFiles = new[]
         {
             "desktop.ini", "thumbs.db", "folder.hta", "ntuser.dat", "ntuser.ini"
@@ -638,7 +638,7 @@ namespace CleanC.Core.Services
                     string? data = bkKey.GetValue(valName)?.ToString();
                     if (string.IsNullOrWhiteSpace(data)) continue;
 
-                    // serviceKey هم باید برگردد؛ برای تسک‌ها و StartupTaskها بدون آن غیرفعال‌سازیِ مجدد ناممکن است
+                    // serviceKey هم باید برگردد؛ برای تسک ها و StartupTaskها بدون آن غیرفعال سازیِ مجدد ناممکن است
                     if (!TryParseBackup(data, out string loc, out string skey, out string _, out string cmd, out string _))
                         continue;
 
@@ -696,9 +696,9 @@ namespace CleanC.Core.Services
                                 Id = $"Service_{subName}",
                                 Name = dispName,
                                 Command = imagePath,
-                                // باید دقیقاً با شاخه‌های Disable/Restore یکی باشد (قبلاً «سرویس ویندوز» بود و هیچ‌وقت disable نمی‌شد)
+                                // باید دقیقاً با شاخه های Disable/Restore یکی باشد (قبلاً «سرویس ویندوز» بود و هیچ وقت disable نمی شد)
                                 Location = "WindowsService",
-                                // نام کلید سرویس، نه DisplayName — چون مسیر رجیستری از subName ساخته می‌شود
+                                // نام کلید سرویس، نه DisplayName — چون مسیر رجیستری از subName ساخته می شود
                                 ServiceKey = subName,
                                 OriginalValue = startType.ToString(),
                                 IsNonEssential = true,
@@ -722,7 +722,7 @@ namespace CleanC.Core.Services
 
         public static string ResolveStartupCategory(string name, string cmd, bool isProtected)
         {
-            if (isProtected) return "سخت‌افزار و سیستم (ضروری)";
+            if (isProtected) return "سخت افزار و سیستم (ضروری)";
 
             string lower = $"{name} {cmd}".ToLowerInvariant();
 
@@ -731,7 +731,7 @@ namespace CleanC.Core.Services
 
             if (lower.Contains("telegram") || lower.Contains("discord") || lower.Contains("whatsapp") ||
                 lower.Contains("skype") || lower.Contains("slack") || lower.Contains("teams") || lower.Contains("viber"))
-                return "پیام‌رسان و چت (اختیاری)";
+                return "پیام رسان و چت (اختیاری)";
 
             if (lower.Contains("idm") || lower.Contains("idman") || lower.Contains("download") ||
                 lower.Contains("torrent") || lower.Contains("utorrent") || lower.Contains("qbittorrent") ||
@@ -743,7 +743,7 @@ namespace CleanC.Core.Services
                 return "لانچر بازی و گیمینگ (اختیاری)";
 
             if (lower.Contains("update") || lower.Contains("updater") || lower.Contains("helper") || lower.Contains("jusched"))
-                return "آپدیتر پس‌زمینه (غیرضروری)";
+                return "آپدیتر پس زمینه (غیرضروری)";
 
             return "برنامه کاربردی (اختیاری)";
         }
@@ -754,7 +754,7 @@ namespace CleanC.Core.Services
             return VpnSignatures.Any(v => combined.Contains(v));
         }
 
-        // A10: StartupExtraSources برای تشخیص ایمنیِ آیتم‌های RunOnce به همین سفیدفهرست نیاز دارد
+        // A10: StartupExtraSources برای تشخیص ایمنیِ آیتم های RunOnce به همین سفیدفهرست نیاز دارد
         public static bool IsWhitelisted(string name, string cmd)
         {
             string combined = $"{name} {cmd}".ToLowerInvariant();
@@ -768,12 +768,12 @@ namespace CleanC.Core.Services
         }
 
         // ── F1: شروع خودکار همراه با ویندوز ─────────────────────────────────
-        // منبع حقیقت «رجیستری» است نه AppSettings، چون کاربر می‌تواند همین آیتم را
-        // از Task Manager هم غیرفعال کند؛ ذخیره در فایل تنظیمات باعث ناهمگامی می‌شد.
+        // منبع حقیقت «رجیستری» است نه AppSettings، چون کاربر می تواند همین آیتم را
+        // از Task Manager هم غیرفعال کند؛ ذخیره در فایل تنظیمات باعث ناهمگامی می شد.
         private const string DefaultRunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
         private const string RunValueName = "CleanC";
 
-        /// <summary>مسیر کلید رجیستری؛ فقط تست‌ها آن را به یک کلید موقت تغییر می‌دهند.</summary>
+        /// <summary>مسیر کلید رجیستری؛ فقط تست ها آن را به یک کلید موقت تغییر می دهند.</summary>
         private static string? _runKeyPathOverride;
 
         internal static void SetRunKeyPathOverrideForTests(string? path) => _runKeyPathOverride = path;
@@ -781,8 +781,8 @@ namespace CleanC.Core.Services
         private static string RunKeyPath => _runKeyPathOverride ?? DefaultRunKeyPath;
 
         /// <summary>
-        /// مسیر اجرایی که در رجیستری ثبت می‌شود. فقط برای تست ست می‌شود تا
-        /// تست‌ها بدون دست زدن به رجیستری واقعی اجرا شوند.
+        /// مسیر اجرایی که در رجیستری ثبت می شود. فقط برای تست ست می شود تا
+        /// تست ها بدون دست زدن به رجیستری واقعی اجرا شوند.
         /// </summary>
         private static string? _executableOverride;
 
@@ -799,7 +799,7 @@ namespace CleanC.Core.Services
             return Path.Combine(AppContext.BaseDirectory, "CleanC.UI.exe");
         }
 
-        /// <summary>مقدار رجیستری را به مسیر فایل تبدیل می‌کند (نقل‌قول‌ها را برمی‌دارد).</summary>
+        /// <summary>مقدار رجیستری را به مسیر فایل تبدیل می کند (نقل قول ها را برمی دارد).</summary>
         private static string NormalizeCommandPath(string raw)
         {
             string s = raw.Trim();
@@ -832,7 +832,7 @@ namespace CleanC.Core.Services
             }
         }
 
-        /// <summary>ثبت (یا حذف) CleanC در آیتم‌های اجرای خودکار ویندوز.</summary>
+        /// <summary>ثبت (یا حذف) CleanC در آیتم های اجرای خودکار ویندوز.</summary>
         public static bool SetCleanCStartupRegistration(bool enabled)
         {
             try
@@ -840,7 +840,7 @@ namespace CleanC.Core.Services
                 if (enabled)
                 {
                     string exe = GetCurrentExecutablePath();
-                    // مسیر ناموجود را ثبت نکن؛ ویندوز در هر ورود خطا می‌دهد
+                    // مسیر ناموجود را ثبت نکن؛ ویندوز در هر ورود خطا می دهد
                     if (!File.Exists(exe)) return false;
                 }
 

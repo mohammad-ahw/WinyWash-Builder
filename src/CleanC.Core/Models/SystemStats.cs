@@ -34,7 +34,8 @@ namespace CleanC.Core.Models
             int digitGroups = (int)(Math.Log(bytes) / Math.Log(1024));
             if (digitGroups >= units.Length) digitGroups = units.Length - 1;
             double num = bytes / Math.Pow(1024, digitGroups);
-            return $"{num.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture)} {units[digitGroups]}";
+            string formattedNum = num.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture).Replace('/', '.').Replace('٫', '.');
+            return $"{formattedNum} {units[digitGroups]}";
         }
     }
 }

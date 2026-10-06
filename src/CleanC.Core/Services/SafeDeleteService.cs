@@ -1,20 +1,20 @@
 // src/CleanC.Core/Services/SafeDeleteService.cs
-// F3 — لایه‌ی حذف ایمن و قابل بازگردانی.
+// F3 — لایه ی حذف ایمن و قابل بازگردانی.
 //
-// پیش از این، فایل‌های «شخصی» کاربر (تکراری‌ها، حجیم‌ها، دانلودها و دسکتاپ) با
-// `FileInfo.Delete()` برای همیشه نابود می‌شدند، در حالی که دیالوگِ تأیید ادعا می‌کرد
-// «به سطل بازیافت منتقل خواهد شد». این سرویس همان ادعا را واقعی می‌کند.
+// پیش از این، فایل های «شخصی» کاربر (تکراری ها، حجیم ها، دانلودها و دسکتاپ) با
+// `FileInfo.Delete()` برای همیشه نابود می شدند، در حالی که دیالوگِ تأیید ادعا می کرد
+// «به سطل بازیافت منتقل خواهد شد». این سرویس همان ادعا را واقعی می کند.
 //
 // سه حالت:
-//   RecycleBin  → انتقال به سطل بازیافت ویندوز (پیش‌فرض؛ همان الگوی از قبل کارکرده در
-//                 LargeFileScannerService). فضا تا خالی کردن سطل آزاد نمی‌شود.
-//   Quarantine  → انتقال به قرنطینه‌ی داخلیِ CleanC با manifest؛ برای وقتی که سطل
+//   RecycleBin  → انتقال به سطل بازیافت ویندوز (پیش فرض؛ همان الگوی از قبل کارکرده در
+//                 LargeFileScannerService). فضا تا خالی کردن سطل آزاد نمی شود.
+//   Quarantine  → انتقال به قرنطینه ی داخلیِ CleanC با manifest؛ برای وقتی که سطل
 //                 در دسترس نیست (درایو شبکه، سطل غیرفعال، مجوز ناکافی) یا کاربر
-//                 می‌خواهد سطل را شلوغ نکند.
+//                 می خواهد سطل را شلوغ نکند.
 //   Permanent   → حذف قطعی؛ فقط برای کش/زباله که هدفشان آزادسازی واقعی فضا است.
 //
-// قاعده: اگر نه سطل کار کرد نه قرنطینه، شیء «حذف نمی‌شود» و خطا گزارش می‌شود.
-// هیچ‌وقت بدون اجازه‌ی صریح، داده‌ی کاربر را برای همیشه از بین نمی‌بریم.
+// قاعده: اگر نه سطل کار کرد نه قرنطینه، شیء «حذف نمی شود» و خطا گزارش می شود.
+// هیچ وقت بدون اجازه ی صریح، داده ی کاربر را برای همیشه از بین نمی بریم.
 
 using System;
 using System.Collections.Generic;
@@ -30,9 +30,9 @@ namespace CleanC.Core.Services
 {
     public enum SafeDeleteMode
     {
-        /// <summary>انتقال به سطل بازیافت ویندوز (پیش‌فرض).</summary>
+        /// <summary>انتقال به سطل بازیافت ویندوز (پیش فرض).</summary>
         RecycleBin = 0,
-        /// <summary>انتقال به قرنطینه‌ی داخلی CleanC با manifest قابل بازگردانی.</summary>
+        /// <summary>انتقال به قرنطینه ی داخلی CleanC با manifest قابل بازگردانی.</summary>
         Quarantine = 1,
         /// <summary>حذف قطعی.</summary>
         Permanent = 2
@@ -52,7 +52,7 @@ namespace CleanC.Core.Services
     {
         public SafeDeleteOutcome Outcome { get; set; } = SafeDeleteOutcome.Failed;
         public string OriginalPath { get; set; } = string.Empty;
-        /// <summary>در حالت Quarantine، مسیر ذخیره‌شده‌ی شیء داخل قرنطینه.</summary>
+        /// <summary>در حالت Quarantine، مسیر ذخیره شده ی شیء داخل قرنطینه.</summary>
         public string StoredPath { get; set; } = string.Empty;
         public long SizeBytes { get; set; }
         public string Error { get; set; } = string.Empty;
@@ -62,7 +62,7 @@ namespace CleanC.Core.Services
             or SafeDeleteOutcome.Permanent
             or SafeDeleteOutcome.NotFound;
 
-        /// <summary>فقط در حذف قطعی فضای دیسک واقعاً آزاد می‌شود؛ انتقال به سطل/قرنطینه فقط جابه‌جایی است.</summary>
+        /// <summary>فقط در حذف قطعی فضای دیسک واقعاً آزاد می شود؛ انتقال به سطل/قرنطینه فقط جابه جایی است.</summary>
         public bool FreesSpace => Outcome == SafeDeleteOutcome.Permanent;
     }
 
@@ -77,7 +77,7 @@ namespace CleanC.Core.Services
 
         /// <summary>فضایی که واقعاً از دیسک آزاد شد (فقط حذف قطعی).</summary>
         public long FreedBytes { get; set; }
-        /// <summary>حجمی که فقط جابه‌جا شد (سطل بازیافت / قرنطینه) — آزاد نشده، ولی قابل بازگردانی است.</summary>
+        /// <summary>حجمی که فقط جابه جا شد (سطل بازیافت / قرنطینه) — آزاد نشده، ولی قابل بازگردانی است.</summary>
         public long MovedBytes { get; set; }
         public List<string> Errors { get; } = new();
 
@@ -113,10 +113,10 @@ namespace CleanC.Core.Services
         private static string? _currentSessionId;
         private static QuarantineManifest? _currentManifest;
 
-        /// <summary>رفتار پیش‌فرض برای فایل‌های شخصی کاربر؛ از تنظیمات برنامه ست می‌شود.</summary>
+        /// <summary>رفتار پیش فرض برای فایل های شخصی کاربر؛ از تنظیمات برنامه ست می شود.</summary>
         public static SafeDeleteMode DefaultMode { get; set; } = SafeDeleteMode.RecycleBin;
 
-        /// <summary>تبدیل مقدار رشته‌ای تنظیمات ({"RecycleBin"|"Quarantine"|"Permanent"}) به enum.</summary>
+        /// <summary>تبدیل مقدار رشته ای تنظیمات ({"RecycleBin"|"Quarantine"|"Permanent"}) به enum.</summary>
         public static SafeDeleteMode ParseMode(string? value) => value?.Trim().ToLowerInvariant() switch
         {
             "quarantine" => SafeDeleteMode.Quarantine,
@@ -124,7 +124,7 @@ namespace CleanC.Core.Services
             _ => SafeDeleteMode.RecycleBin
         };
 
-        /// <summary>نگاشت enum به همان رشته‌ای که در settings.json ذخیره می‌شود.</summary>
+        /// <summary>نگاشت enum به همان رشته ای که در settings.json ذخیره می شود.</summary>
         public static string ModeToString(SafeDeleteMode mode) => mode switch
         {
             SafeDeleteMode.Quarantine => "Quarantine",
@@ -132,17 +132,17 @@ namespace CleanC.Core.Services
             _ => "RecycleBin"
         };
 
-        /// <summary>توصیف فارسیِ رفتار حذف برای نمایش در دیالوگ تأیید (صادقانه، نه وعده‌ی قطعی).</summary>
+        /// <summary>توصیف فارسیِ رفتار حذف برای نمایش در دیالوگ تأیید (صادقانه، نه وعده ی قطعی).</summary>
         public static string DescribeMode(SafeDeleteMode mode) => mode switch
         {
-            SafeDeleteMode.Quarantine => "در قرنطینه‌ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)",
+            SafeDeleteMode.Quarantine => "در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)",
             SafeDeleteMode.Permanent => "برای همیشه حذف خواهد شد (قابل بازگردانی نیست)",
             _ => "به سطل بازیافت منتقل خواهد شد"
         };
 
         /// <summary>
-        /// مسیر ریشه‌ی قرنطینه — برای تست قابل تغییر است.
-        /// عوض‌شدن ریشه یعنی نشستِ باز باید بسته شود تا ورودی‌ها در ریشه‌ی جدید ثبت شوند.
+        /// مسیر ریشه ی قرنطینه — برای تست قابل تغییر است.
+        /// عوض شدن ریشه یعنی نشستِ باز باید بسته شود تا ورودی ها در ریشه ی جدید ثبت شوند.
         /// </summary>
         public static string QuarantineRoot
         {
@@ -167,7 +167,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// متن فارسیِ صادقانه برای گزارش یک دسته‌ی حذف — بسته به اینکه واقعاً چه اتفاقی
+        /// متن فارسیِ صادقانه برای گزارش یک دسته ی حذف — بسته به اینکه واقعاً چه اتفاقی
         /// افتاده (سطل / قرنطینه / قطعی / ناموفق)، نه یک متن ثابتِ احتمالی.
         /// </summary>
         public static string DescribeBatch(SafeDeleteBatchResult batch)
@@ -187,12 +187,12 @@ namespace CleanC.Core.Services
             if (batch.FreedBytes > 0)
                 message += $" — {Models.SystemStats.FormatBytes(batch.FreedBytes)} فضا آزاد گردید";
             else if (batch.MovedBytes > 0)
-                message += $" — {Models.SystemStats.FormatBytes(batch.MovedBytes)} جابه‌جا شد (تا خالی کردن سطل آزاد نمی‌شود)";
+                message += $" — {Models.SystemStats.FormatBytes(batch.MovedBytes)} جابه جا شد (تا خالی کردن سطل آزاد نمی شود)";
 
             return message;
         }
 
-        // ── حذف فایل/پوشه‌ی شخصی ─────────────────────────────────────────
+        // ── حذف فایل/پوشه ی شخصی ─────────────────────────────────────────
 
         public static SafeDeleteResult DeleteFile(string path, SafeDeleteMode? mode = null)
             => DeleteCore(path, mode ?? DefaultMode, isDirectory: false);
@@ -200,7 +200,7 @@ namespace CleanC.Core.Services
         public static SafeDeleteResult DeleteDirectory(string path, SafeDeleteMode? mode = null)
             => DeleteCore(path, mode ?? DefaultMode, isDirectory: true);
 
-        /// <summary>حذف دسته‌ای فایل شخصی؛ خلاصه‌ی آماری برای گزارش UI.</summary>
+        /// <summary>حذف دسته ای فایل شخصی؛ خلاصه ی آماری برای گزارش UI.</summary>
         public static SafeDeleteBatchResult DeleteFiles(IEnumerable<string> paths, SafeDeleteMode? mode = null)
             => DeleteMany(paths, mode, isDirectory: false);
 
@@ -209,7 +209,7 @@ namespace CleanC.Core.Services
 
         /// <summary>
         /// حذف زباله/کش — همیشه قطعی، مستقل از <see cref="DefaultMode"/>.
-        /// هدف این دسته‌ها آزادسازی فضاست؛ فرستادنشان به سطل فقط فضا را معطل می‌کند.
+        /// هدف این دسته ها آزادسازی فضاست؛ فرستادنشان به سطل فقط فضا را معطل می کند.
         /// </summary>
         public static SafeDeleteResult DeleteJunkFile(string path)
             => DeleteCore(path, SafeDeleteMode.Permanent, isDirectory: false);
@@ -328,9 +328,9 @@ namespace CleanC.Core.Services
         private static string FirstNonEmpty(string a, string b)
             => !string.IsNullOrWhiteSpace(a) ? a : (b ?? string.Empty);
 
-        // ── اجراکننده‌ها ──────────────────────────────────────────────────
+        // ── اجراکننده ها ──────────────────────────────────────────────────
 
-        /// <summary>حذف قطعی؛ اتریبیوت‌های ReadOnly/Hidden/System اول برداشته می‌شوند.</summary>
+        /// <summary>حذف قطعی؛ اتریبیوت های ReadOnly/Hidden/System اول برداشته می شوند.</summary>
         private static void DeletePermanent(string path, bool isDirectory)
         {
             if (isDirectory)
@@ -399,7 +399,7 @@ namespace CleanC.Core.Services
             DirectoryNotFoundException => "مسیر پیدا نشد",
             FileNotFoundException => "فایل پیدا نشد",
             IOException io when io.Message.Contains("recycle", StringComparison.OrdinalIgnoreCase) => "سطل بازیافت در دسترس نیست",
-            IOException => "فایل توسط برنامه‌ی دیگری قفل است",
+            IOException => "فایل توسط برنامه ی دیگری قفل است",
             _ => ex.Message
         };
 
@@ -416,7 +416,7 @@ namespace CleanC.Core.Services
                 {
                     EnsureSession();
 
-                    // حجم را قبل از جابه‌جایی بگیر، چون بعد از move دیگر مسیر اصلی وجود ندارد
+                    // حجم را قبل از جابه جایی بگیر، چون بعد از move دیگر مسیر اصلی وجود ندارد
                     long size = Measure(path, isDirectory);
 
                     string index = (_currentManifest!.Entries.Count + 1).ToString("D4");
@@ -526,7 +526,7 @@ namespace CleanC.Core.Services
 
         // ── خواندن/بازگردانی قرنطینه ─────────────────────────────────────
 
-        /// <summary>همه‌ی نشست‌های قرنطینه موجود (جدیدترین اول).</summary>
+        /// <summary>همه ی نشست های قرنطینه موجود (جدیدترین اول).</summary>
         public static List<QuarantineManifest> ListQuarantineSessions()
         {
             var sessions = new List<QuarantineManifest>();
@@ -560,7 +560,7 @@ namespace CleanC.Core.Services
             return sessions.OrderByDescending(s => s.CreatedAt).ToList();
         }
 
-        /// <summary>بازگرداندن همه‌ی ورودی‌های یک نشست به مسیرهای اصلی.</summary>
+        /// <summary>بازگرداندن همه ی ورودی های یک نشست به مسیرهای اصلی.</summary>
         public static (int Restored, int Failed, string Error) RestoreSession(string sessionId)
         {
             int restored = 0, failed = 0;
@@ -595,7 +595,7 @@ namespace CleanC.Core.Services
                 }
             }
 
-            // اگر همه بازگردانده شد، پوشه‌ی نشست را پاک کن
+            // اگر همه بازگردانده شد، پوشه ی نشست را پاک کن
             if (failed == 0) TryDeleteSessionDir(sessionId);
             else RefreshManifestAfterRestore(sessionId, manifest);
 
@@ -641,7 +641,7 @@ namespace CleanC.Core.Services
             return true;
         }
 
-        /// <summary>پاک‌سازی نشست‌های قدیمی‌تر از X روز؛ تعداد نشست‌های حذف‌شده را برمی‌گرداند.</summary>
+        /// <summary>پاک سازی نشست های قدیمی تر از X روز؛ تعداد نشست های حذف شده را برمی گرداند.</summary>
         public static int PurgeOldSessions(int maxAgeDays, long maxTotalBytes = 500_000_000)
         {
             if (maxAgeDays < 1) return 0;
@@ -706,7 +706,7 @@ namespace CleanC.Core.Services
             return Path.Combine(dir, $"{name} ({Guid.NewGuid():N}){ext}");
         }
 
-        // ── اندازه‌گیری ───────────────────────────────────────────────────
+        // ── اندازه گیری ───────────────────────────────────────────────────
 
         private static long Measure(string path, bool isDirectory)
         {

@@ -1,7 +1,7 @@
 // src/CleanC.UI/MainWindow.Quarantine.cs
-// F3 — بخش «فایل‌های قرنطینه‌شده» داخل مرکز بازیابی (Undo Center).
-// منطق واقعی فایل‌سیستم در CleanC.Core/Services/SafeDeleteService.cs است؛
-// این فایل فقط لایه‌ی نمایش و کنترل رویدادهاست.
+// F3 — بخش «فایل های قرنطینه شده» داخل مرکز بازیابی (Undo Center).
+// منطق واقعی فایل سیستم در CleanC.Core/Services/SafeDeleteService.cs است؛
+// این فایل فقط لایه ی نمایش و کنترل رویدادهاست.
 
 using System;
 using System.IO;
@@ -20,14 +20,14 @@ namespace CleanC.UI
     public sealed partial class MainWindow : Window
     {
         /// <summary>
-        /// کارت فایل‌های قرنطینه‌شده برای مرکز بازیابی. برای هر نشست یک ردیف با
-        /// بازگردانی و حذف قطعی (تأیید دو مرحله‌ای) ساخته می‌شود.
+        /// کارت فایل های قرنطینه شده برای مرکز بازیابی. برای هر نشست یک ردیف با
+        /// بازگردانی و حذف قطعی (تأیید دو مرحله ای) ساخته می شود.
         /// </summary>
         private UIElement BuildQuarantineSection()
         {
             var content = new StackPanel { Spacing = 8 };
 
-            // بازسازی کل بدنه بعد از هر عملیات، تا ردیف‌های بازگردانده‌شده/حذف‌شده
+            // بازسازی کل بدنه بعد از هر عملیات، تا ردیف های بازگردانده شده/حذف شده
             // از فهرست خارج شوند و UI با وضعیت واقعی همگام بماند.
             void Rebuild()
             {
@@ -55,14 +55,14 @@ namespace CleanC.UI
             var header = new StackPanel { Spacing = 4 };
             header.Children.Add(new TextBlock
             {
-                Text = "فایل‌های قرنطینه‌شده CleanC",
+                Text = "فایل های قرنطینه شده CleanC",
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 FontSize = 13,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"]
             });
             header.Children.Add(new TextBlock
             {
-                Text = "حذف‌هایی که در حالت «قرنطینه» انجام شده‌اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند.",
+                Text = "حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند.",
                 FontSize = 11,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
@@ -83,7 +83,7 @@ namespace CleanC.UI
             };
         }
 
-        /// <summary>ردیف یک نشست قرنطینه: خلاصه + دکمه‌ی بازگردانی + دکمه‌ی حذف (تأیید دومرحله‌ای).</summary>
+        /// <summary>ردیف یک نشست قرنطینه: خلاصه + دکمه ی بازگردانی + دکمه ی حذف (تأیید دومرحله ای).</summary>
         private UIElement BuildQuarantineRow(QuarantineManifest session, Action rebuild)
         {
             long totalBytes = session.Entries.Sum(e => e.SizeBytes);
@@ -126,7 +126,7 @@ namespace CleanC.UI
             restoreBtn.Click += (_, _) =>
                 SafeInvoker.Run(RestoreQuarantineSessionAsync(session, restoreBtn, deleteBtn, rebuild));
 
-            // تأیید دو مرحله‌ای: اولین کلیک فقط هشدار می‌دهد، کلیک دوم اجرا می‌کند.
+            // تأیید دو مرحله ای: اولین کلیک فقط هشدار می دهد، کلیک دوم اجرا می کند.
             bool armed = false;
             deleteBtn.Click += (_, _) =>
             {
@@ -164,7 +164,7 @@ namespace CleanC.UI
             };
         }
 
-        /// <summary>بازگردانی همه‌ی ورودی‌های یک نشست قرنطینه به مسیر اصلی‌شان.</summary>
+        /// <summary>بازگردانی همه ی ورودی های یک نشست قرنطینه به مسیر اصلی شان.</summary>
         private async Task RestoreQuarantineSessionAsync(
             QuarantineManifest session, Button restoreBtn, Button deleteBtn, Action rebuild)
         {
@@ -218,7 +218,7 @@ namespace CleanC.UI
 
                 ShowInfoBar(
                     "قرنطینه",
-                    ok ? "نشست قرنطینه و فایل‌های آن برای همیشه حذف شد." : "حذف نشست قرنطینه انجام نشد.",
+                    ok ? "نشست قرنطینه و فایل های آن برای همیشه حذف شد." : "حذف نشست قرنطینه انجام نشد.",
                     ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
 
                 rebuild();
