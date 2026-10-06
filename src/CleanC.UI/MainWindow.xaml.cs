@@ -645,14 +645,17 @@ namespace CleanC.UI
                 if (HeroLiveRamText != null) HeroLiveRamText.Text = $"{Math.Round(ramPercent).ToString("0", CultureInfo.InvariantCulture)}%";
                 if (HeroLiveCpuText != null) HeroLiveCpuText.Text = $"{Math.Round(cpuPercent).ToString("0", CultureInfo.InvariantCulture)}%";
 
-                // Bento RAM Card - Format: "14.94 . 16 GB"
-                CardRamText.Text = $"{usedRamGb.ToString("0.00", CultureInfo.InvariantCulture)} . {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
+                // Bento RAM Card - Format: "14.9 of 16 GB" or "14.9 از 16 GB"
+                string ramOf = LocalizationService.IsRtl ? "از" : "of";
+                CardRamText.Text = $"{usedRamGb.ToString("0.0", CultureInfo.InvariantCulture)} {ramOf} {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
                 CardRamProgress.Value = ramPercent;
-                if (CardRamAvailableText != null) CardRamAvailableText.Text = "فضای مصرفی در حال حاضر";
-                if (CardRamTotalBadge != null) CardRamTotalBadge.Text = $"مجموع: {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
+                if (CardRamAvailableText != null) CardRamAvailableText.Text = LocalizationService.Get("RamCurrentlyUsed", "فضای مصرفی در حال حاضر");
+                if (CardRamTotalBadge != null) CardRamTotalBadge.Text = $"{LocalizationService.Get("Total", "مجموع")}: {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
                 if (CardRamStatusText != null)
                 {
-                    CardRamStatusText.Text = ramPercent > 80 ? "مصرف بالا" : (ramPercent > 60 ? "مصرف متوسط" : "روان");
+                    CardRamStatusText.Text = ramPercent > 80
+                        ? LocalizationService.Get("HighUsage", "مصرف بالا")
+                        : (ramPercent > 60 ? LocalizationService.Get("MediumUsage", "مصرف متوسط") : LocalizationService.Get("SmoothUsage", "روان"));
                 }
 
                 // Network Speed Card - Live traffic e.g. "84.5 Mbps" with intelligent consumer detection
@@ -3429,6 +3432,42 @@ namespace CleanC.UI
                 if (UndoCenterBtn != null) ToolTipService.SetToolTip(UndoCenterBtn, LocalizationService.Get("RestoreCenter", "مرکز بازیابی و بازگشت تغییرات"));
                 if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "بروزرسانی وضعیت سیستم"));
                 if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها"));
+
+                if (HeroCleanableLabelText != null) HeroCleanableLabelText.Text = LocalizationService.Get("CleanableSpace", "قابل آزادسازی") + ":";
+                if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? "از 100" : "of 100";
+
+                // Speed Test
+                if (SpeedGaugePhaseText != null && !_isBusy) SpeedGaugePhaseText.Text = LocalizationService.Get("ReadyToStartSpeedTest", "آماده شروع تست سرعت");
+                if (StartSpeedTestBtnText != null) StartSpeedTestBtnText.Text = LocalizationService.Get("StartSpeedTest", "شروع تست سرعت");
+                if (StopSpeedTestBtnText != null) StopSpeedTestBtnText.Text = LocalizationService.Get("StopSpeedTest", "توقف تست");
+                if (SpeedPingTitleText != null) SpeedPingTitleText.Text = LocalizationService.Get("PingLatency", "تاخیر پینگ (Ping)");
+                if (SpeedDownloadTitleText != null) SpeedDownloadTitleText.Text = LocalizationService.Get("DownloadSpeed", "سرعت دانلود");
+                if (SpeedUploadTitleText != null) SpeedUploadTitleText.Text = LocalizationService.Get("UploadSpeed", "سرعت آپلود");
+
+                // Windows Update
+                if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = LocalizationService.Get("CheckNewUpdates", "بررسی آپدیت های جدید");
+                if (PauseUpdatesBtn != null) PauseUpdatesBtn.Content = LocalizationService.Get("Pause5Weeks", "توقف ۵ هفته ای");
+                if (ResumeUpdatesBtn != null) ResumeUpdatesBtn.Content = LocalizationService.Get("ResumeUpdates", "ادامه دریافت");
+                if (DisableUpdateServiceBtn != null) DisableUpdateServiceBtn.Content = LocalizationService.Get("DisableService", "غیرفعال سازی");
+                if (EnableUpdateServiceBtn != null) EnableUpdateServiceBtn.Content = LocalizationService.Get("EnableService", "فعال سازی");
+                if (FixStuckUpdatesBtn != null) FixStuckUpdatesBtn.Content = LocalizationService.Get("CleanCache", "پاکسازی کش");
+
+                // Deep Storage
+                if (DeepStorageScanBtn?.Content is StackPanel dsPanel && dsPanel.Children.Count > 1 && dsPanel.Children[1] is TextBlock dsScanTxt)
+                {
+                    dsScanTxt.Text = LocalizationService.Get("StartDeepScan", "شروع پویش عمیق");
+                }
+                if (DeepStorageTabMessText != null) DeepStorageTabMessText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
+                if (DeepStorageSelectAllCheck != null) DeepStorageSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
+                if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("CleanSelectedItems", "پاکسازی موارد انتخابی");
+
+                // Drivers
+                if (CheckDriverUpdatesBtn != null) CheckDriverUpdatesBtn.Content = LocalizationService.Get("CheckDriverUpdates", "بررسی آپدیت درایورها");
+                if (CleanOldDriversBtn != null) CleanOldDriversBtn.Content = LocalizationService.Get("CleanDriverStore", "پاکسازی DriverStore");
+
+                // Refresh cumulative and disk stats
+                UpdateCumulativeChipsUI();
+                RenderDiskBreakdown(_diskTotalGb, _diskFreeGb, _lastScanCleanableBytes);
             }
             catch (Exception ex)
             {
@@ -3995,28 +4034,33 @@ namespace CleanC.UI
 
         private void UpdateCumulativeChipsUI()
         {
+            bool isRtl = LocalizationService.IsRtl;
+            string totalLabel = LocalizationService.Get("TotalFreed", isRtl ? "مجموع آزادشده" : "Total Freed");
+            string lastLabel = LocalizationService.Get("LastCleanup", isRtl ? "آخرین پاکسازی" : "Last Cleanup");
+            string neverCleaned = isRtl ? "هنوز پاکسازی انجام نشده" : "Never cleaned";
+
             if (HeroTotalCumulativeText != null)
             {
                 HeroTotalCumulativeText.Text = _cumulativeFreedBytes > 0
-                    ? $"مجموع آزادشده: {SystemStats.FormatBytes(_cumulativeFreedBytes)}"
-                    : "مجموع آزادشده: —";
+                    ? $"{totalLabel}: {SystemStats.FormatBytes(_cumulativeFreedBytes)}"
+                    : $"{totalLabel}: —";
             }
             if (HeroLastCleanText != null)
             {
                 if (_lastCleanDateTime == DateTime.MinValue || _lastCleanFreedBytes <= 0)
                 {
-                    HeroLastCleanText.Text = "آخرین: هنوز پاکسازی انجام نشده";
+                    HeroLastCleanText.Text = $"{lastLabel}: {neverCleaned}";
                 }
                 else
                 {
                     string timeStr;
                     var diff = DateTime.Now - _lastCleanDateTime;
-                    if (diff.TotalHours < 1) timeStr = "لحظاتی پیش";
-                    else if (diff.TotalDays < 1) timeStr = $"امروز ({_lastCleanDateTime:HH:mm})";
-                    else if (diff.TotalDays < 2) timeStr = "دیروز";
-                    else timeStr = $"{(int)diff.TotalDays} روز پیش";
+                    if (diff.TotalHours < 1) timeStr = isRtl ? "لحظاتی پیش" : "Just now";
+                    else if (diff.TotalDays < 1) timeStr = isRtl ? $"امروز ({_lastCleanDateTime:HH:mm})" : $"Today ({_lastCleanDateTime:HH:mm})";
+                    else if (diff.TotalDays < 2) timeStr = isRtl ? "دیروز" : "Yesterday";
+                    else timeStr = isRtl ? $"{(int)diff.TotalDays} روز پیش" : $"{(int)diff.TotalDays} days ago";
 
-                    HeroLastCleanText.Text = $"آخرین: {SystemStats.FormatBytes(_lastCleanFreedBytes)} ({timeStr})";
+                    HeroLastCleanText.Text = $"{lastLabel}: {SystemStats.FormatBytes(_lastCleanFreedBytes)} ({timeStr})";
                 }
             }
         }
@@ -4049,10 +4093,11 @@ namespace CleanC.UI
             double freePct = Math.Max(0, 100.0 - usedPct - cleanPct);
 
             // تایمر هر ۲٫۵ ثانیه فراخوانی می کند؛ فقط وقتی عدد واقعاً تغییر کرده layout می دهیم
-            string usedTxt = $"{usedPct:0.#}%";
-            string cleanTxt = cleanableGb > 0.01 ? $"{cleanPct:0.#}%" : "—";
-            string freeTxt = $"{freePct:0.#}%";
-            string badgeTxt = $"{SystemStats.FormatBytes((long)(freeGb * 1024 * 1024 * 1024))} آزاد از {SystemStats.FormatBytes((long)(totalGb * 1024 * 1024 * 1024))}";
+            string usedTxt = $"{usedPct.ToString("0.#", CultureInfo.InvariantCulture)}%";
+            string cleanTxt = cleanableGb > 0.01 ? $"{cleanPct.ToString("0.#", CultureInfo.InvariantCulture)}%" : "—";
+            string freeTxt = $"{freePct.ToString("0.#", CultureInfo.InvariantCulture)}%";
+            string freeWord = LocalizationService.IsRtl ? "آزاد از" : "free of";
+            string badgeTxt = $"{SystemStats.FormatBytes((long)(freeGb * 1024 * 1024 * 1024))} {freeWord} {SystemStats.FormatBytes((long)(totalGb * 1024 * 1024 * 1024))}";
 
             bool dirty = _lastDiskRenderSig != $"{usedTxt}|{cleanTxt}|{freeTxt}|{badgeTxt}";
             if (!dirty) return;

@@ -391,7 +391,7 @@ namespace CleanC.UI
                 // Space detail
                 var spaceDetail = new TextBlock
                 {
-                    Text = $"{drive.FormattedFree} free of {drive.FormattedTotal} ({drive.UsedPercent:0.0}%)",
+                    Text = $"{drive.FormattedFree} free of {drive.FormattedTotal} ({drive.UsedPercent.ToString("0.0", CultureInfo.InvariantCulture)}%)",
                     FontSize = 10.5,
                     Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
                     FlowDirection = FlowDirection.LeftToRight,
@@ -1091,9 +1091,22 @@ namespace CleanC.UI
         private void StartSpeedTestBtn_Click(object sender, RoutedEventArgs e)
             => SafeInvoker.Run(StartSpeedTestBtn_ClickAsync(sender, e));
 
+        private void StopSpeedTestBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _speedTestCts?.Cancel();
+            }
+            catch { }
+            if (StartSpeedTestBtn != null) StartSpeedTestBtn.IsEnabled = true;
+            if (StopSpeedTestBtn != null) StopSpeedTestBtn.IsEnabled = false;
+            if (SpeedGaugePhaseText != null) SpeedGaugePhaseText.Text = LocalizationService.Get("SpeedTestCancelled", "تست متوقف شد");
+        }
+
         private async Task StartSpeedTestBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             StartSpeedTestBtn.IsEnabled = false;
+            if (StopSpeedTestBtn != null) StopSpeedTestBtn.IsEnabled = true;
             _speedTestCts = new CancellationTokenSource();
 
             SpeedGaugeValueText.Text = "0";
@@ -1118,10 +1131,6 @@ namespace CleanC.UI
                             string loc = $"{curResult.City}, {curResult.Country}".Trim(',', ' ');
                             string flag = !string.IsNullOrEmpty(curResult.FlagEmoji) ? curResult.FlagEmoji + " " : "";
                             SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? $"{flag}{loc}" : "سرور ابری جهانی";
-                            if (SpeedVpnBadge != null)
-                            {
-                                SpeedVpnBadge.Visibility = curResult.IsVpnActive ? Visibility.Visible : Visibility.Collapsed;
-                            }
                         }
 
                         int curMbpsInt = (int)Math.Round(mbps);
@@ -1163,10 +1172,6 @@ namespace CleanC.UI
                     string loc = $"{result.City}, {result.Country}".Trim(',', ' ');
                     string flag = !string.IsNullOrEmpty(result.FlagEmoji) ? result.FlagEmoji + " " : "";
                     SpeedLocationChipText.Text = !string.IsNullOrEmpty(loc) ? $"{flag}{loc}" : "سرور ابری جهانی";
-                    if (SpeedVpnBadge != null)
-                    {
-                        SpeedVpnBadge.Visibility = result.IsVpnActive ? Visibility.Visible : Visibility.Collapsed;
-                    }
 
                     SpeedGaugePhaseText.Text = "تست با موفقیت تکمیل شد";
                     SpeedGaugeValueText.Text = $"{result.DownloadSpeedMbpsInt}";
@@ -1197,6 +1202,7 @@ namespace CleanC.UI
             finally
             {
                 StartSpeedTestBtn.IsEnabled = true;
+                if (StopSpeedTestBtn != null) StopSpeedTestBtn.IsEnabled = false;
             }
         }
 

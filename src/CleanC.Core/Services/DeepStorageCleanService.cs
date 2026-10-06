@@ -212,6 +212,61 @@ namespace CleanC.Core.Services
                 }
 
                 // -------------------------------------------------------------
+                // 1.5 Scan Developer Caches & Container Junk (If Present)
+                // -------------------------------------------------------------
+                progress?.Invoke("در حال بررسی حافظه های موقت توسعه دهندگان و کانتینرها...");
+                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string appDataRoaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+                var devCaches = new (string Path, string Name)[]
+                {
+                    (Path.Combine(localAppData, "npm-cache"), "کش پکیج های npm"),
+                    (Path.Combine(appDataRoaming, "npm-cache"), "کش پکیج های npm (Roaming)"),
+                    (Path.Combine(userProfile, ".nuget", "packages"), "کش پکیج های NuGet"),
+                    (Path.Combine(localAppData, "NuGet", "v3-cache"), "کش HTTP پکیج های NuGet"),
+                    (Path.Combine(localAppData, "pip", "cache"), "کش پکیج های Python pip"),
+                    (Path.Combine(userProfile, ".gradle", "caches"), "کش بیلد و ابزارهای Gradle"),
+                    (Path.Combine(userProfile, ".cargo", "registry", "cache"), "کش پکیج های Rust Cargo"),
+                    (Path.Combine(userProfile, ".android", "build-cache"), "کش کامپایل Android Studio"),
+                    (Path.Combine(appDataRoaming, "Code", "Cache"), "کش ادیتور VS Code"),
+                    (Path.Combine(appDataRoaming, "Code", "CachedData"), "داده های کش شده VS Code"),
+                    (Path.Combine(userProfile, ".docker"), "کش و لاگ های Docker")
+                };
+
+                foreach (var (cPath, cName) in devCaches)
+                {
+                    try
+                    {
+                        if (Directory.Exists(cPath))
+                        {
+                            long dirSize = 0;
+                            var di = new DirectoryInfo(cPath);
+                            foreach (var f in di.EnumerateFiles("*", enumOptions))
+                            {
+                                try { dirSize += f.Length; } catch { }
+                            }
+
+                            if (dirSize >= 5 * 1024 * 1024) // 5 MB or more
+                            {
+                                messItems.Add(new StorageMessItem
+                                {
+                                    FilePath = cPath,
+                                    FileName = cName,
+                                    DirectoryPath = Path.GetDirectoryName(cPath) ?? cPath,
+                                    SizeBytes = dirSize,
+                                    LastModified = di.LastWriteTime,
+                                    Category = StorageMessCategory.TempJunk
+                                });
+                            }
+                        }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+
+                // -------------------------------------------------------------
                 // 2. Compute Fast Hashes for Potential Duplicates
                 // -------------------------------------------------------------
                 progress?.Invoke("در حال تحلیل و مقایسه فایل های یکسان...");
@@ -327,9 +382,34 @@ namespace CleanC.Core.Services
             });
         }
 
-        public static async Task<SafeDeleteBatchResult> DeleteMessItemsAsync(IEnumerable<string> filePaths)
+        public static async Task<SafeDeleteBatchResult> DeleteMessItemsAsync(IEnumerable<string> paths)
         {
-            return await DeleteDuplicateFilesAsync(filePaths);
+            return await Task.Run(() =>
+            {
+                var files = new List<string>();
+                var dirs = new List<string>();
+                foreach (var p in paths)
+                {
+                    if (Directory.Exists(p)) dirs.Add(p);
+                    else if (File.Exists(p)) files.Add(p);
+                }
+
+                var res = SafeDeleteService.DeleteFiles(files);
+                if (dirs.Count > 0)
+                {
+                    var dirRes = SafeDeleteService.DeleteDirectories(dirs);
+                    res.Total += dirRes.Total;
+                    res.RecycledCount += dirRes.RecycledCount;
+                    res.QuarantinedCount += dirRes.QuarantinedCount;
+                    res.PermanentCount += dirRes.PermanentCount;
+                    res.FailedCount += dirRes.FailedCount;
+                    res.NotFoundCount += dirRes.NotFoundCount;
+                    res.FreedBytes += dirRes.FreedBytes;
+                    res.MovedBytes += dirRes.MovedBytes;
+                    res.Errors.AddRange(dirRes.Errors);
+                }
+                return res;
+            });
         }
 
         public static async Task<SafeDeleteBatchResult> DeleteLargeFilesAsync(IEnumerable<string> filePaths)

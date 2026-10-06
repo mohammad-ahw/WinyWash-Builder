@@ -29,8 +29,11 @@ namespace CleanC.Core.Models
 
         public static string FormatBytes(long bytes)
         {
-            if (bytes <= 0) return "0 بایت";
-            string[] units = { "بایت", "کیلوبایت", "مگابایت", "گیگابایت", "ترابایت" };
+            bool isFa = string.Equals(Services.LocalizationService.CurrentLanguage?.Code, "fa-IR", System.StringComparison.OrdinalIgnoreCase);
+            if (bytes <= 0) return isFa ? "0 بایت" : "0 B";
+            string[] unitsFa = { "بایت", "کیلوبایت", "مگابایت", "گیگابایت", "ترابایت" };
+            string[] unitsEn = { "B", "KB", "MB", "GB", "TB" };
+            string[] units = isFa ? unitsFa : unitsEn;
             int digitGroups = (int)(Math.Log(bytes) / Math.Log(1024));
             if (digitGroups >= units.Length) digitGroups = units.Length - 1;
             double num = bytes / Math.Pow(1024, digitGroups);

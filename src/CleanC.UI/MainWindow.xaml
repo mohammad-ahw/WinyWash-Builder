@@ -182,7 +182,7 @@
                 <!-- ======================================================= -->
                 <ScrollViewer x:Name="DashboardView" Grid.Row="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid HorizontalAlignment="Stretch">
-                        <StackPanel x:Name="DashboardContentPanel" Spacing="10" HorizontalAlignment="Center" MaxWidth="960" Margin="24,0,24,20">
+                        <StackPanel x:Name="DashboardContentPanel" Spacing="10" HorizontalAlignment="Stretch" MaxWidth="960" Margin="24,0,24,20">
                         
                             <!-- 1. AURORA HERO CARD (Height: 126, CornerRadius: 12) -->
                             <Border x:Name="HeroCard" 
@@ -231,7 +231,7 @@
                                             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
                                                 <Border Background="{ThemeResource HeroChipBackgroundBrush}" BorderBrush="{ThemeResource HeroChipBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="7,2">
                                                     <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                        <TextBlock Text="قابل آزادسازی:" FontSize="10" Foreground="{ThemeResource HeroChipLabelBrush}" />
+                                                        <TextBlock x:Name="HeroCleanableLabelText" Text="قابل آزادسازی:" FontSize="10" Foreground="{ThemeResource HeroChipLabelBrush}" />
                                                         <TextBlock x:Name="HeroCleanableText" Text="—" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight" Foreground="{ThemeResource HeroChipValueBrush}" />
                                                     </StackPanel>
                                                 </Border>
@@ -407,7 +407,7 @@
                                             <!-- Big Number LTR -->
                                             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,4" Spacing="4">
                                                 <TextBlock x:Name="HealthScoreValueText" Text="62" FontSize="26" FontWeight="Bold" FlowDirection="LeftToRight" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                <TextBlock Text="از 100" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
+                                                <TextBlock x:Name="HealthScoreOutOfText" Text="از 100" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Bottom" Margin="0,0,0,3" />
                                             </StackPanel>
                                         </Grid>
 
@@ -443,7 +443,7 @@
                                         </Grid>
 
                                         <!-- Big Metric (22pt Bold LTR) -->
-                                        <TextBlock x:Name="CardRamText" Text="9.6 . 16 GB" FontSize="22" FontWeight="Bold" FlowDirection="LeftToRight" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Margin="0,4,0,0" />
+                                        <TextBlock x:Name="CardRamText" Text="—" FontSize="22" FontWeight="Bold" FlowDirection="LeftToRight" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Margin="0,4,0,0" />
 
                                         <!-- Subtitle -->
                                         <TextBlock x:Name="CardRamAvailableText" Text="فضای مصرفی در حال حاضر" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
@@ -744,7 +744,7 @@
                 <!-- ======================================================= -->
                 <ScrollViewer x:Name="ToolsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid HorizontalAlignment="Stretch">
-                        <StackPanel x:Name="ToolsContentPanel" Spacing="16" HorizontalAlignment="Center" MaxWidth="900" Margin="24,8,24,32">
+                        <StackPanel x:Name="ToolsContentPanel" Spacing="16" HorizontalAlignment="Stretch" MaxWidth="960" Margin="24,8,24,32">
                             
                             <!-- =================================================== -->
                             <!-- Sub-View 0: Tools Launcher Grid                     -->
@@ -1021,97 +1021,112 @@
                                 </Grid>
 
                                 <!-- Network Metadata Chips Bar -->
-                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" HorizontalAlignment="Stretch">
-                                    <!-- IP Chip -->
-                                    <Border CornerRadius="8" Padding="12,8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                                            <TextBlock Text="IP" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
-                                            <TextBlock x:Name="SpeedIpChipText" Text="--.--.--.--" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" VerticalAlignment="Center" />
-                                            <Border x:Name="SpeedVpnBadge" Visibility="Collapsed" CornerRadius="4" Background="#263B82F6" BorderBrush="#803B82F6" BorderThickness="1" Padding="6,1" VerticalAlignment="Center">
-                                                <TextBlock Text="🛡️ VPN فعال" FontSize="10" Foreground="#60A5FA" FontWeight="SemiBold" />
+                                <Border CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
+                                        <!-- IP Chip -->
+                                        <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                            <Border Width="28" Height="28" CornerRadius="14" Background="#1A3B82F6">
+                                                <FontIcon Glyph="&#xE838;" FontSize="13" Foreground="#3B82F6" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
-                                        </StackPanel>
-                                    </Border>
-
-                                    <!-- ISP Chip -->
-                                    <Border Grid.Column="1" CornerRadius="8" Padding="12,8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                                            <TextBlock Text="ISP" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
-                                            <TextBlock x:Name="SpeedIspChipText" Text="در حال شناسایی..." FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" MaxWidth="180" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-
-                                    <!-- Location Chip -->
-                                    <Border Grid.Column="2" CornerRadius="8" Padding="12,8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                        <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
-                                            <TextBlock Text="موقعیت" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
-                                            <TextBlock x:Name="SpeedLocationChipText" Text="در حال شناسایی..." FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" MaxWidth="160" VerticalAlignment="Center" />
-                                        </StackPanel>
-                                    </Border>
-                                </Grid>
-
-                                <!-- Central Arc Speed Gauge Card -->
-                                <Border CornerRadius="12" Padding="24,20" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                    <StackPanel Spacing="14" HorizontalAlignment="Stretch">
-                                        <!-- Phase Status Text -->
-                                        <TextBlock x:Name="SpeedGaugePhaseText" Text="آماده شروع تست سرعت" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-
-                                        <!-- Gauge Visual Representation -->
-                                        <Grid Width="220" Height="130" HorizontalAlignment="Center">
-                                            <!-- Background semi-circle track arc -->
-                                            <Path Stroke="{ThemeResource AppCardSecondaryBrush}" StrokeThickness="11" StrokeStartLineCap="Round" StrokeEndLineCap="Round" HorizontalAlignment="Center" VerticalAlignment="Top">
-                                                <Path.Data>
-                                                    <PathGeometry>
-                                                        <PathFigure StartPoint="15,105">
-                                                            <ArcSegment Point="205,105" Size="95,95" SweepDirection="Clockwise" IsLargeArc="False" />
-                                                        </PathFigure>
-                                                    </PathGeometry>
-                                                </Path.Data>
-                                            </Path>
-
-                                            <!-- Central Value & Mbps text -->
-                                            <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Center" Margin="0,0,0,10" Spacing="2">
-                                                <TextBlock x:Name="SpeedGaugeValueText" Text="0" FontSize="34" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
-                                                <TextBlock Text="Mbps" FontSize="11" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" FlowDirection="LeftToRight" />
-                                                <TextBlock x:Name="SpeedGaugeMBsText" Text="0 MB/s" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" FlowDirection="LeftToRight" Margin="0,2,0,0" />
+                                            <StackPanel VerticalAlignment="Center" Spacing="1">
+                                                <TextBlock Text="IP" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="SpeedIpChipText" Text="--.--.--.--" FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight" />
                                             </StackPanel>
+                                        </StackPanel>
 
-                                            <!-- ProgressRing contract preserved -->
-                                            <ProgressRing x:Name="SpeedGaugeRing" Minimum="0" Maximum="100" Value="0" IsIndeterminate="False" Visibility="Collapsed" />
+                                        <!-- ISP Chip -->
+                                        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                            <Border Width="28" Height="28" CornerRadius="14" Background="#1A10B981">
+                                                <FontIcon Glyph="&#xEC27;" FontSize="13" Foreground="#10B981" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center" Spacing="1">
+                                                <TextBlock Text="ISP" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="SpeedIspChipText" Text="در حال شناسایی..." FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" MaxWidth="180" />
+                                            </StackPanel>
+                                        </StackPanel>
+
+                                        <!-- Location Chip -->
+                                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8" HorizontalAlignment="Center">
+                                            <Border Width="28" Height="28" CornerRadius="14" Background="#1AF59E0B">
+                                                <FontIcon Glyph="&#xE819;" FontSize="13" Foreground="#F59E0B" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            </Border>
+                                            <StackPanel VerticalAlignment="Center" Spacing="1">
+                                                <TextBlock Text="موقعیت" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="SpeedLocationChipText" Text="در حال شناسایی..." FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" MaxWidth="160" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+
+                                <!-- Central Speed Gauge Card -->
+                                <Border CornerRadius="14" Padding="28,24" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                                    <StackPanel Spacing="20" HorizontalAlignment="Stretch">
+                                        <!-- Phase Status Badge -->
+                                        <Border HorizontalAlignment="Center" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" CornerRadius="20" Padding="18,7">
+                                            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                                <FontIcon Glyph="&#xE774;" FontSize="13" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="SpeedGaugePhaseText" Text="آماده شروع تست سرعت" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Speed Gauge Dial -->
+                                        <Grid Width="250" Height="250" HorizontalAlignment="Center">
+                                            <!-- Background Circular Track -->
+                                            <Ellipse Width="240" Height="240" Stroke="{ThemeResource AppCardSecondaryBrush}" StrokeThickness="10" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <!-- WinUI ProgressRing as Gauge Meter -->
+                                            <ProgressRing x:Name="SpeedGaugeRing" Width="240" Height="240" Minimum="0" Maximum="100" Value="0" IsIndeterminate="False" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <!-- Inside Gauge Content -->
+                                            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="2">
+                                                <TextBlock x:Name="SpeedGaugeValueText" Text="0" FontSize="44" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
+                                                <TextBlock Text="Mbps" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" FlowDirection="LeftToRight" />
+                                                <TextBlock x:Name="SpeedGaugeMBsText" Text="0 MB/s" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" FlowDirection="LeftToRight" Margin="0,4,0,0" />
+                                            </StackPanel>
                                         </Grid>
 
                                         <!-- Action Buttons -->
-                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10" Margin="0,4,0,0">
-                                            <Button x:Name="StartSpeedTestBtn" Click="StartSpeedTestBtn_Click" Style="{ThemeResource AccentButtonStyle}" Height="34" Padding="26,0" CornerRadius="6">
-                                                <TextBlock Text="شروع تست سرعت" FontSize="12" FontWeight="SemiBold" />
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="12">
+                                            <Button x:Name="StartSpeedTestBtn" Click="StartSpeedTestBtn_Click" Style="{ThemeResource AccentButtonStyle}" Height="36" Padding="28,0" CornerRadius="8">
+                                                <TextBlock x:Name="StartSpeedTestBtnText" Text="شروع تست سرعت" FontSize="12.5" FontWeight="SemiBold" />
+                                            </Button>
+                                            <Button x:Name="StopSpeedTestBtn" Click="StopSpeedTestBtn_Click" IsEnabled="False" Height="36" Padding="20,0" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
+                                                <TextBlock x:Name="StopSpeedTestBtnText" Text="توقف تست" FontSize="12.5" FontWeight="SemiBold" />
                                             </Button>
                                         </StackPanel>
                                     </StackPanel>
                                 </Border>
 
                                 <!-- 3 Stat Cards Below Gauge (Ping, Download, Upload) -->
-                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" HorizontalAlignment="Stretch">
+                                <Grid ColumnDefinitions="*,*,*" ColumnSpacing="12" HorizontalAlignment="Stretch">
                                     <!-- Ping -->
-                                    <Border Grid.Column="0" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                        <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                            <TextBlock Text="تاخیر پینگ" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                            <TextBlock x:Name="SpeedPingValText" Text="-- ms" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
+                                    <Border Grid.Column="0" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#F59E0B" BorderThickness="0,0,0,3">
+                                        <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                <FontIcon Glyph="&#xE916;" FontSize="13" Foreground="#F59E0B" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="SpeedPingTitleText" Text="تاخیر پینگ (Ping)" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="SpeedPingValText" Text="-- ms" FontSize="19" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Download -->
-                                    <Border Grid.Column="1" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                        <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                            <TextBlock Text="سرعت دانلود" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                            <TextBlock x:Name="SpeedDownloadValText" Text="-- Mbps" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
+                                    <!-- Download Speed -->
+                                    <Border Grid.Column="1" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#10B981" BorderThickness="0,0,0,3">
+                                        <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                <FontIcon Glyph="&#xE896;" FontSize="13" Foreground="#10B981" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="SpeedDownloadTitleText" Text="سرعت دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="SpeedDownloadValText" Text="-- Mbps" FontSize="19" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
                                         </StackPanel>
                                     </Border>
 
-                                    <!-- Upload -->
-                                    <Border Grid.Column="2" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                        <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                            <TextBlock Text="سرعت آپلود" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                            <TextBlock x:Name="SpeedUploadValText" Text="-- Mbps" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
+                                    <!-- Upload Speed -->
+                                    <Border Grid.Column="2" CornerRadius="10" Padding="16,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="#3B82F6" BorderThickness="0,0,0,3">
+                                        <StackPanel Spacing="4" HorizontalAlignment="Center">
+                                            <StackPanel Orientation="Horizontal" Spacing="6" HorizontalAlignment="Center">
+                                                <FontIcon Glyph="&#xE898;" FontSize="13" Foreground="#3B82F6" VerticalAlignment="Center" />
+                                                <TextBlock x:Name="SpeedUploadTitleText" Text="سرعت آپلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                            <TextBlock x:Name="SpeedUploadValText" Text="-- Mbps" FontSize="19" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" FlowDirection="LeftToRight" />
                                         </StackPanel>
                                     </Border>
                                 </Grid>
@@ -1601,49 +1616,7 @@
                                 <!-- Items Container -->
                                 <StackPanel x:Name="DeepStorageItemsStack" Spacing="6" />
 
-                                <!-- Extended Cleaners Section (Docker, Dev Caches, WSL2, DISM) -->
-                                <Border CornerRadius="12" Padding="18,16" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Margin="0,10,0,0">
-                                    <StackPanel Spacing="12">
-                                        <StackPanel Spacing="2">
-                                            <TextBlock Text="پاکسازهای عمیق تخصصی و توسعه دهندگان (Extended Cleaners)" FontSize="13.5" FontWeight="Bold" />
-                                            <TextBlock Text="پاکسازی فایل های حجیم سیستمی، کانتینرها، حافظه های موقت کدنویسی و بهینه سازی دیسک لینوکس" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                        </StackPanel>
-                                        <Grid ColumnDefinitions="*,*,*,*" ColumnSpacing="10">
-                                            <!-- Docker Prune -->
-                                            <Button x:Name="CleanDockerBtn" Grid.Column="0" Click="CleanDockerBtn_Click" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                                    <FontIcon Glyph="&#xE7F4;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="کش داکر (Docker)" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="پاکسازی ایمیج ها" FontSize="9.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                                </StackPanel>
-                                            </Button>
-                                            <!-- Dev Caches -->
-                                            <Button x:Name="CleanDevCachesBtn" Grid.Column="1" Click="CleanDevCachesBtn_Click" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                                    <FontIcon Glyph="&#xE756;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="کش توسعه دهندگان" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="npm, pip, NuGet" FontSize="9.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                                </StackPanel>
-                                            </Button>
-                                            <!-- WSL2 Compactor -->
-                                            <Button x:Name="CompactWslBtn" Grid.Column="2" Click="CompactWslBtn_Click" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                                    <FontIcon Glyph="&#xE8B7;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="تراکم دیسک WSL2" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="فشرده سازی vhdx" FontSize="9.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                                </StackPanel>
-                                            </Button>
-                                            <!-- DISM Cleanup -->
-                                            <Button x:Name="CleanDismBtn" Grid.Column="3" Click="CleanDismBtn_Click" HorizontalAlignment="Stretch" Padding="12,10" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                <StackPanel Spacing="4" HorizontalAlignment="Center">
-                                                    <FontIcon Glyph="&#xE90F;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="پاکسازی DISM" FontSize="11" FontWeight="SemiBold" HorizontalAlignment="Center" />
-                                                    <TextBlock Text="WinSxS Component" FontSize="9.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                                </StackPanel>
-                                            </Button>
-                                        </Grid>
-                                    </StackPanel>
-                                </Border>
+
                             </StackPanel>
 
                             <!-- =================================================== -->
@@ -1752,7 +1725,7 @@
                 <!-- ======================================================= -->
                 <ScrollViewer x:Name="SettingsView" Grid.Row="1" Visibility="Collapsed" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
                     <Grid HorizontalAlignment="Stretch">
-                        <StackPanel x:Name="SettingsContentPanel" Spacing="16" HorizontalAlignment="Center" MaxWidth="880" Margin="24,8,24,32">
+                        <StackPanel x:Name="SettingsContentPanel" Spacing="16" HorizontalAlignment="Stretch" MaxWidth="960" Margin="24,8,24,32">
 
                         <StackPanel Spacing="2">
                             <TextBlock x:Name="SettingsHeaderTitle" Text="تنظیمات برنامه" FontWeight="SemiBold" FontSize="15" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
