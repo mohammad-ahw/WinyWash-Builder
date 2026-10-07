@@ -757,8 +757,8 @@ namespace CleanC.UI
                 {
                     if (ramPercent > 80)
                     {
-                        HeroHealthTitle.Text = "مصرف حافظه رم بالاست";
-                        HeroHealthSubtitle.Text = "با ۱ کلیک فایل های موقت پاک، حافظه رم آزاد و پردازه های اضافی بسته می شوند.";
+                        HeroHealthTitle.Text = LocalizationService.Get("HeroTitleHighRam", "مصرف حافظه رم بالاست");
+                        HeroHealthSubtitle.Text = LocalizationService.Get("HeroSubtitleHighRam", "با ۱ کلیک فایل های موقت پاک، حافظه رم آزاد و پردازه های اضافی بسته می شوند.");
                     }
                 }
             }
@@ -781,7 +781,7 @@ namespace CleanC.UI
             _isBusy = true;
 
             QuickBoostBtn.IsEnabled = false;
-            QuickBoostBtnText.Text = "در حال بهینه سازی سیستم...";
+            QuickBoostBtnText.Text = LocalizationService.Get("QuickBoostRunning", "در حال بهینه سازی سیستم...");
             QuickBoostBtnIcon.Glyph = "\uE895"; // sync icon
 
             // CleanupReportCard فقط بعد از اینکه مشخص شد واقعاً کاری برای انجام هست
@@ -2565,15 +2565,28 @@ namespace CleanC.UI
                 Grid.SetColumn(icon, 0);
                 headerGrid.Children.Add(icon);
 
+                string grpTitle = grp.Id switch
+                {
+                    "system_junk" => LocalizationService.Get("JunkCleanSystem", grp.Title),
+                    "browsers" => LocalizationService.Get("JunkBrowsers", grp.Title),
+                    "apps" => LocalizationService.Get("JunkApps", grp.Title),
+                    "windows_caches" => LocalizationService.Get("JunkWindowsCaches", grp.Title),
+                    "event_logs" => LocalizationService.Get("JunkLogs", grp.Title),
+                    "delivery_opt" => LocalizationService.Get("JunkDelivery", grp.Title),
+                    "system_boost" => LocalizationService.Get("JunkBoost", grp.Title),
+                    _ => grp.Title
+                };
+
                 var titleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-                titleStack.Children.Add(new TextBlock { Text = grp.Title, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13, Foreground = itemPrimary });
+                titleStack.Children.Add(new TextBlock { Text = grpTitle, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 13, Foreground = itemPrimary });
                 titleStack.Children.Add(new TextBlock { Text = grp.Description, FontSize = 11, Foreground = itemSecondary });
                 Grid.SetColumn(titleStack, 1);
                 headerGrid.Children.Add(titleStack);
 
+                string boostFeatureLabel = LocalizationService.Get("OptimizationFeatures", "قابلیت بهینه سازی");
                 var badge = new TextBlock
                 {
-                    Text = grp.Id == "system_boost" ? $"{grp.Items.Count} قابلیت بهینه سازی" : grp.FormattedTotal,
+                    Text = grp.Id == "system_boost" ? $"{grp.Items.Count} {boostFeatureLabel}" : grp.FormattedTotal,
                     FontWeight = Microsoft.UI.Text.FontWeights.Bold,
                     FontSize = 13,
                     VerticalAlignment = VerticalAlignment.Center,
@@ -3532,7 +3545,30 @@ namespace CleanC.UI
                 if (HeroCleanableLabelText != null) HeroCleanableLabelText.Text = LocalizationService.Get("CleanableSpace", "قابل آزادسازی") + ":";
                 if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? "از 100" : "of 100";
 
+                // Notification Flyout
+                if (NotificationHistoryTitleText != null) NotificationHistoryTitleText.Text = LocalizationService.Get("NotificationHistoryTitle", "تاریخچه اعلان ها و اقدامات");
+                if (NotificationHistoryClearText != null) NotificationHistoryClearText.Text = LocalizationService.Get("NotificationClear", "پاکسازی");
+                if (EmptyHistoryText != null) EmptyHistoryText.Text = LocalizationService.Get("NotificationEmpty", "هنوز هیچ اعلانی ثبت نشده است.");
+
+                // System Specs
+                if (SpecsHeaderTitle != null) SpecsHeaderTitle.Text = LocalizationService.Get("SpecsHeaderTitle", "مشخصات جامع سخت افزار");
+                if (SpecsHeaderSubtitle != null) SpecsHeaderSubtitle.Text = LocalizationService.Get("SpecsHeaderSubtitle", "اطلاعات لحظه ای پردازنده، رم، مادربرد، گرافیک، درایوها و لایسنس");
+                if (CopySpecsBtnText != null) CopySpecsBtnText.Text = LocalizationService.Get("CopySpecs", "کپی مشخصات");
+                if (RefreshSpecsBtnText != null) RefreshSpecsBtnText.Text = LocalizationService.Get("RefreshSpecs", "بروزرسانی");
+
+                // App Uninstaller
+                if (UninstallerHeaderTitle != null) UninstallerHeaderTitle.Text = LocalizationService.Get("UninstallerHeaderTitle", "مدیریت و حذف نرم افزارها");
+                if (UninstallerSearchBox != null) UninstallerSearchBox.PlaceholderText = LocalizationService.Get("UninstallerSearchPlaceholder", "جستجوی نرم افزار...");
+                if (UninstallerSortNewest != null) UninstallerSortNewest.Content = LocalizationService.Get("UninstallerSortNewest", "جدیدترین نصب");
+                if (UninstallerSortLargest != null) UninstallerSortLargest.Content = LocalizationService.Get("UninstallerSortLargest", "بیشترین حجم");
+                if (UninstallerSortName != null) UninstallerSortName.Content = LocalizationService.Get("UninstallerSortName", "نام (الفبا)");
+
                 // Speed Test
+                if (SpeedTestHeaderTitle != null) SpeedTestHeaderTitle.Text = LocalizationService.Get("SpeedTestHeaderTitle", "تست سرعت اینترنت");
+                if (SpeedTestHeaderSubtitle != null) SpeedTestHeaderSubtitle.Text = LocalizationService.Get("SpeedTestHeaderSubtitle", "سنجش پهنای باند دانلود، آپلود و تاخیر از سرورهای Cloudflare");
+                if (SpeedIpLabelText != null) SpeedIpLabelText.Text = LocalizationService.Get("SpeedIp", "IP");
+                if (SpeedIspLabelText != null) SpeedIspLabelText.Text = LocalizationService.Get("SpeedIsp", "ISP");
+                if (SpeedLocationLabelText != null) SpeedLocationLabelText.Text = LocalizationService.Get("SpeedLocation", "موقعیت");
                 if (SpeedGaugePhaseText != null && !_isBusy) SpeedGaugePhaseText.Text = LocalizationService.Get("ReadyToStartSpeedTest", "آماده شروع تست سرعت");
                 if (StartSpeedTestBtnText != null) StartSpeedTestBtnText.Text = LocalizationService.Get("StartSpeedTest", "شروع تست سرعت");
                 if (StopSpeedTestBtnText != null) StopSpeedTestBtnText.Text = LocalizationService.Get("StopSpeedTest", "توقف تست");
@@ -3540,30 +3576,127 @@ namespace CleanC.UI
                 if (SpeedDownloadTitleText != null) SpeedDownloadTitleText.Text = LocalizationService.Get("DownloadSpeed", "سرعت دانلود");
                 if (SpeedUploadTitleText != null) SpeedUploadTitleText.Text = LocalizationService.Get("UploadSpeed", "سرعت آپلود");
 
+                // Personalization
+                if (PersonalizationHeaderTitle != null) PersonalizationHeaderTitle.Text = LocalizationService.Get("PersonalizationHeaderTitle", "استایل، تم و گرافیک ویندوز");
+                if (PersonalizationHeaderSubtitle != null) PersonalizationHeaderSubtitle.Text = LocalizationService.Get("PersonalizationHeaderSubtitle", "اعمال آنی بدون نیاز به ریستارت");
+
+                // Startup Manager
+                if (StartupHeaderTitle != null) StartupHeaderTitle.Text = LocalizationService.Get("StartupHeaderTitle", "مدیریت برنامه های شروع خودکار");
+                if (RefreshStartupBtnText != null) RefreshStartupBtnText.Text = LocalizationService.Get("StartupRefresh", "بروزرسانی لیست");
+
                 // Windows Update
+                if (WindowsUpdateHeaderTitle != null) WindowsUpdateHeaderTitle.Text = LocalizationService.Get("WindowsUpdateHeaderTitle", "مدیریت بروزرسانی های ویندوز");
+                if (WindowsUpdateHeaderSubtitle != null) WindowsUpdateHeaderSubtitle.Text = LocalizationService.Get("WindowsUpdateHeaderSubtitle", "بررسی آپدیت ها، توقف رسمی ۵ هفته ای و رفع گیر کردن دانلود");
                 if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = LocalizationService.Get("CheckNewUpdates", "بررسی آپدیت های جدید");
+                if (UpdateStatusHeadlineText != null) UpdateStatusHeadlineText.Text = LocalizationService.Get("UpdateStatusHeadline", "وضعیت آپدیت های سیستم عامل");
+                if (UpdateStatusBadgeText != null) UpdateStatusBadgeText.Text = LocalizationService.Get("UpdateStatusActive", "فعال");
+                if (UpdateRow1Title != null) UpdateRow1Title.Text = LocalizationService.Get("UpdateRow1Title", "توقف رسمی تا ۵ هفته");
+                if (UpdateRow1Sub != null) UpdateRow1Sub.Text = LocalizationService.Get("UpdateRow1Sub", "توقف دریافت بسته ها مطابق مکانیزم رسمی تنظیمات ویندوز");
                 if (PauseUpdatesBtn != null) PauseUpdatesBtn.Content = LocalizationService.Get("Pause5Weeks", "توقف ۵ هفته ای");
                 if (ResumeUpdatesBtn != null) ResumeUpdatesBtn.Content = LocalizationService.Get("ResumeUpdates", "ادامه دریافت");
+                if (UpdateRow2Title != null) UpdateRow2Title.Text = LocalizationService.Get("UpdateRow2Title", "سرویس Windows Update (wuauserv)");
+                if (UpdateRow2Sub != null) UpdateRow2Sub.Text = LocalizationService.Get("UpdateRow2Sub", "فعال یا غیرفعال سازی کامل سرویس پس زمینه");
                 if (DisableUpdateServiceBtn != null) DisableUpdateServiceBtn.Content = LocalizationService.Get("DisableService", "غیرفعال سازی");
                 if (EnableUpdateServiceBtn != null) EnableUpdateServiceBtn.Content = LocalizationService.Get("EnableService", "فعال سازی");
+                if (UpdateRow3Title != null) UpdateRow3Title.Text = LocalizationService.Get("UpdateRow3Title", "رفع گیر کردن آپدیت ها (پاکسازی کش)");
+                if (UpdateRow3Sub != null) UpdateRow3Sub.Text = LocalizationService.Get("UpdateRow3Sub", "توقف سرویس، پاکسازی کامل پوشه SoftwareDistribution و راه اندازی مجدد");
                 if (FixStuckUpdatesBtn != null) FixStuckUpdatesBtn.Content = LocalizationService.Get("CleanCache", "پاکسازی کش");
-
-                // Deep Storage
-                if (DeepStorageScanBtn?.Content is StackPanel dsPanel && dsPanel.Children.Count > 1 && dsPanel.Children[1] is TextBlock dsScanTxt)
-                {
-                    dsScanTxt.Text = LocalizationService.Get("StartDeepScan", "شروع پویش عمیق");
-                }
-                if (DeepStorageTabMessText != null) DeepStorageTabMessText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
-                if (DeepStorageSelectAllCheck != null) DeepStorageSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
-                if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("CleanSelectedItems", "پاکسازی موارد انتخابی");
+                if (UpdatePendingSectionTitle != null) UpdatePendingSectionTitle.Text = LocalizationService.Get("UpdatePendingSectionTitle", "آپدیت های در انتظار نصب");
+                if (NoUpdatesBannerText != null) NoUpdatesBannerText.Text = LocalizationService.Get("NoUpdatesBanner", "هیچ آپدیت معلق یا در انتظار نصبی یافت نشد. ویندوز کاملاً بروز است.");
 
                 // Drivers
-                if (CheckDriverUpdatesBtn != null) CheckDriverUpdatesBtn.Content = LocalizationService.Get("CheckDriverUpdates", "بررسی آپدیت درایورها");
+                if (DriversHeaderTitle != null) DriversHeaderTitle.Text = LocalizationService.Get("DriversHeaderTitle", "مدیریت و پاکسازی درایورها");
+                if (DriversHeaderSubtitle != null) DriversHeaderSubtitle.Text = LocalizationService.Get("DriversHeaderSubtitle", "شناسایی خطاها، پاکسازی ایمن نسخه های تکراری DriverStore");
+                if (CheckDriverUpdatesBtnText != null) CheckDriverUpdatesBtnText.Text = LocalizationService.Get("CheckDriverUpdates", "بررسی آپدیت درایورها");
+                if (DriversTotalStatLabel != null) DriversTotalStatLabel.Text = LocalizationService.Get("DriversTotalLabel", "کل بسته های درایور");
+                if (DriversErrorStatLabel != null) DriversErrorStatLabel.Text = LocalizationService.Get("DriversErrorLabel", "خطاهای سخت افزاری");
+                if (DriversDuplicateStatLabel != null) DriversDuplicateStatLabel.Text = LocalizationService.Get("DriversDuplicateLabel", "نسخه های تکراری");
+                if (DriversDuplicateBannerTitle != null) DriversDuplicateBannerTitle.Text = LocalizationService.Get("DriversDuplicateBannerTitle", "پاکسازی بسته های تکراری و اشغال کننده فضا");
+                if (DriversDuplicateBannerSub != null) DriversDuplicateBannerSub.Text = LocalizationService.Get("DriversDuplicateBannerSub", "نسخه های قدیمی با ایجاد Restore Point به صورت ایمن حذف می شوند.");
                 if (CleanOldDriversBtn != null) CleanOldDriversBtn.Content = LocalizationService.Get("CleanDriverStore", "پاکسازی DriverStore");
+                if (DriversSearchBox != null) DriversSearchBox.PlaceholderText = LocalizationService.Get("DriversSearchPlaceholder", "جستجو در بین درایورها...");
+                if (DriversSelectAll != null) DriversSelectAll.Content = LocalizationService.Get("DriversSelectAll", "انتخاب همه");
+                if (DriversBatchDeleteBtnText != null) DriversBatchDeleteBtnText.Text = LocalizationService.Get("DriversBatchDelete", "حذف انتخاب شده ها");
 
-                // Refresh cumulative and disk stats
+                // DNS
+                if (DnsHeaderTitle != null) DnsHeaderTitle.Text = LocalizationService.Get("DnsHeaderTitle", "تنظیم هوشمند DNS");
+                if (DnsHeaderSubtitle != null) DnsHeaderSubtitle.Text = LocalizationService.Get("DnsHeaderSubtitle", "عبور مطمئن از تحریم ها و کاهش پینگ اتصال");
+                if (ResetDnsDhcpBtnText != null) ResetDnsDhcpBtnText.Text = LocalizationService.Get("ResetDnsDhcp", "ریست به خودکار (DHCP)");
+                if (ActiveDnsLabelText != null) ActiveDnsLabelText.Text = LocalizationService.Get("ActiveDnsLabel", "دی ان اس فعال در حال حاضر");
+                if (FlushDnsQuickBtnText != null) FlushDnsQuickBtnText.Text = LocalizationService.Get("FlushDns", "تخلیه کش DNS");
+                if (DnsPresetsTitleText != null) DnsPresetsTitleText.Text = LocalizationService.Get("DnsPresetsTitle", "سرویس های آماده");
+
+                // Privacy
+                if (PrivacyHeaderTitle != null) PrivacyHeaderTitle.Text = LocalizationService.Get("PrivacyHeaderTitle", "حریم خصوصی و حذف تلمتری");
+                if (PrivacyHeaderSubtitle != null) PrivacyHeaderSubtitle.Text = LocalizationService.Get("PrivacyHeaderSubtitle", "قطع ارسال گزارش ها و بهینه سازی جستجو");
+                if (PrivacyBannerTitle != null) PrivacyBannerTitle.Text = LocalizationService.Get("PrivacyBannerTitle", "اعمال و ذخیره خودکار بلادرنگ");
+                if (PrivacyBannerSub != null) PrivacyBannerSub.Text = LocalizationService.Get("PrivacyBannerSub", "همه گزینه ها با سوییچ، آنی در رجیستری و سرویس ها اعمال می شوند.");
+                if (PrivacyBannerBadge != null) PrivacyBannerBadge.Text = LocalizationService.Get("PrivacyBannerBadge", "فعال");
+                if (PrivacyFooterHint != null) PrivacyFooterHint.Text = LocalizationService.Get("PrivacyFooterHint", "برای حداکثر امنیت، فعال بودن همه گزینه ها پیشنهاد می شود.");
+                if (ResetPrivacyDefaultsBtn != null) ResetPrivacyDefaultsBtn.Content = LocalizationService.Get("PrivacyResetDefaults", "پیش فرض ویندوز");
+                if (EnableAllPrivacyProtectionsBtnText != null) EnableAllPrivacyProtectionsBtnText.Text = LocalizationService.Get("PrivacyEnableAll", "فعال سازی همه");
+
+                // Deep Storage
+                if (DeepStorageHeaderTitle != null) DeepStorageHeaderTitle.Text = LocalizationService.Get("DeepStorageHeaderTitle", "پاکسازی عمیق دیسک و فایل های زائد");
+                if (DeepStorageHeaderSubtitle != null) DeepStorageHeaderSubtitle.Text = LocalizationService.Get("DeepStorageHeaderSubtitle", "شناسایی فایل های تکراری، پوشه های خالی، دانلودها و فایل های حجیم");
+                if (DeepStorageScanBtnText != null) DeepStorageScanBtnText.Text = LocalizationService.Get("StartDeepScan", "شروع پویش عمیق");
+                if (DeepStorageDuplicatesLabel != null) DeepStorageDuplicatesLabel.Text = LocalizationService.Get("DeepStorageDuplicatesLabel", "فایل های تکراری");
+                if (DeepStorageEmptyFoldersLabel != null) DeepStorageEmptyFoldersLabel.Text = LocalizationService.Get("DeepStorageEmptyFoldersLabel", "پوشه های خالی");
+                if (DeepStorageEmptyFoldersSub != null) DeepStorageEmptyFoldersSub.Text = LocalizationService.Get("DeepStorageEmptyFoldersSub", "فاقد فایل یا زیرپوشه");
+                if (DeepStorageMessTitleText != null) DeepStorageMessTitleText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
+                if (DeepStorageLargeFilesLabel != null) DeepStorageLargeFilesLabel.Text = LocalizationService.Get("DeepStorageLargeFilesLabel", "فایل های حجیم");
+                if (DeepStorageLargeFilesSizeText != null) DeepStorageLargeFilesSizeText.Text = LocalizationService.Get("DeepStorageLargeFilesSub", "بالاتر از ۵۰۰ مگابایت");
+                if (DeepStorageTabDuplicatesText != null) DeepStorageTabDuplicatesText.Text = LocalizationService.Get("DeepStorageDuplicatesLabel", "فایل های تکراری");
+                if (DeepStorageTabEmptyFoldersText != null) DeepStorageTabEmptyFoldersText.Text = LocalizationService.Get("DeepStorageEmptyFoldersLabel", "پوشه های خالی");
+                if (DeepStorageTabMessText != null) DeepStorageTabMessText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
+                if (DeepStorageTabLargeFilesText != null) DeepStorageTabLargeFilesText.Text = LocalizationService.Get("DeepStorageLargeFilesLabel", "فایل های حجیم");
+                if (DeepStorageSortLabel != null) DeepStorageSortLabel.Text = LocalizationService.Get("DeepStorageSortLabel", "مرتب سازی:");
+                if (DeepStorageSortSizeBtnText != null) DeepStorageSortSizeBtnText.Text = LocalizationService.Get("DeepStorageSortSize", "حجم 🔻");
+                if (DeepStorageSortDateBtnText != null) DeepStorageSortDateBtnText.Text = LocalizationService.Get("DeepStorageSortDate", "تاریخ 📅");
+                if (DeepStorageSortNameBtnText != null) DeepStorageSortNameBtnText.Text = LocalizationService.Get("DeepStorageSortName", "نام 🔤");
+                if (DeepStorageSelectAllCheck != null) DeepStorageSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
+                if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("CleanSelectedItems", "پاکسازی موارد انتخابی");
+                if (DeepStorageScanStatusText != null) DeepStorageScanStatusText.Text = LocalizationService.Get("DeepStorageScanStatus", "در حال پویش عمیق ساختار فایل ها و محاسبه هش محتوا...");
+
+                // Recycle Bin
+                if (RecycleBinHeaderTitle != null) RecycleBinHeaderTitle.Text = LocalizationService.Get("RecycleBinHeaderTitle", "مدیریت سطل بازیافت");
+                if (RecycleBinHeaderSubtitle != null) RecycleBinHeaderSubtitle.Text = LocalizationService.Get("RecycleBinHeaderSubtitle", "پیش نمایش آیتم به آیتم؛ بازگردانی یا حذف قطعی تک تک اشیاء");
+                if (RecycleBinRefreshBtnText != null) RecycleBinRefreshBtnText.Text = LocalizationService.Get("RecycleBinRefresh", "تازه سازی");
+                if (RecycleBinTotalLabel != null) RecycleBinTotalLabel.Text = LocalizationService.Get("RecycleBinTotalLabel", "تعداد اشیاء");
+                if (RecycleBinSizeLabel != null) RecycleBinSizeLabel.Text = LocalizationService.Get("RecycleBinSizeLabel", "حجم اشغال شده");
+                if (RecycleBinSelectAllCheck != null) RecycleBinSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
+                if (RecycleBinRestoreSelectedText != null) RecycleBinRestoreSelectedText.Text = LocalizationService.Get("RecycleBinRestoreSelected", "بازگردانی انتخاب شده ها");
+                if (RecycleBinDeleteSelectedText != null) RecycleBinDeleteSelectedText.Text = LocalizationService.Get("RecycleBinDeleteSelected", "حذف قطعی انتخاب شده ها");
+                if (RecycleBinEmptyBtnText != null) RecycleBinEmptyBtnText.Text = LocalizationService.Get("RecycleBinEmptyBtn", "خالی کردن کل سطل");
+                if (RecycleBinEmptyHintText != null) RecycleBinEmptyHintText.Text = LocalizationService.Get("RecycleBinEmptyHint", "سطل بازیافت خالی است؛ چیزی برای بازگردانی یا حذف وجود ندارد.");
+                if (RecycleBinLoadingText != null) RecycleBinLoadingText.Text = LocalizationService.Get("RecycleBinLoading", "در حال خواندن فهرست سطل بازیافت...");
+
+                // Immediate live telemetry & disk stats refresh
+                RefreshSystemStats();
                 UpdateCumulativeChipsUI();
                 RenderDiskBreakdown(_diskTotalGb, _diskFreeGb, _lastScanCleanableBytes);
+
+                if (_cachedScanResult != null)
+                {
+                    RenderAdvancedGroups(_cachedScanResult);
+                }
+
+                if (ToolSystemSpecsPanel != null && ToolSystemSpecsPanel.Visibility == Visibility.Visible && _cachedSpecs != null)
+                {
+                    RenderSystemSpecs(_cachedSpecs);
+                }
+                if (ToolPersonalizationPanel != null && ToolPersonalizationPanel.Visibility == Visibility.Visible)
+                {
+                    LoadPersonalizationPage();
+                }
+                if (ToolDnsPanel != null && ToolDnsPanel.Visibility == Visibility.Visible)
+                {
+                    LoadDnsPage();
+                }
+                if (ToolPrivacyPanel != null && ToolPrivacyPanel.Visibility == Visibility.Visible)
+                {
+                    LoadPrivacyPage();
+                }
             }
             catch (Exception ex)
             {

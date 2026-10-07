@@ -83,11 +83,11 @@
                                             <ColumnDefinition Width="*" />
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
-                                        <TextBlock Text="تاریخچه اعلان ها و اقدامات" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="NotificationHistoryTitleText" Text="تاریخچه اعلان ها و اقدامات" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center" />
                                         <Button x:Name="ClearHistoryBtn" Click="ClearHistoryBtn_Click" Grid.Column="1" Padding="6,4" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="پاکسازی تاریخچه">
                                             <StackPanel Orientation="Horizontal" Spacing="4">
                                                 <FontIcon Glyph="&#xE74D;" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
-                                                <TextBlock Text="پاکسازی" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="NotificationHistoryClearText" Text="پاکسازی" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                         </Button>
                                     </Grid>
@@ -939,19 +939,19 @@
                                             <FontIcon x:Name="ToolBackIcon1" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="مشخصات جامع سخت افزار" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="اطلاعات لحظه ای پردازنده، رم، مادربرد، گرافیک، درایوها و لایسنس" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="SpecsHeaderTitle" Text="مشخصات جامع سخت افزار" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="SpecsHeaderSubtitle" Text="اطلاعات لحظه ای پردازنده، رم، مادربرد، گرافیک، درایوها و لایسنس" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
                                         <Button Click="CopySpecsReport_Click" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                            <TextBlock Text="کپی مشخصات" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="CopySpecsBtnText" Text="کپی مشخصات" FontSize="12" FontWeight="SemiBold" />
                                         </Button>
                                         <Button Click="RefreshSpecsPage_Click" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <FontIcon Glyph="&#xE72C;" FontSize="12" />
-                                                <TextBlock Text="بروزرسانی" FontSize="12" FontWeight="SemiBold" />
+                                                <TextBlock x:Name="RefreshSpecsBtnText" Text="بروزرسانی" FontSize="12" FontWeight="SemiBold" />
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -972,7 +972,7 @@
                                             <FontIcon x:Name="ToolBackIcon2" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="مدیریت و حذف نرم افزارها" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="UninstallerHeaderTitle" Text="مدیریت و حذف نرم افزارها" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                             <TextBlock x:Name="UninstallerSummaryText" Text="در حال بارگذاری لیست برنامه ها..." FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -982,9 +982,9 @@
                                 <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" ColumnSpacing="10">
                                     <AutoSuggestBox x:Name="UninstallerSearchBox" PlaceholderText="جستجوی نرم افزار..." QueryIcon="Find" Height="34" TextChanged="UninstallerSearchBox_TextChanged" />
                                     <ComboBox x:Name="UninstallerSortBox" Grid.Column="1" SelectionChanged="UninstallerSortBox_SelectionChanged" Height="34" CornerRadius="6">
-                                        <ComboBoxItem Content="جدیدترین نصب" IsSelected="True" />
-                                        <ComboBoxItem Content="بیشترین حجم" />
-                                        <ComboBoxItem Content="نام (الفبا)" />
+                                        <ComboBoxItem x:Name="UninstallerSortNewest" Content="جدیدترین نصب" IsSelected="True" />
+                                        <ComboBoxItem x:Name="UninstallerSortLargest" Content="بیشترین حجم" />
+                                        <ComboBoxItem x:Name="UninstallerSortName" Content="نام (الفبا)" />
                                     </ComboBox>
                                 </Grid>
 
@@ -1014,8 +1014,8 @@
                                             <FontIcon x:Name="ToolBackIcon3" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="تست سرعت اینترنت" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="سنجش پهنای باند دانلود، آپلود و تاخیر از سرورهای Cloudflare" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="SpeedTestHeaderTitle" Text="تست سرعت اینترنت" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="SpeedTestHeaderSubtitle" Text="سنجش پهنای باند دانلود، آپلود و تاخیر از سرورهای Cloudflare" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
@@ -1029,7 +1029,7 @@
                                                 <FontIcon Glyph="&#xE838;" FontSize="13" Foreground="#3B82F6" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                             <StackPanel VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="IP" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="SpeedIpLabelText" Text="IP" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <TextBlock x:Name="SpeedIpChipText" Text="--.--.--.--" FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight" />
                                             </StackPanel>
                                         </StackPanel>
@@ -1040,7 +1040,7 @@
                                                 <FontIcon Glyph="&#xEC27;" FontSize="13" Foreground="#10B981" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                             <StackPanel VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="ISP" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="SpeedIspLabelText" Text="ISP" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <TextBlock x:Name="SpeedIspChipText" Text="در حال شناسایی..." FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" MaxWidth="180" />
                                             </StackPanel>
                                         </StackPanel>
@@ -1051,7 +1051,7 @@
                                                 <FontIcon Glyph="&#xE819;" FontSize="13" Foreground="#F59E0B" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                             <StackPanel VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="موقعیت" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="SpeedLocationLabelText" Text="موقعیت" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <TextBlock x:Name="SpeedLocationChipText" Text="در حال شناسایی..." FontSize="12" FontWeight="SemiBold" FlowDirection="LeftToRight" TextTrimming="CharacterEllipsis" MaxWidth="160" />
                                             </StackPanel>
                                         </StackPanel>
@@ -1145,8 +1145,8 @@
                                             <FontIcon x:Name="ToolBackIcon4" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="استایل، تم و گرافیک ویندوز" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="اعمال آنی بدون نیاز به ریستارت" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="PersonalizationHeaderTitle" Text="استایل، تم و گرافیک ویندوز" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="PersonalizationHeaderSubtitle" Text="اعمال آنی بدون نیاز به ریستارت" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
@@ -1165,7 +1165,7 @@
                                             <FontIcon x:Name="ToolBackIcon5" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="مدیریت برنامه های شروع خودکار" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="StartupHeaderTitle" Text="مدیریت برنامه های شروع خودکار" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                             <TextBlock x:Name="StartupManagerSummaryText" Text="مدیریت برنامه های استارتاپ و سرعت بوت ویندوز" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
@@ -1173,7 +1173,7 @@
                                     <Button Grid.Column="2" Click="RefreshStartupManager_Click" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon Glyph="&#xE72C;" FontSize="12" />
-                                            <TextBlock Text="بروزرسانی لیست" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="RefreshStartupBtnText" Text="بروزرسانی لیست" FontSize="12" FontWeight="SemiBold" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
@@ -1192,8 +1192,8 @@
                                             <FontIcon x:Name="ToolBackIcon6" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="مدیریت بروزرسانی های ویندوز" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="بررسی آپدیت ها، توقف رسمی ۵ هفته ای و رفع گیر کردن دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="WindowsUpdateHeaderTitle" Text="مدیریت بروزرسانی های ویندوز" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="WindowsUpdateHeaderSubtitle" Text="بررسی آپدیت ها، توقف رسمی ۵ هفته ای و رفع گیر کردن دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
 
@@ -1221,7 +1221,7 @@
                                             <TextBlock x:Name="UpdateServiceDetailText" Text="سرویس Windows Update: فعال و آماده به کار" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </StackPanel>
                                         <Border Grid.Column="2" CornerRadius="5" Padding="8,3" Background="{ThemeResource AppCardSecondaryBrush}" VerticalAlignment="Center">
-                                            <TextBlock Text="فعال" FontSize="10.5" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+                                            <TextBlock x:Name="UpdateStatusBadgeText" Text="فعال" FontSize="10.5" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
                                         </Border>
                                     </Grid>
                                 </Border>
@@ -1235,8 +1235,8 @@
                                                 <FontIcon Glyph="&#xE769;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="توقف رسمی تا ۵ هفته" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                <TextBlock Text="توقف دریافت بسته ها مطابق مکانیزم رسمی تنظیمات ویندوز" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="UpdateRow1Title" Text="توقف رسمی تا ۵ هفته" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <TextBlock x:Name="UpdateRow1Sub" Text="توقف دریافت بسته ها مطابق مکانیزم رسمی تنظیمات ویندوز" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
                                                 <Button x:Name="PauseUpdatesBtn" Click="PauseUpdatesBtn_Click" Content="توقف ۵ هفته ای" Height="32" FontSize="11.5" FontWeight="SemiBold" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" />
@@ -1252,8 +1252,8 @@
                                                 <FontIcon Glyph="&#xE713;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="سرویس ویندوز آپدیت (wuauserv)" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                <TextBlock Text="خاموش کردن کامل برای جلوگیری از مصرف پس زمینه" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="UpdateRow2Title" Text="سرویس Windows Update (wuauserv)" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <TextBlock x:Name="UpdateRow2Sub" Text="فعال یا غیرفعال سازی کامل سرویس پس زمینه" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                             <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
                                                 <Button x:Name="DisableUpdateServiceBtn" Click="DisableUpdateServiceBtn_Click" Content="غیرفعال سازی" Height="32" FontSize="11.5" FontWeight="SemiBold" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" />
@@ -1269,8 +1269,8 @@
                                                 <FontIcon Glyph="&#xE74D;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
                                             <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                                <TextBlock Text="رفع گیر کردن و خطاها" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                <TextBlock Text="پاکسازی SoftwareDistribution و شروع مجدد سرویس ها" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="UpdateRow3Title" Text="رفع گیر کردن آپدیت ها (پاکسازی کش)" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                                <TextBlock x:Name="UpdateRow3Sub" Text="توقف سرویس، پاکسازی کامل پوشه SoftwareDistribution و راه اندازی مجدد" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                             <Button x:Name="FixStuckUpdatesBtn" Click="FixStuckUpdatesBtn_Click" Content="پاکسازی کش" Height="32" FontSize="11.5" FontWeight="SemiBold" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" Grid.Column="2" />
                                         </Grid>
@@ -1280,7 +1280,7 @@
                                 <!-- Pending Updates Section -->
                                 <StackPanel Spacing="8" Margin="0,4,0,0">
                                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch">
-                                        <TextBlock Text="آپدیت های در انتظار نصب" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        <TextBlock x:Name="UpdatePendingSectionTitle" Text="آپدیت های در انتظار نصب" FontSize="12.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         <TextBlock x:Name="PendingUpdatesCountText" Grid.Column="1" Text="۰ مورد" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                     </Grid>
 
@@ -1290,7 +1290,7 @@
                                     <Border x:Name="NoUpdatesBanner" Visibility="Collapsed" CornerRadius="10" Padding="16,14" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch">
                                         <StackPanel Orientation="Horizontal" Spacing="10" HorizontalAlignment="Center">
                                             <FontIcon Glyph="&#xE73E;" FontSize="16" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
-                                            <TextBlock Text="هیچ آپدیت معلق یا در انتظار نصبی یافت نشد. ویندوز کاملاً بروز است." FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock x:Name="NoUpdatesBannerText" Text="هیچ آپدیت معلق یا در انتظار نصبی یافت نشد. ویندوز کاملاً بروز است." FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </StackPanel>
                                     </Border>
                                 </StackPanel>
@@ -1307,14 +1307,14 @@
                                             <FontIcon x:Name="ToolBackIcon7" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="مدیریت و پاکسازی درایورها" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="شناسایی خطاها، پاکسازی ایمن نسخه های تکراری DriverStore" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="DriversHeaderTitle" Text="مدیریت و پاکسازی درایورها" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="DriversHeaderSubtitle" Text="شناسایی خطاها، پاکسازی ایمن نسخه های تکراری DriverStore" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
 
                                     <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="8">
                                         <Button x:Name="CheckDriverUpdatesBtn" Click="CheckDriverUpdatesBtn_Click" Height="32" Padding="14,0" CornerRadius="6" Style="{ThemeResource AccentButtonStyle}">
-                                            <TextBlock Text="بررسی آپدیت درایورها" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="CheckDriverUpdatesBtnText" Text="بررسی آپدیت درایورها" FontSize="12" FontWeight="SemiBold" />
                                         </Button>
                                         <Button Click="RefreshDrivers_Click" AutomationProperties.Name="بروزرسانی فهرست درایورها" ToolTipService.ToolTip="بروزرسانی فهرست درایورها" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                             <FontIcon Glyph="&#xE72C;" FontSize="12" />
@@ -1326,21 +1326,21 @@
                                 <Grid ColumnDefinitions="*,*,*" ColumnSpacing="10" HorizontalAlignment="Stretch">
                                     <Border CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                            <TextBlock Text="کل بسته های درایور" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="DriversTotalStatLabel" Text="کل بسته های درایور" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
                                             <TextBlock x:Name="DriversTotalCountText" Text="-- بسته" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                         </StackPanel>
                                     </Border>
 
                                     <Border Grid.Column="1" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                            <TextBlock Text="خطاهای سخت افزاری" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="DriversErrorStatLabel" Text="خطاهای سخت افزاری" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
                                             <TextBlock x:Name="DriversErrorCountText" Text="۰ خطا" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                         </StackPanel>
                                     </Border>
 
                                     <Border Grid.Column="2" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="3" HorizontalAlignment="Center">
-                                            <TextBlock Text="نسخه های تکراری" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
+                                            <TextBlock x:Name="DriversDuplicateStatLabel" Text="نسخه های تکراری" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
                                             <TextBlock x:Name="DriversDuplicateCountText" Text="۰ بسته" FontSize="17" FontWeight="Bold" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                         </StackPanel>
                                     </Border>
@@ -1351,7 +1351,7 @@
                                     <Grid ColumnDefinitions="*,Auto" HorizontalAlignment="Stretch" VerticalAlignment="Center">
                                         <StackPanel VerticalAlignment="Center" Spacing="2">
                                             <TextBlock x:Name="DriversDuplicateBannerTitle" Text="پاکسازی بسته های تکراری و اشغال کننده فضا" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="نسخه های قدیمی با ایجاد Restore Point به صورت ایمن حذف می شوند." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock x:Name="DriversDuplicateBannerSub" Text="نسخه های قدیمی با ایجاد Restore Point به صورت ایمن حذف می شوند." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </StackPanel>
                                         <Button x:Name="CleanOldDriversBtn" Click="CleanOldDriversBtn_Click" Grid.Column="1" Content="پاکسازی DriverStore" Height="32" CornerRadius="6" FontWeight="SemiBold" FontSize="11.5" Style="{ThemeResource AccentButtonStyle}" />
                                     </Grid>
@@ -1387,13 +1387,13 @@
                                             <FontIcon x:Name="ToolBackIcon8" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="تنظیم هوشمند DNS" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="عبور مطمئن از تحریم ها و کاهش پینگ اتصال" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="DnsHeaderTitle" Text="تنظیم هوشمند DNS" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="DnsHeaderSubtitle" Text="عبور مطمئن از تحریم ها و کاهش پینگ اتصال" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
 
                                     <Button x:Name="ResetDnsDhcpBtn" Click="ResetDnsDhcpBtn_Click" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" Grid.Column="2">
-                                        <TextBlock Text="ریست به خودکار (DHCP)" FontSize="12" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="ResetDnsDhcpBtnText" Text="ریست به خودکار (DHCP)" FontSize="12" FontWeight="SemiBold" />
                                     </Button>
                                 </Grid>
 
@@ -1404,16 +1404,18 @@
                                             <FontIcon Glyph="&#xE80A;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                            <TextBlock Text="دی ان اس فعال در حال حاضر" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="ActiveDnsLabelText" Text="دی ان اس فعال در حال حاضر" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                             <TextBlock x:Name="ActiveDnsNameText" Text="الکترو (Electro DNS)" FontSize="14" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                             <TextBlock x:Name="ActiveDnsIpText" Text="—" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FlowDirection="LeftToRight" HorizontalAlignment="Right" />
                                         </StackPanel>
-                                        <Button Grid.Column="2" Click="FlushDnsQuickBtn_Click" Content="تخلیه کش DNS" Height="32" Padding="12,0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" VerticalAlignment="Center" />
+                                        <Button Grid.Column="2" Click="FlushDnsQuickBtn_Click" Height="32" Padding="12,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" VerticalAlignment="Center">
+                                            <TextBlock x:Name="FlushDnsQuickBtnText" Text="تخلیه کش DNS" FontSize="11.5" FontWeight="SemiBold" />
+                                        </Button>
                                     </Grid>
                                 </Border>
 
                                 <!-- Presets Container -->
-                                <TextBlock Text="سرویس های آماده" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="4,6,4,0" />
+                                <TextBlock x:Name="DnsPresetsTitleText" Text="سرویس های آماده" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" Margin="4,6,4,0" />
                                 <StackPanel x:Name="DnsPresetsContainer" Spacing="6" />
                             </StackPanel>
 
@@ -1428,8 +1430,8 @@
                                             <FontIcon x:Name="ToolBackIcon9" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock Text="حریم خصوصی و حذف تلمتری" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="قطع ارسال گزارش ها و بهینه سازی جستجو" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="PrivacyHeaderTitle" Text="حریم خصوصی و حذف تلمتری" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="PrivacyHeaderSubtitle" Text="قطع ارسال گزارش ها و بهینه سازی جستجو" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                 </Grid>
@@ -1441,11 +1443,11 @@
                                             <FontIcon Glyph="&#xE72E;" FontSize="16" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="1">
-                                            <TextBlock Text="اعمال و ذخیره خودکار بلادرنگ" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="همه گزینه ها با سوییچ، آنی در رجیستری و سرویس ها اعمال می شوند." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock x:Name="PrivacyBannerTitle" Text="اعمال و ذخیره خودکار بلادرنگ" FontSize="13" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="PrivacyBannerSub" Text="همه گزینه ها با سوییچ، آنی در رجیستری و سرویس ها اعمال می شوند." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </StackPanel>
                                         <Border Grid.Column="2" CornerRadius="5" Padding="8,3" Background="{ThemeResource AppCardSecondaryBrush}" VerticalAlignment="Center">
-                                            <TextBlock Text="فعال" FontSize="10.5" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
+                                            <TextBlock x:Name="PrivacyBannerBadge" Text="فعال" FontSize="10.5" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorSuccessBrush}" />
                                         </Border>
                                     </Grid>
                                 </Border>
@@ -1455,11 +1457,11 @@
 
                                 <!-- Bulk Actions Footer -->
                                 <Grid ColumnDefinitions="*,Auto" Margin="4,8,4,0">
-                                    <TextBlock Text="برای حداکثر امنیت، فعال بودن همه گزینه ها پیشنهاد می شود." FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
+                                    <TextBlock x:Name="PrivacyFooterHint" Text="برای حداکثر امنیت، فعال بودن همه گزینه ها پیشنهاد می شود." FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
-                                        <Button Click="ResetPrivacyDefaultsBtn_Click" Content="پیش فرض ویندوز" Height="32" Padding="14,0" CornerRadius="6" FontSize="11.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" />
+                                        <Button x:Name="ResetPrivacyDefaultsBtn" Click="ResetPrivacyDefaultsBtn_Click" Content="پیش فرض ویندوز" Height="32" Padding="14,0" CornerRadius="6" FontSize="11.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" />
                                         <Button Click="EnableAllPrivacyProtectionsBtn_Click" Style="{ThemeResource AccentButtonStyle}" Height="32" Padding="16,0" CornerRadius="6">
-                                            <TextBlock Text="فعال سازی همه" FontSize="11.5" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="EnableAllPrivacyProtectionsBtnText" Text="فعال سازی همه" FontSize="11.5" FontWeight="SemiBold" />
                                         </Button>
                                     </StackPanel>
                                 </Grid>
@@ -1479,14 +1481,14 @@
                                             <FontIcon Glyph="&#xE74C;" FontSize="17" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock Text="پاکسازی عمیق و سازماندهی دیسک" FontWeight="SemiBold" FontSize="16" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="شناسایی فایل های تکراری، پوشه های خالی، دانلودها، دسکتاپ و فایل های حجیم" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock x:Name="DeepStorageHeaderTitle" Text="پاکسازی عمیق و سازماندهی دیسک" FontWeight="SemiBold" FontSize="16" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="DeepStorageHeaderSubtitle" Text="شناسایی فایل های تکراری، پوشه های خالی، دانلودها، دسکتاپ و فایل های حجیم" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                     <Button x:Name="DeepStorageScanBtn" Click="DeepStorageScanBtn_Click" Grid.Column="2" Style="{ThemeResource AccentButtonStyle}" Height="34" Padding="16,0" CornerRadius="6" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <FontIcon Glyph="&#xE72C;" FontSize="13" />
-                                            <TextBlock Text="شروع پویش عمیق" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="DeepStorageScanBtnText" Text="شروع پویش عمیق" FontSize="12" FontWeight="SemiBold" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
@@ -1497,7 +1499,7 @@
                                     <Border Grid.Column="0" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="4">
                                             <Grid ColumnDefinitions="*,Auto">
-                                                <TextBlock Text="فایل های تکراری" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="DeepStorageDuplicatesLabel" Text="فایل های تکراری" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <FontIcon Grid.Column="1" Glyph="&#xE8C8;" FontSize="12" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                             </Grid>
                                             <TextBlock x:Name="DeepStorageDuplicatesCountText" Text="۰ گروه تکراری" FontSize="15" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
@@ -1509,11 +1511,11 @@
                                     <Border Grid.Column="1" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="4">
                                             <Grid ColumnDefinitions="*,Auto">
-                                                <TextBlock Text="پوشه های خالی" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="DeepStorageEmptyFoldersLabel" Text="پوشه های خالی" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <FontIcon Grid.Column="1" Glyph="&#xE8B7;" FontSize="12" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                             </Grid>
                                             <TextBlock x:Name="DeepStorageEmptyFoldersCountText" Text="۰ پوشه خالی" FontSize="15" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="فاقد فایل یا زیرپوشه" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                            <TextBlock x:Name="DeepStorageEmptyFoldersSub" Text="فاقد فایل یا زیرپوشه" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </Border>
 
@@ -1533,7 +1535,7 @@
                                     <Border Grid.Column="3" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="4">
                                             <Grid ColumnDefinitions="*,Auto">
-                                                <TextBlock Text="فایل های حجیم" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="DeepStorageLargeFilesLabel" Text="فایل های حجیم" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <FontIcon Grid.Column="1" Glyph="&#xE7C3;" FontSize="12" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                             </Grid>
                                             <TextBlock x:Name="DeepStorageLargeFilesCountText" Text="۰ فایل حجیم" FontSize="15" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
@@ -1552,13 +1554,13 @@
                                                 <Button x:Name="DeepStorageTabDuplicates" Click="DeepStorageTab_Click" Tag="duplicates" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Style="{ThemeResource AccentButtonStyle}">
                                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                                         <FontIcon Glyph="&#xE8C8;" FontSize="11" />
-                                                        <TextBlock Text="فایل های تکراری" />
+                                                        <TextBlock x:Name="DeepStorageTabDuplicatesText" Text="فایل های تکراری" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeepStorageTabEmptyFolders" Click="DeepStorageTab_Click" Tag="empty_folders" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                                         <FontIcon Glyph="&#xE8B7;" FontSize="11" />
-                                                        <TextBlock Text="پوشه های خالی" />
+                                                        <TextBlock x:Name="DeepStorageTabEmptyFoldersText" Text="پوشه های خالی" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeepStorageTabMess" Click="DeepStorageTab_Click" Tag="mess" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
@@ -1570,22 +1572,22 @@
                                                 <Button x:Name="DeepStorageTabLargeFiles" Click="DeepStorageTab_Click" Tag="large_files" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                                     <StackPanel Orientation="Horizontal" Spacing="5">
                                                         <FontIcon Glyph="&#xE7C3;" FontSize="11" />
-                                                        <TextBlock Text="فایل های حجیم" />
+                                                        <TextBlock x:Name="DeepStorageTabLargeFilesText" Text="فایل های حجیم" />
                                                     </StackPanel>
                                                 </Button>
                                             </StackPanel>
 
                                             <!-- Sorting Controls -->
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                                <TextBlock Text="مرتب سازی:" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                                <TextBlock x:Name="DeepStorageSortLabel" Text="مرتب سازی:" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" Margin="0,0,4,0" />
                                                 <Button x:Name="DeepStorageSortSizeBtn" Click="DeepStorageSort_Click" Tag="size" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Style="{ThemeResource AccentButtonStyle}">
-                                                    <TextBlock Text="حجم 🔻" />
+                                                    <TextBlock x:Name="DeepStorageSortSizeBtnText" Text="حجم 🔻" />
                                                 </Button>
                                                 <Button x:Name="DeepStorageSortDateBtn" Click="DeepStorageSort_Click" Tag="date" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                    <TextBlock Text="تاریخ 📅" />
+                                                    <TextBlock x:Name="DeepStorageSortDateBtnText" Text="تاریخ 📅" />
                                                 </Button>
                                                 <Button x:Name="DeepStorageSortNameBtn" Click="DeepStorageSort_Click" Tag="name" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                    <TextBlock Text="نام 🔤" />
+                                                    <TextBlock x:Name="DeepStorageSortNameBtnText" Text="نام 🔤" />
                                                 </Button>
                                             </StackPanel>
                                         </Grid>
@@ -1633,14 +1635,14 @@
                                             <FontIcon Glyph="&#xE74D;" FontSize="17" Foreground="{ThemeResource AccentFillColorDefaultBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Border>
                                         <StackPanel VerticalAlignment="Center" Spacing="2">
-                                            <TextBlock Text="سطل بازیافت" FontWeight="SemiBold" FontSize="16" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                            <TextBlock Text="پیش نمایش آیتم به آیتم؛ بازگردانی یا حذف قطعی تک تک اشیاء" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <TextBlock x:Name="RecycleBinHeaderTitle" Text="سطل بازیافت" FontWeight="SemiBold" FontSize="16" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="RecycleBinHeaderSubtitle" Text="پیش نمایش آیتم به آیتم؛ بازگردانی یا حذف قطعی تک تک اشیاء" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>
                                     <Button x:Name="RecycleBinRefreshBtn" Click="RecycleBinRefreshBtn_Click" Grid.Column="2" Height="34" Padding="16,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" VerticalAlignment="Center">
                                         <StackPanel Orientation="Horizontal" Spacing="8">
                                             <FontIcon Glyph="&#xE72C;" FontSize="13" />
-                                            <TextBlock Text="تازه سازی" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="RecycleBinRefreshBtnText" Text="تازه سازی" FontSize="12" FontWeight="SemiBold" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
@@ -1650,7 +1652,7 @@
                                     <Border CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="4">
                                             <Grid ColumnDefinitions="*,Auto">
-                                                <TextBlock Text="تعداد اشیاء" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="RecycleBinTotalLabel" Text="تعداد اشیاء" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <FontIcon Grid.Column="1" Glyph="&#xE8FD;" FontSize="12" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                             </Grid>
                                             <TextBlock x:Name="RecycleBinCountText" Text="—" FontSize="15" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
@@ -1659,7 +1661,7 @@
                                     <Border Grid.Column="1" CornerRadius="10" Padding="14,12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                         <StackPanel Spacing="4">
                                             <Grid ColumnDefinitions="*,Auto">
-                                                <TextBlock Text="حجم اشغال شده" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="RecycleBinSizeLabel" Text="حجم اشغال شده" FontSize="11.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                                 <FontIcon Grid.Column="1" Glyph="&#xE964;" FontSize="12" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                             </Grid>
                                             <TextBlock x:Name="RecycleBinSizeText" Text="—" FontSize="15" FontWeight="Bold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
@@ -1678,19 +1680,19 @@
                                             <Button x:Name="RecycleBinRestoreSelectedBtn" Click="RecycleBinRestoreSelectedBtn_Click" Height="30" Padding="14,0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Style="{ThemeResource AccentButtonStyle}">
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon Glyph="&#xE777;" FontSize="11" />
-                                                    <TextBlock Text="بازگردانی انتخاب شده ها" />
+                                                    <TextBlock x:Name="RecycleBinRestoreSelectedText" Text="بازگردانی انتخاب شده ها" />
                                                 </StackPanel>
                                             </Button>
                                             <Button x:Name="RecycleBinDeleteSelectedBtn" Click="RecycleBinDeleteSelectedBtn_Click" Height="30" Padding="14,0" CornerRadius="6" FontSize="11.5" FontWeight="SemiBold" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" Foreground="{ThemeResource SystemFillColorCriticalBrush}">
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon Glyph="&#xE74D;" FontSize="11" />
-                                                    <TextBlock Text="حذف قطعی انتخاب شده ها" />
+                                                    <TextBlock x:Name="RecycleBinDeleteSelectedText" Text="حذف قطعی انتخاب شده ها" />
                                                 </StackPanel>
                                             </Button>
                                             <Button x:Name="RecycleBinEmptyBtn" Click="RecycleBinEmptyBtn_Click" Height="30" Padding="14,0" CornerRadius="6" FontSize="11.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                                 <StackPanel Orientation="Horizontal" Spacing="6">
                                                     <FontIcon Glyph="&#xE75C;" FontSize="11" />
-                                                    <TextBlock Text="خالی کردن کل سطل" />
+                                                    <TextBlock x:Name="RecycleBinEmptyBtnText" Text="خالی کردن کل سطل" />
                                                 </StackPanel>
                                             </Button>
                                         </StackPanel>
@@ -1711,7 +1713,7 @@
                                 <Border x:Name="RecycleBinEmptyHint" Visibility="Collapsed" CornerRadius="10" Padding="24" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
                                     <StackPanel Spacing="6" HorizontalAlignment="Center">
                                         <FontIcon Glyph="&#xE74D;" FontSize="22" Foreground="{ThemeResource TextFillColorTertiaryBrush}" HorizontalAlignment="Center" />
-                                        <TextBlock Text="سطل بازیافت خالی است؛ چیزی برای بازگردانی یا حذف وجود ندارد." FontSize="12.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
+                                        <TextBlock x:Name="RecycleBinEmptyHintText" Text="سطل بازیافت خالی است؛ چیزی برای بازگردانی یا حذف وجود ندارد." FontSize="12.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" HorizontalAlignment="Center" />
                                     </StackPanel>
                                 </Border>
                             </StackPanel>
