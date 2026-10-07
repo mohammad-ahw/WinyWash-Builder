@@ -179,10 +179,6 @@ namespace CleanC.UI
             {
                 try
                 {
-                    if (Content is FrameworkElement root)
-                    {
-                        ApplyTheme(root.ActualTheme);
-                    }
                     if (e.WindowActivationState == WindowActivationState.Deactivated)
                     {
                         StopAuroraAnimations();
@@ -2899,13 +2895,14 @@ namespace CleanC.UI
         /// <param name="persist">اگر true باشد نمای فعلی در تنظیمات ذخیره می شود (هنگام رفرش تم false می شود).</param>
         private void SwitchToView(AppView view, ElementTheme? overrideTheme = null, bool persist = true)
         {
+            var prevView = _currentView;
             _currentView = view;
 
             DashboardView.Visibility = view == AppView.Dashboard ? Visibility.Visible : Visibility.Collapsed;
             ToolsView.Visibility = view == AppView.Tools ? Visibility.Visible : Visibility.Collapsed;
             SettingsView.Visibility = view == AppView.Settings ? Visibility.Visible : Visibility.Collapsed;
 
-            if (view == AppView.Tools)
+            if (view == AppView.Tools && prevView != AppView.Tools)
             {
                 NavigateToToolPage(null);
             }
@@ -3009,7 +3006,11 @@ namespace CleanC.UI
         }
 
         private void NavDashboardBtn_Click(object sender, RoutedEventArgs e) => SwitchToView(AppView.Dashboard);
-        private void NavToolsBtn_Click(object sender, RoutedEventArgs e) => SwitchToView(AppView.Tools);
+        private void NavToolsBtn_Click(object sender, RoutedEventArgs e)
+        {
+            SwitchToView(AppView.Tools);
+            NavigateToToolPage(null);
+        }
         private void SettingsHeaderBtn_Click(object sender, RoutedEventArgs e)
         {
             if (_currentView == AppView.Settings)
