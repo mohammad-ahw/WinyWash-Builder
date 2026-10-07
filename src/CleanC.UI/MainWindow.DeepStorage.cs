@@ -650,7 +650,7 @@ namespace CleanC.UI
             if (DeepStorageSelectedCountText != null)
             {
                 string sizeInfo = selectedBytes > 0 ? $" ({SystemStats.FormatBytes(selectedBytes)})" : "";
-                DeepStorageSelectedCountText.Text = $"{selectedCount} مورد انتخاب شده{sizeInfo}";
+                DeepStorageSelectedCountText.Text = $"{selectedCount} {LocalizationService.Get("ItemsSelected", "مورد انتخاب شده")}{sizeInfo}";
             }
         }
 

@@ -65,4 +65,30 @@
   <data name="ProjectPage" xml:space="preserve"><value>صفحه پروژه در گیت هاب</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>کپی اطلاعات عیب یابی</value></data>
   <data name="BackToTools" xml:space="preserve"><value>بازگشت به فهرست ابزارها</value></data>
-<data name="BackButton" xml:space="preserve"><value>بازگشت</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>شاخص سلامت سیستم</value></data><data name="RamTitle" xml:space="preserve"><value>حافظه رم (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>پردازنده (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>پایش ترافیک اینترنت</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>پاکسازی های اخیر</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>تفکیک فضای دیسک</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>مشخصات جامع سیستم</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>سلامت باتری و توان</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>حذف کننده برنامه ها</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>تست سرعت و کیفیت اینترنت</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>شخصی سازی ویندوز و جلوه ها</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>مدیریت بروزرسانی های ویندوز</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>مدیریت استارتاپ</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>مدیریت درایورها</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>نگهداری و سلامت دیسک</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>مدیریت DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>مدیریت منوی کلیک راست</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>پاکسازی عمیق دیسک</value></data></root>
+<data name="BackButton" xml:space="preserve"><value>بازگشت</value></data>
+<data name="HealthScoreTitle" xml:space="preserve"><value>امتیاز سلامت سیستم</value></data>
+<data name="RamTitle" xml:space="preserve"><value>حافظه رم</value></data>
+<data name="CpuTitle" xml:space="preserve"><value>پردازنده</value></data>
+<data name="NetworkTitle" xml:space="preserve"><value>ترافیک شبکه</value></data>
+<data name="NetworkTrafficTitle" xml:space="preserve"><value>ترافیک شبکه</value></data>
+<data name="CleanupHistoryTitle" xml:space="preserve"><value>فضای آزادشده در ۷ روز اخیر</value></data>
+<data name="DiskBreakdownTitle" xml:space="preserve"><value>تحلیل فضای دیسک C:</value></data>
+<data name="DiskUsed" xml:space="preserve"><value>استفاده شده</value></data>
+<data name="DiskCleanable" xml:space="preserve"><value>قابل پاکسازی</value></data>
+<data name="DiskFree" xml:space="preserve"><value>آزاد</value></data>
+<data name="ItemsSelected" xml:space="preserve"><value>مورد انتخاب شده</value></data>
+<data name="TotalDetected" xml:space="preserve"><value>مجموع شناسایی شده</value></data>
+<data name="Scanning" xml:space="preserve"><value>در حال اسکن...</value></data>
+<data name="RefreshedAfterClean" xml:space="preserve"><value>نوسازی پس از پاکسازی</value></data>
+<data name="ToolSpecsTitle" xml:space="preserve"><value>مشخصات جامع سیستم</value></data>
+<data name="ToolBatteryTitle" xml:space="preserve"><value>سلامت باتری و توان</value></data>
+<data name="ToolUninstallerTitle" xml:space="preserve"><value>حذف کننده برنامه ها</value></data>
+<data name="ToolSpeedTestTitle" xml:space="preserve"><value>تست سرعت و کیفیت اینترنت</value></data>
+<data name="ToolPersonalizationTitle" xml:space="preserve"><value>شخصی سازی ویندوز و جلوه ها</value></data>
+<data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>مدیریت بروزرسانی های ویندوز</value></data>
+<data name="ToolStartupTitle" xml:space="preserve"><value>مدیریت استارتاپ</value></data>
+<data name="ToolDriversTitle" xml:space="preserve"><value>مدیریت درایورها</value></data>
+<data name="ToolDiskTitle" xml:space="preserve"><value>نگهداری و سلامت دیسک</value></data>
+<data name="ToolDnsTitle" xml:space="preserve"><value>مدیریت DNS</value></data>
+<data name="ToolContextMenuTitle" xml:space="preserve"><value>مدیریت منوی کلیک راست</value></data>
+<data name="ToolDeepStorageTitle" xml:space="preserve"><value>پاکسازی عمیق دیسک</value></data></root>

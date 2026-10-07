@@ -297,8 +297,8 @@ namespace CleanC.UI
             double initialDipWidth = _appWindow.Size.Width / dpiScale;
             UpdateResponsiveLayout(initialDipWidth);
 
-            // Set selected navigation item (D2: نمای آخر از تنظیمات بازیابی می شود)
-            SwitchToView(ResolveLastView(), persist: false);
+            // Always start on Dashboard view on app launch
+            SwitchToView(AppView.Dashboard, persist: false);
 
             LiveCleanListView.ItemsSource = _activeCleaningItems;
 
@@ -663,28 +663,33 @@ namespace CleanC.UI
                 _currentNetSpeedMbps = netMbps;
                 string activeConsumer = GetActiveNetworkConsumer(netMbps);
 
-                if (CardDiskTitle != null) CardDiskTitle.Text = "پایش ترافیک اینترنت";
+                if (CardDiskTitle != null) CardDiskTitle.Text = LocalizationService.Get("NetworkTrafficTitle", "ترافیک شبکه");
                 if (CardDiskHealthText != null)
                 {
-                    CardDiskHealthText.Text = netMbps >= 0.3 ? "مصرف فعال" : "آماده به کار (Idle)";
+                    CardDiskHealthText.Text = netMbps >= 0.3 
+                        ? LocalizationService.Get("ActiveTraffic", "مصرف فعال") 
+                        : LocalizationService.Get("IdleTraffic", "آماده به کار");
                 }
                 if (CardDiskText != null)
                 {
+                    string approx = LocalizationService.IsRtl ? "حدود" : "~";
+                    string mbpsUnit = LocalizationService.IsRtl ? "مگابیت" : "Mbps";
+                    string kbpsUnit = LocalizationService.IsRtl ? "کیلوبیت" : "Kbps";
                     if (netMbps >= 10.0)
                     {
                         CardDiskText.Text = $"{netMbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps";
-                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = $"{activeConsumer} · حدود {Math.Round(netMbps)} مگابیت";
+                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = $"{activeConsumer} · {approx} {Math.Round(netMbps)} {mbpsUnit}";
                     }
                     else if (netMbps >= 0.1)
                     {
                         CardDiskText.Text = $"{netMbps.ToString("0.2", CultureInfo.InvariantCulture)} Mbps";
                         double kbps = netMbps * 1024.0;
-                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = $"{activeConsumer} · حدود {Math.Round(kbps)} کیلوبیت";
+                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = $"{activeConsumer} · {approx} {Math.Round(kbps)} {kbpsUnit}";
                     }
                     else
                     {
                         CardDiskText.Text = "0.0 Mbps";
-                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = "بدون مصرف پس زمینه (شبکه پایدار)";
+                        if (CardDiskTypeBadge != null) CardDiskTypeBadge.Text = LocalizationService.Get("NoBackgroundTraffic", "بدون مصرف پس زمینه (شبکه پایدار)");
                     }
                 }
                 CardDiskProgress.Value = Math.Clamp(netMbps, 0, 100);
@@ -692,8 +697,33 @@ namespace CleanC.UI
                 // Bento CPU Card - Format: "18%"
                 CardCpuText.Text = $"{Math.Round(cpuPercent).ToString("0", CultureInfo.InvariantCulture)}%";
                 CardCpuProgress.Value = cpuPercent;
-                if (CardGpuSummaryText != null) CardGpuSummaryText.Text = "بار پردازشی هسته ها";
-                if (CardPowerText != null) CardPowerText.Text = !string.IsNullOrEmpty(stats.PowerSummary) ? stats.PowerSummary : "متصل به برق";
+                if (CardGpuSummaryText != null) CardGpuSummaryText.Text = LocalizationService.Get("CpuLoadSummary", "بار پردازشی هسته ها");
+                if (CardPowerText != null)
+                {
+                    if (LocalizationService.IsRtl)
+                    {
+                        CardPowerText.Text = !string.IsNullOrEmpty(stats.PowerSummary) ? stats.PowerSummary : "متصل به برق";
+                    }
+                    else
+                    {
+                        if (string.IsNullOrEmpty(stats.PowerSummary) || stats.PowerSummary.Contains("برق"))
+                        {
+                            CardPowerText.Text = LocalizationService.Get("PowerPlugged", "Plugged In");
+                        }
+                        else if (stats.PowerSummary.Contains("شارژ"))
+                        {
+                            CardPowerText.Text = LocalizationService.Get("PowerCharging", "Charging");
+                        }
+                        else if (stats.PowerSummary.Contains("باتری"))
+                        {
+                            CardPowerText.Text = stats.PowerSummary.Replace("باتری", LocalizationService.Get("PowerBattery", "Battery")).Trim();
+                        }
+                        else
+                        {
+                            CardPowerText.Text = stats.PowerSummary;
+                        }
+                    }
+                }
 
                 // Health Score calculation & gauge arc update
                 double healthScore;
@@ -780,7 +810,7 @@ namespace CleanC.UI
                     _cachedScanResult = await SystemScanService.ScanAsync();
                     ApplyPersistedJunkSelections(_cachedScanResult);
                     RenderAdvancedGroups(_cachedScanResult);
-                    AdvancedCleanTotalText.Text = $"مجموع شناسایی شده: {_cachedScanResult.FormattedTotal}";
+                    AdvancedCleanTotalText.Text = $"{LocalizationService.Get("TotalDetected", "مجموع شناسایی شده")}: {_cachedScanResult.FormattedTotal}";
                     UpdateHeroCleanable(_cachedScanResult.TotalBytes);
                 }
 
@@ -1395,12 +1425,14 @@ namespace CleanC.UI
                 RenderHierarchicalReport(reportGroups, totalFreedBytes, attentionList);
                 CleanupReportCard.Visibility = Visibility.Visible;
 
-                HeroHealthTitle.Text = "سیستم در وضعیت بهینه و پرسرعت قرار دارد";
-                HeroHealthSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(totalFreedBytes)} از حافظه رم و فضای دیسک آزاد شد.";
+                HeroHealthTitle.Text = LocalizationService.Get("HeroTitleOptimized", "سیستم در وضعیت بهینه و پرسرعت قرار دارد");
+                HeroHealthSubtitle.Text = LocalizationService.IsRtl
+                    ? $"مجموعاً {SystemStats.FormatBytes(totalFreedBytes)} از حافظه رم و فضای دیسک آزاد شد."
+                    : $"Freed a total of {SystemStats.FormatBytes(totalFreedBytes)} from RAM and disk space.";
 
                 // Invalidate cached scan so next custom expansion gets fresh values
                 _cachedScanResult = null;
-                AdvancedCleanTotalText.Text = "نوسازی پس از پاکسازی";
+                AdvancedCleanTotalText.Text = LocalizationService.Get("RefreshedAfterClean", "نوسازی پس از پاکسازی");
                 UpdateHeroCleanable(0);
                 ScheduleHeroCleanableRefresh();
 
@@ -2438,11 +2470,11 @@ namespace CleanC.UI
         {
             if (_cachedScanResult == null)
             {
-                AdvancedCleanTotalText.Text = "در حال اسکن...";
+                AdvancedCleanTotalText.Text = LocalizationService.Get("Scanning", "در حال اسکن...");
                 _cachedScanResult = await SystemScanService.ScanAsync();
                 ApplyPersistedJunkSelections(_cachedScanResult);
                 RenderAdvancedGroups(_cachedScanResult);
-                AdvancedCleanTotalText.Text = $"مجموع شناسایی شده: {_cachedScanResult.FormattedTotal}";
+                AdvancedCleanTotalText.Text = $"{LocalizationService.Get("TotalDetected", "مجموع شناسایی شده")}: {_cachedScanResult.FormattedTotal}";
                 UpdateHeroCleanable(_cachedScanResult.TotalBytes);
             }
         }
@@ -3332,10 +3364,19 @@ namespace CleanC.UI
                 bool isRtl = LocalizationService.IsRtl;
                 var dir = isRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
-                if (MainContentGrid != null) MainContentGrid.FlowDirection = dir;
+                if (MainContentGrid != null)
+                {
+                    MainContentGrid.FlowDirection = dir;
+                    MainContentGrid.Language = isRtl ? "fa-IR" : "en-US";
+                }
+                if (this.Content is FrameworkElement rootElement)
+                {
+                    rootElement.Language = isRtl ? "fa-IR" : "en-US";
+                }
                 if (NotificationHistoryFlyout?.Content is FrameworkElement flyoutRoot)
                 {
                     flyoutRoot.FlowDirection = dir;
+                    flyoutRoot.Language = isRtl ? "fa-IR" : "en-US";
                 }
 
                 UpdateBackButtonsDirection(isRtl);
@@ -3369,11 +3410,36 @@ namespace CleanC.UI
                 }
 
                 // Bento Cards
-                if (CardRamTitle != null) CardRamTitle.Text = LocalizationService.Get("RamTitle", "مصرف رم (RAM)");
-                if (CardCpuTitle != null) CardCpuTitle.Text = LocalizationService.Get("CpuTitle", "پردازنده (CPU)");
-                if (CardDiskTitle != null) CardDiskTitle.Text = LocalizationService.Get("DiskBreakdownTitle", "فضای دیسک و درایوها (Storage)");
+                if (CardHealthTitle != null) CardHealthTitle.Text = LocalizationService.Get("HealthScoreTitle", "سلامت سیستم");
+                SetHealthGaugeScore(_currentHealthScore);
+
+                if (CardRamTitle != null) CardRamTitle.Text = LocalizationService.Get("RamTitle", "حافظه رم");
+                if (CardCpuTitle != null) CardCpuTitle.Text = LocalizationService.Get("CpuTitle", "پردازنده");
+                if (CardDiskTitle != null) CardDiskTitle.Text = LocalizationService.Get("NetworkTrafficTitle", "ترافیک شبکه");
+                if (CardGpuSummaryText != null) CardGpuSummaryText.Text = LocalizationService.Get("CpuLoadSummary", "بار پردازشی هسته ها");
+                if (CardRamAvailableText != null) CardRamAvailableText.Text = LocalizationService.Get("RamCurrentlyUsed", "فضای مصرفی در حال حاضر");
+
+                if (DiskBreakdownTitle != null) DiskBreakdownTitle.Text = LocalizationService.Get("DiskBreakdownTitle", "تحلیل فضای دیسک C:");
+                if (DiskLegendUsedLabel != null) DiskLegendUsedLabel.Text = LocalizationService.Get("DiskUsed", "استفاده شده");
+                if (DiskLegendCleanableLabel != null) DiskLegendCleanableLabel.Text = LocalizationService.Get("DiskCleanable", "قابل پاکسازی");
+                if (DiskLegendFreeLabel != null) DiskLegendFreeLabel.Text = LocalizationService.Get("DiskFree", "آزاد");
+
+                if (CleanupHistoryTitle != null) CleanupHistoryTitle.Text = LocalizationService.Get("CleanupHistoryTitle", "فضای آزادشده در ۷ روز اخیر");
+
                 if (AdvancedCleanExpanderTitle != null) AdvancedCleanExpanderTitle.Text = LocalizationService.Get("AdvancedCleanTitle", "سفارشی سازی موارد پاکسازی و بهینه سازی");
+                if (AdvancedCleanTotalText != null)
+                {
+                    if (_cachedScanResult != null)
+                    {
+                        AdvancedCleanTotalText.Text = $"{LocalizationService.Get("TotalDetected", "مجموع شناسایی شده")}: {_cachedScanResult.FormattedTotal}";
+                    }
+                    else
+                    {
+                        AdvancedCleanTotalText.Text = $"6 {LocalizationService.Get("ItemsSelected", "مورد انتخاب شده")}";
+                    }
+                }
                 if (ToolsHeaderTitle != null) ToolsHeaderTitle.Text = LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز");
+                if (ToolsHeaderSubtitle != null) ToolsHeaderSubtitle.Text = LocalizationService.Get("ToolsHeaderSubtitle", "پرکاربردترین ابزارها همین جا، بقیه یک کلیک آن طرف تر");
 
                 // Launcher Tool Cards Localization
                 if (LauncherWindowsUpdateTitle != null) LauncherWindowsUpdateTitle.Text = LocalizationService.Get("LauncherWindowsUpdateTitle", "آپدیت ویندوز");
@@ -3417,6 +3483,33 @@ namespace CleanC.UI
                 if (SettingsCloseToTrayText != null) SettingsCloseToTrayText.Text = LocalizationService.Get("CloseToTray", "با بستن پنجره خارج نشو؛ در پس زمینه (کنار ساعت) بمان");
                 if (SettingsMinToTrayText != null) SettingsMinToTrayText.Text = LocalizationService.Get("MinimizeToTray", "کوچک نمایی پنجره، برنامه را در کنار ساعت پنهان کند");
 
+                // Settings AutoStart
+                if (SettingsAutoStartTitle != null) SettingsAutoStartTitle.Text = LocalizationService.Get("AutoStartTitle", "شروع همراه با ویندوز");
+                if (SettingsAutoStartDesc != null) SettingsAutoStartDesc.Text = LocalizationService.Get("AutoStartDesc", "با ورود به حساب کاربری، CleanC به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود.");
+
+                // Settings Delete Behavior
+                if (SettingsDeleteModeTitle != null) SettingsDeleteModeTitle.Text = LocalizationService.Get("DeleteBehaviorTitle", "رفتار حذف فایل های شخصی");
+                if (SettingsDeleteModeDesc != null) SettingsDeleteModeDesc.Text = LocalizationService.Get("DeleteBehaviorSub", "برای حذف تکراری ها، فایل های حجیم و سازماندهی دانلودها/دسکتاپ. کش و زباله ها همیشه قطعی حذف می شوند تا فضا واقعاً آزاد شود.");
+                if (DeleteModeRecycleRadio != null) DeleteModeRecycleRadio.Content = LocalizationService.Get("DeleteModeRecycle", "انتقال به سطل بازیافت (پیش فرض)");
+                if (DeleteModeQuarantineRadio != null) DeleteModeQuarantineRadio.Content = LocalizationService.Get("DeleteModeQuarantine", "قرنطینه ی CleanC — نگهداری در پوشه ی برنامه و قابل بازگردانی از مرکز بازیابی");
+                if (DeleteModePermanentRadio != null) DeleteModePermanentRadio.Content = LocalizationService.Get("DeleteModePermanent", "حذف قطعی — فوراً آزاد می شود اما قابل بازگردانی نیست");
+
+                // Settings Auto State Restore
+                if (SettingsStateRestoreTitle != null) SettingsStateRestoreTitle.Text = LocalizationService.Get("AutoStateRestoreTitle", "بازیابی خودکار وضعیت");
+                if (SettingsStateRestoreDesc != null) SettingsStateRestoreDesc.Text = LocalizationService.Get("AutoStateRestoreSub", "هر تغییر بلافاصله ذخیره می شود و در اجرای بعدی برگردانده می شود.");
+                if (SettingsSavePlacementText != null) SettingsSavePlacementText.Text = LocalizationService.Get("SaveWindowPlacement", "اندازه و موقعیت پنجره");
+                if (SettingsSaveLastViewText != null) SettingsSaveLastViewText.Text = LocalizationService.Get("SaveLastView", "نمای آخر (داشبورد / ابزارها / تنظیمات)");
+                if (SettingsSaveScanSelectionsText != null) SettingsSaveScanSelectionsText.Text = LocalizationService.Get("SaveScanSelections", "انتخاب های اسکن پاکسازی");
+                if (ResetWindowPlacementBtn != null) ResetWindowPlacementBtn.Content = LocalizationService.Get("ResetWindowSize", "بازنشانی اندازه ی پنجره");
+                if (ResetAllSettingsBtn != null) ResetAllSettingsBtn.Content = LocalizationService.Get("ResetAllSettings", "بازنشانی همه ی تنظیمات");
+
+                // Settings App Data
+                if (SettingsAppDataTitle != null) SettingsAppDataTitle.Text = LocalizationService.Get("AppDataTitle", "داده های برنامه");
+                if (SettingsAppDataPathLabel != null) SettingsAppDataPathLabel.Text = LocalizationService.Get("AppDataSettingsLabel", "تنظیمات:");
+                if (SettingsLogPathLabel != null) SettingsLogPathLabel.Text = LocalizationService.Get("AppDataLogsLabel", "لاگ خطاها:");
+                if (OpenSettingsFolderBtn != null) OpenSettingsFolderBtn.Content = LocalizationService.Get("OpenSettingsFolder", "باز کردن پوشه ی تنظیمات");
+                if (OpenLogFolderBtn != null) OpenLogFolderBtn.Content = LocalizationService.Get("OpenLogsFolder", "باز کردن پوشه ی لاگ ها");
+
                 if (SettingsExportTitle != null) SettingsExportTitle.Text = LocalizationService.Get("ExportReportTitle", "خروجی گزارش");
                 if (SettingsExportDesc != null) SettingsExportDesc.Text = LocalizationService.Get("ExportReportSub", "خروجی اطلاعات جامع سیستم جهت ارسال به هوش مصنوعی یا بررسی مشخصات سخت افزاری با فرمت متنی تمیز.");
                 if (ExportAiReportText != null) ExportAiReportText.Text = LocalizationService.Get("ExportAiReport", "گزارش جامع برای هوش مصنوعی (.md)");
@@ -3424,6 +3517,8 @@ namespace CleanC.UI
 
                 if (SettingsAboutTitle != null) SettingsAboutTitle.Text = LocalizationService.Get("AboutTitle", "درباره CleanC");
                 if (SettingsAboutDesc != null) SettingsAboutDesc.Text = LocalizationService.Get("AboutSub", "برای گزارش باگ، اطلاعات عیب یابی را کپی و همراه با مشکل ارسال کنید.");
+                if (AboutVersionLabel != null) AboutVersionLabel.Text = LocalizationService.Get("VersionLabel", "نسخه برنامه:");
+                if (AboutOsLabel != null) AboutOsLabel.Text = LocalizationService.Get("OsLabel", "سیستم عامل:");
                 if (CheckAppUpdatesText != null) CheckAppUpdatesText.Text = LocalizationService.Get("CheckUpdates", "بررسی به روزرسانی");
                 if (OpenProjectPageText != null) OpenProjectPageText.Text = LocalizationService.Get("ProjectPage", "صفحه پروژه");
                 if (CopyDiagnosticsText != null) CopyDiagnosticsText.Text = LocalizationService.Get("CopyDiagnostics", "کپی اطلاعات عیب یابی");
@@ -3912,29 +4007,30 @@ namespace CleanC.UI
 
         private static string GetActiveNetworkConsumer(double netMbps)
         {
-            if (netMbps < 0.2) return "شبکه آزاد و پایدار";
+            bool isRtl = LocalizationService.IsRtl;
+            if (netMbps < 0.2) return isRtl ? "شبکه آزاد و پایدار" : "Network Idle";
 
             try
             {
                 var running = GetRunningProcessNames();
 
-                if (running.Contains("IDMan")) return "دانلود فعال (IDM)";
-                if (running.Contains("steam") || running.Contains("steamwebhelper")) return "کلاینت استیم (Steam)";
-                if (running.Contains("qbittorrent") || running.Contains("utorrent")) return "کلاینت تورنت (Torrent)";
-                if (running.Contains("msedge")) return "مرورگر مایکروسافت اج";
-                if (running.Contains("chrome")) return "مرورگر گوگل کروم";
-                if (running.Contains("firefox")) return "مرورگر فایرفاکس";
-                if (running.Contains("Discord")) return "دیسکورد (Discord)";
-                if (running.Contains("Telegram")) return "پیام رسان تلگرام";
-                if (running.Contains("Spotify")) return "استریم اسپاتیفای";
-                if (running.Contains("DoSvc")) return "سرویس آپدیت ویندوز";
+                if (running.Contains("IDMan")) return isRtl ? "دانلود فعال (IDM)" : "Internet Download Manager (IDM)";
+                if (running.Contains("steam") || running.Contains("steamwebhelper")) return isRtl ? "کلاینت استیم (Steam)" : "Steam Client";
+                if (running.Contains("qbittorrent") || running.Contains("utorrent")) return isRtl ? "کلاینت تورنت (Torrent)" : "Torrent Client";
+                if (running.Contains("msedge")) return isRtl ? "مرورگر مایکروسافت اج" : "Microsoft Edge";
+                if (running.Contains("chrome")) return isRtl ? "مرورگر گوگل کروم" : "Google Chrome";
+                if (running.Contains("firefox")) return isRtl ? "مرورگر فایرفاکس" : "Mozilla Firefox";
+                if (running.Contains("Discord")) return "Discord";
+                if (running.Contains("Telegram")) return isRtl ? "پیام رسان تلگرام" : "Telegram";
+                if (running.Contains("Spotify")) return isRtl ? "استریم اسپاتیفای" : "Spotify";
+                if (running.Contains("DoSvc")) return isRtl ? "سرویس آپدیت ویندوز" : "Windows Update Service";
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
             }
 
-            return "ترافیک سیستم و ویندوز";
+            return isRtl ? "ترافیک سیستم و ویندوز" : LocalizationService.Get("NetworkSysTraffic", "System & Windows Traffic");
         }
 
         // ====================================================================
@@ -4159,8 +4255,16 @@ namespace CleanC.UI
                 var bar = col.Children.Count > 1 ? col.Children[1] as Border : null;
                 var labelTb = col.Children.Count > 2 ? col.Children[2] as TextBlock : null;
 
-                if (valueTb != null) valueTb.Text = values[i];
-                if (labelTb != null) labelTb.Text = labels[i];
+                if (valueTb != null)
+                {
+                    valueTb.Language = "en-US";
+                    valueTb.Text = values[i];
+                }
+                if (labelTb != null)
+                {
+                    labelTb.Language = "en-US";
+                    labelTb.Text = labels[i];
+                }
                 if (bar != null)
                 {
                     if (days[i] > 0 && maxBytes > 0)
@@ -5180,35 +5284,35 @@ namespace CleanC.UI
             {
                 if (_currentHealthScore >= 85)
                 {
-                    HealthScoreStatusPill.Text = "عالی";
+                    HealthScoreStatusPill.Text = LocalizationService.Get("HealthExcellent", "عالی");
                     HealthScoreStatusPill.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 108, 203, 95));
                     HealthScoreStatusBadge.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(40, 108, 203, 95));
                     HealthScoreStatusBadge.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(80, 108, 203, 95));
-                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "وضعیت عمومی سیستم پایدار و عالی است";
+                    if (HealthScoreDescText != null) HealthScoreDescText.Text = LocalizationService.Get("HealthDescExcellent", "وضعیت عمومی سیستم پایدار و عالی است");
                 }
                 else if (_currentHealthScore >= 70)
                 {
-                    HealthScoreStatusPill.Text = "خوب";
+                    HealthScoreStatusPill.Text = LocalizationService.Get("HealthGood", "خوب");
                     HealthScoreStatusPill.Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
                     HealthScoreStatusBadge.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(35, 96, 205, 255));
                     HealthScoreStatusBadge.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(70, 96, 205, 255));
-                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "عملکرد کلی سیستم خوب و مطلوب است";
+                    if (HealthScoreDescText != null) HealthScoreDescText.Text = LocalizationService.Get("HealthDescGood", "عملکرد کلی سیستم خوب و مطلوب است");
                 }
                 else if (_currentHealthScore >= 50)
                 {
-                    HealthScoreStatusPill.Text = "متوسط";
+                    HealthScoreStatusPill.Text = LocalizationService.Get("HealthFair", "متوسط");
                     HealthScoreStatusPill.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 245, 165, 36));
                     HealthScoreStatusBadge.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(35, 245, 165, 36));
                     HealthScoreStatusBadge.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(70, 245, 165, 36));
-                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "سیستم نیازمند آزادسازی رم و بهینه سازی فایل ها";
+                    if (HealthScoreDescText != null) HealthScoreDescText.Text = LocalizationService.Get("HealthDescFair", "سیستم نیازمند آزادسازی رم و بهینه سازی فایل ها");
                 }
                 else
                 {
-                    HealthScoreStatusPill.Text = "نیاز به بهینه سازی";
+                    HealthScoreStatusPill.Text = LocalizationService.Get("HealthNeedsOpt", "نیاز به بهینه سازی");
                     HealthScoreStatusPill.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 239, 68, 68));
                     HealthScoreStatusBadge.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(35, 239, 68, 68));
                     HealthScoreStatusBadge.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(70, 239, 68, 68));
-                    if (HealthScoreDescText != null) HealthScoreDescText.Text = "مصرف منابع بالا؛ اجرای پاکسازی سریع توصیه می شود";
+                    if (HealthScoreDescText != null) HealthScoreDescText.Text = LocalizationService.Get("HealthDescPoor", "مصرف منابع بالا؛ اجرای پاکسازی سریع توصیه می شود");
                 }
             }
 

@@ -65,4 +65,30 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub Project Page</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>Copy diagnostic information</value></data>
   <data name="BackToTools" xml:space="preserve"><value>Back to Windows Tools</value></data>
-<data name="BackButton" xml:space="preserve"><value>Back</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>System Health Index</value></data><data name="RamTitle" xml:space="preserve"><value>Memory (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>Processor (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>Network Traffic Monitor</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>Recent Cleanups</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>Disk Storage Breakdown</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>Comprehensive System Specs</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>Battery Health &amp; Power</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>App &amp; Bloatware Uninstaller</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>Internet Speed &amp; Quality Test</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows Personalization &amp; Visuals</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update Manager</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>Startup Manager</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>Hardware Drivers Manager</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>Disk Maintenance &amp; TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNS Manager</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>Context Menu Manager</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>Deep Storage Cleaner</value></data></root>
+<data name="BackButton" xml:space="preserve"><value>Back</value></data>
+<data name="HealthScoreTitle" xml:space="preserve"><value>System Health Score</value></data>
+<data name="RamTitle" xml:space="preserve"><value>RAM</value></data>
+<data name="CpuTitle" xml:space="preserve"><value>CPU</value></data>
+<data name="NetworkTitle" xml:space="preserve"><value>Network</value></data>
+<data name="NetworkTrafficTitle" xml:space="preserve"><value>Network</value></data>
+<data name="CleanupHistoryTitle" xml:space="preserve"><value>Space Freed in Last 7 Days</value></data>
+<data name="DiskBreakdownTitle" xml:space="preserve"><value>Disk Space Breakdown (C:)</value></data>
+<data name="DiskUsed" xml:space="preserve"><value>Used</value></data>
+<data name="DiskCleanable" xml:space="preserve"><value>Cleanable</value></data>
+<data name="DiskFree" xml:space="preserve"><value>Free</value></data>
+<data name="ItemsSelected" xml:space="preserve"><value>items selected</value></data>
+<data name="TotalDetected" xml:space="preserve"><value>Total detected</value></data>
+<data name="Scanning" xml:space="preserve"><value>Scanning...</value></data>
+<data name="RefreshedAfterClean" xml:space="preserve"><value>Optimized after cleanup</value></data>
+<data name="ToolSpecsTitle" xml:space="preserve"><value>Comprehensive System Specs</value></data>
+<data name="ToolBatteryTitle" xml:space="preserve"><value>Battery Health &amp; Power</value></data>
+<data name="ToolUninstallerTitle" xml:space="preserve"><value>App &amp; Bloatware Uninstaller</value></data>
+<data name="ToolSpeedTestTitle" xml:space="preserve"><value>Internet Speed &amp; Quality Test</value></data>
+<data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows Personalization &amp; Visuals</value></data>
+<data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update Manager</value></data>
+<data name="ToolStartupTitle" xml:space="preserve"><value>Startup Manager</value></data>
+<data name="ToolDriversTitle" xml:space="preserve"><value>Hardware Drivers Manager</value></data>
+<data name="ToolDiskTitle" xml:space="preserve"><value>Disk Maintenance &amp; TRIM</value></data>
+<data name="ToolDnsTitle" xml:space="preserve"><value>DNS Manager</value></data>
+<data name="ToolContextMenuTitle" xml:space="preserve"><value>Context Menu Manager</value></data>
+<data name="ToolDeepStorageTitle" xml:space="preserve"><value>Deep Storage Cleaner</value></data></root>

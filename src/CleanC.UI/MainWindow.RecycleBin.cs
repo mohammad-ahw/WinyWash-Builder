@@ -202,7 +202,7 @@ namespace CleanC.UI
         private void UpdateRecycleBinSelectedCount()
         {
             int selected = _recycleBinRows.Count(r => r.Box.IsChecked == true);
-            RecycleBinSelectedCountText.Text = $"{selected} مورد انتخاب شده";
+            RecycleBinSelectedCountText.Text = $"{selected} {LocalizationService.Get("ItemsSelected", "مورد انتخاب شده")}";
 
             bool any = _recycleBinRows.Count > 0;
             RecycleBinRestoreSelectedBtn.IsEnabled = selected > 0;

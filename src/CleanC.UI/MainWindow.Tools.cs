@@ -475,9 +475,10 @@ namespace CleanC.UI
             headerGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             var titleStack = new StackPanel { Spacing = 2 };
+            bool isRtl = LocalizationService.IsRtl;
             titleStack.Children.Add(new TextBlock
             {
-                Text = "طرح مصرف انرژی ویندوز (Power Plan)",
+                Text = isRtl ? "طرح مصرف انرژی ویندوز (Power Plan)" : "Windows Power Plan",
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 FontSize = 13.5
             });
@@ -485,7 +486,9 @@ namespace CleanC.UI
             var status = PowerPlanService.GetPowerStatus();
             var subText = new TextBlock
             {
-                Text = $"اعمال آنی powercfg بدون نیاز به ریستارت | پلن فعلی: {status.ActiveSchemeName}",
+                Text = isRtl 
+                    ? $"اعمال آنی powercfg بدون نیاز به ریستارت | پلن فعلی: {status.ActiveSchemeName}"
+                    : $"Instant powercfg tuning without restart | Current Plan: {status.ActiveSchemeName}",
                 FontSize = 11,
                 Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
             };
@@ -522,13 +525,21 @@ namespace CleanC.UI
                 plansGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             }
 
-            var plans = new[]
-            {
-                ("ultimate", "حداکثر کارایی", "Ultimate", "\uE7E8"),
-                ("high", "کارایی بالا", "High", "\uE945"),
-                ("balanced", "متعادل", "Balanced", "\uE953"),
-                ("saver", "ذخیره انرژی", "Power Saver", "\uEC0A")
-            };
+            var plans = isRtl
+                ? new[]
+                {
+                    ("ultimate", "حداکثر کارایی", "Ultimate", "\uE7E8"),
+                    ("high", "کارایی بالا", "High", "\uE945"),
+                    ("balanced", "متعادل", "Balanced", "\uE953"),
+                    ("saver", "ذخیره انرژی", "Power Saver", "\uEC0A")
+                }
+                : new[]
+                {
+                    ("ultimate", "Ultimate", "Max Speed", "\uE7E8"),
+                    ("high", "High Perf", "Optimal", "\uE945"),
+                    ("balanced", "Balanced", "Recommended", "\uE953"),
+                    ("saver", "Power Saver", "Eco Mode", "\uEC0A")
+                };
 
             var planButtons = new List<(string key, Button btn, TextBlock titleBlock, FontIcon iconBlock, Border activeIndicator)>();
 
