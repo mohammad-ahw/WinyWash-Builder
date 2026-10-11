@@ -58,26 +58,48 @@ namespace CleanC.Core.Services
                     {
                         var dirInfo = new DirectoryInfo(dir);
 
-                        // Empty folders check
+                        // Empty folders check (Strictly safe: only in Downloads/Desktop/Temp, never in system/app/project folders)
                         try
                         {
-                            foreach (var subDir in dirInfo.EnumerateDirectories("*", enumOptions))
+                            bool isSafeDirForEmptyFolders = dir.Contains("Downloads", StringComparison.OrdinalIgnoreCase) ||
+                                                           dir.Contains("Desktop", StringComparison.OrdinalIgnoreCase) ||
+                                                           dir.Contains("Temp", StringComparison.OrdinalIgnoreCase);
+
+                            if (isSafeDirForEmptyFolders)
                             {
-                                try
+                                foreach (var subDir in dirInfo.EnumerateDirectories("*", enumOptions))
                                 {
-                                    if (!subDir.EnumerateFileSystemInfos().Any())
+                                    try
                                     {
-                                        emptyFolders.Add(new EmptyFolderInfo
+                                        string fullName = subDir.FullName;
+                                        if (fullName.Contains(".git", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains(".vs", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains(".idea", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains("node_modules", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains("AppData", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains("bin", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains("obj", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains("Windows", StringComparison.OrdinalIgnoreCase) ||
+                                            fullName.Contains("Microsoft", StringComparison.OrdinalIgnoreCase))
                                         {
-                                            FolderPath = subDir.FullName,
-                                            FolderName = subDir.Name,
-                                            ParentPath = subDir.Parent?.FullName ?? string.Empty
-                                        });
+                                            continue;
+                                        }
+
+                                        if (!subDir.EnumerateFileSystemInfos().Any())
+                                        {
+                                            emptyFolders.Add(new EmptyFolderInfo
+                                            {
+                                                FolderPath = subDir.FullName,
+                                                FolderName = subDir.Name,
+                                                ParentPath = subDir.Parent?.FullName ?? string.Empty,
+                                                IsSelected = false
+                                            });
+                                        }
                                     }
-                                }
-                                catch (Exception __ex)
-                                {
-                                    CcLog.Ignore(__ex);
+                                    catch (Exception __ex)
+                                    {
+                                        CcLog.Ignore(__ex);
+                                    }
                                 }
                             }
                         }
@@ -113,8 +135,42 @@ namespace CleanC.Core.Services
 
                                 if (isUserDesktopOrDownloads)
                                 {
-                                    // Copied duplicates like "name - Copy.ext" or "name (1).ext"
-                                    if (lowerName.Contains(" - copy") || lowerName.Contains(" (1)") || lowerName.Contains(" (2)") || lowerName.Contains("نسخه کپی"))
+                                    // Smart Scenario 1: Unzipped Archives (Both .zip/.rar and extracted directory exist)
+                                    if (archiveExtensions.Contains(ext))
+                                    {
+                                        string folderNameWithoutExt = Path.GetFileNameWithoutExtension(file.Name);
+                                        string potentialDir = Path.Combine(file.DirectoryName ?? string.Empty, folderNameWithoutExt);
+                                        if (Directory.Exists(potentialDir))
+                                        {
+                                            messItems.Add(new StorageMessItem
+                                            {
+                                                FilePath = file.FullName,
+                                                FileName = file.Name,
+                                                DirectoryPath = file.DirectoryName ?? string.Empty,
+                                                SizeBytes = size,
+                                                LastModified = file.LastWriteTime,
+                                                Category = StorageMessCategory.ExtractedArchiveDuplicate,
+                                                IsSelected = false
+                                            });
+                                        }
+                                        else if ((now - file.LastWriteTime).TotalDays > 21)
+                                        {
+                                            messItems.Add(new StorageMessItem
+                                            {
+                                                FilePath = file.FullName,
+                                                FileName = file.Name,
+                                                DirectoryPath = file.DirectoryName ?? string.Empty,
+                                                SizeBytes = size,
+                                                LastModified = file.LastWriteTime,
+                                                Category = StorageMessCategory.OldArchive,
+                                                IsSelected = false
+                                            });
+                                        }
+                                    }
+                                    // Smart Scenario 2: Incomplete / Broken Downloads (.crdownload, .part)
+                                    else if (ext.Equals(".crdownload", StringComparison.OrdinalIgnoreCase) ||
+                                             ext.Equals(".part", StringComparison.OrdinalIgnoreCase) ||
+                                             (ext.Equals(".tmp", StringComparison.OrdinalIgnoreCase) && (now - file.LastWriteTime).TotalDays > 2))
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -123,11 +179,12 @@ namespace CleanC.Core.Services
                                             DirectoryPath = file.DirectoryName ?? string.Empty,
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
-                                            Category = StorageMessCategory.DuplicateCopy
+                                            Category = StorageMessCategory.IncompleteDownload,
+                                            IsSelected = false
                                         });
                                     }
-                                    // Old setup/installers in downloads/desktop > 7 days old
-                                    else if (installerExtensions.Contains(ext) && (now - file.LastWriteTime).TotalDays > 7)
+                                    // Smart Scenario 3: Copied duplicates like "name - Copy.ext" or "name (1).ext"
+                                    else if (lowerName.Contains(" - copy") || lowerName.Contains(" (1)") || lowerName.Contains(" (2)") || lowerName.Contains("نسخه کپی"))
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -136,11 +193,12 @@ namespace CleanC.Core.Services
                                             DirectoryPath = file.DirectoryName ?? string.Empty,
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
-                                            Category = StorageMessCategory.OldInstaller
+                                            Category = StorageMessCategory.DuplicateCopy,
+                                            IsSelected = false
                                         });
                                     }
-                                    // Old archives > 14 days old
-                                    else if (archiveExtensions.Contains(ext) && (now - file.LastWriteTime).TotalDays > 14)
+                                    // Old setup/installers in downloads/desktop > 14 days old
+                                    else if (installerExtensions.Contains(ext) && (now - file.LastWriteTime).TotalDays > 14)
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -149,11 +207,12 @@ namespace CleanC.Core.Services
                                             DirectoryPath = file.DirectoryName ?? string.Empty,
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
-                                            Category = StorageMessCategory.OldArchive
+                                            Category = StorageMessCategory.OldInstaller,
+                                            IsSelected = false
                                         });
                                     }
-                                    // Old screenshots > 14 days old
-                                    else if ((lowerName.StartsWith("screenshot") || lowerName.StartsWith("اسکرین شات") || lowerName.StartsWith("capture")) && (now - file.LastWriteTime).TotalDays > 14)
+                                    // Old screenshots > 21 days old
+                                    else if ((lowerName.StartsWith("screenshot") || lowerName.StartsWith("اسکرین شات") || lowerName.StartsWith("capture")) && (now - file.LastWriteTime).TotalDays > 21)
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -162,7 +221,8 @@ namespace CleanC.Core.Services
                                             DirectoryPath = file.DirectoryName ?? string.Empty,
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
-                                            Category = StorageMessCategory.OldScreenshot
+                                            Category = StorageMessCategory.OldScreenshot,
+                                            IsSelected = false
                                         });
                                     }
                                 }
@@ -230,7 +290,13 @@ namespace CleanC.Core.Services
                     (Path.Combine(userProfile, ".android", "build-cache"), "کش کامپایل Android Studio"),
                     (Path.Combine(appDataRoaming, "Code", "Cache"), "کش ادیتور VS Code"),
                     (Path.Combine(appDataRoaming, "Code", "CachedData"), "داده های کش شده VS Code"),
-                    (Path.Combine(userProfile, ".docker"), "کش و لاگ های Docker")
+                    (Path.Combine(userProfile, ".docker"), "کش و لاگ های Docker"),
+                    (Path.Combine(userProfile, ".ollama", "models"), "مدل های هوش مصنوعی Ollama (.gguf)"),
+                    (Path.Combine(userProfile, ".lmstudio", "models"), "مدل های هوش مصنوعی LM Studio"),
+                    (Path.Combine(localAppData, "lm-studio", "models"), "مدل های هوش مصنوعی LM Studio (Local)"),
+                    (Path.Combine(userProfile, ".cache", "huggingface", "hub"), "کش مدل های HuggingFace"),
+                    (Path.Combine(userProfile, "Apple", "MobileSync", "Backup"), "بکاپ های آیفون (Apple MobileSync)"),
+                    (Path.Combine(appDataRoaming, "Apple Computer", "MobileSync", "Backup"), "بکاپ های آیفون (iTunes)")
                 };
 
                 foreach (var (cPath, cName) in devCaches)

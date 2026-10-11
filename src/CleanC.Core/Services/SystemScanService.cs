@@ -192,6 +192,50 @@ namespace CleanC.Core.Services
                     }
                 }
 
+                // Empty Folders in Downloads and Desktop
+                try
+                {
+                    var emptyFolderPaths = new List<string>();
+                    var candidateRoots = new[] { Path.Combine(userProfile, "Downloads"), Path.Combine(userProfile, "Desktop") };
+                    foreach (var rPath in candidateRoots)
+                    {
+                        if (Directory.Exists(rPath))
+                        {
+                            var rDir = new DirectoryInfo(rPath);
+                            foreach (var sub in rDir.EnumerateDirectories("*", SearchOption.TopDirectoryOnly))
+                            {
+                                try
+                                {
+                                    if (!sub.EnumerateFileSystemInfos().Any())
+                                    {
+                                        emptyFolderPaths.Add(sub.FullName);
+                                    }
+                                }
+                                catch (Exception __ex) { CcLog.Ignore(__ex); }
+                            }
+                        }
+                    }
+
+                    grpRec.Items.Add(new JunkCategory
+                    {
+                        Id = "emptyFolders",
+                        GroupId = "recommended",
+                        Title = "پوشه‌های خالی رهاشده (Empty Folders)",
+                        Description = emptyFolderPaths.Count > 0
+                            ? $"{emptyFolderPaths.Count} پوشه کاملاً خالی در Downloads و Desktop"
+                            : "پوشه خالی در پوشه‌های کاربری یافت نشد (سیستم مرتب است)",
+                        Path = Path.Combine(userProfile, "Downloads"),
+                        TargetPaths = emptyFolderPaths,
+                        Bytes = 0,
+                        IconGlyph = "\uE838",
+                        IsChecked = emptyFolderPaths.Count > 0
+                    });
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
                 result.Groups.Add(grpRec);
 
                 // -------------------------------------------------------------
@@ -473,6 +517,86 @@ namespace CleanC.Core.Services
                     });
                 }
 
+                // AI & LLM Models & Caches (Ollama, LM Studio, HuggingFace)
+                var aiPaths = new List<string>
+                {
+                    Path.Combine(userProfile, @".ollama\models"),
+                    Path.Combine(userProfile, @".lmstudio\models"),
+                    Path.Combine(localApp, @"lm-studio\models"),
+                    Path.Combine(userProfile, @".cache\huggingface\hub")
+                }.Where(Directory.Exists).ToList();
+
+                long aiBytes = SafeGetPathsSize(aiPaths);
+                if (aiBytes > 0)
+                {
+                    grpApps.Items.Add(new JunkCategory
+                    {
+                        Id = "aiModelsCache",
+                        GroupId = "apps",
+                        Title = "مدل ها و کش ابزارهای هوش مصنوعی (AI & LLMs)",
+                        Description = "مدل های دانلودشده Ollama، LM Studio و کش HuggingFace",
+                        Path = aiPaths[0],
+                        TargetPaths = aiPaths,
+                        Bytes = aiBytes,
+                        IconGlyph = "\uE946",
+                        IsChecked = false
+                    });
+                }
+
+                // Mobile Phone Old Device Backups (Apple MobileSync, Samsung SmartSwitch, Huawei HiSuite)
+                var phoneBackupPaths = new List<string>
+                {
+                    Path.Combine(userProfile, @"Apple\MobileSync\Backup"),
+                    Path.Combine(appData, @"Apple Computer\MobileSync\Backup"),
+                    Path.Combine(userProfile, @"Documents\Samsung\Smart Switch\backup"),
+                    Path.Combine(appData, @"Samsung\SmartSwitch\backup"),
+                    Path.Combine(userProfile, @"Documents\HiSuite\backup"),
+                    Path.Combine(userProfile, @"Documents\MiPhoneManager\Backup")
+                }.Where(Directory.Exists).ToList();
+
+                long phoneBytes = SafeGetPathsSize(phoneBackupPaths);
+                grpApps.Items.Add(new JunkCategory
+                {
+                    Id = "phoneBackups",
+                    GroupId = "apps",
+                    Title = "بکاپ‌های قدیمی گوشی و تبلت (Apple، سامسونگ، هواوی)",
+                    Description = phoneBytes > 0
+                        ? "نسخه‌های پشتیبان حجیم و قدیمی دستگاه‌های موبایل و تبلت در کامپیوتر"
+                        : "هیچ بکاپ قدیمی از گوشی یا تبلت در کامپیوتر یافت نشد",
+                    Path = phoneBackupPaths.FirstOrDefault() ?? Path.Combine(userProfile, @"Apple\MobileSync\Backup"),
+                    TargetPaths = phoneBackupPaths,
+                    Bytes = phoneBytes,
+                    IconGlyph = "\uE71D",
+                    IsChecked = phoneBytes > 0
+                });
+
+                // Browser Dead Extensions & Orphaned IndexedDB Storage
+                try
+                {
+                    var deadExtList = BrowserOptimizerService.ScanExtensions()
+                        .Where(e => e.Category == ExtensionRiskCategory.SafeToClean || BrowserOptimizerService.KnownDeadExtensionIds.Contains(e.Id))
+                        .ToList();
+                    long deadExtBytes = deadExtList.Sum(e => e.SizeBytes);
+                    grpApps.Items.Add(new JunkCategory
+                    {
+                        Id = "browserDeadExtensions",
+                        GroupId = "apps",
+                        Title = "افزونه‌های زائد و دیتابیس‌های منسوخ مرورگرها (Chrome / Edge)",
+                        Description = deadExtList.Count > 0
+                            ? $"{deadExtList.Count} افزونه منسوخ یا دیتابیس رهاشده با حفظ ۱۰۰٪ اطلاعات سایت‌ها"
+                            : "افزونه منسوخ یا دیتابیس زائد مرورگر یافت نشد (مرورگرها مرتب هستند)",
+                        Path = "Browsers",
+                        TargetPaths = deadExtList.Select(e => e.InstallPath).Where(p => !string.IsNullOrEmpty(p)).ToList(),
+                        Bytes = deadExtBytes,
+                        IconGlyph = "\uE774",
+                        IsChecked = deadExtList.Count > 0
+                    });
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
                 result.Groups.Add(grpApps);
 
                 // -------------------------------------------------------------
@@ -617,6 +741,69 @@ namespace CleanC.Core.Services
                                 IconGlyph = "\uE896"
                             });
                         }
+
+                        // Old Installers & Setups (.exe, .msi, .iso older than 14 days in Downloads)
+                        var installerFiles = new List<string>();
+                        long installerBytes = 0;
+                        var cutoffInstallers = DateTime.Now.AddDays(-14);
+
+                        foreach (var fi in dir.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+                        {
+                            if (fi.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase) ||
+                                fi.Extension.Equals(".msi", StringComparison.OrdinalIgnoreCase) ||
+                                fi.Extension.Equals(".iso", StringComparison.OrdinalIgnoreCase))
+                            {
+                                if (fi.LastWriteTime < cutoffInstallers)
+                                {
+                                    installerFiles.Add(fi.FullName);
+                                    installerBytes += fi.Length;
+                                }
+                            }
+                        }
+
+                        grpDownloads.Items.Add(new JunkCategory
+                        {
+                            Id = "oldInstallers",
+                            GroupId = "downloads",
+                            Title = "فایل‌های نصبی و اینستالرهای قدیمی (.exe / .iso)",
+                            Description = installerFiles.Count > 0
+                                ? $"{installerFiles.Count} فایل نصبی با بیش از ۱۴ روز عدم استفاده در Downloads"
+                                : "اینستالر یا ستاپ قدیمی با بیش از ۱۴ روز قدمت یافت نشد",
+                            Path = userDownloads,
+                            TargetPaths = installerFiles,
+                            Bytes = installerBytes,
+                            IconGlyph = "\uE896",
+                            IsChecked = false
+                        });
+
+                        // Large Files > 200MB older than 21 days in Downloads
+                        var largeFiles = new List<string>();
+                        long largeFilesBytes = 0;
+                        var cutoffLarge = DateTime.Now.AddDays(-21);
+
+                        foreach (var fi in dir.EnumerateFiles("*.*", SearchOption.TopDirectoryOnly))
+                        {
+                            if (fi.Length >= 200L * 1024 * 1024 && fi.LastWriteTime < cutoffLarge)
+                            {
+                                largeFiles.Add(fi.FullName);
+                                largeFilesBytes += fi.Length;
+                            }
+                        }
+
+                        grpDownloads.Items.Add(new JunkCategory
+                        {
+                            Id = "largeUserFiles",
+                            GroupId = "downloads",
+                            Title = "فایل‌های بسیار حجیم قدیمی (بالای ۲۰۰ مگابایت)",
+                            Description = largeFiles.Count > 0
+                                ? $"{largeFiles.Count} فایل حجیم با بیش از ۲۱ روز عدم تغییر در پوشه Downloads"
+                                : "فایل حجیم قدیمی بالای ۲۰۰ مگابایت در Downloads یافت نشد",
+                            Path = userDownloads,
+                            TargetPaths = largeFiles,
+                            Bytes = largeFilesBytes,
+                            IconGlyph = "\uEDA2",
+                            IsChecked = false
+                        });
                     }
                     catch (Exception __ex)
                     {
@@ -624,10 +811,7 @@ namespace CleanC.Core.Services
                     }
                 }
 
-                if (grpDownloads.Items.Count > 0)
-                {
-                    result.Groups.Add(grpDownloads);
-                }
+                result.Groups.Add(grpDownloads);
 
                 // -------------------------------------------------------------
                 // Group 6: Leftover Folders of Uninstalled Apps
@@ -761,19 +945,6 @@ namespace CleanC.Core.Services
 
                 grpBoost.Items.Add(new JunkCategory
                 {
-                    Id = "powerPlanBoost",
-                    GroupId = "system_boost",
-                    Title = "تنظیم پلن انرژی با کارایی بالا (High Performance Plan)",
-                    Description = "انتقال مدیریت توان ویندوز به پلن حداکثر کارایی سخت افزاری پردازنده",
-                    Path = "PowerPlan",
-                    TargetPaths = new List<string>(),
-                    Bytes = 0,
-                    IconGlyph = "\uE7E8",
-                    IsChecked = true
-                });
-
-                grpBoost.Items.Add(new JunkCategory
-                {
                     Id = "fastStartup",
                     GroupId = "system_boost",
                     Title = "کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)",
@@ -808,6 +979,19 @@ namespace CleanC.Core.Services
                     TargetPaths = new List<string>(),
                     Bytes = 0,
                     IconGlyph = "\uE770",
+                    IsChecked = true
+                });
+
+                grpBoost.Items.Add(new JunkCategory
+                {
+                    Id = "inactiveHeavyApps",
+                    GroupId = "system_boost",
+                    Title = "بازبینی نرم‌افزارهای حجیم و کم‌استفاده (> 500MB با بیش از ۳۰ روز عدم اجرا)",
+                    Description = "مکث تعاملی جهت نمایش لیست برنامه‌های سنگین بلااستفاده و تایید اختیاری کاربر برای حذف",
+                    Path = "AppsReview",
+                    TargetPaths = new List<string>(),
+                    Bytes = 0,
+                    IconGlyph = "\uE74C",
                     IsChecked = true
                 });
 

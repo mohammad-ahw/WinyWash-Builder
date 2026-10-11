@@ -33,7 +33,7 @@ namespace CleanC.Core.Models
         public string FolderPath { get; set; } = string.Empty;
         public string FolderName { get; set; } = string.Empty;
         public string ParentPath { get; set; } = string.Empty;
-        public bool IsSelected { get; set; } = true;
+        public bool IsSelected { get; set; } = false;
     }
 
     public enum StorageMessCategory
@@ -43,7 +43,9 @@ namespace CleanC.Core.Models
         DuplicateCopy,
         OldScreenshot,
         TempJunk,
-        LargeFile
+        LargeFile,
+        ExtractedArchiveDuplicate,
+        IncompleteDownload
     }
 
     public class StorageMessItem
@@ -63,10 +65,12 @@ namespace CleanC.Core.Models
             StorageMessCategory.OldScreenshot => "اسکرین شات قدیمی",
             StorageMessCategory.TempJunk => "فایل موقت و زائد (Temp / Junk)",
             StorageMessCategory.LargeFile => "فایل بسیار حجیم (>200MB)",
+            StorageMessCategory.ExtractedArchiveDuplicate => "فایل آرشیو آنزیپ‌شده (پوشه هم‌نام موجود است)",
+            StorageMessCategory.IncompleteDownload => "دانلود ناتمام و موقت (crdownload / part)",
             _ => "سایر"
         };
         public string CategoryTitle => CategoryName;
-        public bool IsSelected { get; set; } = true;
+        public bool IsSelected { get; set; } = false;
     }
 
     public class DeepStorageScanResult

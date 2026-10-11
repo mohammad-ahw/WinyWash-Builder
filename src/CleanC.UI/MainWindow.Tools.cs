@@ -2368,8 +2368,27 @@ namespace CleanC.UI
 
         private async Task CheckUpdatesBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
+            try
+            {
+                await Task.Run(() =>
+                {
+                    try
+                    {
+                        var psi = new ProcessStartInfo("usoclient.exe", "StartInteractiveScan")
+                        {
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        };
+                        using var p = Process.Start(psi);
+                        p?.WaitForExit(2000);
+                    }
+                    catch (Exception __ex) { CcLog.Ignore(__ex); }
+                });
+            }
+            catch (Exception __ex) { CcLog.Ignore(__ex); }
+
             await LoadWindowsUpdatePageAsync();
-            ShowInfoBar("بروزرسانی ویندوز", "لیست آپدیت های در انتظار با موفقیت بررسی گردید.", InfoBarSeverity.Informational);
+            ShowInfoBar("بروزرسانی ویندوز", "وضعیت و لیست بروزرسانی‌های سیستم به‌روزرسانی شد.", InfoBarSeverity.Informational);
         }
 
         private void PauseUpdatesBtn_Click(object sender, RoutedEventArgs e)
@@ -2779,14 +2798,24 @@ namespace CleanC.UI
         private async Task CleanOldDriversBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (_cachedDrivers == null) return;
-            var duplicates = _cachedDrivers.Where(d => d.IsDuplicateOldVersion).ToList();
-            if (duplicates.Count == 0) return;
+            var selectedByUser = _cachedDrivers.Where(d => d.IsSelected).ToList();
+            var targets = selectedByUser.Count > 0 ? selectedByUser : _cachedDrivers.Where(d => d.IsDuplicateOldVersion).ToList();
+            if (targets.Count == 0)
+            {
+                ShowInfoBar("پاکسازی درایورها", "هیچ درایور قدیمی یا انتخاب‌شده‌ای برای حذف وجود ندارد.", InfoBarSeverity.Informational);
+                return;
+            }
+
+            string dialogTitle = selectedByUser.Count > 0 ? "پاکسازی درایورهای انتخاب‌شده" : "پاکسازی درایورهای قدیمی DriverStore";
+            string dialogContent = selectedByUser.Count > 0
+                ? $"تعداد {targets.Count} بسته درایور انتخاب‌شده توسط شما شناسایی شده است.\n\nپیش از شروع، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.\nآیا مایل به حذف بسته‌های انتخاب‌شده هستید؟"
+                : $"تعداد {targets.Count} بسته درایور قدیمی و تکراری شناسایی شده است.\n\nپیش از شروع، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.\nآیا مایل به شروع فرآیند پاکسازی هستید؟";
 
             var dialog = new ContentDialog
             {
                 XamlRoot = this.Content.XamlRoot,
-                Title = "پاکسازی دسته جمعی درایورهای قدیمی DriverStore",
-                Content = $"تعداد {duplicates.Count} بسته درایور قدیمی و تکراری شناسایی شده است.\n\nپیش از شروع پاکسازی، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.\nآیا مایل به شروع فرآیند پاکسازی هستید؟",
+                Title = dialogTitle,
+                Content = dialogContent,
                 PrimaryButtonText = "شروع پاکسازی ایمن",
                 CloseButtonText = "انصراف",
                 DefaultButton = ContentDialogButton.Primary
@@ -2800,7 +2829,7 @@ namespace CleanC.UI
 
             try
             {
-                await RestorePointService.CreateRestorePointAsync("قبل از پاکسازی درایورهای قدیمی DriverStore");
+                await RestorePointService.CreateRestorePointAsync("قبل از پاکسازی درایورهای DriverStore");
             }
             catch (Exception __ex)
             {
@@ -2810,7 +2839,7 @@ namespace CleanC.UI
             int deleted = 0;
             int skipped = 0;
 
-            foreach (var d in duplicates)
+            foreach (var d in targets)
             {
                 var (success, _) = await DriverManagerService.DeleteDriverPackageAsync(d.PublishedName);
                 if (success) deleted++;
@@ -2818,7 +2847,7 @@ namespace CleanC.UI
             }
 
             CleanOldDriversBtn.IsEnabled = true;
-            ShowInfoBar("نتیجه پاکسازی درایورها", $"پاکسازی تکمیل شد: {deleted} بسته با موفقیت حذف شد. ({skipped} بسته در حال استفاده فعال بودند و حفظ شدند)", InfoBarSeverity.Success);
+            ShowInfoBar("نتیجه پاکسازی درایورها", $"پاکسازی تکمیل شد: {deleted} بسته با موفقیت حذف شد. ({skipped} بسته در حال استفاده فعال سیستم بودند و حفظ شدند)", InfoBarSeverity.Success);
             await LoadDriversPageAsync(forceRefresh: true);
         }
 

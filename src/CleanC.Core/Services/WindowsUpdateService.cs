@@ -249,7 +249,27 @@ namespace CleanC.Core.Services
                 using var conn = new SqliteConnection($"Data Source={tempFile};Mode=ReadOnly;");
                 await conn.OpenAsync();
 
-                // 1. Inspect UPDATES table for modern seeker/feature updates
+                // 1. Collect all completed/installed update IDs
+                var completedIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                try
+                {
+                    using var compCmd = conn.CreateCommand();
+                    compCmd.CommandText = "SELECT UPDATEID FROM COMPLETEDUPDATES";
+                    using var compReader = await compCmd.ExecuteReaderAsync();
+                    while (await compReader.ReadAsync())
+                    {
+                        if (!compReader.IsDBNull(0))
+                        {
+                            completedIds.Add(compReader.GetString(0));
+                        }
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
+                // 2. Inspect UPDATES table for modern seeker/feature updates
                 using (var cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = "SELECT UPDATEID, SERIALIZEDUPDATE FROM UPDATES";
@@ -257,6 +277,11 @@ namespace CleanC.Core.Services
                     while (await reader.ReadAsync())
                     {
                         string updateId = reader.IsDBNull(0) ? "" : reader.GetString(0);
+                        if (string.IsNullOrEmpty(updateId) || completedIds.Contains(updateId) || completedIds.Any(c => c.StartsWith(updateId, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            continue;
+                        }
+
                         if (reader.IsDBNull(1)) continue;
 
                         byte[] blob = (byte[])reader[1];

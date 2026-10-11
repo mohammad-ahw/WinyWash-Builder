@@ -1012,20 +1012,27 @@ namespace CleanC.UI
                     }
                 }
 
-                // 5. Browser Background Tasks Suppression
+                // 5. Browser Background Tasks Suppression & Dead Extensions Cleanup
                 int browserTweaks = 0;
+                long extFreed = 0;
                 if (IsBoostEnabled("browserBoost"))
                 {
                     LiveCleanProgressBar.Value = 92;
-                    LiveCleanStatusTitle.Text = "در حال خاموش سازی تسک های پس زمینه مرورگرها...";
-                    LiveCleanPhaseSubtitle.Text = "توقف Startup Boost و فعالیت پنهان Edge و Chrome";
+                    LiveCleanStatusTitle.Text = "در حال بهینه سازی سرعت و حذف افزونه های زائد مرورگرها...";
+                    LiveCleanPhaseSubtitle.Text = "فعال سازی شتاب سخت افزاری، توقف تسک های پس زمینه و حذف افزونه های مرده";
                     try
                     {
                         browserTweaks = await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
+                        extFreed = await Task.Run(() => BrowserOptimizerService.CleanInactiveChromeExtensions());
+                        if (extFreed > 0)
+                        {
+                            totalFreedBytes += extFreed;
+                            AnimateCountUp(totalFreedBytes);
+                        }
                     }
                     catch (Exception ex)
                     {
-                        ReportStepFailure("browser_opt_fail", "توقف تسک های پس زمینه و Startup Boost مرورگرها", "\uE774", ex, ex.Message);
+                        ReportStepFailure("browser_opt_fail", "بهینه سازی مرورگر و پاکسازی افزونه ها", "\uE774", ex, ex.Message);
                     }
                     await Task.Delay(50);
                 }
@@ -1169,24 +1176,6 @@ namespace CleanC.UI
                     await Task.Delay(40);
                 }
 
-                // 8.5 Power Plan Optimization
-                bool powerPlanSet = false;
-                if (IsBoostEnabled("powerPlanBoost"))
-                {
-                    LiveCleanProgressBar.Value = 98.5;
-                    LiveCleanStatusTitle.Text = "در حال تنظیم پلن انرژی کارایی بالا...";
-                    LiveCleanPhaseSubtitle.Text = "تنظیم توان پردازنده بر روی High / Ultimate Performance";
-                    try
-                    {
-                        powerPlanSet = await Task.Run(() => PowerPlanService.ApplyHighPerformancePlan());
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("power_plan_fail", "تنظیم پلن انرژی کارایی بالا", "\uE7E8", ex, ex.Message);
-                    }
-                    await Task.Delay(40);
-                }
-
                 // 8.6 Bloatware & Default Games Debloating + Interactive Borderline Apps Review
                 int bloatRemovedCount = 0;
                 long bloatFreedBytes = 0;
@@ -1210,16 +1199,19 @@ namespace CleanC.UI
                         }
 
                         // 2. اسکن و پرسش تعاملی برای موارد ریسک دار/اختیاری (Paint، Xbox، برنامه های > 500MB با ۳۰ روز عدم استفاده)
-                        var reviewCandidates = await BloatwareService.ScanBorderlineReviewAppsAsync();
-                        if (reviewCandidates.Count > 0)
+                        if (IsBoostEnabled("inactiveHeavyApps") || IsBoostEnabled("bloatwareClean"))
                         {
-                            var (revRemoved, revFreed) = await ShowBorderlineAppsReviewDialogAsync(reviewCandidates);
-                            borderlineRemovedCount = revRemoved;
-                            borderlineFreedBytes = revFreed;
-                            if (revFreed > 0)
+                            var reviewCandidates = await BloatwareService.ScanBorderlineReviewAppsAsync();
+                            if (reviewCandidates.Count > 0)
                             {
-                                totalFreedBytes += revFreed;
-                                AnimateCountUp(totalFreedBytes);
+                                var (revRemoved, revFreed) = await ShowBorderlineAppsReviewDialogAsync(reviewCandidates);
+                                borderlineRemovedCount = revRemoved;
+                                borderlineFreedBytes = revFreed;
+                                if (revFreed > 0)
+                                {
+                                    totalFreedBytes += revFreed;
+                                    AnimateCountUp(totalFreedBytes);
+                                }
                             }
                         }
                     }
@@ -1283,17 +1275,17 @@ namespace CleanC.UI
                     });
                 }
 
-                if (browserTweaks > 0)
+                if (browserTweaks > 0 || extFreed > 0)
                 {
                     systemBoostGroup.Items.Add(new CleanupReportItem
                     {
                         GroupId = "system_boost",
                         Id = "browser_opt",
-                        Title = "توقف تسک های پس زمینه و Startup Boost مرورگرها",
+                        Title = extFreed > 0 ? "بهینه سازی مرورگرها و حذف افزونه های زائد" : "توقف تسک های پس زمینه و Startup Boost مرورگرها",
                         IconGlyph = "\uE774",
-                        FreedBytes = 0,
+                        FreedBytes = extFreed,
                         WasEmpty = false,
-                        StatusSummary = "بهینه سازی شد ✓"
+                        StatusSummary = extFreed > 0 ? $"+ {SystemStats.FormatBytes(extFreed)} آزاد شد ✓" : "بهینه سازی شد ✓"
                     });
                 }
 
@@ -1322,20 +1314,6 @@ namespace CleanC.UI
                         FreedBytes = 0,
                         WasEmpty = false,
                         StatusSummary = $"{gpuConfiguredCount} برنامه بهینه سازی شد ✓"
-                    });
-                }
-
-                if (powerPlanSet)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "power_plan",
-                        Title = "پلن انرژی عملکرد بالا (High Performance)",
-                        IconGlyph = "\uE7E8",
-                        FreedBytes = 0,
-                        WasEmpty = false,
-                        StatusSummary = "فعال شد ✓"
                     });
                 }
 
@@ -1829,6 +1807,34 @@ namespace CleanC.UI
                             bool ok = GpuOptimizerService.EnableHags();
                             MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فعال شد ✓");
                             ShowInfoBar("شتاب دهنده گرافیک", "قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)", InfoBarSeverity.Success);
+                        }
+                        else if (capturedAtt.Id == "proxy_vpn_conflict")
+                        {
+                            bool ok = NetworkProxyDiagnosticService.FixGhostProxy();
+                            if (ok)
+                            {
+                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "برطرف شد ✓");
+                                ShowInfoBar("رفع تداخل پراکسی", "پراکسی معلق غیرفعال شد و اتصال مستقیم اینترنت به ترمینال و ویندوز بازگشت.", InfoBarSeverity.Success);
+                            }
+                            else
+                            {
+                                ShowInfoBar("خطا", "امکان تغییر تنظیمات پراکسی در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
+                            }
+                        }
+                        else if (capturedAtt.Id == "orphaned_services")
+                        {
+                            int count = RegistryCleanerService.DisableOrphanedServices();
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "غیرفعال شد ✓");
+                            ShowInfoBar("سرویس های یتیم", $"{count} سرویس با فایل اجرایی ناموجود غیرفعال شدند تا بوت سیستم روان تر شود.", InfoBarSeverity.Success);
+                        }
+                        else if (capturedAtt.Id == "wsl_docker_compact")
+                        {
+                            actionBtn.Content = "در حال فشرده سازی...";
+                            actionBtn.IsEnabled = false;
+                            var (ok, freed) = await DiskMaintenanceService.CompactAllWslDockerVhdxAsync();
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فشرده شد ✓");
+                            string freedMsg = freed > 0 ? $"+ {SystemStats.FormatBytes(freed)} فضا آزاد شد." : "دیسک های مجازی با موفقیت فشرده سازی شدند.";
+                            ShowInfoBar("فشرده سازی VHDX", freedMsg, InfoBarSeverity.Success);
                         }
                     };
                     Grid.SetColumn(actionBtn, 2);
@@ -3453,7 +3459,7 @@ namespace CleanC.UI
                     }
                 }
                 if (ToolsHeaderTitle != null) ToolsHeaderTitle.Text = LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز");
-                if (ToolsHeaderSubtitle != null) ToolsHeaderSubtitle.Text = LocalizationService.Get("ToolsHeaderSubtitle", "پرکاربردترین ابزارها همین جا، بقیه یک کلیک آن طرف تر");
+                if (ToolsHeaderSubtitle != null) ToolsHeaderSubtitle.Text = LocalizationService.Get("ToolsHeaderSubtitle", "مجموعه ابزارهای کاربردی مدیریت و بهینه‌سازی سیستم");
 
                 // Launcher Tool Cards Localization
                 if (LauncherWindowsUpdateTitle != null) LauncherWindowsUpdateTitle.Text = LocalizationService.Get("LauncherWindowsUpdateTitle", "آپدیت ویندوز");

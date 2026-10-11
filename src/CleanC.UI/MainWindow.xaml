@@ -752,7 +752,7 @@
                             <StackPanel x:Name="ToolsLauncherPanel" Spacing="14" Visibility="Visible">
                                 <StackPanel Spacing="2">
                                     <TextBlock x:Name="ToolsHeaderTitle" Text="ابزارهای سیستمی" FontWeight="SemiBold" FontSize="15" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                    <TextBlock x:Name="ToolsHeaderSubtitle" Text="پرکاربردترین ابزارها همین جا، بقیه یک کلیک آن طرف تر" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
+                                    <TextBlock x:Name="ToolsHeaderSubtitle" Text="مجموعه ابزارهای کاربردی مدیریت و بهینه‌سازی سیستم" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                 </StackPanel>
 
                                 <!-- Section 1: Frequently Used (پرکاربرد) -->

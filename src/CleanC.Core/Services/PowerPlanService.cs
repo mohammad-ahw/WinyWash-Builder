@@ -201,6 +201,13 @@ namespace CleanC.Core.Services
 
         public static bool ApplyHighPerformancePlan()
         {
+            var status = GetPowerStatus();
+            if (status.IsLaptop)
+            {
+                // On laptops, High Performance locks CPU min clock at 100%, causing fan revving and battery drain.
+                // Keep laptop on Balanced plan.
+                return SetActivePlan("balanced");
+            }
             return SetActivePlan("high");
         }
 

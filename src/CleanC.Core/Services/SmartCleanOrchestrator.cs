@@ -183,6 +183,8 @@ namespace CleanC.Core.Services
             });
 
             int browserTweaks = await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
+            long extFreed = BrowserOptimizerService.CleanInactiveChromeExtensions();
+            cumulativeFreed += extFreed;
             ProcessManagerService.CleanBackgroundHelpers();
             await Task.Delay(250);
 

@@ -155,8 +155,8 @@ namespace CleanC.Core.Services
 
                     string infName = publishedName.Trim();
 
-                    // 2. Try pnputil /delete-driver oemX.inf /uninstall
-                    var psi = new ProcessStartInfo("pnputil.exe", $"/delete-driver {infName} /uninstall")
+                    // 2. Safely delete driver package from DriverStore without uninstalling active devices
+                    var psi = new ProcessStartInfo("pnputil.exe", $"/delete-driver {infName}")
                     {
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -173,26 +173,13 @@ namespace CleanC.Core.Services
 
                     if (p.ExitCode == 0 || stdout.Contains("successfully", StringComparison.OrdinalIgnoreCase) || stdout.Contains("حذف شد", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (true, $"بسته درایور {infName} با موفقیت حذف شد.");
+                        return (true, $"بسته درایور {infName} با موفقیت از مخزن درایورها حذف شد.");
                     }
 
-                    // 3. Try with /force if not deleted
-                    var psiForce = new ProcessStartInfo("pnputil.exe", $"/delete-driver {infName} /uninstall /force")
+                    // If in use by an active device, safely preserve it rather than forcibly breaking hardware
+                    if (stdout.Contains("in use", StringComparison.OrdinalIgnoreCase) || stderr.Contains("in use", StringComparison.OrdinalIgnoreCase))
                     {
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true,
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    using var pForce = Process.Start(psiForce);
-                    if (pForce != null)
-                    {
-                        string outForce = pForce.StandardOutput.ReadToEnd();
-                        pForce.WaitForExit(10000);
-                        if (pForce.ExitCode == 0 || outForce.Contains("successfully", StringComparison.OrdinalIgnoreCase) || outForce.Contains("حذف شد", StringComparison.OrdinalIgnoreCase))
-                        {
-                            return (true, $"بسته درایور {infName} با سوئیچ اجباری با موفقیت حذف شد.");
-                        }
+                        return (false, $"بسته درایور {infName} در حال استفاده توسط سخت‌افزار فعال سیستم است و جهت حفظ پایداری حذف نشد.");
                     }
 
                     // 4. Fallback to DISM /Online /Remove-Driver

@@ -7,6 +7,7 @@ namespace CleanC.Core.Tests
     /// تست های لاگ مرکزیِ خطاهای نادیده گرفته شده.
     /// هر تست پوشه ی خروجی را به یک مسیر موقت منتقل می کند تا روی داده ی واقعی کاربر اثر نگذارد.
     /// </summary>
+    [Collection("CcLog")]
     public class CcLogTests : IDisposable
     {
         private readonly string _tempDir;

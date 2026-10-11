@@ -79,6 +79,38 @@ namespace CleanC.Core.Services
                 }
             }
 
+            if (item.Id == "emptyFolders")
+            {
+                if (item.TargetPaths != null)
+                {
+                    foreach (var path in item.TargetPaths)
+                    {
+                        try
+                        {
+                            if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
+                            {
+                                Directory.Delete(path, false);
+                            }
+                        }
+                        catch (Exception __ex) { CcLog.Ignore(__ex); }
+                    }
+                }
+                return 0;
+            }
+
+            if (item.Id == "browserDeadExtensions")
+            {
+                try
+                {
+                    return BrowserOptimizerService.CleanInactiveChromeExtensions();
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                    return 0;
+                }
+            }
+
             var paths = item.TargetPaths != null && item.TargetPaths.Count > 0
                 ? item.TargetPaths
                 : (!string.IsNullOrEmpty(item.Path) ? new List<string> { item.Path } : new List<string>());
@@ -92,7 +124,12 @@ namespace CleanC.Core.Services
 
                 if (Directory.Exists(path))
                 {
-                    freed += SafeCleanFolder(path);
+                    // اعمال آستانه سنی هوشمند (۱۴ روز) برای کش‌های مرورگر جهت حفظ سرعت لود صفحات
+                    TimeSpan? minAge = (item.Id == "chromeCache" || item.Id == "edgeCache")
+                        ? TimeSpan.FromDays(14)
+                        : null;
+
+                    freed += SafeCleanFolder(path, minAge);
 
                     if (item.GroupId == "leftovers")
                     {
@@ -195,7 +232,7 @@ namespace CleanC.Core.Services
         private static bool IsReparsePoint(FileAttributes attributes)
             => (attributes & FileAttributes.ReparsePoint) != 0;
 
-        public static long SafeCleanFolder(string dirPath)
+        public static long SafeCleanFolder(string dirPath, TimeSpan? minAge = null)
         {
             if (string.IsNullOrWhiteSpace(dirPath) || !Directory.Exists(dirPath) || IsProtectedSystemPath(dirPath)) return 0;
             long freed = 0;
@@ -206,6 +243,8 @@ namespace CleanC.Core.Services
                 RecurseSubdirectories = false,
                 AttributesToSkip = 0
             };
+
+            DateTime? thresholdUtc = minAge.HasValue ? DateTime.UtcNow - minAge.Value : null;
 
             try
             {
@@ -218,6 +257,13 @@ namespace CleanC.Core.Services
                     try
                     {
                         if (IsReparsePoint(file.Attributes)) continue;
+
+                        // کش زنده و تازه که لود صفحات را سریع نگه می‌دارد؛ دست نزن!
+                        if (thresholdUtc.HasValue && file.LastWriteTimeUtc > thresholdUtc.Value)
+                        {
+                            continue;
+                        }
+
                         long len = file.Length;
                         if ((file.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
                         {
@@ -239,15 +285,18 @@ namespace CleanC.Core.Services
                     {
                         if (IsReparsePoint(sub.Attributes)) continue;
 
-                        freed += SafeCleanFolder(sub.FullName);
+                        freed += SafeCleanFolder(sub.FullName, minAge);
 
-                        if ((sub.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
+                        // اگر شرط زمانی نداشته باشیم و زیرپوشه خالی شده باشد، آن را پاک می‌کنیم
+                        if (!thresholdUtc.HasValue)
                         {
-                            sub.Attributes = FileAttributes.Normal;
+                            if ((sub.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
+                            {
+                                sub.Attributes = FileAttributes.Normal;
+                            }
+                            // فقط زمانی حذف می شود که واقعاً خالی مانده باشد
+                            sub.Delete(false);
                         }
-                        // فقط زمانی حذف می شود که واقعاً خالی مانده باشد؛
-                        // قبلاً Delete(true) بود که شرط «خالی بودن» را دور می زد
-                        sub.Delete(false);
                     }
                     catch
                     {

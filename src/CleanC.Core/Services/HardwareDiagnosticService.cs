@@ -133,6 +133,74 @@ namespace CleanC.Core.Services
                     CcLog.Ignore(__ex);
                 }
 
+                // 7. Ghost Proxy & VPN Conflict Check (M31)
+                try
+                {
+                    var proxyConflict = NetworkProxyDiagnosticService.DetectGhostProxyConflict();
+                    if (proxyConflict.HasConflict)
+                    {
+                        list.Insert(0, new AttentionDecisionItem
+                        {
+                            Id = "proxy_vpn_conflict",
+                            Title = $"تداخل پراکسی سیستم و قطعی اینترنت ({proxyConflict.ProxyServer})",
+                            Description = proxyConflict.Details,
+                            Category = "شبکه و ارتباطات",
+                            ActionText = "رفع قطعی و حذف پراکسی",
+                            IconGlyph = "\uE774"
+                        });
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
+                // 8. Orphaned Services Check (M08)
+                try
+                {
+                    var orphanedServices = RegistryCleanerService.ScanOrphanedServices();
+                    if (orphanedServices.Count > 0)
+                    {
+                        list.Add(new AttentionDecisionItem
+                        {
+                            Id = "orphaned_services",
+                            Title = $"{orphanedServices.Count} سرویس یتیم در ویندوز شناسایی شد",
+                            Description = "سرویس‌هایی که فایل اجرایی آن‌ها از روی دیسک پاک شده اما ورودی آن‌ها در ویندوز مانده و باعث کندی استارتاپ سیستم می‌شوند.",
+                            Category = "سرویس‌ها و بوت",
+                            ActionText = "غیرفعال‌سازی سرویس‌ها",
+                            IconGlyph = "\uE7B5",
+                            IntParameter = orphanedServices.Count
+                        });
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
+                // 9. WSL / Docker VHDX Compaction Check (M21)
+                try
+                {
+                    var vhdxFiles = DiskMaintenanceService.GetWslDockerVhdxFiles();
+                    long totalVhdx = vhdxFiles.Sum(f => f.Length);
+                    if (totalVhdx >= 2L * 1024 * 1024 * 1024) // 2GB+
+                    {
+                        list.Add(new AttentionDecisionItem
+                        {
+                            Id = "wsl_docker_compact",
+                            Title = $"فشرده‌سازی دیسک‌های مجازی WSL و داکر ({SystemStats.FormatBytes(totalVhdx)})",
+                            Description = "دیسک‌های مجازی پس از حذف فایل‌ها و کانتینرها حجم خود را پس نمی‌دهند. فشرده‌سازی VHDX می‌تواند گیگابایت‌ها فضا را آزاد کند.",
+                            Category = "مجازی‌سازی و دیسک",
+                            ActionText = "فشرده‌سازی دیسک‌ها",
+                            IconGlyph = "\uEDA2"
+                        });
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
                 return list;
             });
         }

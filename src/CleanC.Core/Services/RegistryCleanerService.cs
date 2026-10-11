@@ -279,5 +279,113 @@ namespace CleanC.Core.Services
                 return false;
             }
         }
+
+        // --------------------------------------------------------------------
+        // Orphaned Services (سرویس های یتیم با فایل اجرایی ناموجود)
+        // --------------------------------------------------------------------
+
+        public static List<OrphanedServiceItem> ScanOrphanedServices()
+        {
+            var list = new List<OrphanedServiceItem>();
+            try
+            {
+                using var servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", false);
+                if (servicesKey == null) return list;
+
+                foreach (var subName in servicesKey.GetSubKeyNames())
+                {
+                    try
+                    {
+                        using var svcKey = servicesKey.OpenSubKey(subName, false);
+                        if (svcKey == null) continue;
+
+                        int type = svcKey.GetValue("Type") is int t ? t : 0;
+                        if (type == 1 || type == 2) continue; // Skip kernel / filesystem drivers
+
+                        int start = svcKey.GetValue("Start") is int s ? s : 3;
+                        if (start == 4) continue; // Already disabled
+
+                        string? rawImagePath = svcKey.GetValue("ImagePath")?.ToString();
+                        if (string.IsNullOrWhiteSpace(rawImagePath)) continue;
+
+                        if (rawImagePath.Contains("svchost.exe", StringComparison.OrdinalIgnoreCase)) continue;
+                        if (rawImagePath.StartsWith(@"\SystemRoot\", StringComparison.OrdinalIgnoreCase)) continue;
+
+                        string expanded = Environment.ExpandEnvironmentVariables(rawImagePath);
+                        string exePath = ExtractExePath(expanded);
+                        if (string.IsNullOrEmpty(exePath)) continue;
+
+                        string? root = Path.GetPathRoot(exePath);
+                        if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
+
+                        if (!File.Exists(exePath))
+                        {
+                            string disp = svcKey.GetValue("DisplayName")?.ToString() ?? subName;
+                            list.Add(new OrphanedServiceItem
+                            {
+                                ServiceName = subName,
+                                DisplayName = disp,
+                                MissingImagePath = exePath,
+                                StartType = start
+                            });
+                        }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return list;
+        }
+
+        public static int DisableOrphanedServices(IEnumerable<string>? serviceNames = null)
+        {
+            int disabledCount = 0;
+            try
+            {
+                var targets = serviceNames != null ? new HashSet<string>(serviceNames, StringComparer.OrdinalIgnoreCase) : null;
+                var orphaned = ScanOrphanedServices();
+
+                using var servicesKey = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services", true);
+                if (servicesKey == null) return 0;
+
+                foreach (var item in orphaned)
+                {
+                    if (targets != null && !targets.Contains(item.ServiceName)) continue;
+
+                    try
+                    {
+                        using var svcKey = servicesKey.OpenSubKey(item.ServiceName, true);
+                        if (svcKey != null)
+                        {
+                            svcKey.SetValue("Start", 4, RegistryValueKind.DWord);
+                            disabledCount++;
+                        }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return disabledCount;
+        }
+    }
+
+    public class OrphanedServiceItem
+    {
+        public string ServiceName { get; set; } = string.Empty;
+        public string DisplayName { get; set; } = string.Empty;
+        public string MissingImagePath { get; set; } = string.Empty;
+        public int StartType { get; set; }
     }
 }

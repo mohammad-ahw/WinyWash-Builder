@@ -139,5 +139,124 @@ namespace CleanC.Core.Services
                 return false;
             });
         }
+
+        public static List<FileInfo> GetWslDockerVhdxFiles()
+        {
+            var list = new List<FileInfo>();
+            try
+            {
+                string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                var searchFolders = new List<string>
+                {
+                    Path.Combine(localApp, @"Docker\wsl\data"),
+                    Path.Combine(localApp, @"Docker\wsl\distro"),
+                    Path.Combine(localApp, @"wsl"),
+                    Path.Combine(localApp, @"Packages")
+                };
+
+                foreach (var folder in searchFolders)
+                {
+                    if (!Directory.Exists(folder)) continue;
+
+                    try
+                    {
+                        var di = new DirectoryInfo(folder);
+                        foreach (var file in di.EnumerateFiles("*.vhdx", new EnumerationOptions { RecurseSubdirectories = true, MaxRecursionDepth = 3, IgnoreInaccessible = true }))
+                        {
+                            if (file.Length >= 500L * 1024 * 1024) // 500MB+
+                            {
+                                list.Add(file);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CcLog.Ignore(ex);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex);
+            }
+            return list;
+        }
+
+        public static async Task<(bool Success, long FreedBytes)> CompactAllWslDockerVhdxAsync()
+        {
+            return await Task.Run(() =>
+            {
+                long totalFreed = 0;
+                bool anySuccess = false;
+
+                try
+                {
+                    var files = GetWslDockerVhdxFiles();
+                    if (files.Count == 0) return (false, 0);
+
+                    // 1. Terminate WSL instances cleanly so disk files are released
+                    try
+                    {
+                        var wslPsi = new ProcessStartInfo("wsl.exe", "--shutdown")
+                        {
+                            UseShellExecute = false,
+                            CreateNoWindow = true
+                        };
+                        using var wslProc = Process.Start(wslPsi);
+                        wslProc?.WaitForExit(5000);
+                    }
+                    catch (Exception ex)
+                    {
+                        CcLog.Ignore(ex);
+                    }
+
+                    // 2. Compact each VHDX using diskpart
+                    foreach (var file in files)
+                    {
+                        try
+                        {
+                            file.Refresh();
+                            long beforeSize = file.Length;
+
+                            string tempScript = Path.Combine(Path.GetTempPath(), $"compact_{Guid.NewGuid():N}.txt");
+                            string scriptContent = $"select vdisk file=\"{file.FullName}\"\r\nattach vdisk readonly\r\ncompact vdisk\r\ndetach vdisk\r\n";
+                            File.WriteAllText(tempScript, scriptContent);
+
+                            var dpPsi = new ProcessStartInfo("diskpart.exe", $"/s \"{tempScript}\"")
+                            {
+                                UseShellExecute = false,
+                                CreateNoWindow = true,
+                                RedirectStandardOutput = true,
+                                RedirectStandardError = true
+                            };
+
+                            using (var dpProc = Process.Start(dpPsi))
+                            {
+                                dpProc?.WaitForExit(60000);
+                            }
+
+                            try { File.Delete(tempScript); } catch { }
+
+                            file.Refresh();
+                            long afterSize = file.Length;
+                            long freed = Math.Max(0, beforeSize - afterSize);
+                            totalFreed += freed;
+                            anySuccess = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            CcLog.Ignore(ex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                }
+
+                return (anySuccess, totalFreed);
+            });
+        }
     }
 }
