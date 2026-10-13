@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Running as administrator</value></data>
@@ -7,7 +7,9 @@
   <data name="NotificationHistory" xml:space="preserve"><value>Notification &amp; action history</value></data>
   <data name="ToggleTheme" xml:space="preserve"><value>Toggle theme (Dark / Light)</value></data>
   <data name="Settings" xml:space="preserve"><value>Application Settings</value></data>
-  <data name="NavDashboard" xml:space="preserve"><value>Optimization Dashboard</value></data>
+  <data name="NavDashboardShort" xml:space="preserve"><value>Dashboard</value></data>
+    <data name="NavToolsShort" xml:space="preserve"><value>Tools</value></data>
+    <data name="NavDashboard" xml:space="preserve"><value>Optimization Dashboard</value></data>
   <data name="NavTools" xml:space="preserve"><value>Windows System Utilities</value></data>
 
   
@@ -91,4 +93,27 @@
 <data name="ToolDiskTitle" xml:space="preserve"><value>Disk Maintenance &amp; TRIM</value></data>
 <data name="ToolDnsTitle" xml:space="preserve"><value>DNS Manager</value></data>
 <data name="ToolContextMenuTitle" xml:space="preserve"><value>Context Menu Manager</value></data>
-<data name="ToolDeepStorageTitle" xml:space="preserve"><value>Deep Storage Cleaner</value></data></root>
+<data name="ToolDeepStorageTitle" xml:space="preserve"><value>Deep Storage Cleaner</value></data>  <data name="CharacterTitle" xml:space="preserve"><value>Hero Character</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>Look, tone and behavior of the character on the dashboard card. Changes apply instantly.</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>Speech tone</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>Playful</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>Calm</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>Serious</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>Character name</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>Your name (for greetings)</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>City (weather module)</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>Animation intensity</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>Off</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>Low</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>Medium</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>High</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>Character size</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>Accessory</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>Occasion accessory (events)</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>Speech bubble</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>Scene and ambient effects behind the character</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>Sounds</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>Fast reactions (shorter animations)</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>Calm mode (reduced motion, for slower PCs)</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>Lunar calendar correction for occasions (±1 day)</value></data>
+</root>

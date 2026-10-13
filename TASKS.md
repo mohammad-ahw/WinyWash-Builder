@@ -1,6 +1,6 @@
 # TASKS — وضعیت پروژه CleanC
 
-> آخرین بروزرسانی: **۲۰۲۶/۱۰/۰۵**
+> آخرین بروزرسانی: **۲۰۲۶/۱۰/۱۳**
 > وضعیت هر آیتم با بازبینی مستقیم کد مشخص شده (نه حافظه).
 > نشان‌گرها: ✅ انجام شده | ⚠️ ناقص/جزئی | ❌ انجام نشده
 
@@ -16,7 +16,8 @@
 | **D** | چیزهای جاافتاده | 12/13 | 1 | 0 |
 | **E** | کد مرده | 5/5 | 0 | 0 |
 | **F** | فیچر | 8/8 | 0 | 0 |
-| | **مجموع** | **52/56** | **4** | **0** |
+| **G** | بازطراحی هیرو و هدر (فاز ۱۷) | 10/10 | 0 | 0 |
+| | **مجموع** | **62/66** | **4** | **0** |
 
 ---
 
@@ -118,6 +119,40 @@
 
 ---
 
+## گروه G — بازطراحی هیرو و هدر (فاز ۱۷)
+
+> مرجع طراحی: `CleanC_hero_New-v1.html` (دست‌نخورده) · نتیجه: `src/CleanC.UI/Assets/Hero/CleanC.hero.html`
+> **وضعیت: build پاک ۰ هشدار/۰ خطا · ۱۴۹ تست سبز · اجرای Debug و Release هر دو بدون کرش**
+
+| # | وضعیت | یادداشت |
+| :-- | :--: | :--- |
+| G1 جایگزینی هیروکارت | ✅ | `HeroHost` (UserControl با WebView2) به‌جای `HeroCard` قدیمی. قرارداد پیام در `HeroBridge.cs`: JS→C# با `postMessage` + پاسخ RPC `{type:'rpc',id,ok,result}` تا حلقهٔ ۱۴ مرحله‌ای resolve شود؛ C#→JS با `PostWebMessageAsJson`. **۱۰ پیام ورودی و ۴ پیام خروجی از نظر اسمی با HTML cross-check شدند** (`run.step/borderline/scan/after`، `settings.request`، `run.abort`، `borderline.confirm`، `codex.open`، `chip`، `quick` ← `host.update`، `settings`، `theme`، `borderline.result`). |
+| G2 HOST bridge واقعی | ✅ | `HeroHostApi.cs` هر پیام را به `MainWindow` ترجمه می‌کند؛ `HeroRunStepAsync` هر ۱۴ case (`0..13`) را دارد و `{mb}` برمی‌گرداند؛ `ShowHeroBorderlineDialogAsync`/`ShowHeroCodexDialogAsync` پیاده‌سازی واقعی دارند و `[[name,size]]` ارسال می‌کنند. |
+| G3 سینک Accent Color | ✅ | `InitHeroAccentSync` (نام‌گذاری مجدد از `InitHeroAurora`) روی `UISettings.ColorValuesChanged` → `UpdateAccentBrushes + ConfigureSystemBackdrop + PushHeroTheme`؛ رنگ Windows Accent به `--halo` هیرو می‌رود (`GetWindowsAccentHex`، fallback `#1fa971`). |
+| G4 حذف اورورا و کد مرده | ✅ | `StartAuroraAnimations`/`StopAuroraAnimations`/`SetupButtonShine`/`SetupStatusPulse` و همهٔ فراخوانی‌هاشان حذف شدند؛ فیلدهای `_auroraRootVisual`، `_auroraBlobVisuals`، `_auroraBrushes`، `_shineVisual`، `_isAuroraAnimating` پاک شدند؛ ۶ پراپرتی `HeroHealth*`/`HeroLive*`/`QuickBoostBtnText` و… حذف و به `PushHeroState()` تبدیل شدند؛ `QuickBoostBtn_ClickAsync` (۶۷۰ خط) به حلقهٔ نازک ۱۴مرحله‌ای تبدیل شد. |
+| G5 ناوبری در هدر | ↩️ | **با G13 برگشت خورد.** نسخهٔ کوتاه: `AppTitleBar` ۵ ستون شد و دکمه‌های `Ctrl+1/2` به هدر رفتند؛ کاربر ساختار قبلی را خواست و حالا دوباره pill وسط‌چینِ `MainContentGrid` است (`CaptionButtonsSpacer.Width` داینامیک `inset > 0 ? inset : 144` همچنان پابرجاست). |
+| G6 کارت «کاراکتر» در Settings | ✅ | ۱۴ فیلد `Character*` در `AppSettings` (nullable ⇒ null = دست‌نخورده) + ۱۴ `[ObservableProperty]` در `SettingsViewModel` با گارد `_loading` و `PersistRequested` → `ScheduleSettingsSave + PushHeroSettings` + کارت XAML با ۲۵ کنترل. `CharacterLun` حالا `int?` (افست تقویم قمری ±۱، نه bool). handler ها با گارد `_characterUiReady` تا اولین `PopulateSettingsUi` هیچ ورودی نمی‌پذیرند تا مقداردهی اولیهٔ XAML «تنظیمات دست‌نخورده» را پر نکند. |
+| G7 لکالایزیشن | ✅ | هیرو عمداً Persian-only است؛ کارت Settings و هدر از `LocalizationService` لکالایز می‌شوند. **۲۵ کلید جدید** (`Character*` × ۲۳ + `NavDashboardShort`/`NavToolsShort`) به `en-US` و `fa-IR/Resources.resw` اضافه شد (هر دو ۱۱۳ data، XML معتبر). `AdminBadgeText` هم بالاخره لکالایز شد (`RunningAsAdmin` از قبل موجود بود). |
+| G8 سینک وان‌وی‌واي | ✅ | `InitHeroHost` در constructor · `_statsTimer` tick → `PushHeroState()` · تم → `finally`ِ `ApplyTheme` → `PushHeroTheme()` · تغییر تنظیمات → `PushHeroSettings()`. `settings.request` هنگام آماده شدن صفحه هر سه را همان لحظه می‌فرستد. |
+| G9 WebView2 در publish | ✅ | `CoreWebView2Environment.CreateAsync()` **بدون پارامتر** (با پروب build تأیید شد؛ ۲/۳ آرگومانی کامپایل نمی‌شود). user data پیش‌فرض کنار exe. publish Release self-contained: **۱۷۴MB / ۲۶۷ فایل**، `CleanC.hero.html` + `WebView2Loader.dll` + هر دو resw موجود، و اجرای خروجی publish ۲۰ ثانیه بدون کرش با پروفایل WebView2 ساخته‌شده. |
+| G10 تست | ✅ | `dotnet test`: **۱۴۹/۱۴۹ سبز** · smoke run دیباگ ۱۸ ثانیه بدون کرش · لاگ فقط `TrySetBadge: COMException` قدیمی، **هیچ خطای Hero نیست**. |
+| G11 دکمهٔ «بررسی مجدد» به‌جای «بهینه‌سازی» | ✅ | **ریشه (سطح کد):** `BuildHeroItems()` وقتی `_cachedScanResult == null` (یعنی هنوز هیچ اسکنی نشده، که حالت عادیِ استارت‌آپ است) آرایهٔ خالی برمی‌گرداند → دکمهٔ اصلی هیرو `re` می‌شد. **رفع:** (۱) در نبودِ اسکن و قبل از اولین اسکن، `DefaultHeroBoostItems` (۸ آیتم) فرستاده می‌شود؛ (۲) `ApplyHeroScanResult` نتیجهٔ اسکن را واقعاً نگه می‌دارد؛ (۳) `GetHeroScanAsync()` با قفل، همهٔ مسیرها را به **یک** اسکن مشترک می‌چسباند؛ (۴) ترتیب `issues()` طوری شد که بین مسائلِ هم‌شدت، آیتم‌های `act=='run'` جلوتر بایستند — وگرنه کارتِ «آپ‌تایم ۷ روزه» (که `btn:['بررسی مجدد','ghost','re']` دارد) می‌نشست روی دکمهٔ اصلی. |
+| G12 ریشهٔ واقعی: پل پیام WebView2 مرده بود | ✅ | **این باعِ اصلیِ همان باگِ گزارش‌شده بود.** JS هیرو روی `window.addEventListener('message')` گوش می‌داد، ولی WebView2 پیام‌های `PostWebMessageAsJson` میزبان را **فقط** روی `window.chrome.webview` تحویل می‌دهد. نتیجه: هیرو هیچ‌وقت `state`/`settings`/`theme`/پاسخِ RPC را نمی‌گرفت → `active` همیشه `[]` (دکمه «بررسی مجدد»)، `issues()` خالی، سنسورها بی‌حرکت، و `await HOST.scan()` تا timeout **۱۸۰ ثانیه‌ای** گیر می‌کرد — یعنی دقیقاً همان «چند دقیقه اسکن و بی‌نتیجه». **رفع:** شنونده به `_rt = chrome.webview ?? window` منتقل شد + پارسِ رشتهٔ JSON برای حالت fallback. **اثبات:** اسکرین‌شات publish بعد از فیکس → دکمه **«بهینه‌سازی سیستم · ۸ مورد»**، چیپ‌ها و سنسورهای زنده، «رفع همه · ۹ مورد». لاگِ موقتِ ریشه‌یابی تأیید کرد میزبان درست می‌فرستاد (`items=[junk,dns,browser,reg,startup,tweak,fast,gpu,debloat]`) و مشکل فقط گیرنده بود. لاگ موقت بعد از تأیید حذف شد. |
+| G13 چهار ایراد گزارش‌شدهٔ کاربر | ✅ | **۱) سایزهای واقعی `IT` از هسته:** `HeroState.Sizes` (`Dictionary<string,long>` به بایت) + `BuildHeroSizes()` — junk از اسکن (بدون `orphanedRegistry` تا دوباره شمرده نشود)، browser از `_heroBrowserMb`، reg از `orphanedRegistry.Bytes`، بقیه صفر. سمت JS تابع `syncSizes()` از `window.CleanC.update` صدا می‌خورد و `IT[k][5]` را عوض می‌کند + فقط اگر متن جزئیات با «عدد + واحد حجم» شروع شود (regex) عددِ ابتدایش را هم به‌روز می‌کند — متن‌های شمارشی («312 ورودی»، «9 برنامه») دست نمی‌خورند. `meta` هم وقتی جمع صفر است پیشوند «قابل پاکسازی» را حذف می‌کند. **اثبات:** «1.53 گیگابایت فایل زائد و کش…» به‌جای `796 مگابایت` دمویی. |
+| G14 گوشه‌های هیرو (لایهٔ مربعی زیرِ radius) | ✅ | **ریشه:** `body{background:var(--sf)}` یک مستطیل opaque و **مربعی** بود که چهار گوشهٔ `border-radius:12px` هیرو را می‌پوشاند؛ ضمناً `.hero{height:170px}` در باکسِ ۱۶۸پیکسلیِ `Height="170"` با `BorderThickness=1` سرریز می‌کرد و گوشه‌های پایین عملاً مربعی می‌ماندند. **رفع:** `body{background:transparent}` + `html/body/.app/.hero{height:100%}` + `HeroHost`: `WebView.DefaultBackgroundColor = Microsoft.UI.Colors.Transparent` (باید **قبل از** `EnsureCoreWebView2Async` ست شود) + `HeroCard.BorderThickness="0"` (کادر و radius را خودِ HTML می‌کشد تا کادر دوبل نشود). **اثبات:** بزرگ‌نمایی ۸× روی گوشهٔ بالا-چپ و پاین-چپ → کاملاً گرد، بدون سفید و بدون وصلهٔ مربعی. |
+| G15 حذف «کشف‌شده N از M» | ✅ | `<div id="coll">` + CSS `.coll` + توابع `updColl` (هر دو تعریفش) + `$('coll').onclick` + `#coll` در selectorِ pointerover کامل حذف شدند؛ `found()` فقط `FOUND` را نگه می‌دارد. **نکته:** `codex.open` تنها درِ کدکس دستاوردها بود، پس به خط وضعیت هیرو (`.st`) منتقل شد (`title` + `cursor:pointer`) تا پنل `ShowHeroCodexDialogAsync` از دست نرود. |
+| G16 سوئیچ ابزار/داشبورد به ساختار قبلی | ✅ | پنل nav از `AppTitleBar` حذف شد (۵→۴ ستون؛ `TitleBarDragRegion` 2→1، ابزارهای سریع 3→2، `CaptionButtonsSpacer` 4→3) و **pill شناورِ قبلی** (`Border` با `CornerRadius=19`، `Margin=0,0,0,10`، دو دکمهٔ ۳۴پیکسلی با متن کامل) به `Grid.Row="0"`ِ `MainContentGrid` برگشت؛ نام‌ها/هاهنلرها/`KeyboardAccelerator`ها دست‌نخورده ماندند پس `StyleNav` و Ctrl+1/2 کار می‌کنند. `ApplyLanguage` حالا کلیدهای کامل `NavDashboard`/`NavTools` را می‌خواند (کلیدهای `*Short` دیگر استفاده نمی‌شوند). **اثبات:** UIA invoke روی `NavToolsBtn` ← نمای ابزارها باز شد و حالت فعالِ pill جابه‌جا شد؛ سپس به داشبورد برگشت (`LastView` درست ذخیره شد). |
+
+**انجام‌شده در این فاز:** `MainWindow.xaml(.cs)`، `MainWindow.Hero.cs` (جدید)، `SettingsViewModel.cs`، `SettingsService.cs`، `Hero/*` (جدید: `HeroBridge`، `HeroState`، `HeroHost.xaml(.cs)`، `HeroHostApi`، `HeroLooks`)، `Assets/Hero/CleanC.hero.html` (جدید)، `Resources.resw` × ۲، `Directory.Packages.props` + `CleanC.UI.csproj` (WebView2).
+
+**باقی‌مانده (نیاز به دستی/بازبینی انسانی):**
+- ⚠️ راستی‌آزمایی بصری زنده: تغییر هر ۱۴ تنظیمات کاراکتر و دیدن اعمال فوری در کارت داشبورد.
+- ⚠️ اجرای واقعیِ ۱۴ مرحلهٔ پاکسازی از هیرو (عمداً خودکار نشد: عملیات پاکسازی واقعی روی دیسک انجام می‌دهد).
+- ✅ اجرای `.\publish.ps1` کامل: `CleanC-Release-win-x64.zip` بازنویسی شد (**۳۶۴ فایل / ۴۴۹.۲ مگابایت** خروجی، zip **۳۳۲.۲ مگابایت**)؛ در `publish\Assets\Hero\CleanC.hero.html` چک شد: `syncSizes`/`background:transparent`/`height:100%` موجود، `updColl`/`id="coll"` ناموجود.
+- 💤 `CleanC_hero_New-v1.html` در root هنوز untracked است (مرجع طراحی؛ commit شود یا حذف؟).
+
+---
+
 ## اولویت پیشنهادی برای ادامه
 
 **بلوکر + خطرناک (دیتای کاربر) — همه انجام شد:**
@@ -191,7 +226,7 @@
 42. ✅ `catch {}` خالی = صفر · `e.Handled = true` فقط در هندلر کیبوردِ Escape ( legitimately) · `TODO/FIXME` = صفر · کلید/توکن/پسورد در کد = صفر.
 43. ✅ **رفع باگ:** ۴ هندلرِ `async void` سطل بازیافت (بازگردانی/حذف گروهی/خالی‌سازی/بروزرسانی) که در فاز ۱۱ بدون `SafeInvoker` مانده بودند → به الگوی `Task + SafeInvoker.Run` برگردانده شدند؛ حالا `private async void` در کل UI صفر است (با fail-fast فاز ۱۳ اینها می‌توانستند کل برنامه را بکشند).
 
-**پیشرفت فاز‌ها:** ۱ ✅ | ۲ ✅ | ۳ ✅ | ۴ ✅ | ۵ ✅ | ۶ ✅ | ۷ ✅ | ۸ ✅ | ۹ ✅ | ۱۰ ✅ | ۱۱ ✅ | ۱۲ ✅ | ۱۳ ✅ | ۱۴ ✅ | ۱۵ ✅ | ۱۶ ✅ — **همه‌ی فاز‌ها تمام شد**
+**پیشرفت فاز‌ها:** ۱ ✅ | ۲ ✅ | ۳ ✅ | ۴ ✅ | ۵ ✅ | ۶ ✅ | ۷ ✅ | ۸ ✅ | ۹ ✅ | ۱۰ ✅ | ۱۱ ✅ | ۱۲ ✅ | ۱۳ ✅ | ۱۴ ✅ | ۱۵ ✅ | ۱۶ ✅ | **۱۷ ✅** — **همه‌ی فاز‌ها تمام شد**
 
 **بقیه:** ✅ **همه‌چیز تمام شد** — کامیت نهایی `dcf9b62` (۹۹ فایل، working tree تمیز) + بیلد نهایی Release **۰ هشدار / ۰ خطا** + ۱۳۳ تست سبز + اجرای نهایی ۱۸ ثانیه‌ای بدون کرش (crash.log خالی؛ تنها لاگِ شناخته‌شده همان `TrySetBadge: COMException` یک‌بار در هر اجراست).
 

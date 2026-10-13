@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>اجرا با دسترسی مدیر</value></data>
@@ -7,7 +7,9 @@
   <data name="NotificationHistory" xml:space="preserve"><value>تاریخچه عملیات و اعلان ها</value></data>
   <data name="ToggleTheme" xml:space="preserve"><value>تغییر تم (تاریک / روشن)</value></data>
   <data name="Settings" xml:space="preserve"><value>تنظیمات برنامه</value></data>
-  <data name="NavDashboard" xml:space="preserve"><value>داشبورد بهینه سازی</value></data>
+  <data name="NavDashboardShort" xml:space="preserve"><value>داشبورد</value></data>
+    <data name="NavToolsShort" xml:space="preserve"><value>ابزارها</value></data>
+    <data name="NavDashboard" xml:space="preserve"><value>داشبورد بهینه سازی</value></data>
   <data name="NavTools" xml:space="preserve"><value>ابزارهای سیستمی ویندوز</value></data>
 
   
@@ -91,4 +93,27 @@
 <data name="ToolDiskTitle" xml:space="preserve"><value>نگهداری و سلامت دیسک</value></data>
 <data name="ToolDnsTitle" xml:space="preserve"><value>مدیریت DNS</value></data>
 <data name="ToolContextMenuTitle" xml:space="preserve"><value>مدیریت منوی کلیک راست</value></data>
-<data name="ToolDeepStorageTitle" xml:space="preserve"><value>پاکسازی عمیق دیسک</value></data></root>
+<data name="ToolDeepStorageTitle" xml:space="preserve"><value>پاکسازی عمیق دیسک</value></data>  <data name="CharacterTitle" xml:space="preserve"><value>کاراکتر هیرو</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>ظاهر، لحن و رفتار کاراکتر داخل کارت داشبورد. تغییرات بلافاصله در کارت اعمال می شود.</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>لحن گفتار</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>شوخ‌طبع</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>آرام</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>جدی</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>اسم کاراکتر</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>اسم شما (برای سلام کردن)</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>شهر (ماژول آب و هوا)</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>شدت انیمیشن ها</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>خاموش</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>کم</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>متوسط</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>زیاد</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>اندازه کاراکتر</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>اکسسوری</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>اکسسوری مناسبتی (رویدادها)</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>حباب گفتار</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>صحنه و جلوه های محیطی پشت کاراکتر</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>صداها</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>عکس العمل سریع (کوتاه کردن انیمیشن ها)</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>حالت آرام (کم تحرک، مناسب سیستم های کند)</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>تنظیم تقویم قمری برای مناسبت ها (±۱ روز)</value></data>
+</root>

@@ -4,6 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Hero="using:CleanC.UI.Hero"
     mc:Ignorable="d"
     Title="CleanC">
 
@@ -20,9 +21,13 @@
                 BorderThickness="0,0,0,1">
             <Grid x:Name="AppTitleBar" FlowDirection="LeftToRight" Padding="16,0,0,0">
                 <Grid.ColumnDefinitions>
+                    <!-- برند + پیشوند Admin -->
                     <ColumnDefinition Width="Auto" />
+                    <!-- ناحیه کشیدن پنجره (تنها ستون کششی) -->
                     <ColumnDefinition Width="*" />
+                    <!-- دکمه‌های ابزار سریع هدر -->
                     <ColumnDefinition Width="Auto" />
+                    <!-- جای دکمه‌های caption ویندوز -->
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
@@ -50,13 +55,14 @@
                                 VerticalAlignment="Center">
                             <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                 <FontIcon Glyph="&#xE7EF;" FontSize="10" Foreground="{ThemeResource AdminBadgeForegroundBrush}" VerticalAlignment="Center" />
-                                <TextBlock Text="Running as admin" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource AdminBadgeForegroundBrush}" VerticalAlignment="Center" />
+                                <TextBlock x:Name="AdminBadgeText" Text="Running as admin" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource AdminBadgeForegroundBrush}" VerticalAlignment="Center" />
                             </StackPanel>
                         </Border>
                     </StackPanel>
                 </StackPanel>
 
-                <!-- Drag Region (Center) -->
+                <!-- Drag Region (Center) — فقط همین ستون برای جابه‌جایی پنجره است.
+                     ناوبری اینجا نیست: به شکل pill جداگانه بالای محتوای اصلی برگشته. -->
                 <Border x:Name="TitleBarDragRegion" Grid.Column="1" Background="Transparent" />
 
                 <!-- Quick Action Tools on Titlebar (Right, before caption buttons) - Pill shaped -->
@@ -120,7 +126,8 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Modern Fluent 2 Floating Segmented Pill Switcher (Replaces generic File Explorer tabs) -->
+            <!-- Modern Fluent 2 Floating Segmented Pill Switcher — ساختار قبلیِ ناوبری که
+                 از نوار عنوان به بالای محتوای اصلی برگشته تا هم وسط باشد و هم فضا را نگیرد. -->
             <Border Grid.Row="0"
                     HorizontalAlignment="Center"
                     Background="{ThemeResource AppHeaderPillBrush}"
@@ -133,6 +140,7 @@
                     <!-- Dashboard Tab Pill Button -->
                     <Button x:Name="NavDashboardBtn"
                             Click="NavDashboardBtn_Click"
+                            AutomationProperties.Name="داشبورد بهینه سازی"
                             Height="34"
                             Padding="18,0"
                             CornerRadius="16"
@@ -143,7 +151,7 @@
                             <FontIcon x:Name="NavDashboardIcon" Glyph="&#xE9D9;" FontSize="13" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                             <TextBlock x:Name="NavDashboardText" Text="داشبورد بهینه سازی" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                         </StackPanel>
-                        <!-- D6: میان بر صفحه کلید — تغییر نما بدون ماوس -->
+                        <!-- میان‌بر صفحه‌کلید: تغییر نما بدون ماوس -->
                         <Button.KeyboardAccelerators>
                             <KeyboardAccelerator Key="Number1" Modifiers="Control" />
                         </Button.KeyboardAccelerators>
@@ -152,6 +160,7 @@
                     <!-- System Tools Tab Pill Button -->
                     <Button x:Name="NavToolsBtn"
                             Click="NavToolsBtn_Click"
+                            AutomationProperties.Name="ابزارهای سیستمی ویندوز"
                             Height="34"
                             Padding="18,0"
                             CornerRadius="16"
@@ -184,101 +193,20 @@
                     <Grid HorizontalAlignment="Stretch">
                         <StackPanel x:Name="DashboardContentPanel" Spacing="10" HorizontalAlignment="Stretch" MaxWidth="960" Margin="24,0,24,20">
                         
-                            <!-- 1. AURORA HERO CARD (Height: 126, CornerRadius: 12) -->
-                            <Border x:Name="HeroCard" 
-                                    CornerRadius="12" 
-                                    Height="126" 
-                                    Background="Transparent" 
-                                    BorderBrush="{ThemeResource AppCardBorderBrush}" 
-                                    BorderThickness="1" 
-                                    HorizontalAlignment="Stretch" 
-                                    Translation="0,0,32" 
+                            <!-- 1. HERO CARD — هیروکارت داخل WebView2 (CleanC.hero.html) -->
+                            <!-- BorderThickness صفر است: کادر و radius را خود HTML (.hero) می‌کشد تا
+                                 کادر دوبار نشود و ارتفاع داخلی دقیقاً با height:100% داخل HTML بخواند. -->
+                            <Border x:Name="HeroCard"
+                                    CornerRadius="12"
+                                    Height="170"
+                                    Background="{ThemeResource AppCardBackgroundBrush}"
+                                    BorderThickness="0"
+                                    HorizontalAlignment="Stretch"
+                                    Translation="0,0,32"
                                     Shadow="{StaticResource SharedCardShadow}">
-                                <Grid>
-                                    <!-- Layer 0: Semi-translucent Header Background -->
-                                    <Border CornerRadius="12" Background="{ThemeResource HeroCardBackgroundBrush}" IsHitTestVisible="False" />
-
-                                    <!-- Layer 1: Aurora Composition Visual Host -->
-                                    <Border x:Name="HeroAuroraHost" CornerRadius="12" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" IsHitTestVisible="False" />
-
-                                    <!-- Layer 2: Gradient Scrim for Contrast & Legibility -->
-                                    <Border CornerRadius="12" Background="{ThemeResource HeroScrimBrush}" IsHitTestVisible="False" />
-
-                                    <!-- Hero Content Grid (Left text stack, Right action stack) -->
-                                    <Grid x:Name="HeroContentGrid" ColumnDefinitions="*,Auto" Padding="18,8" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                                        
-                                        <!-- Left Content Stack -->
-                                        <StackPanel x:Name="HeroTextStack" Grid.Column="0" VerticalAlignment="Center" Spacing="2">
-                                            <!-- Status Chip with Pulsing Dot -->
-                                            <Border Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="8,2" HorizontalAlignment="Left">
-                                                <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                                    <Ellipse x:Name="HeroStatusDot" Width="6" Height="6" Fill="#6CCB5F" VerticalAlignment="Center" />
-                                                    <TextBlock x:Name="HeroHealthCategoryText" Text="وضعیت سلامت و کارایی سیستم" FontSize="10.5" FontWeight="Medium" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                                </StackPanel>
-                                            </Border>
-
-                                            <!-- Hero Title (17pt SemiBold) -->
-                                            <TextBlock x:Name="HeroHealthTitle" Text="سیستم آماده بهینه سازی است" FontSize="17" FontWeight="SemiBold" Foreground="{ThemeResource HeroTitleBrush}" Margin="0,1,0,0">
-                                                <TextBlock.Shadow>
-                                                    <ThemeShadow />
-                                                </TextBlock.Shadow>
-                                            </TextBlock>
-
-                                            <!-- Hero Subtitle -->
-                                            <TextBlock x:Name="HeroHealthSubtitle" Text="با ۱ کلیک فایل های موقت پاک، حافظه رم آزاد و پردازه های اضافی بسته می شوند." FontSize="11" Foreground="{ThemeResource HeroSubtitleBrush}" TextWrapping="Wrap" MaxWidth="480" LineHeight="16" />
-
-                                             <!-- Mini Chips: Cleanable, Last Cleaned & Cumulative Total -->
-                                            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,2,0,0">
-                                                <Border Background="{ThemeResource HeroChipBackgroundBrush}" BorderBrush="{ThemeResource HeroChipBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="7,2">
-                                                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                        <TextBlock x:Name="HeroCleanableLabelText" Text="قابل آزادسازی:" FontSize="10" Foreground="{ThemeResource HeroChipLabelBrush}" />
-                                                        <TextBlock x:Name="HeroCleanableText" Text="—" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight" Language="en-US" Foreground="{ThemeResource HeroChipValueBrush}" />
-                                                    </StackPanel>
-                                                </Border>
-                                                <Border Background="{ThemeResource HeroChipBackgroundBrush}" BorderBrush="{ThemeResource HeroChipBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="7,2">
-                                                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                        <TextBlock x:Name="HeroLastCleanText" Text="آخرین پاکسازی: —" FontSize="10" Foreground="{ThemeResource HeroChipLabelBrush}" />
-                                                    </StackPanel>
-                                                </Border>
-                                                <Border Background="{ThemeResource HeroChipBackgroundBrush}" BorderBrush="{ThemeResource HeroChipBorderBrush}" BorderThickness="1" CornerRadius="6" Padding="7,2">
-                                                    <StackPanel Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
-                                                        <TextBlock x:Name="HeroTotalCumulativeText" Text="مجموع آزادشده: —" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource HeroChipValueBrush}" />
-                                                    </StackPanel>
-                                                </Border>
-                                            </StackPanel>
-                                        </StackPanel>
-
-                                        <!-- Right Action Stack (.act in preview HTML) -->
-                                        <StackPanel x:Name="HeroActionStack" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="6" Margin="12,0,0,0">
-                                            <!-- Quick Boost Accent Button -->
-                                            <Grid MinWidth="230" HorizontalAlignment="Right" Height="36">
-                                                <Button x:Name="QuickBoostBtn" 
-                                                        Click="QuickBoostBtn_Click" 
-                                                        Style="{ThemeResource AccentButtonStyle}"
-                                                        CornerRadius="8" 
-                                                        Height="36"
-                                                        HorizontalAlignment="Stretch"
-                                                        Padding="16,0">
-                                                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" HorizontalAlignment="Center">
-                                                        <FontIcon x:Name="QuickBoostBtnIcon" Glyph="&#xE777;" FontSize="13" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                        <TextBlock x:Name="QuickBoostBtnText" Text="بهینه سازی و ارتقای سرعت سیستم" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextOnAccentFillColorPrimaryBrush}" />
-                                                    </StackPanel>
-                                                </Button>
-                                                <!-- Shine Sweep Target Host (Clipped strictly inside button bounds) -->
-                                                <Border x:Name="BoostBtnShineHost" CornerRadius="8" Height="36" IsHitTestVisible="False" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
-                                            </Grid>
-
-                                            <!-- Live Telemetry directly under button matching HTML preview (.hr) -->
-                                            <StackPanel Orientation="Horizontal" Spacing="7" HorizontalAlignment="Center" VerticalAlignment="Center">
-                                                <TextBlock Text="RAM" FontSize="10" Foreground="{ThemeResource HeroTelemetryLabelBrush}" />
-                                                <TextBlock x:Name="HeroLiveRamText" Text="—" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight" Language="en-US" Foreground="{ThemeResource HeroTelemetryValueBrush}" />
-                                                <TextBlock Text="·" FontSize="10" Foreground="{ThemeResource HeroTelemetrySeparatorBrush}" />
-                                                <TextBlock Text="CPU" FontSize="10" Foreground="{ThemeResource HeroTelemetryLabelBrush}" />
-                                                <TextBlock x:Name="HeroLiveCpuText" Text="—" FontSize="10" FontWeight="Bold" FlowDirection="LeftToRight" Language="en-US" Foreground="{ThemeResource HeroTelemetryValueBrush}" />
-                                            </StackPanel>
-                                        </StackPanel>
-                                    </Grid>
-                                </Grid>
+                                <Hero:HeroHost x:Name="HeroHostXaml"
+                                               HorizontalAlignment="Stretch"
+                                               VerticalAlignment="Stretch" />
                             </Border>
 
                             <!-- ================================================================= -->
@@ -1770,6 +1698,111 @@
                                     <RadioButton x:Name="ThemeDarkRadio" Content="تاریک" Click="ThemeRadio_Click" IsChecked="{x:Bind SettingsVm.IsThemeDark, Mode=OneWay}" />
                                 </StackPanel>
                             </Grid>
+                        </Border>
+
+                        <!-- 1.5. کاراکتر هیرو — همان چیزی که داخل کارت داشبورد (WebView2) رندر می شود -->
+                        <Border CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Padding="18" HorizontalAlignment="Stretch">
+                            <StackPanel Spacing="12">
+                                <StackPanel Spacing="4">
+                                    <TextBlock x:Name="SettingsCharTitle" Text="کاراکتر هیرو" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                    <TextBlock x:Name="SettingsCharDesc" Text="ظاهر، لحن و رفتار کاراکتر داخل کارت داشبورد. تغییرات بلافاصله در کارت اعمال می شود." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
+                                </StackPanel>
+
+                                <!-- لحن گفتار -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharToneText" Text="لحن گفتار" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ComboBox x:Name="CharToneCombo" Grid.Column="1" Width="190" VerticalAlignment="Center" SelectionChanged="CharToneCombo_SelectionChanged">
+                                        <ComboBoxItem x:Name="CharToneJokeItem" Tag="joke" Content="شوخ‌طبع" />
+                                        <ComboBoxItem x:Name="CharToneCalmItem" Tag="calm" Content="آرام" />
+                                        <ComboBoxItem x:Name="CharToneSeriousItem" Tag="serious" Content="جدی" />
+                                    </ComboBox>
+                                </Grid>
+
+                                <!-- اسم کاراکتر / اسم کاربر / شهر -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharNameText" Text="اسم کاراکتر" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <TextBox x:Name="CharNameBox" Grid.Column="1" Width="190" MaxLength="24" Text="{x:Bind SettingsVm.CharacterName, Mode=TwoWay}" PlaceholderText="مثلاً سی‌سی" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharUserNameText" Text="اسم شما (برای سلام کردن)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <TextBox x:Name="CharUserNameBox" Grid.Column="1" Width="190" MaxLength="24" Text="{x:Bind SettingsVm.CharacterUserName, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharCityText" Text="شهر (ماژول آب و هوا)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <TextBox x:Name="CharCityBox" Grid.Column="1" Width="190" MaxLength="40" Text="{x:Bind SettingsVm.CharacterCity, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- شدت انیمیشن -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharIntensityText" Text="شدت انیمیشن ها" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ComboBox x:Name="CharIntensityCombo" Grid.Column="1" Width="190" VerticalAlignment="Center" SelectionChanged="CharIntensityCombo_SelectionChanged">
+                                        <ComboBoxItem x:Name="CharIntOffItem" Tag="off" Content="خاموش" />
+                                        <ComboBoxItem x:Name="CharIntLowItem" Tag="low" Content="کم" />
+                                        <ComboBoxItem x:Name="CharIntMidItem" Tag="mid" Content="متوسط" />
+                                        <ComboBoxItem x:Name="CharIntHighItem" Tag="high" Content="زیاد" />
+                                    </ComboBox>
+                                </Grid>
+
+                                <!-- اندازه -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharSizeText" Text="اندازه کاراکتر" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Slider x:Name="CharSizeSlider" Width="170" Minimum="0.7" Maximum="1.4" StepFrequency="0.05"
+                                                Value="{x:Bind SettingsVm.CharacterSize, Mode=TwoWay}"
+                                                ValueChanged="CharSizeSlider_ValueChanged" />
+                                        <TextBlock x:Name="CharSizeValueText" Width="38" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- اکسسوری / اکسسوری مناسبتی -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharLookText" Text="اکسسوری" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ComboBox x:Name="CharLookCombo" Grid.Column="1" Width="190" VerticalAlignment="Center" SelectionChanged="CharLookCombo_SelectionChanged" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharOccLookText" Text="اکسسوری مناسبتی (رویدادها)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ComboBox x:Name="CharOccLookCombo" Grid.Column="1" Width="190" VerticalAlignment="Center" SelectionChanged="CharOccLookCombo_SelectionChanged" />
+                                </Grid>
+
+                                <!-- کلیدهای رفتاری -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                    <TextBlock x:Name="CharBubbleText" Text="حباب گفتار" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ToggleSwitch x:Name="CharBubbleToggle" Grid.Column="1" IsOn="{x:Bind SettingsVm.CharacterBubble, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                    <TextBlock x:Name="CharEnvText" Text="صحنه و جلوه های محیطی پشت کاراکتر" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ToggleSwitch x:Name="CharEnvToggle" Grid.Column="1" IsOn="{x:Bind SettingsVm.CharacterEnv, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                    <TextBlock x:Name="CharSoundText" Text="صداها" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ToggleSwitch x:Name="CharSoundToggle" Grid.Column="1" IsOn="{x:Bind SettingsVm.CharacterSound, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                    <TextBlock x:Name="CharFastText" Text="عکس العمل سریع (کوتاه کردن انیمیشن ها)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ToggleSwitch x:Name="CharFastToggle" Grid.Column="1" IsOn="{x:Bind SettingsVm.CharacterFast, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                                    <TextBlock x:Name="CharCalmText" Text="حالت آرام (کم تحرک، مناسب سیستم های کند)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <ToggleSwitch x:Name="CharCalmToggle" Grid.Column="1" IsOn="{x:Bind SettingsVm.CharacterCalm, Mode=TwoWay}" VerticalAlignment="Center" />
+                                </Grid>
+
+                                <!-- افست تقویم قمری -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
+                                    <TextBlock x:Name="CharLunText" Text="تنظیم تقویم قمری برای مناسبت ها (±۱ روز)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
+                                        <Slider x:Name="CharLunSlider" Width="170" Minimum="-1" Maximum="1" StepFrequency="1" TickFrequency="1" IsThumbToolTipEnabled="True"
+                                                ValueChanged="CharLunSlider_ValueChanged" />
+                                        <TextBlock x:Name="CharLunValueText" Width="38" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Grid>
+                            </StackPanel>
                         </Border>
 
                         <!-- 2. اجرا در پس زمینه و نوار وظیفه -->

@@ -66,6 +66,56 @@ namespace CleanC.Core.Services
             WindowWidth >= 660 && WindowHeight >= 550 &&
             WindowX != int.MinValue && WindowY != int.MinValue;
 
+        // ====================================================================
+        // کاراکتر هیرو (بخش «کاراکتر» در Settings)
+        //
+        // همه nullable هستند و null پیش فرض است: وقتی null باشد در پیام «settings»
+        // اصلاً ارسال نمی شود و CleanC.hero.html مقدار پیش فرض / ذخیره شده ی خودش
+        // را نگه می دارد. فقط وقتی کاربر واقعاً چیزی را عوض کرده مقدار می فرستیم.
+        // ====================================================================
+
+        /// <summary>لحن گفتار: "joke" (شوخ) | "serious" (جدی) | "calm" (آرام)</summary>
+        public string? CharacterTone { get; set; }
+
+        /// <summary>اسمی که کاراکتر کاربر را با آن صدا می زند.</summary>
+        public string? CharacterUserName { get; set; }
+
+        /// <summary>اسم خود کاراکتر (پیش فرض خود HTML «سی‌سی» است).</summary>
+        public string? CharacterName { get; set; }
+
+        /// <summary>شهر برای ماژول آب و هوا؛ خالی یعنی تشخیص خودکار از IP.</summary>
+        public string? CharacterCity { get; set; }
+
+        /// <summary>رفتار آرام: کمتر حرف می زند و کمتر تکان می خورد.</summary>
+        public bool? CharacterCalm { get; set; }
+
+        /// <summary>حالت تند و سریع در اجرای مراحل (کوتاه کردن انیمیشن ها).</summary>
+        public bool? CharacterFast { get; set; }
+
+        /// <summary>شدت رفتارها: "off" | "low" | "mid" | "high"</summary>
+        public string? CharacterIntensity { get; set; }
+
+        /// <summary>حباب گفتار روی کاراکتر نمایش داده شود.</summary>
+        public bool? CharacterBubble { get; set; }
+
+        /// <summary>صحنه/محیط پشت کاراکتر (آسمان، اتاق و…) فعال باشد.</summary>
+        public bool? CharacterEnv { get; set; }
+
+        /// <summary>صدای کاراکتر فعال باشد.</summary>
+        public bool? CharacterSound { get; set; }
+
+        /// <summary>کد ظاهر کاراکتر (ACC)؛ null یعنی ظاهر پیش فرض روز.</summary>
+        public string? CharacterLook { get; set; }
+
+        /// <summary>کد ظاهر مناسبتی؛ null یعنی غیرفعال.</summary>
+        public string? CharacterOccLook { get; set; }
+
+        /// <summary>مقیاس اندازهٔ کاراکتر: 0.85 | 1 | 1.15</summary>
+        public double? CharacterSize { get; set; }
+
+        /// <summary>افست روز برای تقویم قمری (مناسبت ها): -1 | 0 | 1 — طرفداران تقویم ایران/عربی ممکن است یک روز جابه جا ببینند.</summary>
+        public int? CharacterLun { get; set; }
+
         /// <summary>نگاشت تم ذخیره شده به ElementTheme (پیش فرض: از تنظیمات سیستم).</summary>
         [JsonIgnore]
         public bool IsDarkRequested => string.Equals(Theme, "Dark", StringComparison.OrdinalIgnoreCase);

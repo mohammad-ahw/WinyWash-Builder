@@ -1,0 +1,17 @@
+<UserControl
+    x:Class="CleanC.UI.Hero.HeroHost"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!--
+      WebView2 فقط هیروکارت را می‌پوشاند (۱۷۰ پیکسل). پسزمینهٔ WebView شفاف است تا
+      گوشه‌های گِرد و حاشیهٔ کارت دقیقاً از CSS خود CleanC.hero.html بیاید؛
+      اگر شفافیت روی دستگاهی اجرا نشد، رنگ کارت در HeroHost.cs جایگزین می‌شود.
+    -->
+    <Grid x:Name="RootGrid" Background="Transparent">
+        <WebView2 x:Name="WebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+    </Grid>
+</UserControl>

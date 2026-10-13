@@ -44,6 +44,8 @@
       مدیریت پکیج (build targets و managed هایش) سر جایش می‌ماند.
     -->
     <PackageReference Include="Microsoft.Windows.AI.MachineLearning" ExcludeAssets="native" />
+    <!-- هیروکارت + هدر HTML داخل WebView2 اجرا می‌شود -->
+    <PackageReference Include="Microsoft.Web.WebView2" />
   </ItemGroup>
 
   <ItemGroup>

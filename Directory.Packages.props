@@ -24,6 +24,8 @@
     <PackageVersion Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <!-- B9/C3: فقط برای خاموش کردن runtime آن (رفرنسِ مستقیم با ExcludeAssets) -->
     <PackageVersion Include="Microsoft.Windows.AI.MachineLearning" Version="2.1.74" />
+    <!-- هیروکارت/کاراکتر داخل WebView2 اجرا می‌شود (فایل Assets/Hero/CleanC.hero.html) -->
+    <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.3719.77" />
 
     <!-- تست -->
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />

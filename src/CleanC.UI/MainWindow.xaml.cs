@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -27,6 +27,7 @@ using WinRT;
 using CleanC.Core.Models;
 using CleanC.Core.Services;
 using CleanC.UI.ViewModels;
+using CleanC.UI.Hero;
 
 namespace CleanC.UI
 {
@@ -62,13 +63,9 @@ namespace CleanC.UI
         // B4 — سقف تاریخچه ی اعلان ها (در ذخیره و نمایش یکسان نگه داشته می شود)
         private const int NotificationHistoryCapacity = 50;
 
-        // Dashboard V2 Aurora, Sparkline, and Gauge state
+        // Dashboard V2: Accent sync, Sparklines, and Gauge state
+        // (اورورای Composition قدیمی حذف شد — هیرو حالا داخل WebView2 است و خودش هاله را می‌کشد)
         private readonly UISettings _uiSettings = new();
-        private ContainerVisual? _auroraRootVisual;
-        private readonly List<SpriteVisual> _auroraBlobVisuals = new();
-        private readonly List<CompositionRadialGradientBrush> _auroraBrushes = new();
-        private Visual? _shineVisual;
-        private bool _isAuroraAnimating = false;
         private readonly float[] _ramHistory = new float[24];
         private readonly float[] _cpuHistory = new float[24];
         private readonly float[] _diskHistory = new float[24];
@@ -103,6 +100,9 @@ namespace CleanC.UI
         internal SettingsViewModel SettingsVm { get; }
         /// <summary>هنگام مقداردهی اولیه ی کنترل های صفحه Settings نباید Toggled ذخیره انجام دهد.</summary>
         private bool _isLoadingSettings = false;
+        // کنترل های کارت کاراکتر تا پایان اولین PopulateSettingsUi مقادیر را به VM نمی نویسند؛
+        // وگرنه مقداردهی اولیه ی XAML (مثلاً Value اسلایدر) «تنظیمات دست نخورده» را پر می کرد.
+        private bool _characterUiReady = false;
         private AppView _currentView = AppView.Dashboard;
         private bool _isExiting = false;
         /// <summary>هشدار تری فقط یک بار در هر اجرا نمایش داده شود تا آزاردهنده نشود.</summary>
@@ -119,7 +119,13 @@ namespace CleanC.UI
             _settingsStore = AppServices.GetRequired<ISettingsStore>();
             _settingsStore.OnSaveRequested += CapturePlacementForSave;
             SettingsVm = AppServices.GetRequired<SettingsViewModel>();
-            SettingsVm.PersistRequested += ScheduleSettingsSave;
+            SettingsVm.PersistRequested += () =>
+            {
+                ScheduleSettingsSave();
+                // تنظیمات کاراکتر درون WebView2 زندگی می کند؛ بدون این پیام، تغییر
+                // تا ری‌استارت بعدی اعمال نمی شود. برای بقیه ی تنظیمات بی اثر است.
+                PushHeroSettings();
+            };
             SettingsVm.ThemeChangeRequested += mode => ApplyTheme(ResolveInitialTheme(mode));
             SettingsVm.DeleteModeChangeRequested += OnDeleteModeChangedInUi;
             SettingsVm.LanguageChangeRequested += code =>
@@ -181,9 +187,7 @@ namespace CleanC.UI
                 {
                     if (e.WindowActivationState == WindowActivationState.Deactivated)
                     {
-                        StopAuroraAnimations();
-
-                        // D3: کوچک نمایی → پنهان شدن در تری آیکون.
+                       // D3: کوچک نمایی → پنهان شدن در تری آیکون.
                         // فقط وقتی پنجره واقعاً minimize است مخفی می شود تا Alt+Tab زدن
                         // باعث پنهان شدن برنامه نشود.
                         if (!_isExiting && _settings.MinimizeToTray && NativeMethods.IsWindowMinimized(_hWnd))
@@ -193,8 +197,7 @@ namespace CleanC.UI
                     }
                     else if (DashboardView != null && DashboardView.Visibility == Visibility.Visible)
                     {
-                        StartAuroraAnimations();
-                    }
+                   }
                 }
                 catch (Exception __ex)
                 {
@@ -303,7 +306,12 @@ namespace CleanC.UI
             {
                 Interval = TimeSpan.FromSeconds(2.5)
             };
-            _statsTimer.Tick += (s, e) => RefreshSystemStats();
+            _statsTimer.Tick += (s, e) =>
+            {
+                RefreshSystemStats();
+                // آمار زندهٔ هیروکارت داخل WebView2 — مستقل از داشبورد، چون هیرو همیشه دیده می شود
+                PushHeroState();
+            };
             _statsTimer.Start();
 
             // B6: تایمرها هنگام بستن پنجره متوقف نمی شدند و تا لحظه ی مرگ پروسه
@@ -364,7 +372,8 @@ namespace CleanC.UI
 
             // Initial load
             RefreshSystemStats();
-            InitHeroAurora();
+            InitHeroAccentSync();
+            InitHeroHost();
             InitSparklines();
 
             // اسکن پس زمینه برای پر کردن چیپ «قابل آزادسازی» با داده واقعی
@@ -389,8 +398,7 @@ namespace CleanC.UI
                 {
                     _trayManager?.Dispose();
                     _windowsNotifications.Dispose();
-                    StopAuroraAnimations();
-                    // StopBackgroundTimers() در سازنده به Closed وصل است تا
+                   // StopBackgroundTimers() در سازنده به Closed وصل است تا
                     // حتی اگر مقداردهی تری شکست بخورد، تایمرها متوقف شوند.
                 };
             }
@@ -637,9 +645,8 @@ namespace CleanC.UI
                 _diskFreeGb = diskFreeGb;
                 RenderDiskBreakdown(diskTotalGb, diskFreeGb, _lastScanCleanableBytes);
 
-                // Hero Live Telemetry (.hr in HTML preview)
-                if (HeroLiveRamText != null) HeroLiveRamText.Text = $"{Math.Round(ramPercent).ToString("0", CultureInfo.InvariantCulture)}%";
-                if (HeroLiveCpuText != null) HeroLiveCpuText.Text = $"{Math.Round(cpuPercent).ToString("0", CultureInfo.InvariantCulture)}%";
+                // Hero Live Telemetry: مقدارهای زندهٔ رم/CPU از طریق PushHeroState
+                // (که زیر همین تایمر صدا می‌شود) به WebView2 هیرو می‌روند — تلهمتری جداگانه نداریم.
 
                 // Bento RAM Card - Format: "14.9 of 16 GB" or "14.9 از 16 GB"
                 string ramOf = LocalizationService.IsRtl ? "از" : "of";
@@ -752,15 +759,6 @@ namespace CleanC.UI
                 PushSample(_cpuHistory, (float)cpuPercent);
                 PushSample(_diskHistory, (float)netMbps);
                 UpdateSparklinePaths();
-
-                if (!_isBusy)
-                {
-                    if (ramPercent > 80)
-                    {
-                        HeroHealthTitle.Text = LocalizationService.Get("HeroTitleHighRam", "مصرف حافظه رم بالاست");
-                        HeroHealthSubtitle.Text = LocalizationService.Get("HeroSubtitleHighRam", "با ۱ کلیک فایل های موقت پاک، حافظه رم آزاد و پردازه های اضافی بسته می شوند.");
-                    }
-                }
             }
             catch (Exception __ex)
             {
@@ -772,6 +770,10 @@ namespace CleanC.UI
         // The 1-Click Master Boost & Clean Orchestration (PC Manager Style)
         // ====================================================================
 
+        /// <summary>
+        /// مسیر اجرای دستی ۱۴ مرحله (دکمه/تری/میان‌بر). منطق مراحل در MainWindow.Hero.cs است
+        /// تا هم این مسیر و هم WebView2 هیرو از یک کد واحد استفاده کنند و منطق دو نسخه نشود.
+        /// </summary>
         private void QuickBoostBtn_Click(object sender, RoutedEventArgs e)
             => SafeInvoker.Run(QuickBoostBtn_ClickAsync(sender, e));
 
@@ -779,667 +781,18 @@ namespace CleanC.UI
         {
             if (_isBusy) return;
             _isBusy = true;
-
-            QuickBoostBtn.IsEnabled = false;
-            QuickBoostBtnText.Text = LocalizationService.Get("QuickBoostRunning", "در حال بهینه سازی سیستم...");
-            QuickBoostBtnIcon.Glyph = "\uE895"; // sync icon
-
-            // CleanupReportCard فقط بعد از اینکه مشخص شد واقعاً کاری برای انجام هست
-            // پنهان می شود تا در حالت «هیچ موردی انتخاب نشده» گزارش قبلی از بین نرود.
-            LiveCleanupCard.Visibility = Visibility.Visible;
-            LiveCleanDoneIcon.Visibility = Visibility.Collapsed;
-            LiveCleanSpinner.Visibility = Visibility.Visible;
-            LiveCleanStatusTitle.Text = "در حال آماده سازی و ارزیابی سرفصل های سیستم...";
-            LiveCleanPhaseSubtitle.Text = "بررسی متوالی فایل های موقت، کش ها و فضاهای ذخیره سازی";
-            LiveFreedCounterText.Text = "+ 0 بایت آزاد شد";
-            LiveCleanProgressBar.Value = 5;
-
-            _activeCleaningItems.Clear();
-            _displayedFreedBytes = 0;
-
             try
             {
-                // 1. Gather scan items
-                if (_cachedScanResult == null)
+                for (int i = 0; i < 14; i++)
                 {
-                    LiveCleanStatusTitle.Text = "در حال پویش سریع سرفصل های سیستم...";
-                    _cachedScanResult = await SystemScanService.ScanAsync();
-                    ApplyPersistedJunkSelections(_cachedScanResult);
-                    RenderAdvancedGroups(_cachedScanResult);
-                    AdvancedCleanTotalText.Text = $"{LocalizationService.Get("TotalDetected", "مجموع شناسایی شده")}: {_cachedScanResult.FormattedTotal}";
-                    UpdateHeroCleanable(_cachedScanResult.TotalBytes);
-                }
-
-                // A3: فقط مواردی که کاربر تیک زده پردازش می شوند.
-                var allChecked = _cachedScanResult.Groups
-                    .SelectMany(g => g.Items)
-                    .Where(i => i.IsChecked)
-                    .ToList();
-
-                if (allChecked.Count == 0)
-                {
-                    LiveCleanupCard.Visibility = Visibility.Collapsed;
-                    ShowInfoBar(
-                        "موردی انتخاب نشده",
-                        "برای شروع بهینه سازی، دست کم یکی از سرفصل ها را در بخش پاکسازی انتخاب کنید.",
-                        InfoBarSeverity.Warning);
-                    return;
-                }
-
-                // سرفصل های فایلی برای نمایش در لیست زنده ی تمیزکاری
-                var itemsToProcess = _cachedScanResult.Groups
-                    .Where(g => g.Id != "system_boost")
-                    .SelectMany(g => g.Items)
-                    .Where(i => i.IsChecked)
-                    .ToList();
-
-                bool IsBoostEnabled(string boostId)
-                {
-                    var boostGroup = _cachedScanResult.Groups.FirstOrDefault(g => g.Id == "system_boost");
-                    if (boostGroup == null) return true;
-                    var item = boostGroup.Items.FirstOrDefault(i => i.Id == boostId);
-                    return item == null || item.IsChecked;
-                }
-
-                CleanupReportCard.Visibility = Visibility.Collapsed;
-
-                // Prepare report groups structure based on scanned groups
-                var reportGroups = new List<CleanupReportGroup>();
-                foreach (var group in _cachedScanResult.Groups)
-                {
-                    var repGroup = new CleanupReportGroup
-                    {
-                        GroupId = group.Id,
-                        Title = group.Title,
-                        IconGlyph = group.IconGlyph
-                    };
-                    reportGroups.Add(repGroup);
-                }
-
-                // 2. Populate the active live cleaning list so the user sees all items in line
-                foreach (var item in itemsToProcess)
-                {
-                    var vm = new JunkItemViewModel(item)
-                    {
-                        IsLoading = false,
-                        IsSuccess = false,
-                        WasEmpty = (item.Bytes == 0),
-                        StatusText = item.Bytes > 0 ? item.FormattedBytes : "در صف بهینه سازی"
-                    };
-                    _activeCleaningItems.Add(vm);
-                }
-
-                await Task.Delay(100);
-
-                long totalFreedBytes = 0;
-                int totalCount = itemsToProcess.Count;
-
-                // 3. Sequential single-item flow:
-                // "روی اون تسک لودینگ شه! سبز شه و بعد حذف شه!"
-                for (int i = 0; i < itemsToProcess.Count; i++)
-                {
-                    var item = itemsToProcess[i];
-                    var vm = _activeCleaningItems.FirstOrDefault(v => v.Id == item.Id);
-                    if (vm == null) continue;
-
-                    double progressVal = 5.0 + ((double)i / totalCount * 70.0);
-                    LiveCleanProgressBar.Value = progressVal;
-                    LiveCleanStatusTitle.Text = $"در حال پردازش: {vm.Title}...";
-                    LiveCleanPhaseSubtitle.Text = $"مرحله {i + 1} از {totalCount}: پاکسازی و بهینه سازی متوالی";
-
-                    // STEP 1: Spinner / Loading on this task
-                    vm.IsLoading = true;
-                    vm.IsSuccess = false;
-                    vm.StatusText = "در حال بررسی و پاکسازی...";
-                    await Task.Delay(60);
-
-                    // Background physical deletion — فقط واقعاً آزاد شده گزارش می شود
-                    long freed = await Task.Run(() => CleanService.CleanCategory(item));
-                    bool wasEmpty = freed <= 0;
-                    totalFreedBytes += freed;
-
-                    // STEP 2: Turns Emerald Green with checkmark & freed bytes
-                    vm.IsLoading = false;
-                    vm.IsSuccess = true;
-                    vm.WasEmpty = wasEmpty;
-
-                    if (wasEmpty)
-                    {
-                        vm.StatusText = item.Bytes > 0 ? "قبلاً پاک بود ✓" : "بدون فایل زائد (پاک)";
-                    }
-                    else
-                    {
-                        vm.StatusText = $"+ {SystemStats.FormatBytes(freed)} آزاد شد ✓";
-                    }
-
-                    if (totalFreedBytes > _displayedFreedBytes)
-                    {
-                        AnimateCountUp(totalFreedBytes);
-                    }
-
-                    // Pacing: User clearly observes the green success status
-                    await Task.Delay(90);
-
-                    // Record in report group
-                    var targetRepGroup = reportGroups.FirstOrDefault(g => g.GroupId == item.GroupId);
-                    targetRepGroup?.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = item.GroupId,
-                        Id = item.Id,
-                        Title = item.Title,
-                        IconGlyph = item.IconGlyph,
-                        FreedBytes = freed,
-                        WasEmpty = wasEmpty,
-                        StatusSummary = wasEmpty ? (item.Bytes > 0 ? "قبلاً پاک بود" : "خالی بود (بدون تغییر)") : $"+ {SystemStats.FormatBytes(freed)} آزاد شد"
-                    });
-
-                    // STEP 3: Remove from active list
-                    _activeCleaningItems.Remove(vm);
-                    await Task.Delay(20);
-                }
-
-                // F2: هر گام بعدی جداگانه محافظت می شود؛ شکستِ یک گام نباید کلِ بهینه سازی را
-                // قطع کند و باید در گزارش پایانی «ناموفق» گزارش شود نه اینکه بی صدا حذف شود.
-                var failedSteps = new List<CleanupReportItem>();
-
-                void ReportStepFailure(string id, string title, string glyph, Exception ex, string why)
-                {
-                    CcLog.Ignore(ex, "QuickBoost." + id);
-                    failedSteps.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = id,
-                        Title = title,
-                        IconGlyph = glyph,
-                        FreedBytes = 0,
-                        WasEmpty = false,
-                        IsFailed = true,
-                        StatusSummary = $"ناموفق ✗ — {why}"
-                    });
-                }
-
-                // 4. Live System Optimization (RAM Boost & Network DNS Flush)
-                long ramFreed = 0;
-                if (IsBoostEnabled("ramBoost"))
-                {
-                    LiveCleanProgressBar.Value = 82;
-                    LiveCleanStatusTitle.Text = "در حال آزادسازی حافظه فعال رم (RAM)...";
-                    LiveCleanPhaseSubtitle.Text = "تخلیه Working Set و بهینه سازی تخصیص حافظه پردازه ها";
-                    await Task.Delay(60);
-
-                    try
-                    {
-                        var boostResult = await OptimizerService.BoostRamAsync();
-                        ramFreed = boostResult.FreedBytes;
-                        if (!boostResult.Success && ramFreed <= 0)
-                        {
-                            failedSteps.Add(new CleanupReportItem
-                            {
-                                GroupId = "system_boost", Id = "ram_boost_fail", Title = "آزادسازی حافظه رم (RAM Working Set)",
-                                IconGlyph = "\uE9D2", IsFailed = true,
-                                StatusSummary = "ناموفق ✗ — دسترسی لازم برای تخلیه Working Set فراهم نشد"
-                            });
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("ram_boost_fail", "آزادسازی حافظه رم (RAM Working Set)", "\uE9D2", ex, ex.Message);
-                    }
-
-                    totalFreedBytes += ramFreed;
-                    AnimateCountUp(totalFreedBytes);
-                }
-
-                // DNS Flush & Clean Helpers
-                if (IsBoostEnabled("dnsFlush") || IsBoostEnabled("backgroundHelpers"))
-                {
-                    LiveCleanProgressBar.Value = 90;
-                    LiveCleanStatusTitle.Text = "در حال تخلیه کش DNS و نوسازی کانکشن ها...";
-                    LiveCleanPhaseSubtitle.Text = "رفرش جدول آدرس های شبکه و پاکسازی پردازه های زائد پس زمینه";
-                    await Task.Delay(50);
-
-                    try
-                    {
-                        await Task.Run(() =>
-                        {
-                            if (IsBoostEnabled("dnsFlush")) OptimizerService.FlushDns();
-                            if (IsBoostEnabled("backgroundHelpers")) ProcessManagerService.CleanBackgroundHelpers();
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("dns_flush_fail", "تخلیه کش DNS و نوسازی کانکشن ها", "\uE774", ex, ex.Message);
-                    }
-                }
-
-                // 5. Browser Background Tasks Suppression & Dead Extensions Cleanup
-                int browserTweaks = 0;
-                long extFreed = 0;
-                if (IsBoostEnabled("browserBoost"))
-                {
-                    LiveCleanProgressBar.Value = 92;
-                    LiveCleanStatusTitle.Text = "در حال بهینه سازی سرعت و حذف افزونه های زائد مرورگرها...";
-                    LiveCleanPhaseSubtitle.Text = "فعال سازی شتاب سخت افزاری، توقف تسک های پس زمینه و حذف افزونه های مرده";
-                    try
-                    {
-                        browserTweaks = await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
-                        extFreed = await Task.Run(() => BrowserOptimizerService.CleanInactiveChromeExtensions());
-                        if (extFreed > 0)
-                        {
-                            totalFreedBytes += extFreed;
-                            AnimateCountUp(totalFreedBytes);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("browser_opt_fail", "بهینه سازی مرورگر و پاکسازی افزونه ها", "\uE774", ex, ex.Message);
-                    }
-                    await Task.Delay(50);
-                }
-
-                // 5.5 Deep Clean & Leftover Software Trace Removal
-                int regCleaned = 0;
-                int leftoverFolderCount = 0;
-                long leftoverFreedBytes = 0;
-                if (IsBoostEnabled("orphanedRegistry") || IsBoostEnabled("leftovers"))
-                {
-                    LiveCleanProgressBar.Value = 94;
-                    LiveCleanStatusTitle.Text = "در حال پاکسازی عمیق و پویش بقایای نرم افزارهای حذف شده...";
-                    LiveCleanPhaseSubtitle.Text = "اسکن پوشه های رهاشده در AppData و کلیدهای نامعتبر رجیستری";
-                    await Task.Delay(50);
-
-                    try
-                    {
-                        (regCleaned, leftoverFolderCount, leftoverFreedBytes) = await Task.Run(() =>
-                        {
-                            int cleaned = IsBoostEnabled("orphanedRegistry") ? RegistryCleanerService.CleanOrphanedRegistry() : 0;
-                            var folders = LeftoverCleanerService.ScanLeftoverFolders();
-                            long freed = IsBoostEnabled("leftovers") ? LeftoverCleanerService.DeleteLeftoverFolders(folders) : 0;
-                            return (cleaned, folders.Count, freed);
-                        });
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("deep_clean_leftovers_fail", "پاکسازی عمیق بقایای نرم افزارها", "\uE74D", ex, ex.Message);
-                    }
-                    totalFreedBytes += leftoverFreedBytes;
-                    if (leftoverFreedBytes > 0) AnimateCountUp(totalFreedBytes);
-                }
-
-                // 6. Startup Apps & Launchers Optimization
-                int disabledStartups = 0;
-                if (IsBoostEnabled("startupOptimize"))
-                {
-                    LiveCleanProgressBar.Value = 95;
-                    LiveCleanStatusTitle.Text = "در حال بهینه سازی استارتاپ ویندوز...";
-                    LiveCleanPhaseSubtitle.Text = "غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار";
-                    try
-                    {
-                        disabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("startup_opt_fail", "بهینه سازی استارتاپ ویندوز", "\uE7B5", ex, ex.Message);
-                    }
-                    await Task.Delay(50);
-                }
-
-                // 7. Windows Performance & Privacy Tweaks
-                int winTweaks = 0;
-                if (IsBoostEnabled("winTweaks"))
-                {
-                    LiveCleanProgressBar.Value = 96;
-                    LiveCleanStatusTitle.Text = "در حال اعمال تنظیمات بهینه سازی ویندوز...";
-                    LiveCleanPhaseSubtitle.Text = "غیرفعال سازی پیشنهادات و سرویس های درگیرکننده پردازنده";
-                    try
-                    {
-                        winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
-                        winTweaks += await TelemetryOptimizerService.DisableTelemetryAndDiagTrackAsync();
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("win_tweaks_fail", "توقف تله متری و تنظیمات عملکرد ویندوز", "\uE770", ex, ex.Message);
-                    }
-                    await Task.Delay(50);
-                }
-
-                // 7.5 Fast Startup
-                CleanupReportItem? fastStartupReport = null;
-                if (IsBoostEnabled("fastStartup"))
-                {
-                    LiveCleanProgressBar.Value = 97;
-                    LiveCleanStatusTitle.Text = "در حال بررسی و اعمال Fast Startup...";
-                    LiveCleanPhaseSubtitle.Text = "کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)";
-                    try
-                    {
-                        var fsStatus = await Task.Run(FastStartupService.GetStatus);
-                        if (fsStatus.IsFastStartupEnabled)
-                        {
-                            fastStartupReport = new CleanupReportItem
-                            {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
-                                IconGlyph = "\uE7E8", WasEmpty = true, StatusSummary = "از قبل فعال بود ✓"
-                            };
-                        }
-                        else if (!fsStatus.IsHibernationEnabled)
-                        {
-                            fastStartupReport = new CleanupReportItem
-                            {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
-                                IconGlyph = "\uE7E8", IsFailed = true,
-                                StatusSummary = "انجام نشد ✗ — هایبرنیشن خاموش است (فعال سازی آن فایل hiberfil.sys می سازد)"
-                            };
-                        }
-                        else if (FastStartupService.SetFastStartup(true))
-                        {
-                            fastStartupReport = new CleanupReportItem
-                            {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
-                                IconGlyph = "\uE7E8", WasEmpty = false, StatusSummary = "فعال شد ✓"
-                            };
-                        }
-                        else
-                        {
-                            fastStartupReport = new CleanupReportItem
-                            {
-                                GroupId = "system_boost", Id = "fast_startup", Title = "Fast Startup (خاموش شدن سریع ویندوز)",
-                                IconGlyph = "\uE7E8", IsFailed = true,
-                                StatusSummary = "ناموفق ✗ — دسترسی Administrator لازم است"
-                            };
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("fast_startup", "Fast Startup (خاموش شدن سریع ویندوز)", "\uE7E8", ex, ex.Message);
-                    }
-                    await Task.Delay(50);
-                }
-
-                // 8. GPU Graphics Preference Optimization
-                int gpuConfiguredCount = 0;
-                string gpuName = string.Empty;
-                if (IsBoostEnabled("gpuOptimize"))
-                {
-                    LiveCleanProgressBar.Value = 98;
-                    LiveCleanStatusTitle.Text = "در حال تخصیص هوشمند کارت گرافیک...";
-                    LiveCleanPhaseSubtitle.Text = "هدایت برنامه های سنگین و بازی ها به پردازنده گرافیکی قدرتمند";
-                    try
-                    {
-                        var gpuResult = await GpuOptimizerService.OptimizeGpuPreferencesAsync();
-                        gpuConfiguredCount = gpuResult.ConfiguredAppsCount;
-                        gpuName = gpuResult.DedicatedGpuName;
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("gpu_opt_fail", "تخصیص کارت گرافیک مجزا", "\uE790", ex, ex.Message);
-                    }
-                    await Task.Delay(40);
-                }
-
-                // 8.6 Bloatware & Default Games Debloating + Interactive Borderline Apps Review
-                int bloatRemovedCount = 0;
-                long bloatFreedBytes = 0;
-                int borderlineRemovedCount = 0;
-                long borderlineFreedBytes = 0;
-                if (IsBoostEnabled("bloatwareClean"))
-                {
-                    LiveCleanProgressBar.Value = 99;
-                    LiveCleanStatusTitle.Text = "در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)...";
-                    LiveCleanPhaseSubtitle.Text = "پاکسازی Candy Crush و بازی های پیش فرض و بررسی برنامه های کم استفاده";
-                    try
-                    {
-                        // 1. حذف خودکار تبلیغات و بازی های بی استفاده قطعی
-                        var (autoRemoved, autoFreed) = await BloatwareService.CleanAutomaticBloatwareAsync();
-                        bloatRemovedCount = autoRemoved;
-                        bloatFreedBytes = autoFreed;
-                        if (autoFreed > 0)
-                        {
-                            totalFreedBytes += autoFreed;
-                            AnimateCountUp(totalFreedBytes);
-                        }
-
-                        // 2. اسکن و پرسش تعاملی برای موارد ریسک دار/اختیاری (Paint، Xbox، برنامه های > 500MB با ۳۰ روز عدم استفاده)
-                        if (IsBoostEnabled("inactiveHeavyApps") || IsBoostEnabled("bloatwareClean"))
-                        {
-                            var reviewCandidates = await BloatwareService.ScanBorderlineReviewAppsAsync();
-                            if (reviewCandidates.Count > 0)
-                            {
-                                var (revRemoved, revFreed) = await ShowBorderlineAppsReviewDialogAsync(reviewCandidates);
-                                borderlineRemovedCount = revRemoved;
-                                borderlineFreedBytes = revFreed;
-                                if (revFreed > 0)
-                                {
-                                    totalFreedBytes += revFreed;
-                                    AnimateCountUp(totalFreedBytes);
-                                }
-                            }
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        ReportStepFailure("bloatware_clean_fail", "حذف برنامه ها و بازی های تبلیغاتی", "\uE74C", ex, ex.Message);
-                    }
-                    await Task.Delay(40);
-                }
-
-                // 9. Hardware, Display & Power Diagnostics
-                LiveCleanProgressBar.Value = 99.5;
-                LiveCleanStatusTitle.Text = "در حال بررسی وضعیت مانیتور و توان سیستم...";
-                LiveCleanPhaseSubtitle.Text = "سنجش نرخ نوسازی تصویر و پلن مصرف انرژی";
-                var attentionList = new List<AttentionDecisionItem>();
-                try
-                {
-                    attentionList = await HardwareDiagnosticService.RunDiagnosticsAsync();
-                }
-                catch (Exception ex)
-                {
-                    CcLog.Ignore(ex, "QuickBoost.hardware_diagnostics");
-                }
-                await Task.Delay(150);
-
-                // Add Live System Boost group to report
-                var systemBoostGroup = new CleanupReportGroup
-                {
-                    GroupId = "system_boost",
-                    Title = "بهینه سازی زنده سیستم و پایداری",
-                    IconGlyph = "\uE9D2"
-                };
-
-                bool HasFailure(string id) => failedSteps.Any(f => f.Id == id);
-
-                if (IsBoostEnabled("ramBoost") && !HasFailure("ram_boost_fail"))
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "ram_boost",
-                        Title = "آزادسازی حافظه رم (RAM Working Set)",
-                        IconGlyph = "\uE9D2",
-                        FreedBytes = ramFreed,
-                        WasEmpty = (ramFreed == 0),
-                        StatusSummary = ramFreed > 0 ? $"+ {SystemStats.FormatBytes(ramFreed)} آزاد شد" : "بدون تغییر"
-                    });
-                }
-
-                if (IsBoostEnabled("dnsFlush") && !HasFailure("dns_flush_fail"))
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "dns_flush",
-                        Title = "تخلیه کش DNS و نوسازی کانکشن ها",
-                        IconGlyph = "\uE774",
-                        FreedBytes = 0,
-                        WasEmpty = false,
-                        StatusSummary = "با موفقیت نوسازی شد ✓"
-                    });
-                }
-
-                if (browserTweaks > 0 || extFreed > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "browser_opt",
-                        Title = extFreed > 0 ? "بهینه سازی مرورگرها و حذف افزونه های زائد" : "توقف تسک های پس زمینه و Startup Boost مرورگرها",
-                        IconGlyph = "\uE774",
-                        FreedBytes = extFreed,
-                        WasEmpty = false,
-                        StatusSummary = extFreed > 0 ? $"+ {SystemStats.FormatBytes(extFreed)} آزاد شد ✓" : "بهینه سازی شد ✓"
-                    });
-                }
-
-                if (disabledStartups > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "startup_opt",
-                        Title = $"بهینه سازی استارتاپ ({disabledStartups} برنامه غیرضروری)",
-                        IconGlyph = "\uE7B5",
-                        FreedBytes = 0,
-                        WasEmpty = false,
-                        StatusSummary = "غیرفعال شد ✓"
-                    });
-                }
-
-                if (gpuConfiguredCount > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "gpu_opt",
-                        Title = $"تخصیص کارت گرافیک مجزا ({gpuName})",
-                        IconGlyph = "\uE790",
-                        FreedBytes = 0,
-                        WasEmpty = false,
-                        StatusSummary = $"{gpuConfiguredCount} برنامه بهینه سازی شد ✓"
-                    });
-                }
-
-                if (bloatRemovedCount > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "bloat_clean",
-                        Title = $"حذف خودکار برنامه ها و بازی های تبلیغاتی ({bloatRemovedCount} برنامه)",
-                        IconGlyph = "\uE74C",
-                        FreedBytes = bloatFreedBytes,
-                        WasEmpty = false,
-                        StatusSummary = bloatFreedBytes > 0 ? $"+ {SystemStats.FormatBytes(bloatFreedBytes)} آزاد شد ✓" : "پاکسازی شد ✓"
-                    });
-                }
-
-                if (borderlineRemovedCount > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "borderline_clean",
-                        Title = $"پاکسازی برنامه های اختیاری تاییدشده ({borderlineRemovedCount} برنامه)",
-                        IconGlyph = "\uE74C",
-                        FreedBytes = borderlineFreedBytes,
-                        WasEmpty = false,
-                        StatusSummary = borderlineFreedBytes > 0 ? $"+ {SystemStats.FormatBytes(borderlineFreedBytes)} آزاد شد ✓" : "پاکسازی شد ✓"
-                    });
-                }
-
-                if (winTweaks > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "win_tweaks",
-                        Title = "توقف تله متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز",
-                        IconGlyph = "\uE770",
-                        FreedBytes = 0,
-                        WasEmpty = false,
-                        StatusSummary = "اعمال شد ✓"
-                    });
-                }
-
-                if (fastStartupReport != null)
-                {
-                    systemBoostGroup.Items.Add(fastStartupReport);
-                }
-
-                if (regCleaned > 0 || leftoverFreedBytes > 0)
-                {
-                    systemBoostGroup.Items.Add(new CleanupReportItem
-                    {
-                        GroupId = "system_boost",
-                        Id = "deep_clean_leftovers",
-                        Title = $"پاکسازی عمیق ({regCleaned} کلید نامعتبر رجیستری + {leftoverFolderCount} پوشه رهاشده)",
-                        IconGlyph = "\uE74D",
-                        FreedBytes = leftoverFreedBytes,
-                        WasEmpty = (regCleaned == 0 && leftoverFreedBytes == 0),
-                        StatusSummary = leftoverFreedBytes > 0 ? $"+ {SystemStats.FormatBytes(leftoverFreedBytes)} آزاد شد ✓" : "کلیدهای نامعتبر پاکسازی شدند ✓"
-                    });
-                }
-
-                // گام های ناموفقِ گام به گام — همیشه در انتهای گروه و با رنگ هشدار
-                systemBoostGroup.Items.AddRange(failedSteps);
-
-                reportGroups.Add(systemBoostGroup);
-
-                // 9. Celebration & Transition to Hierarchical Report Card
-                LiveCleanProgressBar.Value = 100;
-                LiveCleanSpinner.Visibility = Visibility.Collapsed;
-                LiveCleanDoneIcon.Visibility = Visibility.Visible;
-                LiveCleanStatusTitle.Text = "بهینه سازی خودکار سیستم با موفقیت به پایان رسید!";
-                LiveCleanPhaseSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(totalFreedBytes)} آزاد گردید.";
-                _displayedFreedBytes = totalFreedBytes;
-                LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(totalFreedBytes)} آزاد شد";
-
-                await Task.Delay(500);
-
-                // Hide Live card, show Hierarchical Report Card
-                LiveCleanupCard.Visibility = Visibility.Collapsed;
-                RenderHierarchicalReport(reportGroups, totalFreedBytes, attentionList);
-                CleanupReportCard.Visibility = Visibility.Visible;
-
-                HeroHealthTitle.Text = LocalizationService.Get("HeroTitleOptimized", "سیستم در وضعیت بهینه و پرسرعت قرار دارد");
-                HeroHealthSubtitle.Text = LocalizationService.IsRtl
-                    ? $"مجموعاً {SystemStats.FormatBytes(totalFreedBytes)} از حافظه رم و فضای دیسک آزاد شد."
-                    : $"Freed a total of {SystemStats.FormatBytes(totalFreedBytes)} from RAM and disk space.";
-
-                // Invalidate cached scan so next custom expansion gets fresh values
-                _cachedScanResult = null;
-                AdvancedCleanTotalText.Text = LocalizationService.Get("RefreshedAfterClean", "نوسازی پس از پاکسازی");
-                UpdateHeroCleanable(0);
-                ScheduleHeroCleanableRefresh();
-
-                _isCleanedRecently = true;
-                _lastCleanFreedBytes = totalFreedBytes;
-                _cumulativeFreedBytes += totalFreedBytes;
-                _lastCleanDateTime = DateTime.Now;
-                RecordCleanupSession(totalFreedBytes);
-                SaveCumulativeFreedStats();
-                UpdateCumulativeChipsUI();
-                RenderCleanupHistory();
-
-                // امتیاز سلامت جدید را ابتدا محاسبه کن، بعد انیمیشن را از مقدار قبلی به جدید ببر
-                double prevHealthScore = _currentHealthScore;
-                RefreshSystemStats();
-                double targetHealthScore = _currentHealthScore;
-                if (Math.Abs(targetHealthScore - prevHealthScore) > 0.5)
-                {
-                    SafeInvoker.Run(AnimateHealthScoreTransition(prevHealthScore, targetHealthScore));
+                    await HeroRunStepAsync(i, Array.Empty<int>());
                 }
             }
             catch (Exception ex)
             {
-                ShowInfoBar("خطا در بهینه سازی", ex.Message, InfoBarSeverity.Error);
-                LiveCleanStatusTitle.Text = "خطا در عملیات پاکسازی";
-                LiveCleanSpinner.Visibility = Visibility.Collapsed;
-            }
-            finally
-            {
-                _isBusy = false;
-                QuickBoostBtn.IsEnabled = true;
-                QuickBoostBtnText.Text = "بهینه سازی و ارتقای سرعت سیستم";
-                QuickBoostBtnIcon.Glyph = "\uE777";
+                CcLog.Report("Hero.QuickBoost", ex);
+                ShowInfoBar(LocalizationService.Get("BoostError", "خطا در بهینه‌سازی سیستم"), ex.Message, InfoBarSeverity.Error);
+                HeroAbortRun();
             }
         }
 
@@ -2136,7 +1489,6 @@ namespace CleanC.UI
                             _displayedFreedBytes = _currentReportTotalFreed;
                             ReportTotalFreedText.Text = $"+ {SystemStats.FormatBytes(_currentReportTotalFreed)} آزاد شد";
                             LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(_currentReportTotalFreed)} آزاد شد";
-                            HeroHealthSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(_currentReportTotalFreed)} از حافظه رم و فضای دیسک آزاد شد.";
 
                             MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, $"{removed} برنامه حذف شد ✓");
 
@@ -2177,9 +1529,8 @@ namespace CleanC.UI
 
         private void CloseReportBtn_Click(object sender, RoutedEventArgs e)
         {
+            // وضعیت سلامت هیرو بعد از بستن کارت گزارش از طریق PushHeroState بازمحاسبه می‌شود.
             CleanupReportCard.Visibility = Visibility.Collapsed;
-            HeroHealthTitle.Text = "سیستم در وضعیت بهینه و پرسرعت قرار دارد";
-            HeroHealthSubtitle.Text = "تمامی بهینه سازی ها با موفقیت اعمال شدند. وضعیت منابع سیستم عالی است.";
         }
 
         private void AnimateCountUp(long targetBytes)
@@ -2473,11 +1824,9 @@ namespace CleanC.UI
             if (_cachedScanResult == null)
             {
                 AdvancedCleanTotalText.Text = LocalizationService.Get("Scanning", "در حال اسکن...");
-                _cachedScanResult = await SystemScanService.ScanAsync();
-                ApplyPersistedJunkSelections(_cachedScanResult);
-                RenderAdvancedGroups(_cachedScanResult);
-                AdvancedCleanTotalText.Text = $"{LocalizationService.Get("TotalDetected", "مجموع شناسایی شده")}: {_cachedScanResult.FormattedTotal}";
-                UpdateHeroCleanable(_cachedScanResult.TotalBytes);
+                // از اسکنِ مشترک استفاده می شود؛ اگر اسکنِ پس زمینهٔ استارت‌آپ در جریان
+                // است همان را می گیریم تا دو اسکن موازی روی کل دیسک نیفتد.
+                ApplyHeroScanResult(await GetHeroScanAsync());
             }
         }
 
@@ -2864,6 +2213,9 @@ namespace CleanC.UI
             finally
             {
                 _isApplyingTheme = false;
+                // هیرو درون WebView2 است و دیکت تمِ اپ را نمی‌بیند؛ حالت/اکسنت جدید را صریحاً می‌فرستیم
+                // تا --halo و فونت‌های CSS آن هم‌زمان با اپ عوض شوند.
+                PushHeroTheme();
             }
         }
 
@@ -2875,7 +2227,7 @@ namespace CleanC.UI
                 if (AppTitleText != null) AppTitleText.Foreground = primary;
                 if (RefreshStatsIcon != null) RefreshStatsIcon.Foreground = primary;
 
-                // Hero Card (کارت Aurora در هر دو تم سطح تیره دارد؛ رنگ از ThemeResource می آید و دستکاری نمی شود)
+                // Hero Card (داخل WebView2 است؛ تم/رنگش را خودش از پیام theme می‌گیرد و دستکاری XAML نمی‌شود)
 
                 // Bento RAM Card
                 if (CardRamTitle != null) CardRamTitle.Foreground = primary;
@@ -2928,14 +2280,12 @@ namespace CleanC.UI
 
             if (view == AppView.Dashboard)
             {
-                StartAuroraAnimations();
-                // مقدارها هنگام مخفی بودن به روز نمی شدند؛ بلافاصله تازه سازی کن
+               // مقدارها هنگام مخفی بودن به روز نمی شدند؛ بلافاصله تازه سازی کن
                 RefreshSystemStats();
             }
             else
             {
-                StopAuroraAnimations();
-            }
+           }
 
             ElementTheme currentTheme;
             if (overrideTheme.HasValue)
@@ -3084,6 +2434,10 @@ namespace CleanC.UI
                 // F1 — وضعیت شروع خودکار از رجیستری خوانده می شود، نه از فایل تنظیمات
                 AutoStartToggle.IsOn = StartupOptimizerService.IsCleanCRegisteredAtStartup();
 
+                // 1.5 — کارت کاراکتر: آیتم های ComboBox را می سازیم و اندیس فعلی را از VM می خوانیم
+                PopulateCharacterSettingsUi();
+                _characterUiReady = true;
+
                 SettingsPathText.Text = Path.GetDirectoryName(SettingsService.FilePath) ?? string.Empty;
                 LogPathText.Text = CcLog.LogDirectory;
 
@@ -3100,6 +2454,115 @@ namespace CleanC.UI
             {
                 _isLoadingSettings = false;
             }
+        }
+
+        // ====================================================================
+        // 1.5 — کارت «کاراکتر هیرو» در صفحه تنظیمات
+        // ====================================================================
+
+        /// <summary>
+        /// آیتم های کمبوباکس های کاراکتر را می سازد و اندیس فعلی را از ViewModel می خواند.
+        /// خودِ نوشتن در VM اینجا انجام نمی شود تا hydration پاک بماند؛ handler ها هم
+        /// تا قبل از <c>_characterUiReady</c> هیچ ورودی نمی پذیرند.
+        /// </summary>
+        private void PopulateCharacterSettingsUi()
+        {
+            try
+            {
+                if (CharLookCombo != null && CharLookCombo.Items.Count == 0)
+                {
+                    foreach (var (_, name) in HeroLooks.All) CharLookCombo.Items.Add(name);
+                }
+
+                if (CharOccLookCombo != null && CharOccLookCombo.Items.Count == 0)
+                {
+                    foreach (var (_, name) in HeroLooks.Occasion()) CharOccLookCombo.Items.Add(name);
+                }
+
+                SelectComboByTag(CharToneCombo, SettingsVm.CharacterTone);
+                SelectComboByTag(CharIntensityCombo, SettingsVm.CharacterIntensity);
+
+                if (CharLookCombo != null)
+                    CharLookCombo.SelectedIndex = HeroLooks.IndexOf(HeroLooks.All, SettingsVm.CharacterLook);
+
+                if (CharOccLookCombo != null)
+                    CharOccLookCombo.SelectedIndex = HeroLooks.IndexOfOccasion(SettingsVm.CharacterOccLook);
+
+                // اسلایدرها → رویداد ValueChanged متن نمایشی را هم تازه می کند
+                if (CharSizeSlider != null) CharSizeSlider.Value = SettingsVm.CharacterSize;
+                if (CharLunSlider != null) CharLunSlider.Value = SettingsVm.CharacterLun;
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "PopulateCharacterSettingsUi");
+            }
+        }
+
+        private static void SelectComboByTag(ComboBox? combo, string? tag)
+        {
+            if (combo == null) return;
+            for (int i = 0; i < combo.Items.Count; i++)
+            {
+                if (combo.Items[i] is ComboBoxItem item &&
+                    string.Equals(item.Tag as string, tag, StringComparison.OrdinalIgnoreCase))
+                {
+                    combo.SelectedIndex = i;
+                    return;
+                }
+            }
+            if (combo.Items.Count > 0) combo.SelectedIndex = 0;
+        }
+
+        private void CharToneCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_characterUiReady || SettingsVm == null) return;
+            if (CharToneCombo?.SelectedItem is ComboBoxItem item)
+                SettingsVm.CharacterTone = (item.Tag as string) ?? "joke";
+        }
+
+        private void CharIntensityCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_characterUiReady || SettingsVm == null) return;
+            if (CharIntensityCombo?.SelectedItem is ComboBoxItem item)
+                SettingsVm.CharacterIntensity = (item.Tag as string) ?? "mid";
+        }
+
+        private void CharLookCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_characterUiReady || SettingsVm == null) return;
+            int i = CharLookCombo?.SelectedIndex ?? -1;
+            SettingsVm.CharacterLook = (i >= 0 && i < HeroLooks.All.Length) ? HeroLooks.All[i].Id : "none";
+        }
+
+        private void CharOccLookCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (!_characterUiReady || SettingsVm == null) return;
+            var items = HeroLooks.Occasion();
+            int i = CharOccLookCombo?.SelectedIndex ?? -1;
+            SettingsVm.CharacterOccLook = (i >= 0 && i < items.Length) ? items[i].Id : "";
+        }
+
+        private void CharSizeSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            if (CharSizeValueText != null)
+                CharSizeValueText.Text = "×" + e.NewValue.ToString("0.00", CultureInfo.InvariantCulture);
+
+            if (!_characterUiReady || SettingsVm == null) return;
+            SettingsVm.CharacterSize = e.NewValue;
+        }
+
+        private void CharLunSlider_ValueChanged(object sender, Microsoft.UI.Xaml.Controls.Primitives.RangeBaseValueChangedEventArgs e)
+        {
+            int v = (int)Math.Round(e.NewValue);
+            if (CharLunValueText != null)
+            {
+                CharLunValueText.Text = v > 0
+                    ? "+" + v.ToString(CultureInfo.InvariantCulture)
+                    : v.ToString(CultureInfo.InvariantCulture);
+            }
+
+            if (!_characterUiReady || SettingsVm == null) return;
+            SettingsVm.CharacterLun = v;
         }
 
         /// <summary>شروع debounce ذخیره؛ تایمرِ نوشتن در خود SettingsStore است (C6).</summary>
@@ -3408,26 +2871,13 @@ namespace CleanC.UI
                 Application.Current.Resources["ContentControlThemeFontFamily"] = ff;
 
                 // Update UI text strings
+                // ناوبری به شکل pill وسط‌چین بالای محتوا برگشته؛ برچسب کامل می‌خواهد نه مخفف.
                 if (NavDashboardText != null) NavDashboardText.Text = LocalizationService.Get("NavDashboard", "داشبورد بهینه سازی");
                 if (NavToolsText != null) NavToolsText.Text = LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز");
 
-                if (HeroHealthCategoryText != null) HeroHealthCategoryText.Text = LocalizationService.Get("HeroCategory", "وضعیت سلامت و کارایی سیستم");
-                if (HeroHealthTitle != null)
-                {
-                    HeroHealthTitle.Text = _isCleanedRecently
-                        ? LocalizationService.Get("HeroTitleOptimized", "سیستم در وضعیت بهینه و پرسرعت قرار دارد")
-                        : LocalizationService.Get("HeroTitleReady", "سیستم آماده بررسی و ارتقای سرعت است");
-                }
-                if (HeroHealthSubtitle != null)
-                {
-                    HeroHealthSubtitle.Text = _isCleanedRecently
-                        ? LocalizationService.Get("HeroSubtitleOptimized", "تمام فایل های موقت پاکسازی و سرویس ها بهینه سازی شدند.")
-                        : LocalizationService.Get("HeroSubtitleReady", "با یک کلیک حافظه موقت و فایل های زائد را پاکسازی کنید.");
-                }
-                if (QuickBoostBtnText != null && !_isBusy)
-                {
-                    QuickBoostBtnText.Text = LocalizationService.Get("QuickBoost", "بهینه سازی و ارتقای سرعت سیستم");
-                }
+                // متن‌های هیرو (عنوان/زیرعنوان/دسته‌بندی/دکمه) در BuildHeroState از همین
+                // LocalizationService ساخته می‌شوند؛ فقط وضعیت جدید را به JS می‌فرستیم.
+                PushHeroState();
 
                 // Bento Cards
                 if (CardHealthTitle != null) CardHealthTitle.Text = LocalizationService.Get("HealthScoreTitle", "سلامت سیستم");
@@ -3537,6 +2987,31 @@ namespace CleanC.UI
 
                 if (SettingsAboutTitle != null) SettingsAboutTitle.Text = LocalizationService.Get("AboutTitle", "درباره CleanC");
                 if (SettingsAboutDesc != null) SettingsAboutDesc.Text = LocalizationService.Get("AboutSub", "برای گزارش باگ، اطلاعات عیب یابی را کپی و همراه با مشکل ارسال کنید.");
+
+                // 1.5 — کارت «کاراکتر هیرو» (مقادیر خام HTML فارسی اند؛ برای زبان های دیگر انگلیسی برمی گردد)
+                if (SettingsCharTitle != null) SettingsCharTitle.Text = LocalizationService.Get("CharacterTitle", "کاراکتر هیرو");
+                if (SettingsCharDesc != null) SettingsCharDesc.Text = LocalizationService.Get("CharacterSub", "ظاهر، لحن و رفتار کاراکتر داخل کارت داشبورد. تغییرات بلافاصله در کارت اعمال می شود.");
+                if (CharToneText != null) CharToneText.Text = LocalizationService.Get("CharacterTone", "لحن گفتار");
+                if (CharToneJokeItem != null) CharToneJokeItem.Content = LocalizationService.Get("CharacterToneJoke", "شوخ‌طبع");
+                if (CharToneCalmItem != null) CharToneCalmItem.Content = LocalizationService.Get("CharacterToneCalm", "آرام");
+                if (CharToneSeriousItem != null) CharToneSeriousItem.Content = LocalizationService.Get("CharacterToneSerious", "جدی");
+                if (CharNameText != null) CharNameText.Text = LocalizationService.Get("CharacterNameLabel", "اسم کاراکتر");
+                if (CharUserNameText != null) CharUserNameText.Text = LocalizationService.Get("CharacterUserName", "اسم شما (برای سلام کردن)");
+                if (CharCityText != null) CharCityText.Text = LocalizationService.Get("CharacterCity", "شهر (ماژول آب و هوا)");
+                if (CharIntensityText != null) CharIntensityText.Text = LocalizationService.Get("CharacterIntensity", "شدت انیمیشن ها");
+                if (CharIntOffItem != null) CharIntOffItem.Content = LocalizationService.Get("CharacterIntOff", "خاموش");
+                if (CharIntLowItem != null) CharIntLowItem.Content = LocalizationService.Get("CharacterIntLow", "کم");
+                if (CharIntMidItem != null) CharIntMidItem.Content = LocalizationService.Get("CharacterIntMid", "متوسط");
+                if (CharIntHighItem != null) CharIntHighItem.Content = LocalizationService.Get("CharacterIntHigh", "زیاد");
+                if (CharSizeText != null) CharSizeText.Text = LocalizationService.Get("CharacterSize", "اندازه کاراکتر");
+                if (CharLookText != null) CharLookText.Text = LocalizationService.Get("CharacterLook", "اکسسوری");
+                if (CharOccLookText != null) CharOccLookText.Text = LocalizationService.Get("CharacterOccLook", "اکسسوری مناسبتی (رویدادها)");
+                if (CharBubbleText != null) CharBubbleText.Text = LocalizationService.Get("CharacterBubble", "حباب گفتار");
+                if (CharEnvText != null) CharEnvText.Text = LocalizationService.Get("CharacterEnv", "صحنه و جلوه های محیطی پشت کاراکتر");
+                if (CharSoundText != null) CharSoundText.Text = LocalizationService.Get("CharacterSound", "صداها");
+                if (CharFastText != null) CharFastText.Text = LocalizationService.Get("CharacterFast", "عکس العمل سریع (کوتاه کردن انیمیشن ها)");
+                if (CharCalmText != null) CharCalmText.Text = LocalizationService.Get("CharacterCalm", "حالت آرام (کم تحرک، مناسب سیستم های کند)");
+                if (CharLunText != null) CharLunText.Text = LocalizationService.Get("CharacterLun", "تنظیم تقویم قمری برای مناسبت ها (±۱ روز)");
                 if (AboutVersionLabel != null) AboutVersionLabel.Text = LocalizationService.Get("VersionLabel", "نسخه برنامه:");
                 if (AboutOsLabel != null) AboutOsLabel.Text = LocalizationService.Get("OsLabel", "سیستم عامل:");
                 if (CheckAppUpdatesText != null) CheckAppUpdatesText.Text = LocalizationService.Get("CheckUpdates", "بررسی به روزرسانی");
@@ -3544,11 +3019,11 @@ namespace CleanC.UI
                 if (CopyDiagnosticsText != null) CopyDiagnosticsText.Text = LocalizationService.Get("CopyDiagnostics", "کپی اطلاعات عیب یابی");
 
                 if (SettingsHeaderBtn != null) ToolTipService.SetToolTip(SettingsHeaderBtn, LocalizationService.Get("Settings", "تنظیمات برنامه (Settings)"));
+                if (AdminBadgeText != null) AdminBadgeText.Text = LocalizationService.Get("RunningAsAdmin", "Running as administrator");
                 if (UndoCenterBtn != null) ToolTipService.SetToolTip(UndoCenterBtn, LocalizationService.Get("RestoreCenter", "مرکز بازیابی و بازگشت تغییرات"));
                 if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "بروزرسانی وضعیت سیستم"));
                 if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها"));
 
-                if (HeroCleanableLabelText != null) HeroCleanableLabelText.Text = LocalizationService.Get("CleanableSpace", "قابل آزادسازی") + ":";
                 if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? "از 100" : "of 100";
 
                 // Notification Flyout
@@ -4268,37 +3743,14 @@ namespace CleanC.UI
             }
         }
 
+        /// <summary>
+        /// متن‌های تجمیعی (مجموع آزادشده / آخرین پاکسازی) اکنون داخل خودِ HTML رندر می‌شوند؛
+        /// فقط کش وضعیت را باطل می‌کنیم تا PushHeroState مقدارهای جدید را بفرستد.
+        /// </summary>
         private void UpdateCumulativeChipsUI()
         {
-            bool isRtl = LocalizationService.IsRtl;
-            string totalLabel = LocalizationService.Get("TotalFreed", isRtl ? "مجموع آزادشده" : "Total Freed");
-            string lastLabel = LocalizationService.Get("LastCleanup", isRtl ? "آخرین پاکسازی" : "Last Cleanup");
-            string neverCleaned = isRtl ? "هنوز پاکسازی انجام نشده" : "Never cleaned";
-
-            if (HeroTotalCumulativeText != null)
-            {
-                HeroTotalCumulativeText.Text = _cumulativeFreedBytes > 0
-                    ? $"{totalLabel}: {SystemStats.FormatBytes(_cumulativeFreedBytes)}"
-                    : $"{totalLabel}: —";
-            }
-            if (HeroLastCleanText != null)
-            {
-                if (_lastCleanDateTime == DateTime.MinValue || _lastCleanFreedBytes <= 0)
-                {
-                    HeroLastCleanText.Text = $"{lastLabel}: {neverCleaned}";
-                }
-                else
-                {
-                    string timeStr;
-                    var diff = DateTime.Now - _lastCleanDateTime;
-                    if (diff.TotalHours < 1) timeStr = isRtl ? "لحظاتی پیش" : "Just now";
-                    else if (diff.TotalDays < 1) timeStr = isRtl ? $"امروز ({_lastCleanDateTime:HH:mm})" : $"Today ({_lastCleanDateTime:HH:mm})";
-                    else if (diff.TotalDays < 2) timeStr = isRtl ? "دیروز" : "Yesterday";
-                    else timeStr = isRtl ? $"{(int)diff.TotalDays} روز پیش" : $"{(int)diff.TotalDays} days ago";
-
-                    HeroLastCleanText.Text = $"{lastLabel}: {SystemStats.FormatBytes(_lastCleanFreedBytes)} ({timeStr})";
-                }
-            }
+            _heroLastStateJson = null;
+            PushHeroState();
         }
 
         // ====================================================================
@@ -4427,28 +3879,32 @@ namespace CleanC.UI
         private void UpdateHeroCleanable(long cleanableBytes)
         {
             _lastScanCleanableBytes = Math.Max(0, cleanableBytes);
-            if (HeroCleanableText != null)
-            {
-                HeroCleanableText.Text = _lastScanCleanableBytes > 0
-                    ? SystemStats.FormatBytes(_lastScanCleanableBytes)
-                    : "—";
-            }
             RenderDiskBreakdown(_diskTotalGb, _diskFreeGb, _lastScanCleanableBytes);
+            PushHeroState();
         }
 
         /// <summary>
-        /// بعد از پاکسازی، اسکن مجدد را در پس زمینه انجام می دهد تا عدد
-        /// «قابل پاکسازی» قهرمان به روز بماند (بدون بلاک کردن UI).
+        /// اسکن در پس زمینه (بدون بلاک کردن UI) تا عدد «قابل پاکسازی» قهرمان به روز بماند.
+        ///
+        /// keepResult=true (استارت‌آپ): نتیجه به‌عنوان اسکنِ فعلی نگه داشته می شود تا
+        ///   فهرست آیتم‌های هیرو پر شود و دکمهٔ اصلی «بهینه‌سازی سیستم» باشد و مرحلهٔ ۱
+        ///   پروسه از همان اول آماده باشد.
+        /// keepResult=false (بعد از پاکسازی): فقط چیپ شمارش تازه می شود و اسکن عمداً
+        ///   نگه داشته نمی شود تا بعد از تمیز کردن، دکمه «بررسی مجدد» بماند.
         /// </summary>
-        private void ScheduleHeroCleanableRefresh()
+        private void ScheduleHeroCleanableRefresh(bool keepResult = true)
         {
             _ = Task.Run(async () =>
             {
                 try
                 {
-                    var scan = await SystemScanService.ScanAsync();
+                    var scan = await GetHeroScanAsync();
                     long cleanable = scan.TotalBytes;
-                    DispatcherQueue.TryEnqueue(() => UpdateHeroCleanable(cleanable));
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        if (keepResult) ApplyHeroScanResult(scan);
+                        else UpdateHeroCleanable(cleanable);
+                    });
                 }
                 catch
                 {
@@ -4762,23 +4218,12 @@ namespace CleanC.UI
 
         private void ApplyResponsiveMode(bool compact)
         {
-            if (HeroContentGrid == null || BentoGrid == null) return;
+            // کارت هیرو اکنون یک WebView2 مستقل است و خودش responsive می‌شود؛
+            // این متد فقط شبکهٔ Bento را جمع‌وجور/کشیده می‌کند.
+            if (BentoGrid == null) return;
 
             if (compact)
             {
-                // Stack Hero card vertically
-                HeroContentGrid.ColumnDefinitions.Clear();
-                HeroContentGrid.RowDefinitions.Clear();
-                HeroContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-                HeroContentGrid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-                Grid.SetColumn(HeroTextStack, 0);
-                Grid.SetRow(HeroTextStack, 0);
-
-                Grid.SetColumn(HeroActionStack, 0);
-                Grid.SetRow(HeroActionStack, 1);
-                HeroActionStack.Margin = new Thickness(0, 14, 0, 0);
-
                 // Stack Row 1 into 2 columns x 2 rows
                 BentoGrid.ColumnDefinitions.Clear();
                 BentoGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -4825,19 +4270,6 @@ namespace CleanC.UI
             }
             else
             {
-                // Side-by-side Hero card
-                HeroContentGrid.RowDefinitions.Clear();
-                HeroContentGrid.ColumnDefinitions.Clear();
-                HeroContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                HeroContentGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                Grid.SetRow(HeroTextStack, 0);
-                Grid.SetColumn(HeroTextStack, 0);
-
-                Grid.SetRow(HeroActionStack, 0);
-                Grid.SetColumn(HeroActionStack, 1);
-                HeroActionStack.Margin = new Thickness(16, 0, 0, 0);
-
                 // Side-by-side 4 columns Row 1 (1.15*, 1*, 1*, 1*)
                 BentoGrid.RowDefinitions.Clear();
                 BentoGrid.ColumnDefinitions.Clear();
@@ -4884,180 +4316,35 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // Dashboard V2: Aurora Composition, Shine, Sparklines & Health Gauge
+        // Dashboard V2: Accent Sync, Sparklines & Health Gauge
         // ====================================================================
 
-        private void InitHeroAurora()
+        /// <summary>
+        /// رنگ Accent سیستم را به براش‌های برنامه و هالهٔ هیروکارت می‌برد.
+        /// اورورای قدیمی حذف شد چون هیرو حالا داخل WebView2 است و خودش هاله را می‌کشد؛
+        /// فقط کافی است هر بار Accent عوض شد پیام theme را برایش بفرستیم.
+        /// </summary>
+        private void InitHeroAccentSync()
         {
             try
             {
-                if (HeroAuroraHost != null)
-                {
-                    HeroAuroraHost.Loaded += (s, e) =>
-                    {
-                        SetupHeroAurora();
-                        StartAuroraAnimations();
-                    };
-
-                    HeroAuroraHost.SizeChanged += (s, e) =>
-                    {
-                        UpdateHeroAuroraSize(e.NewSize);
-                    };
-
-                    if (HeroAuroraHost.ActualWidth > 0 && HeroAuroraHost.ActualHeight > 0)
-                    {
-                        SetupHeroAurora();
-                        UpdateHeroAuroraSize(new Windows.Foundation.Size(HeroAuroraHost.ActualWidth, HeroAuroraHost.ActualHeight));
-                        StartAuroraAnimations();
-                    }
-                }
-
                 UpdateAccentBrushes();
 
-                    _uiSettings.ColorValuesChanged += (s, e) =>
+                _uiSettings.ColorValuesChanged += (s, e) =>
+                {
+                    DispatcherQueue.TryEnqueue(() =>
                     {
-                        DispatcherQueue.TryEnqueue(() =>
-                        {
-                            UpdateAccentBrushes();
-                            UpdateAuroraColors();
-                            // D6: تغییر رنگ سیستم می تواند روشن/خاموش شدن High Contrast باشد
-                            ConfigureSystemBackdrop();
-                        });
-                    };
-
-                SetupButtonShine();
-                SetupStatusPulse();
+                        UpdateAccentBrushes();
+                        // D6: تغییر رنگ سیستم می تواند روشن/خاموش شدن High Contrast باشد
+                        ConfigureSystemBackdrop();
+                        // هالهٔ دور کاراکتر داخل هیرو از همین Accent پیروی می کند
+                        PushHeroTheme();
+                    });
+                };
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
-            }
-        }
-
-        private void SetupHeroAurora()
-        {
-            if (_auroraRootVisual != null || HeroAuroraHost == null) return;
-            try
-            {
-                var hostVisual = ElementCompositionPreview.GetElementVisual(HeroAuroraHost);
-                var compositor = hostVisual.Compositor;
-
-                _auroraRootVisual = compositor.CreateContainerVisual();
-                _auroraBlobVisuals.Clear();
-                _auroraBrushes.Clear();
-
-                for (int i = 0; i < 4; i++)
-                {
-                    var blob = compositor.CreateSpriteVisual();
-                    var brush = compositor.CreateRadialGradientBrush();
-                    brush.EllipseCenter = new Vector2(0.5f, 0.5f);
-                    brush.EllipseRadius = new Vector2(0.5f, 0.5f);
-
-                    // 4 color stops for ultra-soft, feathered/blurred ethereal glow ("محو تر")
-                    var stop0 = compositor.CreateColorGradientStop(0.0f, Windows.UI.Color.FromArgb(90, 0, 120, 212));
-                    var stop1 = compositor.CreateColorGradientStop(0.35f, Windows.UI.Color.FromArgb(42, 0, 120, 212));
-                    var stop2 = compositor.CreateColorGradientStop(0.70f, Windows.UI.Color.FromArgb(14, 0, 120, 212));
-                    var stop3 = compositor.CreateColorGradientStop(1.0f, Windows.UI.Color.FromArgb(0, 0, 120, 212));
-                    brush.ColorStops.Add(stop0);
-                    brush.ColorStops.Add(stop1);
-                    brush.ColorStops.Add(stop2);
-                    brush.ColorStops.Add(stop3);
-
-                    blob.Brush = brush;
-                    _auroraBlobVisuals.Add(blob);
-                    _auroraBrushes.Add(brush);
-                    _auroraRootVisual.Children.InsertAtBottom(blob);
-                }
-
-                ElementCompositionPreview.SetElementChildVisual(HeroAuroraHost, _auroraRootVisual);
-                UpdateAuroraColors();
-
-                if (HeroAuroraHost.ActualWidth > 0 && HeroAuroraHost.ActualHeight > 0)
-                {
-                    UpdateHeroAuroraSize(new Windows.Foundation.Size(HeroAuroraHost.ActualWidth, HeroAuroraHost.ActualHeight));
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private void UpdateHeroAuroraSize(Windows.Foundation.Size newSize)
-        {
-            if (_auroraRootVisual == null) return;
-            float w = (float)newSize.Width;
-            float h = (float)newSize.Height;
-            if (w <= 1f || h <= 1f) return;
-
-            try
-            {
-                var compositor = _auroraRootVisual.Compositor;
-                _auroraRootVisual.Size = new Vector2(w, h);
-
-                // Clip visual with CompositionGeometricClip and RoundedRectangleGeometry matching header's CornerRadius 14
-                var geom = compositor.CreateRoundedRectangleGeometry();
-                geom.Size = new Vector2(w, h);
-                geom.CornerRadius = new Vector2(14f, 14f);
-                _auroraRootVisual.Clip = compositor.CreateGeometricClip(geom);
-
-                if (_auroraBlobVisuals.Count >= 4)
-                {
-                    // Blobs with larger scale & overlapping spread for smooth atmospheric fog
-                    _auroraBlobVisuals[0].Size = new Vector2(w * 0.70f, h * 1.55f);
-                    _auroraBlobVisuals[0].Offset = new Vector3(-w * 0.10f, -h * 0.35f, 0);
-
-                    _auroraBlobVisuals[1].Size = new Vector2(w * 0.75f, h * 1.65f);
-                    _auroraBlobVisuals[1].Offset = new Vector3(w * 0.20f, -h * 0.40f, 0);
-
-                    _auroraBlobVisuals[2].Size = new Vector2(w * 0.65f, h * 1.45f);
-                    _auroraBlobVisuals[2].Offset = new Vector3(w * 0.50f, -h * 0.20f, 0);
-
-                    _auroraBlobVisuals[3].Size = new Vector2(w * 0.58f, h * 1.35f);
-                    _auroraBlobVisuals[3].Offset = new Vector3(w * 0.15f, h * 0.25f, 0);
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private void UpdateAuroraColors()
-        {
-            if (_auroraBrushes.Count < 4) return;
-            try
-            {
-                var accent = _uiSettings.GetColorValue(UIColorType.Accent);
-                var accentLight = _uiSettings.GetColorValue(UIColorType.AccentLight2);
-                var accentDark = _uiSettings.GetColorValue(UIColorType.AccentDark1);
-
-                // Multi-stop soft gradient colors
-                SetBrushColors(_auroraBrushes[0], accent, 110, 42);
-                SetBrushColors(_auroraBrushes[1], accentLight, 125, 48);
-                SetBrushColors(_auroraBrushes[2], accent, 100, 38);
-                SetBrushColors(_auroraBrushes[3], accentDark, 95, 34);
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private static void SetBrushColors(CompositionRadialGradientBrush brush, Windows.UI.Color c, byte coreAlpha, byte midAlpha)
-        {
-            if (brush.ColorStops.Count >= 4)
-            {
-                brush.ColorStops[0].Color = Windows.UI.Color.FromArgb(coreAlpha, c.R, c.G, c.B);
-                brush.ColorStops[1].Color = Windows.UI.Color.FromArgb(midAlpha, c.R, c.G, c.B);
-                brush.ColorStops[2].Color = Windows.UI.Color.FromArgb((byte)(midAlpha / 3), c.R, c.G, c.B);
-                brush.ColorStops[3].Color = Windows.UI.Color.FromArgb(0, c.R, c.G, c.B);
-            }
-            else if (brush.ColorStops.Count >= 3)
-            {
-                brush.ColorStops[0].Color = Windows.UI.Color.FromArgb(coreAlpha, c.R, c.G, c.B);
-                brush.ColorStops[1].Color = Windows.UI.Color.FromArgb(midAlpha, c.R, c.G, c.B);
-                brush.ColorStops[2].Color = Windows.UI.Color.FromArgb(0, c.R, c.G, c.B);
             }
         }
 
@@ -5095,178 +4382,6 @@ namespace CleanC.UI
                     rbb.Color = borderColor;
                 else
                     Application.Current.Resources["AppAccentBorderBrush"] = new SolidColorBrush(borderColor);
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private void StartAuroraAnimations()
-        {
-            try
-            {
-                if (!_uiSettings.AnimationsEnabled || _isAuroraAnimating || _auroraBlobVisuals.Count < 4) return;
-                _isAuroraAnimating = true;
-
-                var compositor = _auroraBlobVisuals[0].Compositor;
-
-                var durations = new[] { 18.0, 23.0, 17.0, 24.0 };
-                // Increased motion range ("حرکت بیشتر")
-                var offsetDeltas = new[]
-                {
-                    new Vector3(95, 38, 0),
-                    new Vector3(-85, -42, 0),
-                    new Vector3(-95, 45, 0),
-                    new Vector3(80, -35, 0)
-                };
-                var scales = new[]
-                {
-                    new Vector3(1.45f, 1.40f, 1f),
-                    new Vector3(1.35f, 1.50f, 1f),
-                    new Vector3(1.50f, 1.35f, 1f),
-                    new Vector3(1.40f, 1.45f, 1f)
-                };
-
-                for (int i = 0; i < 4; i++)
-                {
-                    var visual = _auroraBlobVisuals[i];
-                    var baseOffset = visual.Offset;
-
-                    var offsetAnim = compositor.CreateVector3KeyFrameAnimation();
-                    offsetAnim.InsertKeyFrame(0.0f, baseOffset);
-                    offsetAnim.InsertKeyFrame(0.5f, baseOffset + offsetDeltas[i]);
-                    offsetAnim.InsertKeyFrame(1.0f, baseOffset);
-                    offsetAnim.Duration = TimeSpan.FromSeconds(durations[i]);
-                    offsetAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-
-                    var scaleAnim = compositor.CreateVector3KeyFrameAnimation();
-                    scaleAnim.InsertKeyFrame(0.0f, Vector3.One);
-                    scaleAnim.InsertKeyFrame(0.5f, scales[i]);
-                    scaleAnim.InsertKeyFrame(1.0f, Vector3.One);
-                    scaleAnim.Duration = TimeSpan.FromSeconds(durations[i]);
-                    scaleAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-
-                    visual.StartAnimation("Offset", offsetAnim);
-                    visual.StartAnimation("Scale", scaleAnim);
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private void StopAuroraAnimations()
-        {
-            try
-            {
-                if (!_isAuroraAnimating) return;
-                _isAuroraAnimating = false;
-                foreach (var visual in _auroraBlobVisuals)
-                {
-                    visual.StopAnimation("Offset");
-                    visual.StopAnimation("Scale");
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private void SetupButtonShine()
-        {
-            try
-            {
-                if (!_uiSettings.AnimationsEnabled || BoostBtnShineHost == null) return;
-                var hostVisual = ElementCompositionPreview.GetElementVisual(BoostBtnShineHost);
-                var compositor = hostVisual.Compositor;
-
-                float hostW = BoostBtnShineHost.ActualWidth > 0 ? (float)BoostBtnShineHost.ActualWidth : 230f;
-                float hostH = BoostBtnShineHost.ActualHeight > 0 ? (float)BoostBtnShineHost.ActualHeight : 36f;
-
-                // Strict clipping to the button bounds so shine NEVER sweeps outside the button
-                var roundGeometry = compositor.CreateRoundedRectangleGeometry();
-                roundGeometry.CornerRadius = new Vector2(8, 8);
-                roundGeometry.Size = new Vector2(hostW, hostH);
-                hostVisual.Clip = compositor.CreateGeometricClip(roundGeometry);
-
-                BoostBtnShineHost.SizeChanged += (s, e) =>
-                {
-                    if (e.NewSize.Width > 0 && e.NewSize.Height > 0)
-                    {
-                        roundGeometry.Size = new Vector2((float)e.NewSize.Width, (float)e.NewSize.Height);
-                    }
-                };
-
-                var shine = compositor.CreateSpriteVisual();
-                shine.Size = new Vector2(60, hostH);
-
-                var gradientBrush = compositor.CreateLinearGradientBrush();
-                gradientBrush.StartPoint = new Vector2(0, 0);
-                gradientBrush.EndPoint = new Vector2(1, 0.5f);
-                var s1 = compositor.CreateColorGradientStop(0.0f, Windows.UI.Color.FromArgb(0, 255, 255, 255));
-                var s2 = compositor.CreateColorGradientStop(0.5f, Windows.UI.Color.FromArgb(70, 255, 255, 255));
-                var s3 = compositor.CreateColorGradientStop(1.0f, Windows.UI.Color.FromArgb(0, 255, 255, 255));
-                gradientBrush.ColorStops.Add(s1);
-                gradientBrush.ColorStops.Add(s2);
-                gradientBrush.ColorStops.Add(s3);
-                shine.Brush = gradientBrush;
-
-                // Opacity animation: completely invisible outside the button, fades in upon entering, fades out before leaving
-                var opacityAnim = compositor.CreateScalarKeyFrameAnimation();
-                opacityAnim.InsertKeyFrame(0.0f, 0.0f);
-                opacityAnim.InsertKeyFrame(0.04f, 1.0f);
-                opacityAnim.InsertKeyFrame(0.28f, 1.0f);
-                opacityAnim.InsertKeyFrame(0.33f, 0.0f);
-                opacityAnim.InsertKeyFrame(1.0f, 0.0f);
-                opacityAnim.Duration = TimeSpan.FromSeconds(3.6);
-                opacityAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-                shine.StartAnimation("Opacity", opacityAnim);
-
-                var sweepAnim = compositor.CreateVector3KeyFrameAnimation();
-                sweepAnim.InsertKeyFrame(0.0f, new Vector3(-60, 0, 0));
-                sweepAnim.InsertKeyFrame(0.33f, new Vector3(hostW, 0, 0));
-                sweepAnim.InsertKeyFrame(1.0f, new Vector3(hostW, 0, 0));
-                sweepAnim.Duration = TimeSpan.FromSeconds(3.6);
-                sweepAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-
-                shine.StartAnimation("Offset", sweepAnim);
-                _shineVisual = shine;
-                ElementCompositionPreview.SetElementChildVisual(BoostBtnShineHost, shine);
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-        }
-
-        private void SetupStatusPulse()
-        {
-            try
-            {
-                if (!_uiSettings.AnimationsEnabled || HeroStatusDot == null) return;
-                var visual = ElementCompositionPreview.GetElementVisual(HeroStatusDot);
-                var compositor = visual.Compositor;
-                visual.CenterPoint = new Vector3(3.5f, 3.5f, 0);
-
-                var scaleAnim = compositor.CreateVector3KeyFrameAnimation();
-                scaleAnim.InsertKeyFrame(0.0f, new Vector3(1f, 1f, 1f));
-                scaleAnim.InsertKeyFrame(0.5f, new Vector3(1.4f, 1.4f, 1f));
-                scaleAnim.InsertKeyFrame(1.0f, new Vector3(1f, 1f, 1f));
-                scaleAnim.Duration = TimeSpan.FromSeconds(2.2);
-                scaleAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-
-                var opacityAnim = compositor.CreateScalarKeyFrameAnimation();
-                opacityAnim.InsertKeyFrame(0.0f, 1.0f);
-                opacityAnim.InsertKeyFrame(0.5f, 0.45f);
-                opacityAnim.InsertKeyFrame(1.0f, 1.0f);
-                opacityAnim.Duration = TimeSpan.FromSeconds(2.2);
-                opacityAnim.IterationBehavior = AnimationIterationBehavior.Forever;
-
-                visual.StartAnimation("Scale", scaleAnim);
-                visual.StartAnimation("Opacity", opacityAnim);
             }
             catch (Exception __ex)
             {
