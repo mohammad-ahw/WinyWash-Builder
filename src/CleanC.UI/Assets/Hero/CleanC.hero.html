@@ -205,7 +205,7 @@ requestAnimationFrame(frame);
 
 /* ===== Card logic: state -> text + mood + scene ===== */
 const $$=s=>document.querySelectorAll(s),sleep=ms=>new Promise(r=>setTimeout(r,ms)),T=()=>performance.now()/1e3;
-let yw=0,stch=0,wk0=0,waitStart=0,tapN=0,idleS=0,oprog=0,fired={},lastCi=-1,active=[],run=null,thinkUntil=0,alreadyUntil=0,curiousUntil=0,turboUntil=0,lastMove=T(),total=11.72,lastTxt='5.22 گیگابایت، امروز 18:04',tickI=0,sig='',lastSub='',afterMsg='',cur=null,curSince=0,ramHigh=false,hotSince=0,cfm=null;
+let yw=0,stch=0,wk0=0,waitStart=0,tapN=0,idleS=0,oprog=0,fired={},lastCi=-1,active=[],run=null,thinkUntil=0,alreadyUntil=0,curiousUntil=0,turboUntil=0,lastMove=T(),total=0,lastTxt='',tickI=0,sig='',lastSub='',afterMsg='',cur=null,curSince=0,ramHigh=false,hotSince=0,cfm=null;
 
 /* 14 real steps: [short name, headline while running, "why?" subtitle] — scene index = step index */
 const STEPS=[
@@ -233,16 +233,16 @@ const CATS=[['فایل‌های سیستمی','لاگ‌ها و فایل‌ها�
 ['کش گرافیک و درایور','کش شیدر و درایور گرافیک با آپدیت‌ها بی‌استفاده می‌شه'],
 ['کش ابزارهای توسعه','پکیج‌ها و بیلدهای قدیمی فضای زیادی بی‌دلیل می‌گیرن']];
 /* the 9 items that can need attention: [label, detail, severity, mood, headline, sizeMB] */
-const IT={junk:['فایل‌های زائد','796 مگابایت فایل زائد و کش آماده‌ی پاکسازی است',1,'good','فایل‌های زائد آماده‌ی پاکسازی است',796],
-ram:['حافظه رم','رم 87% پر است؛ پردازش‌های پس‌زمینه را می‌شود آزاد کرد',2,'ram','حافظه رم نیاز به آزادسازی دارد',1800],
+const IT={junk:['فایل‌های زائد','فایل‌های موقت و کش آماده‌ی پاکسازی است',1,'good','فایل‌های زائد آماده‌ی پاکسازی است',0],
+ram:['حافظه رم','پردازش‌های پس‌زمینه را می‌شود آزاد کرد',2,'ram','حافظه رم نیاز به آزادسازی دارد',0],
 dns:['DNS و شبکه','کش DNS قدیمی باعث کندی باز شدن سایت‌ها می‌شود',1,'focus','شبکه نیاز به بهینه‌سازی دارد',0],
-browser:['مرورگر','کش و افزونه‌های اضافهٔ مرورگر پیدا شد',1,'good','مرورگر نیاز به سبک‌سازی دارد',340],
-reg:['رجیستری','312 ورودی خراب در رجیستری پیدا شد',1,'good','رجیستری نیاز به پاک‌سازی دارد',12],
-startup:['استارتاپ','9 برنامه سرعت روشن شدن ویندوز را کم می‌کنند',1,'focus','برنامه‌های استارتاپ سیستم را کند کرده‌اند',0],
-tweak:['توئیک‌ها','چند تنظیم پیشنهادی و تله‌متری هنوز اعمال نشده است',1,'focus','تنظیمات پیشنهادی هنوز اعمال نشده است',0],
-fast:['Fast Startup','Fast Startup فعال است و می‌تواند جلوی خاموشی کامل را بگیرد',1,'focus','Fast Startup نیاز به بررسی دارد',0],
-gpu:['GPU','زمان‌بندی سخت‌افزاری GPU هنوز بهینه نشده است',1,'focus','GPU نیاز به تنظیم دارد',0],
-debloat:['برنامه‌های اضافی','5 برنامهٔ پیش‌نصب‌شدهٔ بی‌استفاده پیدا شد',1,'good','برنامه‌های اضافی پیدا شد',0]};
+browser:['مرورگر','کش و افزونه‌های اضافهٔ مرورگر قابل سبک‌سازی است',1,'good','مرورگر نیاز به سبک‌سازی دارد',0],
+reg:['رجیستری','ورودی‌های نامعتبر رجیستری نیاز به پاک‌سازی دارند',1,'good','رجیستری نیاز به پاک‌سازی دارد',0],
+startup:['استارتاپ','برنامه‌های سنگین شروع خودکار سیستم را کند می‌کنند',1,'focus','برنامه‌های استارتاپ نیاز به بهینه‌سازی دارند',0],
+tweak:['توئیک‌ها','چند تنظیم پیشنهادی و تله‌متری برای بهبود کارایی',1,'focus','تنظیمات پیشنهادی آماده اعمال است',0],
+fast:['Fast Startup','بررسی و هماهنگ‌سازی قابلیت راه‌اندازی سریع',1,'focus','Fast Startup نیاز به بررسی دارد',0],
+gpu:['GPU','بهینه‌سازی تخصیص کارت گرافیک برای برنامه‌ها',1,'focus','GPU نیاز به تنظیم دارد',0],
+debloat:['برنامه‌های اضافی','برنامه‌های پیش‌نصب‌شدهٔ بی‌استفاده',1,'good','برنامه‌های اضافی آماده بررسی هستند',0]};
 
 /* ===== پل پیام با میزبان (C#) — WebView2 ===== */
 const post=o=>{try{window.chrome&&window.chrome.webview&&window.chrome.webview.postMessage(o)}catch(e){}};
@@ -281,7 +281,7 @@ const HOST=HAS_HOST()?{
  after:async()=>({chips:[['3 فایل حجیم · 4.2 گیگابایت','files'],['2 برنامهٔ سنگین','apps']]}),
  chip:k=>console.log('chip',k),
  action:a=>{if(a=='fixproxy')ST.proxyDead=false;else if(a=='ram'){if(ST.sim)ST.ram=Math.min(ST.ram,52);ST.topRam=''}else if(a=='browser'){ST.browserMB=0;ST.tabs=0}else if(a=='cpu'){if(ST.sim)ST.cpu=17;ST.topCpu=''}else console.log('action',a)}};
-window.CleanC={update(p){Object.assign(ST,p);ST.sim=false;if(p.sizes)syncSizes(p.sizes);if(p.items)active=p.items.slice();live();sense()},host:h=>Object.assign(HOST,h),run:()=>runProcess(),state:()=>cur&&cur.id};
+window.CleanC={update(p){Object.assign(ST,p);ST.sim=false;if(p.totalFreedGb!=null)total=+p.totalFreedGb||0;if(p.lastClean!=null)lastTxt=p.lastClean;if(p.sizes)syncSizes(p.sizes);if(p.items)active=p.items.slice();live();sense();render(true)},host:h=>Object.assign(HOST,h),run:()=>runProcess(),state:()=>cur&&cur.id};
 
 const fmt=mb=>mb>=1024?(mb/1024).toFixed(2)+' گیگابایت':Math.round(mb)+' مگابایت';
 /* سایز واقعی هر آیتم از هسته می‌آید (واحد: بایت). IT[key][5] همان چیزی است که چیپ‌ها،
@@ -293,10 +293,13 @@ function syncSizes(sz){
   const it=IT[k];if(!it)return;
   const b=Math.max(0,Number(sz[k])||0);
   it[5]=Math.round(b/1048576);
-  /* فقط متنی که با «عدد + واحد حجم» شروع می‌شود عوض می‌شود (مثل «796 مگابایت فایل زائد…»)؛
-     متن‌های شمارشی («312 ورودی»، «9 برنامه») دست نمی‌خورند. */
-  if(b>0&&/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت)/.test(it[1]))
-   it[1]=fmt(b/1048576)+it[1].replace(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایт)\s*/,' ');
+  if(b>0){
+   if(k==='junk')it[1]=fmt(it[5])+' فایل زائد و کش آماده‌ی پاکسازی است';
+   else if(k==='browser')it[1]='حدود '+fmt(it[5])+' کش و حافظه مرورگرها';
+   else if(k==='reg')it[1]=fmt(it[5])+' ورودی نامعتبر در رجیستری';
+   else if(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت)/.test(it[1]))
+    it[1]=fmt(b/1048576)+it[1].replace(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت)\s*/,' ');
+  }
  });
 }
 const by=()=>[...active].sort((a,b)=>IT[b][2]-IT[a][2]);
@@ -317,16 +320,16 @@ function view(){
   btn=p.btn||(p.act=='run'?['بهینه‌سازی سیستم'+(runN>1?' · '+runN+' مورد':''),'','go']:go);
   return V('iss_'+p.id,p.mood,p.title,p.detail,[p.sev>=3?'نیاز به اقدام فوری':p.sev==2?'نیاز به توجه':'پیشنهاد',SEVC[p.sev],L.length>1?L.length+' مورد'+(c3?' · '+c3+' بحرانی':''):''],{warn:1,crit:p.sev>=3,iss:p.scene,list:L,pid:p.id,btn})}
  /* healthy tier */
- if(idleS>=100)return V('sleep','sleep','در حال استراحت','برای بیدار کردنش یه حرکت موس کافیه',['حالت خواب','#8f84d6'],{btn:go});
- if(idleS>=70)return V('drowsy','drowsy','خوابش می‌آد …','چند لحظهٔ دیگه می‌خوابه',['بیکار','#8f9bc4'],{btn:go});
- if(idleS>=40)return V('idle','idle','سیستم آماده‌ست','هر وقت خواستی بهینه‌سازی رو شروع کن · آخرین پاکسازی '+lastTxt,['بیکار','#9db4c4'],{btn:go});
+ if(idleS>=300)return V('sleep','sleep','در حال استراحت','برای بیدار کردنش یه حرکت موس کافیه',['حالت خواب','#8f84d6'],{btn:go});
+ if(idleS>=180)return V('drowsy','drowsy','خوابش می‌آد …','چند لحظهٔ دیگه می‌خوابه',['بیکار','#8f9bc4'],{btn:go});
+ if(idleS>=90)return V('idle','idle','سیستم آماده‌ست','هر وقت خواستی بهینه‌سازی رو شروع کن'+(lastTxt?' · آخرین پاکسازی '+lastTxt:''),['بیکار','#9db4c4'],{btn:go});
  if(curiousUntil>now&&ST.chips.length)return V('curious','curious','یه چیزایی پیدا کردم','بعد از بهینه‌سازی، چند مورد پرحجم هم دیدم',['پیشنهاد','#8fb4ff'],{chips:ST.chips,btn:go});
  if(turboUntil>now)return V('turbo','turbo','سیستم توربوئه','منابع آزاد شدن و همه‌چیز سریع‌تر شده',['عملکرد','#c07bff','توربو'],{btn:go});
  
- return V('ready',hl.mood,hl.head,hl.sub.replace('{last}',lastTxt),['سلامت سیستم','#1fa971','عالی'],{btn:go})}
+ return V('ready',hl.mood,hl.head,hl.sub.replace('{last}',lastTxt||'امروز'),['سلامت سیستم','#1fa971','عالی'],{btn:go})}
 
-/* min 3 s per calm state (anti-flicker); transient / critical states cut in immediately */
-function pick(){const v=view();if(cur&&v.id!==cur.id&&!v.fast&&!cur.fast&&!v.crit&&now-curSince<3)return cur;return v}
+/* min 4 s per calm state (anti-flicker); transient / critical states cut in immediately */
+function pick(){const v=view();if(cur&&v.id!==cur.id&&!v.fast&&!cur.fast&&!v.crit&&now-curSince<4)return cur;return v}
 function onChange(a,b){bt=0;nb=now+2+Math.random()*3;
  if(b.warn&&!(a&&(a.warn||a.fast)))sp.sq.w-=4;                      /* sudden alert: small jump */
  if(a&&a.warn&&!b.warn&&!b.fast){sp.sq.w+=2.5;okUntil=now+1.8} /* fixed: sigh + sparks */
@@ -335,7 +338,7 @@ const GO='<path d="M5 12.5l4.5 4.5L19 7.5"/>',RE='<path d="M20 12a8 8 0 1 1-2.5-
 function render(force){const v=pick();
  if(v!==cur){if(!cur||v.id!==cur.id){onChange(cur,v);curSince=now}cur=v}
  const rec=active.reduce((a,i)=>a+IT[i][5],0);
- const meta=(rec>0?'قابل پاکسازی '+fmt(rec)+' · ':'')+'آخرین پاکسازی '+lastTxt+' · مجموع آزادشده '+total.toFixed(2)+' گیگابایت';
+ const meta=(rec>0?'قابل پاکسازی '+fmt(rec)+' · ':'')+(lastTxt?'آخرین پاکسازی '+lastTxt+' · ':'')+(total>0?'مجموع آزادشده '+total.toFixed(2)+' گیگابایت':'وضعیت سیستم پایدار');
  const s=JSON.stringify(v)+tickI+meta+MR();if(!force&&s===sig)return;sig=s;
  document.documentElement.style.setProperty('--sc',v.st[1]);$('st').innerHTML=v.st[0]+(v.st[2]?' · <b>'+v.st[2]+'</b>':'');
  if($('h').textContent!==v.head){$('h').textContent=v.head;$('h').style.animation='none';$('h').offsetWidth;$('h').style.animation=''}
@@ -378,7 +381,7 @@ $('sn').onclick=()=>{const id=cur&&cur.pid;if(!id)return;SNZ[id]=Date.now()+36e5
 function live(){const nz=()=>Math.random()-.5;
  if(ST.sim){cpu=Math.max(4,Math.min(99,ST.cpu+(run?35:0)+nz()*6));ramv=Math.max(20,Math.min(97,ST.ram+nz()*3))}else{cpu=ST.cpu;ramv=ST.ram}
  ramHist.push(ramv);if(ramHist.length>4)ramHist.shift();dsk=100-ST.cFree;}
-function sense(){ramHigh=ramv>80?true:ramv<75?false:ramHigh;if(cpu>80){if(!hotSince)hotSince=T()}else hotSince=0}   /* RAM: on >80, off <75 · CPU hot: >80 for 5 s */
+function sense(){ramHigh=ramv>=88?true:ramv<=76?false:ramHigh;if(cpu>=85){if(!hotSince)hotSince=T()}else if(cpu<72)hotSince=0}   /* RAM: on >=88, off <=76 · CPU hot: >=85 for 5 s */
 setInterval(live,2500);setInterval(sense,500);
 setInterval(()=>{idleS=now-lastMove;oprog=run?Math.min(1,(run.i+prog)/14):0;
  if(run&&run.i==2&&scn==2){run.ci=Math.min(7,Math.floor(prog*8));if(run.ci!=lastCi){lastCi=run.ci;for(let n=0;n<5;n++){const s=Math.random()<.5?-1:1;add({t:'j',k:run.ci,r:1.15,x:s*(100+Math.random()*30),y:-40+Math.random()*80,vx:-s*40,tx:(Math.random()-.5)*20,ty:34,c:hx(SC[2]),d:.35,vr:(Math.random()-.5)*4})}}}
@@ -1004,7 +1007,7 @@ function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],
  if(hotSince&&T()-hotSince>=5)P({id:'cpu',sev:cpu>=95?3:2,name:'شلوغی سیستم',val:Math.round(cpu)+'%',title:'سیستم شلوغه',detail:ST.topCpu?'بیشترین مصرف: '+ST.topCpu:'پردازنده بیش از ۵ ثانیه روی ۸۰٪ مونده؛ برنامه‌ای سنگین در حال اجراست',mood:'warm',scene:'cpu',act:'cpu',btn:['برنامه‌های سنگین','','cpu']});
  if(bh)P({id:'bheavy',sev:1,name:'مرورگر',val:ST.tabs?ST.tabs+' تب':fmt(ST.browserMB),title:'مرورگر سنگین شده',detail:(ST.tabs?ST.tabs+' تب باز':'تب‌ها و افزونه‌ها')+' حدود '+fmt(ST.browserMB)+' رم می‌گیرن؛ تب‌های بی‌استفاده رو می‌شه سبک کرد',mood:'ram',scene:'browser',act:'browser',btn:['مرورگر را سبک کن','','browser']});
  if(ST.offline)P({id:'offline',sev:1,name:'اینترنت',val:'آفلاین',title:'اینترنت وصل نیست',detail:'کارهای آفلاین کار می‌کنن؛ بررسی‌های آنلاین موقتاً متوقف شدن',mood:'offline',scene:'wifi',act:null});
- if(ST.uptimeDays>=7)P({id:'uptime',sev:1,name:'آپ‌تایم',val:ST.uptimeDays+' روز',title:ST.uptimeDays+' روزه که سیستم روشنه',detail:'یه وقفهٔ کوتاه هم سیستم رو سرحال‌تر می‌کنه؛ ترجیحاً وقتی کاری نداری',mood:'yawn',scene:null,act:null,btn:['بررسی مجدد','ghost','re']});
+ if(ST.uptimeDays>=14&&active.length>0)P({id:'uptime',sev:1,name:'آپ‌تایم',val:ST.uptimeDays+' روز',title:ST.uptimeDays+' روزه که سیستم روشنه',detail:'یه وقفهٔ کوتاه هم سیستم رو سرحال‌تر می‌کنه؛ ترجیحاً وقتی کاری نداری',mood:'yawn',scene:null,act:null,btn:['بررسی مجدد','ghost','re']});
  by().forEach(i=>{if((i=='ram'&&ramHigh)||(i=='browser'&&bh))return;const t=IT[i];P({id:'m_'+i,sev:t[2],name:t[0],val:t[5]?fmt(t[5]):'',title:t[4],detail:t[1],mood:t[3],scene:null,act:'run'})});
  L.sort((a,b)=>(b.sev-a.sev)||((b.act=='run')-(a.act=='run')));return L.filter(i=>!(SNZ[i.id]>Date.now()&&i.sev<3))}
 const issChips=v=>{const L=v.list,sh=L.slice(0,4),more=L.length-sh.length;return sh.map(i=>`<button class="ch iss${i.id==v.pid?' ac':''}" data-iss="${i.id}" title="${i.title}"><i style="background:${SEVC[i.sev]}"></i><bdi>${i.name}</bdi>${i.val&&!i.id.startsWith('m_')?' · <bdi>'+i.val+'</bdi>':''}</button>`).join('')+(more>0?`<span class="more">+${more}</span>`:'')};

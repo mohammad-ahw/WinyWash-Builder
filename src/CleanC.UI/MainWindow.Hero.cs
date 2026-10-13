@@ -388,15 +388,19 @@ namespace CleanC.UI
         {
             var items = new List<string>();
             var scan = _cachedScanResult;
+
+            bool cleanedRecently = _isCleanedRecently ||
+                (_lastCleanDateTime != DateTime.MinValue && (DateTime.Now - _lastCleanDateTime).TotalHours < 24);
+
             if (scan == null)
             {
-                // اسکنی در دست نداریم. دو حالت دارد:
-                //   • تازه استارت شده‌ایم → آیتم‌های پیش‌فرض را می‌فرستیم تا دکمهٔ هیرو
-                //     «بهینه‌سازی سیستم · N مورد» باشد و با کلیک مستقیم وارد ۱۴ مرحله شود.
-                //     (این رفتارِ دکمهٔ قدیمی Quick Boost است؛ حالت «بررسی مجدد» فقط اسکن
-                //     می‌کند و کاربر را چند دقیقه معطل می‌گذارد بدون دیدن نتیجه.)
-                //   • تازه پاک کرده‌ایم → لیست خالی تا اسکنِ تازه، دکمه «بررسی مجدد» بماند.
-                if (!_heroScanSeen) items.AddRange(DefaultHeroBoostItems);
+                // اسکنی در دست نداریم:
+                //   • اگر کاربر اخیراً پاکسازی نکرده و اسکن هم ندیده‌ایم → موارد پیشنهادی را می‌دهیم
+                //   • اگر اخیراً پاکسازی شده → لیست خالی تا هیرو آرام و در حالت سلامت بماند
+                if (!_heroScanSeen && !cleanedRecently)
+                {
+                    items.AddRange(DefaultHeroBoostItems);
+                }
                 return items;
             }
 
@@ -408,22 +412,39 @@ namespace CleanC.UI
 
             if (junkBytes > 0) items.Add("junk");
 
-            bool BoostOn(string id)
+            // رجیستری یتیم فقط در صورتی اضافه می‌شود که واقعاً کلید معلقی در اسکن باشد
+            var regItem = scan.Groups
+                .SelectMany(g => g.Items)
+                .FirstOrDefault(i => i.Id == "orphanedRegistry" && i.IsChecked);
+            if (regItem != null && regItem.Bytes > 0)
             {
-                var group = scan.Groups.FirstOrDefault(g => g.Id == "system_boost");
-                if (group == null) return true;
-                var item = group.Items.FirstOrDefault(i => i.Id == id);
-                return item == null || item.IsChecked;
+                items.Add("reg");
             }
 
-            if (BoostOn("dnsFlush")) items.Add("dns");
-            if (BoostOn("browserBoost")) items.Add("browser");
-            if (BoostOn("orphanedRegistry")) items.Add("reg");
-            if (BoostOn("startupOptimize")) items.Add("startup");
-            if (BoostOn("winTweaks")) items.Add("tweak");
-            if (BoostOn("fastStartup")) items.Add("fast");
-            if (BoostOn("gpuOptimize")) items.Add("gpu");
-            if (BoostOn("bloatwareClean")) items.Add("debloat");
+            // مرورگر اگر رم سنگین گرفته باشد
+            if (_heroBrowserMb >= 1500)
+            {
+                items.Add("browser");
+            }
+
+            // سایر گزینه‌های بهینه‌سازی عمومی: فقط در صورتی که اخیراً پاکسازی نشده باشد
+            if (!cleanedRecently)
+            {
+                bool BoostOn(string id)
+                {
+                    var group = scan.Groups.FirstOrDefault(g => g.Id == "system_boost");
+                    if (group == null) return false;
+                    var item = group.Items.FirstOrDefault(i => i.Id == id);
+                    return item != null && item.IsChecked;
+                }
+
+                if (BoostOn("dnsFlush")) items.Add("dns");
+                if (BoostOn("startupOptimize")) items.Add("startup");
+                if (BoostOn("winTweaks")) items.Add("tweak");
+                if (BoostOn("fastStartup")) items.Add("fast");
+                if (BoostOn("gpuOptimize")) items.Add("gpu");
+                if (BoostOn("bloatwareClean")) items.Add("debloat");
+            }
 
             return items;
         }
@@ -703,7 +724,8 @@ namespace CleanC.UI
                 await Task.Delay(20);
             }
 
-            return new { mb = freed };
+            long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
+            return new { mb = mbFreed };
         }
 
         // ---------------------------------------------------------------- 3
@@ -734,7 +756,8 @@ namespace CleanC.UI
 
             s.TotalFreed += freed;
             if (freed > 0) AnimateCountUp(s.TotalFreed);
-            return new { mb = freed };
+            long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
+            return new { mb = mbFreed };
         }
 
         // ---------------------------------------------------------------- 4
@@ -782,7 +805,8 @@ namespace CleanC.UI
                 s.Fail("browser_opt_fail", "بهینه سازی مرورگر و پاکسازی افزونه ها", "\uE774", ex, ex.Message);
             }
             await Task.Delay(50);
-            return new { mb = freed };
+            long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
+            return new { mb = mbFreed };
         }
 
         // ---------------------------------------------------------------- 6
@@ -814,7 +838,8 @@ namespace CleanC.UI
             {
                 s.Fail("deep_clean_leftovers_fail", "پاکسازی عمیق بقایای نرم افزارها", "\uE74D", ex, ex.Message);
             }
-            return new { mb = freed };
+            long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
+            return new { mb = mbFreed };
         }
 
         // ---------------------------------------------------------------- 7
@@ -967,7 +992,8 @@ namespace CleanC.UI
                 s.Fail("bloatware_clean_fail", "حذف برنامه ها و بازی های تبلیغاتی", "\uE74C", ex, ex.Message);
             }
             await Task.Delay(40);
-            return new { mb = freed };
+            long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
+            return new { mb = mbFreed };
         }
 
         // ---------------------------------------------------------------- 12

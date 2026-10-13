@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -3696,7 +3696,13 @@ namespace CleanC.UI
                     if (doc.RootElement.TryGetProperty("lastCleanBytes", out var lastProp))
                         _lastCleanFreedBytes = lastProp.GetInt64();
                     if (doc.RootElement.TryGetProperty("lastCleanTime", out var timeProp) && DateTime.TryParse(timeProp.GetString(), out var dt))
+                    {
                         _lastCleanDateTime = dt;
+                        if (_lastCleanDateTime != DateTime.MinValue && (DateTime.Now - _lastCleanDateTime).TotalHours < 24)
+                        {
+                            _isCleanedRecently = true;
+                        }
+                    }
 
                     if (doc.RootElement.TryGetProperty("history", out var histProp) && histProp.ValueKind == System.Text.Json.JsonValueKind.Array)
                     {
