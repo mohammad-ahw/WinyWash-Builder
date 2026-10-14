@@ -368,14 +368,14 @@ async function runProcess(start=0){
  scn=null;run=null;celeb=T()+4.6;if(freed>0){total+=freed/1024;lastTxt=fmt(freed)+'، امروز '+new Date().toTimeString().slice(0,5)}
  afterMsg=(n0?n0+' بخش با موفقیت بهینه‌سازی شد':'بررسی کامل سیستم انجام شد')+(freed>0?' · '+fmt(freed)+' فضا و منابع بازیابی گردید':' · همه بخش‌ها مرتب و سریع هستند');active=[];if(ST.sim){ST.cFree=Math.min(48,ST.cFree+Math.max(4,Math.round(freed/350)));ST.ram=Math.min(ST.ram,56);ST.browserMB=0;ST.tabs=0;ST.topRam='';ST.topCpu=''}
  sp.sq.w-=3;add({t:'rg',x:0,y:0,d:.5,c:hx('#7dffbf')});add({t:'rg',x:0,y:0,d:.4,c:hx('#ffffff')});
- afterRun();recheckedCleanUntil=T()+600;SNZ['cpu']=Date.now()+300000;SNZ['ram']=Date.now()+300000;LS.s('cc_snz',SNZ);}
+ afterRun();recheckedCleanUntil=T()+600;SNZ['hero_all']=Date.now()+24*36e5;SNZ['bheavy']=Date.now()+24*36e5;SNZ['cpu']=Date.now()+300000;SNZ['ram']=Date.now()+300000;LS.s('cc_snz',SNZ);}
 function abortRun(){if(run){run.abort=true;run=null}scn=null;closeDlg([],true);post({type:'run.abort'})}
 window.CleanC.abort=abortRun;
-async function recheck(){if(run||thinkUntil>now)return;thinkUntil=T()+99;await HOST.scan();thinkUntil=0;recheckedCleanUntil=T()+600;alreadyUntil=T()+600;render(true);}
+async function recheck(){if(run||thinkUntil>now)return;for(const k in SNZ)delete SNZ[k];LS.s('cc_snz',SNZ);thinkUntil=T()+99;await HOST.scan();thinkUntil=0;recheckedCleanUntil=T()+600;alreadyUntil=T()+600;render(true);}
 $('go').onclick=()=>{const a=cur&&cur.btn?cur.btn[2]:'';if(a=='go')runProcess();else if(a=='re')recheck();else if(QA.includes(a))quick(a)};
 $('it').onclick=e=>{const c=e.target.closest('.ch');if(!c)return;if(c.dataset.iss){pinned=c.dataset.iss;pinUntil=T()+30;curSince=-9;render(true);return}HOST.chip(c.dataset.c);curiousUntil=0;render(true)};
 $('go2').onclick=()=>fixAll();
-$('sn').onclick=()=>{const id=cur&&cur.pid;if(!id)return;SNZ[id]=Date.now()+36e5;LS.s('cc_snz',SNZ);pinned=null;curSince=-9;render(true)};
+$('sn').onclick=()=>{const nowMs=Date.now(),snooze24h=nowMs+24*36e5;SNZ['hero_all']=snooze24h;issues().filter(i=>i.sev<3).forEach(i=>{SNZ[i.id]=snooze24h});SNZ['bheavy']=snooze24h;SNZ['browser']=snooze24h;SNZ['ram']=snooze24h;SNZ['cpu']=snooze24h;SNZ['uptime']=snooze24h;LS.s('cc_snz',SNZ);pinned=null;curSince=-9;alreadyUntil=T()+600;post({type:'hero.snooze'});render(true)};
 
 
 /* ===== Live numbers (2.5 s) + sensors ===== */
@@ -1041,7 +1041,7 @@ window.CleanC.fire=fire;
 /* ===== v10: unified problem list, quick actions, per-problem pictures ===== */
 const SNZ=LS.g('cc_snz',{}),SEVC={3:'#ff4d5e',2:'#ff9f3d',1:'#e6c34a'},QA=['fixproxy','ram','browser','cpu'];
 let pinned=null,pinUntil=0,busyUntil=0,busyMsg='',okUntil=0;
-function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],0),bh=(ST.browserMB||0)>=1500;
+function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],0),bh=((ST.browserMB||0)>=3000)||((ST.browserMB||0)>=1800&&(ramHigh||ramv>=80));
  if(ST.proxyDead)P({id:'proxy',sev:3,name:'اینترنت',val:'قطع',title:'اینترنت به‌خاطر پراکسی قطعه',detail:'پراکسی ویندوز به سروری اشاره می‌کنه که جواب نمی‌ده؛ با یک کلیک خاموشش می‌کنم',mood:'proxy',scene:'proxy',act:'fixproxy',btn:['اتصال را درست کن','','fixproxy']});
  if(ST.cFree<=20){const c=ST.cFree<=10;P({id:'disk',sev:c?3:2,name:'دیسک C',val:(100-ST.cFree)+'% پر',title:c?'فضای دیسک C رو به اتمام است':'فضای دیسک C کم شده',detail:'فقط '+ST.cFree+'٪ آزاد مانده'+(rec>0?'؛ حدود '+fmt(rec)+' قابل آزادسازی است':'؛ ویندوز با کمبود فضا کند و ناپایدار می‌شه'),mood:c?'critical':'disk',scene:'disk',act:'run'})}
  if(!ST.charging&&ST.batt<=20){const c=ST.batt<=10;P({id:'batt',sev:c?3:2,name:'باتری',val:ST.batt+'%',title:c?'باتری تقریباً تموم شده':'باتری کم است',detail:'شارژر وصل نیست؛ بهینه‌سازی سنگین رو بذار برای بعد از شارژ',mood:'battery',scene:'battery',act:null})}
@@ -1050,10 +1050,12 @@ function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],
  if(bh)P({id:'bheavy',sev:1,name:'مرورگر',val:ST.tabs?ST.tabs+' تب':fmt(ST.browserMB),title:'مرورگر سنگین شده',detail:(ST.tabs?ST.tabs+' تب باز':'تب‌ها و افزونه‌ها')+' حدود '+fmt(ST.browserMB)+' رم می‌گیرن؛ تب‌های بی‌استفاده رو می‌شه سبک کرد',mood:'ram',scene:'browser',act:'browser',btn:['مرورگر را سبک کن','','browser']});
  if(ST.offline)P({id:'offline',sev:1,name:'اینترنت',val:'آفلاین',title:'اینترنت وصل نیست',detail:'کارهای آفلاین کار می‌کنن؛ بررسی‌های آنلاین موقتاً متوقف شدن',mood:'offline',scene:'wifi',act:null});
  if(ST.uptimeDays>=14&&active.length>0)P({id:'uptime',sev:1,name:'آپ‌تایم',val:ST.uptimeDays+' روز',title:ST.uptimeDays+' روزه که سیستم روشنه',detail:'یه وقفهٔ کوتاه هم سیستم رو سرحال‌تر می‌کنه؛ ترجیحاً وقتی کاری نداری',mood:'yawn',scene:null,act:null,btn:['بررسی مجدد','ghost','re']});
- by().forEach(i=>{if((i=='ram'&&ramHigh)||(i=='browser'&&bh))return;const t=IT[i];P({id:'m_'+i,sev:t[2],name:t[0],val:t[5]?fmt(t[5]):'',title:t[4],detail:t[1],mood:t[3],scene:null,act:'run'})});
- L.sort((a,b)=>(b.sev-a.sev)||((b.act=='run')-(a.act=='run')));return L.filter(i=>!(SNZ[i.id]>Date.now()&&i.sev<3))}
+ by().forEach(i=>{if(i=='ram'||i=='browser')return;const t=IT[i];P({id:'m_'+i,sev:t[2],name:t[0],val:t[5]?fmt(t[5]):'',title:t[4],detail:t[1],mood:t[3],scene:null,act:'run'})});
+ L.sort((a,b)=>(b.sev-a.sev)||((b.act=='run')-(a.act=='run')));
+ if(SNZ['hero_all']>Date.now())return L.filter(i=>i.sev>=3);
+ return L.filter(i=>!(SNZ[i.id]>Date.now()&&i.sev<3))}
 const issChips=v=>{const L=v.list,sh=L.slice(0,4),more=L.length-sh.length;return sh.map(i=>`<button class="ch iss${i.id==v.pid?' ac':''}" data-iss="${i.id}" title="${i.title}"><i style="background:${SEVC[i.sev]}"></i><bdi>${i.name}</bdi>${i.val&&!i.id.startsWith('m_')?' · <bdi>'+i.val+'</bdi>':''}</button>`).join('')+(more>0?`<span class="more">+${more}</span>`:'')};
-function quick(a){const M2={fixproxy:'در حال تنظیم اتصال و خاموش‌سازی پراکسی …',ram:'در حال آزادسازی و سبک‌سازی رم …',browser:'در حال سبک‌سازی و آزادسازی حافظهٔ مرورگر …',cpu:'در حال بررسی و مدیریت پردازه‌های سنگین …'};const OK2={fixproxy:'اتصال اینترنت با موفقیت اصلاح شد ✓',ram:'حافظه رم با موفقیت آزاد و سبک شد ✓',browser:'پردازه‌ها و تب‌های مرورگر با موفقیت سبک شدند ✓',cpu:'پردازه‌های سنگین سیستم بررسی و تعدیل شدند ✓'};busyMsg=M2[a]||'در حال انجام عملیات …';busyUntil=T()+2.0;if(a==='browser'){ST.browserMB=0;ST.tabs=0;SNZ['bheavy']=Date.now()+600000;LS.s('cc_snz',SNZ)}else if(a==='ram'){ramHigh=false;SNZ['ram']=Date.now()+300000;LS.s('cc_snz',SNZ)}else if(a==='fixproxy'){ST.proxyDead=false;SNZ['proxy']=Date.now()+600000;LS.s('cc_snz',SNZ)}else if(a==='cpu'){hotSince=0;SNZ['cpu']=Date.now()+300000;LS.s('cc_snz',SNZ)}HOST.action(a);render(true);setTimeout(()=>{busyUntil=0;okUntil=now+2.5;sp.sq.w+=3;bubble(OK2[a]||'عملیات با موفقیت انجام شد ✓');live();sense();render(true)},1100)}
+function quick(a){const M2={fixproxy:'در حال تنظیم اتصال و خاموش‌سازی پراکسی …',ram:'در حال آزادسازی و سبک‌سازی رم …',browser:'در حال سبک‌سازی و آزادسازی حافظهٔ مرورگر …',cpu:'در حال بررسی و مدیریت پردازه‌های سنگین …'};const OK2={fixproxy:'اتصال اینترنت با موفقیت اصلاح شد ✓',ram:'حافظه رم با موفقیت آزاد و سبک شد ✓',browser:'پردازه‌ها و تب‌های مرورگر با موفقیت سبک شدند ✓',cpu:'پردازه‌های سنگین سیستم بررسی و تعدیل شدند ✓'};busyMsg=M2[a]||'در حال انجام عملیات …';busyUntil=T()+2.0;if(a==='browser'){ST.browserMB=0;ST.tabs=0;SNZ['bheavy']=Date.now()+24*36e5;LS.s('cc_snz',SNZ)}else if(a==='ram'){ramHigh=false;SNZ['ram']=Date.now()+300000;LS.s('cc_snz',SNZ)}else if(a==='fixproxy'){ST.proxyDead=false;SNZ['proxy']=Date.now()+600000;LS.s('cc_snz',SNZ)}else if(a==='cpu'){hotSince=0;SNZ['cpu']=Date.now()+300000;LS.s('cc_snz',SNZ)}HOST.action(a);render(true);setTimeout(()=>{busyUntil=0;okUntil=now+2.5;sp.sq.w+=3;bubble(OK2[a]||'عملیات با موفقیت انجام شد ✓');live();sense();render(true)},1100)}
 async function fixAll(){if(run)return;const L=issues(),qs=[...new Set(L.map(i=>i.act).filter(a=>QA.includes(a)))];for(const a of qs){quick(a);await sleep(1900)}if(L.some(i=>i.act=='run'))runProcess()}
 /* pictures drawn on the character's screen for each problem (steady, no flashing) */
 function issScene(kind){const S=now,cs=RA(col,1);x.save();x.strokeStyle=x.fillStyle=cs;x.shadowColor=cs;x.shadowBlur=7;x.lineWidth=1.7;x.lineCap=x.lineJoin='round';const RED='rgb(255,110,110)';

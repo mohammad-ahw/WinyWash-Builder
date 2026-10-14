@@ -3739,6 +3739,14 @@ namespace CleanC.UI
                             _isCleanedRecently = true;
                         }
                     }
+                    if (doc.RootElement.TryGetProperty("heroSnoozeUntil", out var snzProp) && DateTime.TryParse(snzProp.GetString(), out var sdt))
+                    {
+                        _heroSnoozedUntil = sdt;
+                    }
+                    if (doc.RootElement.TryGetProperty("heroBrowserSnoozeUntil", out var bsnzProp) && DateTime.TryParse(bsnzProp.GetString(), out var bsdt))
+                    {
+                        _heroBrowserAlertSuppressedUntil = bsdt;
+                    }
 
                     if (doc.RootElement.TryGetProperty("history", out var histProp) && histProp.ValueKind == System.Text.Json.JsonValueKind.Array)
                     {
@@ -3762,7 +3770,7 @@ namespace CleanC.UI
             RenderCleanupHistory();
         }
 
-        private void SaveCumulativeFreedStats()
+        internal void SaveCumulativeFreedStats()
         {
             try
             {
@@ -3775,6 +3783,8 @@ namespace CleanC.UI
                     cumulativeBytes = _cumulativeFreedBytes,
                     lastCleanBytes = _lastCleanFreedBytes,
                     lastCleanTime = (_lastCleanDateTime == DateTime.MinValue ? "" : _lastCleanDateTime.ToString("o")),
+                    heroSnoozeUntil = (_heroSnoozedUntil == DateTime.MinValue ? "" : _heroSnoozedUntil.ToString("o")),
+                    heroBrowserSnoozeUntil = (_heroBrowserAlertSuppressedUntil == DateTime.MinValue ? "" : _heroBrowserAlertSuppressedUntil.ToString("o")),
                     history = _cleanupHistory.Select(h => new { date = h.Date, bytes = h.Bytes })
                 };
                 File.WriteAllText(statsFile, System.Text.Json.JsonSerializer.Serialize(obj));

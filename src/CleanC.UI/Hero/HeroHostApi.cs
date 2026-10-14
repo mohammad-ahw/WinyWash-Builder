@@ -78,6 +78,11 @@ namespace CleanC.UI.Hero
                         await _window.HandleHeroQuickAsync(msg.Action);
                         break;
 
+                    case "hero.snooze":
+                    case "snooze":
+                        _window.HandleHeroSnooze();
+                        break;
+
                     default:
                         var unknown = "پیام ناشناخته از هیرو: " + msg.Type;
                         CcLog.Report("Hero.HostApi", new InvalidOperationException(unknown));

@@ -44,6 +44,8 @@ namespace CleanC.UI
         private DateTime _heroProxyAt = DateTime.MinValue;
         private bool _heroProxyDead;
         private DateTime _heroBrowserAlertSuppressedUntil = DateTime.MinValue;
+        private DateTime _heroSnoozedUntil = DateTime.MinValue;
+        private double _heroLastRamPercent = 0.0;
         private DateTime _heroRamAlertSuppressedUntil = DateTime.MinValue;
         private DateTime _heroProxyAlertSuppressedUntil = DateTime.MinValue;
         private DateTime _heroCpuAlertSuppressedUntil = DateTime.MinValue;
@@ -226,6 +228,7 @@ namespace CleanC.UI
 
             double totalRam = stats.TotalRamBytes > 0 ? stats.TotalRamBytes : 1;
             double ramPercent = stats.UsedRamBytes * 100.0 / totalRam;
+            _heroLastRamPercent = ramPercent;
             double cFreePercent = stats.DiskTotalBytes > 0
                 ? stats.DiskFreeBytes * 100.0 / stats.DiskTotalBytes
                 : 0;
@@ -412,15 +415,15 @@ namespace CleanC.UI
             bool cleanedRecently = _isCleanedRecently ||
                 (_lastCleanDateTime != DateTime.MinValue && (DateTime.Now - _lastCleanDateTime).TotalHours < 24);
 
+            // اگر کاربر کلید «بعداً» را زده، هیرو تا پایان مهلت در آرامش کامل می‌ماند
+            if (DateTime.UtcNow < _heroSnoozedUntil)
+            {
+                return items;
+            }
+
             if (scan == null)
             {
-                // اسکنی در دست نداریم:
-                //   • اگر کاربر اخیراً پاکسازی نکرده و اسکن هم ندیده‌ایم → موارد پیشنهادی را می‌دهیم
-                //   • اگر اخیراً پاکسازی شده → لیست خالی تا هیرو آرام و در حالت سلامت بماند
-                if (!_heroScanSeen && !cleanedRecently)
-                {
-                    items.AddRange(DefaultHeroBoostItems);
-                }
+                // برنامه در حال بالا آمدن است؛ تا زمان تکمیل اولین اسکن، هیرو آرام و پایدار می‌ماند
                 return items;
             }
 
@@ -430,7 +433,7 @@ namespace CleanC.UI
                 .Where(i => i.IsChecked)
                 .Sum(i => i.Bytes);
 
-            long junkThreshold = cleanedRecently ? 100L * 1024 * 1024 : 10L * 1024 * 1024;
+            long junkThreshold = cleanedRecently ? 1024L * 1024 * 1024 : 500L * 1024 * 1024;
             if (junkBytes > junkThreshold) items.Add("junk");
 
             // رجیستری یتیم فقط در صورتی اضافه می‌شود که واقعاً کلید معلقی در اسکن باشد
@@ -442,8 +445,9 @@ namespace CleanC.UI
                 items.Add("reg");
             }
 
-            // مرورگر اگر رم سنگین گرفته باشد
-            if (_heroBrowserMb >= 1500)
+            // مرورگر فقط اگر مصرف غیرعادی (بالای ۳ گیگابایت) داشته باشد یا مصرف رم کلی سیستم بالای ۸۰ درصد باشد
+            bool browserHeavy = _heroBrowserMb >= 3000 || (_heroBrowserMb >= 1800 && _heroLastRamPercent >= 80);
+            if (browserHeavy && DateTime.UtcNow >= _heroBrowserAlertSuppressedUntil)
             {
                 items.Add("browser");
             }
@@ -1058,14 +1062,16 @@ namespace CleanC.UI
             _lastCleanFreedBytes = s.TotalFreed;
             _lastCleanDateTime = DateTime.Now;
             _isCleanedRecently = true;
+            _heroBrowserAlertSuppressedUntil = DateTime.UtcNow.AddHours(24);
+            _heroSnoozedUntil = DateTime.UtcNow.AddHours(24);
             if (s.TotalFreed > 0)
             {
                 _cumulativeFreedBytes += s.TotalFreed;
                 RecordCleanupSession(s.TotalFreed);
-                SaveCumulativeFreedStats();
-                UpdateCumulativeChipsUI();
-                RenderCleanupHistory();
             }
+            SaveCumulativeFreedStats();
+            UpdateCumulativeChipsUI();
+            RenderCleanupHistory();
 
             _cachedScanResult = null;
             AdvancedCleanTotalText.Text =
@@ -1197,7 +1203,20 @@ namespace CleanC.UI
         /// <summary>پویش دوباره — توسط دکمهٔ «بررسی مجدد» هیرو صدا زده می‌شود.</summary>
         internal async Task HeroRescanAsync()
         {
+            _heroSnoozedUntil = DateTime.MinValue;
+            _heroBrowserAlertSuppressedUntil = DateTime.MinValue;
+            SaveCumulativeFreedStats();
             ApplyHeroScanResult(await GetHeroScanAsync());
+        }
+
+        /// <summary>به تعویق انداختن هشدارهای غیرضروری هیرو به مدت ۲۴ ساعت با کلیک روی «بعداً».</summary>
+        internal void HandleHeroSnooze()
+        {
+            _heroSnoozedUntil = DateTime.UtcNow.AddHours(24);
+            _heroBrowserAlertSuppressedUntil = DateTime.UtcNow.AddHours(24);
+            _heroLastStateJson = null;
+            SaveCumulativeFreedStats();
+            PushHeroState(force: true);
         }
 
         /// <summary>کاندیداهای مرزی را برمی‌گرداند و ایندکس‌ها را برای مرحلهٔ ۱۱ کش می‌کند.</summary>
@@ -1444,8 +1463,9 @@ namespace CleanC.UI
                         }
                         await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
                         await Task.Run(BrowserOptimizerService.CleanInactiveChromeExtensions);
-                        _heroBrowserAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(10);
+                        _heroBrowserAlertSuppressedUntil = DateTime.UtcNow.AddHours(24);
                         _heroBrowserMb = 0;
+                        SaveCumulativeFreedStats();
                         long freedMb = Math.Max(0, (beforeBytes - afterBytes) / (1024 * 1024));
                         string bMsg = freedMb > 0
                             ? $"پردازه‌ها و تب‌های پس‌زمینهٔ مرورگر با موفقیت سبک شدند ({freedMb} مگابایت رم آزاد شد)."
