@@ -2048,7 +2048,7 @@ namespace CleanC.UI
         private void RefreshStatsBtn_Click(object sender, RoutedEventArgs e)
         {
             RefreshSystemStats();
-            ShowInfoBar("بروزرسانی شد", "اطلاعات مصرف رم، پردازنده و دیسک بروزرسانی شدند.", InfoBarSeverity.Informational);
+            ShowInfoBar("به‌روزرسانی شد", "اطلاعات مصرف رم، پردازنده و دیسک به‌روزرسانی شدند.", InfoBarSeverity.Informational);
         }
 
         private void ThemeToggleBtn_Click(object sender, RoutedEventArgs e)
@@ -3021,7 +3021,7 @@ namespace CleanC.UI
                 if (SettingsHeaderBtn != null) ToolTipService.SetToolTip(SettingsHeaderBtn, LocalizationService.Get("Settings", "تنظیمات برنامه (Settings)"));
                 if (AdminBadgeText != null) AdminBadgeText.Text = LocalizationService.Get("RunningAsAdmin", "Running as administrator");
                 if (UndoCenterBtn != null) ToolTipService.SetToolTip(UndoCenterBtn, LocalizationService.Get("RestoreCenter", "مرکز بازیابی و بازگشت تغییرات"));
-                if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "بروزرسانی وضعیت سیستم"));
+                if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "به‌روزرسانی وضعیت سیستم"));
                 if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها"));
 
                 if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? "از 100" : "of 100";
@@ -3035,7 +3035,7 @@ namespace CleanC.UI
                 if (SpecsHeaderTitle != null) SpecsHeaderTitle.Text = LocalizationService.Get("SpecsHeaderTitle", "مشخصات جامع سخت افزار");
                 if (SpecsHeaderSubtitle != null) SpecsHeaderSubtitle.Text = LocalizationService.Get("SpecsHeaderSubtitle", "اطلاعات لحظه ای پردازنده، رم، مادربرد، گرافیک، درایوها و لایسنس");
                 if (CopySpecsBtnText != null) CopySpecsBtnText.Text = LocalizationService.Get("CopySpecs", "کپی مشخصات");
-                if (RefreshSpecsBtnText != null) RefreshSpecsBtnText.Text = LocalizationService.Get("RefreshSpecs", "بروزرسانی");
+                if (RefreshSpecsBtnText != null) RefreshSpecsBtnText.Text = LocalizationService.Get("RefreshSpecs", "به‌روزرسانی");
 
                 // App Uninstaller
                 if (UninstallerHeaderTitle != null) UninstallerHeaderTitle.Text = LocalizationService.Get("UninstallerHeaderTitle", "مدیریت و حذف نرم افزارها");
@@ -3063,10 +3063,10 @@ namespace CleanC.UI
 
                 // Startup Manager
                 if (StartupHeaderTitle != null) StartupHeaderTitle.Text = LocalizationService.Get("StartupHeaderTitle", "مدیریت برنامه های شروع خودکار");
-                if (RefreshStartupBtnText != null) RefreshStartupBtnText.Text = LocalizationService.Get("StartupRefresh", "بروزرسانی لیست");
+                if (RefreshStartupBtnText != null) RefreshStartupBtnText.Text = LocalizationService.Get("StartupRefresh", "به‌روزرسانی لیست");
 
                 // Windows Update
-                if (WindowsUpdateHeaderTitle != null) WindowsUpdateHeaderTitle.Text = LocalizationService.Get("WindowsUpdateHeaderTitle", "مدیریت بروزرسانی های ویندوز");
+                if (WindowsUpdateHeaderTitle != null) WindowsUpdateHeaderTitle.Text = LocalizationService.Get("WindowsUpdateHeaderTitle", "مدیریت به‌روزرسانی‌های ویندوز");
                 if (WindowsUpdateHeaderSubtitle != null) WindowsUpdateHeaderSubtitle.Text = LocalizationService.Get("WindowsUpdateHeaderSubtitle", "بررسی آپدیت ها، توقف رسمی ۵ هفته ای و رفع گیر کردن دانلود");
                 if (CheckUpdatesBtnText != null) CheckUpdatesBtnText.Text = LocalizationService.Get("CheckNewUpdates", "بررسی آپدیت های جدید");
                 if (UpdateStatusHeadlineText != null) UpdateStatusHeadlineText.Text = LocalizationService.Get("UpdateStatusHeadline", "وضعیت آپدیت های سیستم عامل");
@@ -3382,7 +3382,7 @@ namespace CleanC.UI
         private async Task CheckAppUpdatesBtn_ClickAsync()
         {
             string local = ReportExportService.GetVersion(typeof(MainWindow).Assembly);
-            ShowInfoBar("بررسی به روزرسانی", "در حال بررسی...", InfoBarSeverity.Informational);
+            ShowInfoBar("بررسی به‌روزرسانی", "در حال بررسی...", InfoBarSeverity.Informational);
 
             try
             {
@@ -3395,16 +3395,16 @@ namespace CleanC.UI
 
                 if (resp.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    ShowInfoBar("بررسی به روزرسانی",
-                        $"هنوز نسخه ای منتشر نشده (یا مخزن خصوصی است). نسخه ی فعلی: {local}",
+                    ShowInfoBar("بررسی به‌روزرسانی",
+                        $"هنوز نسخه‌ای منتشر نشده (یا مخزن خصوصی است). نسخهٔ فعلی: {local}",
                         InfoBarSeverity.Informational);
                     return;
                 }
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    ShowInfoBar("بررسی به روزرسانی",
-                        $"نتوانستم منبع نسخه ها را بخوانم (کد {(int)resp.StatusCode}). نسخه ی فعلی: {local}",
+                    ShowInfoBar("بررسی به‌روزرسانی",
+                        $"نتوانستم منبع نسخه‌ها را بخوانم (کد {(int)resp.StatusCode}). نسخهٔ فعلی: {local}",
                         InfoBarSeverity.Warning);
                     return;
                 }
@@ -3413,22 +3413,22 @@ namespace CleanC.UI
                 string? tag = ExtractJsonString(json, "tag_name");
                 if (string.IsNullOrWhiteSpace(tag))
                 {
-                    ShowInfoBar("بررسی به روزرسانی", $"پاسخ منبع نامعتبر بود. نسخه ی فعلی: {local}", InfoBarSeverity.Warning);
+                    ShowInfoBar("بررسی به‌روزرسانی", $"پاسخ منبع نامعتبر بود. نسخهٔ فعلی: {local}", InfoBarSeverity.Warning);
                     return;
                 }
 
                 string remote = tag.TrimStart('v', 'V');
-                ShowInfoBar("بررسی به روزرسانی",
+                ShowInfoBar("بررسی به‌روزرسانی",
                     IsNewer(remote, local)
-                        ? $"نسخه ی جدیدتری منتشر شده: {remote} (نسخه ی فعلی: {local})"
-                        : $"به روز هستی؛ آخرین نسخه ی منتشرشده {remote} است.",
+                        ? $"نسخهٔ جدیدتری منتشر شده: {remote} (نسخهٔ فعلی: {local})"
+                        : $"به‌روز هستی؛ آخرین نسخهٔ منتشرشده {remote} است.",
                     IsNewer(remote, local) ? InfoBarSeverity.Success : InfoBarSeverity.Informational);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "CheckUpdates");
-                ShowInfoBar("بررسی به روزرسانی",
-                    $"بررسی به روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخه ی فعلی: {local}",
+                ShowInfoBar("بررسی به‌روزرسانی",
+                    $"بررسی به‌روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخهٔ فعلی: {local}",
                     InfoBarSeverity.Warning);
             }
         }

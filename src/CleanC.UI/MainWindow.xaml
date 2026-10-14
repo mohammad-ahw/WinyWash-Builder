@@ -879,7 +879,7 @@
                                         <Button Click="RefreshSpecsPage_Click" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                             <StackPanel Orientation="Horizontal" Spacing="6">
                                                 <FontIcon Glyph="&#xE72C;" FontSize="12" />
-                                                <TextBlock x:Name="RefreshSpecsBtnText" Text="بروزرسانی" FontSize="12" FontWeight="SemiBold" />
+                                                <TextBlock x:Name="RefreshSpecsBtnText" Text="به‌روزرسانی" FontSize="12" FontWeight="SemiBold" />
                                             </StackPanel>
                                         </Button>
                                     </StackPanel>
@@ -1101,7 +1101,7 @@
                                     <Button Grid.Column="2" Click="RefreshStartupManager_Click" Height="32" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <FontIcon Glyph="&#xE72C;" FontSize="12" />
-                                            <TextBlock x:Name="RefreshStartupBtnText" Text="بروزرسانی لیست" FontSize="12" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="RefreshStartupBtnText" Text="به‌روزرسانی لیست" FontSize="12" FontWeight="SemiBold" />
                                         </StackPanel>
                                     </Button>
                                 </Grid>
@@ -1120,7 +1120,7 @@
                                             <FontIcon x:Name="ToolBackIcon6" Glyph="&#xE72A;" FontSize="14" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                         </Button>
                                         <StackPanel Spacing="1" VerticalAlignment="Center">
-                                            <TextBlock x:Name="WindowsUpdateHeaderTitle" Text="مدیریت بروزرسانی های ویندوز" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                            <TextBlock x:Name="WindowsUpdateHeaderTitle" Text="مدیریت به‌روزرسانی‌های ویندوز" FontSize="15" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                             <TextBlock x:Name="WindowsUpdateHeaderSubtitle" Text="بررسی آپدیت ها، توقف رسمی ۵ هفته ای و رفع گیر کردن دانلود" FontSize="11.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" />
                                         </StackPanel>
                                     </StackPanel>

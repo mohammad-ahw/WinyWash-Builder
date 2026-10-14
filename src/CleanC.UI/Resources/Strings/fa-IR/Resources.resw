@@ -1,9 +1,9 @@
-﻿<?xml version='1.0' encoding='utf-8'?>
+<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>اجرا با دسترسی مدیر</value></data>
   <data name="RestoreCenter" xml:space="preserve"><value>مرکز بازیابی و بازگشت تغییرات</value></data>
-  <data name="RefreshStatus" xml:space="preserve"><value>بروزرسانی وضعیت سیستم</value></data>
+  <data name="RefreshStatus" xml:space="preserve"><value>به‌روزرسانی وضعیت سیستم</value></data>
   <data name="NotificationHistory" xml:space="preserve"><value>تاریخچه عملیات و اعلان ها</value></data>
   <data name="ToggleTheme" xml:space="preserve"><value>تغییر تم (تاریک / روشن)</value></data>
   <data name="Settings" xml:space="preserve"><value>تنظیمات برنامه</value></data>
@@ -63,7 +63,7 @@
   <data name="ExportSpecsReport" xml:space="preserve"><value>مشخصات جامع سخت افزار (.txt)</value></data>
   <data name="AboutTitle" xml:space="preserve"><value>درباره CleanC</value></data>
   <data name="AboutSub" xml:space="preserve"><value>ابزار مدرن بهینه سازی، پاکسازی و مدیریت سخت افزار در ویندوز ۱۱.</value></data>
-  <data name="CheckUpdates" xml:space="preserve"><value>بررسی بروزرسانی</value></data>
+  <data name="CheckUpdates" xml:space="preserve"><value>بررسی به‌روزرسانی</value></data>
   <data name="ProjectPage" xml:space="preserve"><value>صفحه پروژه در گیت هاب</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>کپی اطلاعات عیب یابی</value></data>
   <data name="BackToTools" xml:space="preserve"><value>بازگشت به فهرست ابزارها</value></data>
@@ -87,7 +87,7 @@
 <data name="ToolUninstallerTitle" xml:space="preserve"><value>حذف کننده برنامه ها</value></data>
 <data name="ToolSpeedTestTitle" xml:space="preserve"><value>تست سرعت و کیفیت اینترنت</value></data>
 <data name="ToolPersonalizationTitle" xml:space="preserve"><value>شخصی سازی ویندوز و جلوه ها</value></data>
-<data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>مدیریت بروزرسانی های ویندوز</value></data>
+<data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>مدیریت به‌روزرسانی‌های ویندوز</value></data>
 <data name="ToolStartupTitle" xml:space="preserve"><value>مدیریت استارتاپ</value></data>
 <data name="ToolDriversTitle" xml:space="preserve"><value>مدیریت درایورها</value></data>
 <data name="ToolDiskTitle" xml:space="preserve"><value>نگهداری و سلامت دیسک</value></data>

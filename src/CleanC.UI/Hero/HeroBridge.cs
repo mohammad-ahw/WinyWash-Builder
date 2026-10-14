@@ -142,6 +142,7 @@ namespace CleanC.UI.Hero
         public static string Settings(HeroCharacterSettings settings) => Wrap("settings", "settings", settings);
         public static string Theme(HeroThemeMessage theme) => Wrap("theme", "theme", theme);
         public static string BorderlineResult(int[] selected) => Wrap("borderline.result", "sel", selected);
+        public static string Fire(string id) => Wrap("fire", "id", id);
 
         public static string RpcOk(int id, object? result)
             => JsonSerializer.Serialize(new HeroRpc { Type = "rpc", Id = id, Ok = true, Result = result }, s_opts);
