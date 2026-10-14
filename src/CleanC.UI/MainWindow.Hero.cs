@@ -47,6 +47,7 @@ namespace CleanC.UI
         private DateTime _heroRamAlertSuppressedUntil = DateTime.MinValue;
         private DateTime _heroProxyAlertSuppressedUntil = DateTime.MinValue;
         private DateTime _heroCpuAlertSuppressedUntil = DateTime.MinValue;
+        private bool _heroBorderlineDismissed;
 
         /// <summary>آخرین JSON فرستاده‌شده — برای جلوگیری از ارسال بی‌معنی در هر تیک تایمر.</summary>
         private string? _heroLastStateJson;
@@ -429,13 +430,14 @@ namespace CleanC.UI
                 .Where(i => i.IsChecked)
                 .Sum(i => i.Bytes);
 
-            if (junkBytes > 0) items.Add("junk");
+            long junkThreshold = cleanedRecently ? 100L * 1024 * 1024 : 10L * 1024 * 1024;
+            if (junkBytes > junkThreshold) items.Add("junk");
 
             // رجیستری یتیم فقط در صورتی اضافه می‌شود که واقعاً کلید معلقی در اسکن باشد
             var regItem = scan.Groups
                 .SelectMany(g => g.Items)
                 .FirstOrDefault(i => i.Id == "orphanedRegistry" && i.IsChecked);
-            if (regItem != null && regItem.Bytes > 0)
+            if (!cleanedRecently && regItem != null && regItem.Bytes > 0)
             {
                 items.Add("reg");
             }
@@ -1054,11 +1056,11 @@ namespace CleanC.UI
             CleanupReportCard.Visibility = Visibility.Visible;
 
             _lastCleanFreedBytes = s.TotalFreed;
+            _lastCleanDateTime = DateTime.Now;
+            _isCleanedRecently = true;
             if (s.TotalFreed > 0)
             {
                 _cumulativeFreedBytes += s.TotalFreed;
-                _lastCleanDateTime = DateTime.Now;
-                _isCleanedRecently = true;
                 RecordCleanupSession(s.TotalFreed);
                 SaveCumulativeFreedStats();
                 UpdateCumulativeChipsUI();
@@ -1201,6 +1203,12 @@ namespace CleanC.UI
         /// <summary>کاندیداهای مرزی را برمی‌گرداند و ایندکس‌ها را برای مرحلهٔ ۱۱ کش می‌کند.</summary>
         internal async Task<List<HeroBorderlineItem>> HeroGetBorderlineAsync()
         {
+            if (_heroBorderlineDismissed || _isCleanedRecently)
+            {
+                _heroBorderline = new List<CandidateAppItem>();
+                return new List<HeroBorderlineItem>();
+            }
+
             try
             {
                 _heroBorderline = await BloatwareService.ScanBorderlineReviewAppsAsync() ?? new List<CandidateAppItem>();
@@ -1278,6 +1286,7 @@ namespace CleanC.UI
                         DefaultButton = ContentDialogButton.Close
                     };
 
+                    _heroBorderlineDismissed = true;
                     var result = await dialog.ShowAsync();
                     picked = result == ContentDialogResult.Primary
                         ? boxes.Select((b, i) => b.IsChecked == true ? i : -1).Where(i => i >= 0).ToArray()

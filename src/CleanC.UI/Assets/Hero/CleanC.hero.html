@@ -201,7 +201,7 @@ requestAnimationFrame(frame);
 
 /* ===== Card logic: state -> text + mood + scene ===== */
 const $$=s=>document.querySelectorAll(s),sleep=ms=>new Promise(r=>setTimeout(r,ms)),T=()=>performance.now()/1e3;
-let yw=0,stch=0,wk0=0,waitStart=0,tapN=0,idleS=0,oprog=0,fired={},lastCi=-1,active=[],run=null,thinkUntil=0,alreadyUntil=0,curiousUntil=0,turboUntil=0,lastMove=T(),total=0,lastTxt='',tickI=0,sig='',lastSub='',afterMsg='',cur=null,curSince=0,ramHigh=false,hotSince=0,cfm=null;
+let yw=0,stch=0,wk0=0,waitStart=0,tapN=0,idleS=0,oprog=0,fired={},lastCi=-1,active=[],run=null,thinkUntil=0,alreadyUntil=0,curiousUntil=0,turboUntil=0,recheckedCleanUntil=0,lastMove=T(),total=0,lastTxt='',tickI=0,sig='',lastSub='',afterMsg='',cur=null,curSince=0,ramHigh=false,hotSince=0,cfm=null;
 
 /* 14 real steps: [short name, headline while running, "why?" subtitle] — scene index = step index */
 const STEPS=[
@@ -307,7 +307,11 @@ function view(){
  if(run){const i=run.i,c=CATS[run.ci||0];return V('run','focus',i==2?'در حال پاک‌سازی: '+c[0]:STEPS[i][1],i==2?c[1]:STEPS[i][2],['در حال بهینه‌سازی','#8b9bff'],{fast:1,seg:1,lab:(i+1)+' از 14 · '+(i==2?c[0]:STEPS[i][0]),btn:['در حال بهینه‌سازی …','ghost','dis']})}
  if(thinkUntil>now)return V('think','think','در حال بررسی سیستم …','تحلیل رم، دیسک، استارتاپ و تنظیمات',['در حال تحلیل','#8b9bff'],{fast:1,btn:['در حال بررسی …','ghost','dis']});
  if(celeb>now)return V('done','excellent','سیستم نفس راحت کشید! ✨',afterMsg,['انجام شد','#1fa971'],{fast:1,btn:['بررسی مجدد','ghost','re']});
- if(alreadyUntil>now)return V('already','smile','سیستم از قبل بهینه بود','چیزی برای پاک‌سازی پیدا نشد؛ همه‌چیز مرتبه',['انجام شد','#1fa971'],{fast:1,btn:['بررسی مجدد','ghost','re']});
+ if(recheckedCleanUntil>now){
+  const critL=issues().filter(i=>i.sev>=3);
+  if(!critL.length)return V('clean_ok','good','حال سیستم کاملاً خوبه ✨','همه‌چیز مرتب و روونه؛ ولی اگه خواستی می‌تونیم دوباره بهینه‌سازی کنیم.',['وضعیت سیستم','#1fa971','عالی'],{btn:['بهینه‌سازی مجدد','ghost','go']});
+ }
+ if(alreadyUntil>now)return V('already','smile','حال سیستم کاملاً خوبه ✨','همه‌چیز پاکیزه و روونه؛ ولی اگه خواستی می‌تونیم دوباره بهینه‌سازی کنیم.',['وضعیت سیستم','#1fa971','عالی'],{fast:1,btn:['بهینه‌سازی مجدد','ghost','go']});
  const go=n?['بهینه‌سازی سیستم'+(n>1?' · '+n+' مورد':''),'','go']:['بررسی مجدد','ghost','re'];
  /* every problem (live sensors + maintenance items) becomes one entry; the most severe is featured, the rest are chips */
  if(busyUntil>T())return V('busy','focus',busyMsg,'چند لحظه صبر کن',['در حال انجام','#8b9bff'],{fast:1,btn:['در حال انجام …','ghost','dis']});
@@ -319,8 +323,6 @@ function view(){
  if(idleS>=300)return V('sleep','sleep','در حال استراحت','برای بیدار کردنش یه حرکت موس کافیه',['حالت خواب','#8f84d6'],{btn:go});
  if(idleS>=180)return V('drowsy','drowsy','خوابش می‌آد …','چند لحظهٔ دیگه می‌خوابه',['بیکار','#8f9bc4'],{btn:go});
  if(idleS>=90)return V('idle','idle','سیستم آماده‌ست','هر وقت خواستی می‌تونی بهینه‌سازی رو شروع کنی',['بیکار','#9db4c4'],{btn:go});
- if(curiousUntil>now&&ST.chips.length)return V('curious','curious','یه چیزایی پیدا کردم','بعد از بهینه‌سازی، چند مورد پرحجم هم دیدم',['پیشنهاد','#8fb4ff'],{chips:ST.chips,btn:go});
- if(turboUntil>now)return V('turbo','turbo','سیستم توربوئه','منابع آزاد شدن و همه‌چیز سریع‌تر شده',['عملکرد','#c07bff','توربو'],{btn:go});
  
  return V('ready',hl.mood,hl.head,hl.sub,['سلامت سیستم','#1fa971','عالی'],{btn:go})}
 
@@ -368,10 +370,10 @@ async function runProcess(start=0){
  scn=null;run=null;celeb=T()+4.6;if(freed>0){total+=freed/1024;lastTxt=fmt(freed)+'، امروز '+new Date().toTimeString().slice(0,5)}
  afterMsg=(n0?n0+' بخش با موفقیت بهینه‌سازی شد':'بررسی کامل سیستم انجام شد')+(freed>0?' · '+fmt(freed)+' فضا و منابع بازیابی گردید':' · همه بخش‌ها مرتب و سریع هستند');active=[];if(ST.sim){ST.cFree=Math.min(48,ST.cFree+Math.max(4,Math.round(freed/350)));ST.ram=Math.min(ST.ram,56);ST.browserMB=0;ST.tabs=0;ST.topRam='';ST.topCpu=''}
  sp.sq.w-=3;add({t:'rg',x:0,y:0,d:.5,c:hx('#7dffbf')});add({t:'rg',x:0,y:0,d:.4,c:hx('#ffffff')});
- afterRun();turboUntil=celeb+30;try{const a=await HOST.after();ST.chips=a&&a.chips||[]}catch(e){ST.chips=[]}if(ST.chips.length)curiousUntil=celeb+25}
+ afterRun();recheckedCleanUntil=T()+600;SNZ['cpu']=Date.now()+300000;SNZ['ram']=Date.now()+300000;LS.s('cc_snz',SNZ);}
 function abortRun(){if(run){run.abort=true;run=null}scn=null;closeDlg([],true);post({type:'run.abort'})}
 window.CleanC.abort=abortRun;
-async function recheck(){if(run||thinkUntil>now)return;thinkUntil=T()+99;await HOST.scan();thinkUntil=0;if(!active.length)alreadyUntil=T()+4.2}
+async function recheck(){if(run||thinkUntil>now)return;thinkUntil=T()+99;await HOST.scan();thinkUntil=0;recheckedCleanUntil=T()+600;alreadyUntil=T()+600;render(true);}
 $('go').onclick=()=>{const a=cur&&cur.btn?cur.btn[2]:'';if(a=='go')runProcess();else if(a=='re')recheck();else if(QA.includes(a))quick(a)};
 $('it').onclick=e=>{const c=e.target.closest('.ch');if(!c)return;if(c.dataset.iss){pinned=c.dataset.iss;pinUntil=T()+30;curSince=-9;render(true);return}HOST.chip(c.dataset.c);curiousUntil=0;render(true)};
 $('go2').onclick=()=>fixAll();
@@ -382,7 +384,7 @@ $('sn').onclick=()=>{const id=cur&&cur.pid;if(!id)return;SNZ[id]=Date.now()+36e5
 function live(){const nz=()=>Math.random()-.5;
  if(ST.sim){cpu=Math.max(4,Math.min(99,ST.cpu+(run?35:0)+nz()*6));ramv=Math.max(20,Math.min(97,ST.ram+nz()*3))}else{cpu=ST.cpu;ramv=ST.ram}
  ramHist.push(ramv);if(ramHist.length>4)ramHist.shift();dsk=100-ST.cFree;}
-function sense(){ramHigh=ramv>=88?true:ramv<=76?false:ramHigh;if(cpu>=85){if(!hotSince)hotSince=T()}else if(cpu<72)hotSince=0}   /* RAM: on >=88, off <=76 · CPU hot: >=85 for 5 s */
+function sense(){ramHigh=ramv>=92?true:ramv<=78?false:ramHigh;if(cpu>=92){if(!hotSince)hotSince=T()}else if(cpu<75)hotSince=0}   /* RAM: on >=92, off <=78 · CPU hot: >=92 for 12 s */
 setInterval(live,2500);setInterval(sense,500);
 setInterval(()=>{idleS=now-lastMove;oprog=run?Math.min(1,(run.i+prog)/14):0;
  if(run&&run.i==2&&scn==2){run.ci=Math.min(7,Math.floor(prog*8));if(run.ci!=lastCi){lastCi=run.ci;for(let n=0;n<5;n++){const s=Math.random()<.5?-1:1;add({t:'j',k:run.ci,r:1.15,x:s*(100+Math.random()*30),y:-40+Math.random()*80,vx:-s*40,tx:(Math.random()-.5)*20,ty:34,c:hx(SC[2]),d:.35,vr:(Math.random()-.5)*4})}}}
@@ -1005,7 +1007,7 @@ function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],
  if(ST.cFree<=20){const c=ST.cFree<=10;P({id:'disk',sev:c?3:2,name:'دیسک C',val:(100-ST.cFree)+'% پر',title:c?'فضای دیسک C رو به اتمام است':'فضای دیسک C کم شده',detail:'فقط '+ST.cFree+'٪ آزاد مانده'+(rec>0?'؛ حدود '+fmt(rec)+' قابل آزادسازی است':'؛ ویندوز با کمبود فضا کند و ناپایدار می‌شه'),mood:c?'critical':'disk',scene:'disk',act:'run'})}
  if(!ST.charging&&ST.batt<=20){const c=ST.batt<=10;P({id:'batt',sev:c?3:2,name:'باتری',val:ST.batt+'%',title:c?'باتری تقریباً تموم شده':'باتری کم است',detail:'شارژر وصل نیست؛ بهینه‌سازی سنگین رو بذار برای بعد از شارژ',mood:'battery',scene:'battery',act:null})}
  if(ramHigh)P({id:'ram',sev:ramv>=92?3:2,name:'رم',val:Math.round(ramv)+'%',title:'مصرف رم بالاست',detail:(ST.topRam?'بیشترین مصرف: '+ST.topRam+'؛ ':'')+'پردازش‌های پس‌زمینه رو می‌شه آزاد کرد',mood:'ram',scene:'ram',act:'ram',btn:['رم را آزاد کن','','ram']});
- if(hotSince&&T()-hotSince>=5)P({id:'cpu',sev:cpu>=95?3:2,name:'شلوغی سیستم',val:Math.round(cpu)+'%',title:'سیستم شلوغه',detail:ST.topCpu?'بیشترین مصرف: '+ST.topCpu:'پردازنده بیش از ۵ ثانیه روی ۸۰٪ مونده؛ برنامه‌ای سنگین در حال اجراست',mood:'warm',scene:'cpu',act:'cpu',btn:['برنامه‌های سنگین','','cpu']});
+ if(hotSince&&T()-hotSince>=12&&!(recheckedCleanUntil>now))P({id:'cpu',sev:cpu>=95?3:2,name:'شلوغی سیستم',val:Math.round(cpu)+'%',title:'سیستم شلوغه',detail:ST.topCpu?'بیشترین مصرف: '+ST.topCpu:'پردازنده بیش از ۱۲ ثانیه روی بیش از ۹۰٪ مانده است',mood:'warm',scene:'cpu',act:'cpu',btn:['برنامه‌های سنگین','','cpu']});
  if(bh)P({id:'bheavy',sev:1,name:'مرورگر',val:ST.tabs?ST.tabs+' تب':fmt(ST.browserMB),title:'مرورگر سنگین شده',detail:(ST.tabs?ST.tabs+' تب باز':'تب‌ها و افزونه‌ها')+' حدود '+fmt(ST.browserMB)+' رم می‌گیرن؛ تب‌های بی‌استفاده رو می‌شه سبک کرد',mood:'ram',scene:'browser',act:'browser',btn:['مرورگر را سبک کن','','browser']});
  if(ST.offline)P({id:'offline',sev:1,name:'اینترنت',val:'آفلاین',title:'اینترنت وصل نیست',detail:'کارهای آفلاین کار می‌کنن؛ بررسی‌های آنلاین موقتاً متوقف شدن',mood:'offline',scene:'wifi',act:null});
  if(ST.uptimeDays>=14&&active.length>0)P({id:'uptime',sev:1,name:'آپ‌تایم',val:ST.uptimeDays+' روز',title:ST.uptimeDays+' روزه که سیستم روشنه',detail:'یه وقفهٔ کوتاه هم سیستم رو سرحال‌تر می‌کنه؛ ترجیحاً وقتی کاری نداری',mood:'yawn',scene:null,act:null,btn:['بررسی مجدد','ghost','re']});
