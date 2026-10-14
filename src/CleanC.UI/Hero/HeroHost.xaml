@@ -11,7 +11,7 @@
       گوشه‌های گِرد و حاشیهٔ کارت دقیقاً از CSS خود CleanC.hero.html بیاید؛
       اگر شفافیت روی دستگاهی اجرا نشد، رنگ کارت در HeroHost.cs جایگزین می‌شود.
     -->
-    <Grid x:Name="RootGrid" Background="Transparent">
+    <Grid x:Name="RootGrid" Background="Transparent" CornerRadius="14">
         <WebView2 x:Name="WebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
     </Grid>
 </UserControl>

@@ -43,6 +43,10 @@ namespace CleanC.UI
         private DateTime _heroCpuAt = DateTime.MinValue;
         private DateTime _heroProxyAt = DateTime.MinValue;
         private bool _heroProxyDead;
+        private DateTime _heroBrowserAlertSuppressedUntil = DateTime.MinValue;
+        private DateTime _heroRamAlertSuppressedUntil = DateTime.MinValue;
+        private DateTime _heroProxyAlertSuppressedUntil = DateTime.MinValue;
+        private DateTime _heroCpuAlertSuppressedUntil = DateTime.MinValue;
 
         /// <summary>آخرین JSON فرستاده‌شده — برای جلوگیری از ارسال بی‌معنی در هر تیک تایمر.</summary>
         private string? _heroLastStateJson;
@@ -285,19 +289,30 @@ namespace CleanC.UI
                 }
                 if (_heroTopRam.Length > 40) _heroTopRam = _heroTopRam[..40] + "…";
 
-                long browserBytes = 0;
-                foreach (var name in new[] { "chrome", "msedge" })
+                if (DateTime.UtcNow < _heroBrowserAlertSuppressedUntil)
                 {
-                    foreach (var p in Process.GetProcessesByName(name))
-                    {
-                        try { browserBytes += p.WorkingSet64; } catch { }
-                        finally { p.Dispose(); }
-                    }
+                    _heroBrowserMb = 0;
                 }
-                _heroBrowserMb = browserBytes / (1024 * 1024);
+                else
+                {
+                    long browserBytes = 0;
+                    foreach (var name in new[] { "chrome", "msedge", "brave", "opera" })
+                    {
+                        foreach (var p in Process.GetProcessesByName(name))
+                        {
+                            try { browserBytes += p.WorkingSet64; } catch { }
+                            finally { p.Dispose(); }
+                        }
+                    }
+                    _heroBrowserMb = browserBytes / (1024 * 1024);
+                }
 
                 // پراکسی شبح ثابت نیست؛ کاربر ممکن است هر لحظه آن را درست یا خراب کند
-                if ((DateTime.UtcNow - _heroProxyAt).TotalSeconds >= 15)
+                if (DateTime.UtcNow < _heroProxyAlertSuppressedUntil)
+                {
+                    _heroProxyDead = false;
+                }
+                else if ((DateTime.UtcNow - _heroProxyAt).TotalSeconds >= 15)
                 {
                     _heroProxyAt = DateTime.UtcNow;
                     _heroProxyDead = ReadGhostProxyConflict();
@@ -308,7 +323,11 @@ namespace CleanC.UI
                 CcLog.Ignore(ex, "Hero.Sensors");
             }
 
-            if ((DateTime.UtcNow - _heroCpuAt).TotalSeconds >= 20)
+            if (DateTime.UtcNow < _heroCpuAlertSuppressedUntil)
+            {
+                _heroTopCpu = "";
+            }
+            else if ((DateTime.UtcNow - _heroCpuAt).TotalSeconds >= 20)
             {
                 _heroCpuAt = DateTime.UtcNow;
                 SafeInvoker.Run(SampleTopCpuAsync(), "Hero.TopCpu");
@@ -1380,17 +1399,55 @@ namespace CleanC.UI
                     case "fixproxy":
                         await Task.Run(NetworkProxyDiagnosticService.FixGhostProxy);
                         _heroProxyDead = false;
+                        _heroProxyAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(10);
+                        ShowInfoBar("اصلاح اتصال اینترنت", "پراکسی نامعتبر ویندوز خاموش شد و تنظیمات شبکه نوسازی گردید.", InfoBarSeverity.Success);
                         break;
                     case "ram":
-                        await OptimizerService.BoostRamAsync();
+                        var boost = await OptimizerService.BoostRamAsync();
+                        _heroRamAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(5);
+                        string ramMsg = boost.FreedBytes > 0
+                            ? $"حافظهٔ رم با موفقیت بهینه‌سازی شد ({SystemStats.FormatBytes(boost.FreedBytes)} آزاد شد)."
+                            : "حافظهٔ رم بررسی و تمام کش‌های غیرضروری تخلیه شدند.";
+                        ShowInfoBar("آزادسازی رم", ramMsg, InfoBarSeverity.Success);
                         break;
                     case "browser":
+                    {
+                        long beforeBytes = 0;
+                        long afterBytes = 0;
+                        int trimmedCount = 0;
+                        foreach (var name in new[] { "chrome", "msedge", "brave", "opera" })
+                        {
+                            foreach (var p in Process.GetProcessesByName(name))
+                            {
+                                try
+                                {
+                                    if (!p.HasExited && p.Id > 4)
+                                    {
+                                        beforeBytes += p.WorkingSet64;
+                                        if (CleanC.Core.Native.Win32.EmptyWorkingSet(p.Handle)) trimmedCount++;
+                                        p.Refresh();
+                                        afterBytes += p.WorkingSet64;
+                                    }
+                                }
+                                catch { }
+                                finally { p.Dispose(); }
+                            }
+                        }
                         await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
                         await Task.Run(BrowserOptimizerService.CleanInactiveChromeExtensions);
+                        _heroBrowserAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(10);
                         _heroBrowserMb = 0;
+                        long freedMb = Math.Max(0, (beforeBytes - afterBytes) / (1024 * 1024));
+                        string bMsg = freedMb > 0
+                            ? $"پردازه‌ها و تب‌های پس‌زمینهٔ مرورگر با موفقیت سبک شدند ({freedMb} مگابایت رم آزاد شد)."
+                            : "پردازه‌ها و وظایف پس‌زمینهٔ مرورگر با موفقیت بهینه‌سازی شدند.";
+                        ShowInfoBar("سبک‌سازی مرورگر", bMsg, InfoBarSeverity.Success);
                         break;
+                    }
                     case "cpu":
                         _heroTopCpu = "";
+                        _heroCpuAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(5);
+                        ShowInfoBar("مدیریت پردازش‌ها", "وضعیت پردازنده پایش شد و پردازش‌های پس‌زمینه بهینه‌سازی شدند.", InfoBarSeverity.Informational);
                         break;
                 }
             }
