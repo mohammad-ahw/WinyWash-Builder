@@ -952,16 +952,16 @@ namespace CleanC.UI
 
             var achievementsCard = new Border
             {
-                Background = new SolidColorBrush(Windows.UI.Color.FromArgb(24, 59, 130, 246)),
-                BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(110, 59, 130, 246)),
+                Background = cardBg,
+                BorderBrush = borderBrush,
                 BorderThickness = new Thickness(1),
-                CornerRadius = new CornerRadius(10),
-                Padding = new Thickness(16, 14, 16, 14),
+                CornerRadius = new CornerRadius(12),
+                Padding = new Thickness(18, 16, 18, 16),
                 Margin = new Thickness(0, 0, 0, 10),
                 HorizontalAlignment = HorizontalAlignment.Stretch
             };
 
-            var achStack = new StackPanel { Spacing = 10 };
+            var achStack = new StackPanel { Spacing = 12 };
             var achHeader = new Grid();
             achHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
             achHeader.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -969,22 +969,22 @@ namespace CleanC.UI
             var achIcon = new FontIcon
             {
                 Glyph = "\uE777",
-                FontSize = 18,
-                Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 59, 130, 246)),
-                Margin = new Thickness(0, 0, 10, 0),
+                FontSize = 20,
+                Foreground = accentFg,
+                Margin = new Thickness(0, 0, 12, 0),
                 VerticalAlignment = VerticalAlignment.Center
             };
             Grid.SetColumn(achIcon, 0);
             achHeader.Children.Add(achIcon);
 
-            var achTitleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 2 };
-            achTitleStack.Children.Add(new TextBlock { Text = "خلاصه دستاوردهای ارتقای سرعت و آزادسازی سیستم", FontSize = 13.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
-            achTitleStack.Children.Add(new TextBlock { Text = "نتایج بهینه سازی زنده پردازنده، حافظه رم، استارتاپ و اتصالات شبکه", FontSize = 11, Foreground = neutralFg });
+            var achTitleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 3 };
+            achTitleStack.Children.Add(new TextBlock { Text = "دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم", FontSize = 14, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            achTitleStack.Children.Add(new TextBlock { Text = "خلاصهٔ اقدامات کلیدی و آزادسازی حافظه، دیسک، استارتاپ و اتصالات شبکه", FontSize = 11.5, Foreground = neutralFg });
             Grid.SetColumn(achTitleStack, 1);
             achHeader.Children.Add(achTitleStack);
             achStack.Children.Add(achHeader);
 
-            // Multi-Column Achievement Grid (Fits 100% within card bounds with zero horizontal scrolling)
+            // Multi-Column Achievement Grid
             var achievementsGrid = new Grid { ColumnSpacing = 8, RowSpacing = 8, Margin = new Thickness(0, 4, 0, 0), HorizontalAlignment = HorizontalAlignment.Stretch };
             achievementsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             achievementsGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
@@ -1002,15 +1002,15 @@ namespace CleanC.UI
 
                 var chip = new Border
                 {
-                    Background = new SolidColorBrush(Windows.UI.Color.FromArgb(20, color.R, color.G, color.B)),
-                    BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(70, color.R, color.G, color.B)),
+                    Background = new SolidColorBrush(Windows.UI.Color.FromArgb(18, color.R, color.G, color.B)),
+                    BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(60, color.R, color.G, color.B)),
                     BorderThickness = new Thickness(1),
                     CornerRadius = new CornerRadius(8),
-                    Padding = new Thickness(12, 8, 12, 8),
+                    Padding = new Thickness(14, 10, 14, 10),
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 };
                 var sp = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
-                sp.Children.Add(new FontIcon { Glyph = glyph, FontSize = 13, Foreground = new SolidColorBrush(color), VerticalAlignment = VerticalAlignment.Center });
+                sp.Children.Add(new FontIcon { Glyph = glyph, FontSize = 13.5, Foreground = new SolidColorBrush(color), VerticalAlignment = VerticalAlignment.Center });
                 sp.Children.Add(new TextBlock { Text = text, FontSize = 11.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = new SolidColorBrush(color), VerticalAlignment = VerticalAlignment.Center, TextTrimming = TextTrimming.CharacterEllipsis });
                 chip.Child = sp;
 
@@ -1032,19 +1032,22 @@ namespace CleanC.UI
 
             if (startupItem != null)
             {
-                AddAchievementChip("\uE7B5", startupItem.Title, Windows.UI.Color.FromArgb(255, 245, 158, 11));
+                AddAchievementChip("\uE7B5", "بهینه‌سازی استارتاپ و سرعت بوت", Windows.UI.Color.FromArgb(255, 245, 158, 11));
             }
 
-            AddAchievementChip("\uE774", "نوسازی کش DNS و سوکت های شبکه", Windows.UI.Color.FromArgb(255, 6, 182, 212));
+            if (boostGroup?.Items.Any(i => i.Id == "dns_flush") == true)
+            {
+                AddAchievementChip("\uE774", "نوسازی کش DNS و سوکت‌های شبکه", Windows.UI.Color.FromArgb(255, 6, 182, 212));
+            }
 
             if (browserItem != null)
             {
-                AddAchievementChip("\uE774", "توقف تسک های پس زمینه Edge و Chrome", Windows.UI.Color.FromArgb(255, 139, 92, 246));
+                AddAchievementChip("\uE774", "توقف تسک‌های پس‌زمینهٔ مرورگرها", Windows.UI.Color.FromArgb(255, 139, 92, 246));
             }
 
             if (winTweaksItem != null)
             {
-                AddAchievementChip("\uE770", "توقف تله متری و افزایش سرعت ویندوز", Windows.UI.Color.FromArgb(255, 236, 72, 153));
+                AddAchievementChip("\uE770", "توقف تله‌متری و روان‌سازی ویندوز", Windows.UI.Color.FromArgb(255, 236, 72, 153));
             }
 
             if (gpuItem != null)
@@ -1198,18 +1201,25 @@ namespace CleanC.UI
                 }
             }
 
+            int cleanPriorCount = 0;
+
             foreach (var group in groups)
             {
                 if (group.Items.Count == 0) continue;
+
+                var activeItems = group.Items.Where(i => i.FreedBytes > 0 || (i.IsFailed && !i.WasEmpty)).ToList();
+                cleanPriorCount += group.Items.Count(i => i.WasEmpty && i.FreedBytes == 0);
+
+                if (activeItems.Count == 0 && group.TotalFreedBytes == 0) continue;
 
                 var groupCard = new Border
                 {
                     Background = cardBg,
                     BorderBrush = borderBrush,
                     BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8),
-                    Padding = new Thickness(14, 12, 14, 12),
-                    Margin = new Thickness(0, 0, 0, 6),
+                    CornerRadius = new CornerRadius(10),
+                    Padding = new Thickness(16, 14, 16, 14),
+                    Margin = new Thickness(0, 0, 0, 8),
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 };
 
@@ -1245,8 +1255,8 @@ namespace CleanC.UI
                 var groupTotalBadge = new Border
                 {
                     Background = group.TotalFreedBytes > 0 ? successBg : neutralBg,
-                    CornerRadius = new CornerRadius(5),
-                    Padding = new Thickness(8, 3, 8, 3),
+                    CornerRadius = new CornerRadius(6),
+                    Padding = new Thickness(10, 4, 10, 4),
                     VerticalAlignment = VerticalAlignment.Center
                 };
                 var groupTotalText = new TextBlock
@@ -1271,10 +1281,11 @@ namespace CleanC.UI
                     HorizontalAlignment = HorizontalAlignment.Stretch
                 });
 
-                // Hierarchical Sub-items
+                // Hierarchical Sub-items (displaying active changes)
+                var itemsToDisplay = activeItems.Count > 0 ? activeItems : group.Items;
                 var itemsStack = new StackPanel { Spacing = 6, HorizontalAlignment = HorizontalAlignment.Stretch, Margin = new Thickness(6, 2, 6, 2) };
 
-                foreach (var item in group.Items)
+                foreach (var item in itemsToDisplay)
                 {
                     var itemGrid = new Grid { HorizontalAlignment = HorizontalAlignment.Stretch, Margin = new Thickness(0, 2, 0, 2) };
                     itemGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
@@ -1287,7 +1298,7 @@ namespace CleanC.UI
                     var failBg = new SolidColorBrush(Windows.UI.Color.FromArgb(26, 239, 68, 68));
                     var itemGlyph = new FontIcon
                     {
-                        Glyph = isFailed ? "\uE711" : (hasFreed ? "\uE73E" : (item.WasEmpty ? "\uE946" : "\uE73E")),
+                        Glyph = isFailed ? "\uE711" : (hasFreed ? "\uE73E" : "\uE73E"),
                         FontSize = 13,
                         Margin = new Thickness(0, 0, 8, 0),
                         VerticalAlignment = VerticalAlignment.Center,
@@ -1311,8 +1322,8 @@ namespace CleanC.UI
                     var itemBadge = new Border
                     {
                         Background = isFailed ? failBg : (hasFreed ? successBg : neutralBg),
-                        CornerRadius = new CornerRadius(4),
-                        Padding = new Thickness(7, 2, 7, 2),
+                        CornerRadius = new CornerRadius(5),
+                        Padding = new Thickness(8, 3, 8, 3),
                         VerticalAlignment = VerticalAlignment.Center
                     };
                     var itemBadgeText = new TextBlock
@@ -1321,7 +1332,7 @@ namespace CleanC.UI
                             ? item.StatusSummary
                             : (hasFreed
                                 ? $"+ {item.FormattedFreed} آزاد شد ✓"
-                                : (item.WasEmpty ? "خالی بود (بدون تغییر)" : item.StatusSummary)),
+                                : item.StatusSummary),
                         FontSize = 11,
                         FontWeight = Microsoft.UI.Text.FontWeights.Normal,
                         Foreground = isFailed ? failFg : (hasFreed ? successFg : neutralFg)
@@ -1336,6 +1347,31 @@ namespace CleanC.UI
                 mainStack.Children.Add(itemsStack);
                 groupCard.Child = mainStack;
                 ReportGroupsContainer.Children.Add(groupCard);
+            }
+
+            if (cleanPriorCount > 0)
+            {
+                var cleanBanner = new Border
+                {
+                    Background = cardBg,
+                    BorderBrush = borderBrush,
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(10),
+                    Padding = new Thickness(16, 12, 16, 12),
+                    Margin = new Thickness(0, 2, 0, 0),
+                    HorizontalAlignment = HorizontalAlignment.Stretch
+                };
+                var cbStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 10, VerticalAlignment = VerticalAlignment.Center };
+                cbStack.Children.Add(new FontIcon { Glyph = "\uE73E", FontSize = 14, Foreground = successFg, VerticalAlignment = VerticalAlignment.Center });
+                cbStack.Children.Add(new TextBlock
+                {
+                    Text = $"{cleanPriorCount} سرفصل دیگر سیستم بررسی شدند و از قبل کاملاً پاکیزه و بهینه بودند.",
+                    FontSize = 12,
+                    Foreground = neutralFg,
+                    VerticalAlignment = VerticalAlignment.Center
+                });
+                cleanBanner.Child = cbStack;
+                ReportGroupsContainer.Children.Add(cleanBanner);
             }
         }
 

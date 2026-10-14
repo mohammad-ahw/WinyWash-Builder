@@ -1,4 +1,4 @@
-﻿// src/CleanC.UI/Hero/HeroHost.xaml.cs
+// src/CleanC.UI/Hero/HeroHost.xaml.cs
 // میزبان WebView2 برای هیروکارت: راه‌اندازی هسته، بارگذاری CleanC.hero.html،
 // صف کردن پیام‌ها تا آماده شدن صفحه، و تحویل پیام‌های JS به MainWindow.
 
@@ -72,6 +72,9 @@ namespace CleanC.UI.Hero
                 var env = await CoreWebView2Environment.CreateAsync();
 
                 await WebView.EnsureCoreWebView2Async(env);
+                try { WebView.DefaultBackgroundColor = Microsoft.UI.Colors.Transparent; }
+                catch (Exception ex) { CcLog.Ignore(ex, "HeroHost.DefaultBackgroundColorPost"); }
+
                 var core = WebView.CoreWebView2;
                 if (core == null) return;
 

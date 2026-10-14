@@ -683,13 +683,18 @@ namespace CleanC.UI
                 var vm = _activeCleaningItems.FirstOrDefault(v => v.Id == item.Id);
                 if (vm == null) continue;
 
-                Live($"در حال پردازش: {vm.Title}...",
-                    $"مرحله {i + 1} از {total}: پاکسازی و بهینه سازی متوالی",
+                string detail = item.Bytes > 0
+                    ? $"پویش سکتورها و پاک‌سازی فضای شناسایی‌شده · حجم: {item.FormattedBytes}"
+                    : $"شناسایی و پاک‌سازی فایل‌های زائد و کش سرفصل {vm.Title}";
+
+                Live($"پاک‌سازی فعال: {vm.Title}",
+                    $"سرفصل {i + 1} از {total} · {detail}",
                     10 + (i * 70.0 / total));
 
                 vm.IsLoading = true;
                 vm.IsSuccess = false;
-                vm.StatusText = "در حال بررسی و پاکسازی...";
+                vm.StatusText = "در حال پردازش سکتورها...";
+                LiveCleanListView?.ScrollIntoView(vm);
                 await Task.Delay(60);
 
                 long itemFreed = await Task.Run(() => CleanService.CleanCategory(item));
@@ -719,8 +724,6 @@ namespace CleanC.UI
                         ? (item.Bytes > 0 ? "قبلاً پاک بود" : "خالی بود (بدون تغییر)")
                         : $"+ {SystemStats.FormatBytes(itemFreed)} آزاد شد"
                 });
-
-                _activeCleaningItems.Remove(vm);
                 await Task.Delay(20);
             }
 
@@ -732,8 +735,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepRamAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("ramBoost")) return new { mb = 0L };
-            Live("در حال آزادسازی حافظه فعال رم (RAM)...",
-                "تخلیه Working Set و بهینه سازی تخصیص حافظه پردازه ها", 82);
+            Live("بهینه‌سازی عمیق حافظه رم (RAM Working Set)",
+                "تخلیه Working Set پردازه‌ها و بازیابی بلوک‌های غیرفعال حافظه فیزیکی", 82);
             await Task.Delay(60);
 
             long freed = 0;
@@ -764,8 +767,8 @@ namespace CleanC.UI
         private async Task HeroStepDnsAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("dnsFlush") && !s.IsBoostEnabled("backgroundHelpers")) return;
-            Live("در حال تخلیه کش DNS و نوسازی کانکشن ها...",
-                "رفرش جدول آدرس های شبکه و پاکسازی پردازه های زائد پس زمینه", 90);
+            Live("نوسازی کش DNS و سوکت‌های شبکه",
+                "تخلیه Resolve Cache، پاک‌سازی جدول ARP و ریست بافرهای Winsock", 90);
             await Task.Delay(50);
             try
             {
@@ -785,8 +788,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepBrowserAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("browserBoost")) return new { mb = 0L };
-            Live("در حال بهینه سازی سرعت و حذف افزونه های زائد مرورگرها...",
-                "فعال سازی شتاب سخت افزاری، توقف تسک های پس زمینه و حذف افزونه های مرده", 92);
+            Live("سبک‌سازی مرورگر و توقف پردازه‌های مخفی",
+                "بستن Background Tasks مرورگرهای Edge و Chrome و آزادسازی کش افزونه‌ها", 92);
             long freed = 0;
             try
             {
@@ -813,8 +816,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepRegistryAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("orphanedRegistry") && !s.IsBoostEnabled("leftovers")) return new { mb = 0L };
-            Live("در حال پاکسازی عمیق و پویش بقایای نرم افزارهای حذف شده...",
-                "اسکن پوشه های رهاشده در AppData و کلیدهای نامعتبر رجیستری", 94);
+            Live("پویش عمیق رجیستری و بقایای نرم‌افزارها",
+                "شناسایی ارجاعات مفقود در AppData و حذف کلیدهای نامعتبر رجیستری", 94);
             await Task.Delay(50);
             long freed = 0;
             try
@@ -846,8 +849,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepStartupAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("startupOptimize")) return new { mb = 0L };
-            Live("در حال بهینه سازی استارتاپ ویندوز...",
-                "غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار", 95);
+            Live("ارزیابی و بهینه‌سازی استارتاپ ویندوز",
+                "بررسی اولویت بارگذاری و غیرفعال‌سازی سرویس‌ها و لانچرهای کندکننده بوت", 95);
             try
             {
                 s.DisabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
@@ -864,8 +867,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepTweaksAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("winTweaks")) return new { mb = 0L };
-            Live("در حال اعمال تنظیمات بهینه سازی ویندوز...",
-                "غیرفعال سازی پیشنهادات و سرویس های درگیرکننده پردازنده", 96);
+            Live("توقف تله‌متری و روان‌سازی پردازشی ویندوز",
+                "غیرفعال‌سازی DiagTrack و اعمال تنظیمات افزایش پاسخ‌دهی سیستم‌عامل", 96);
             try
             {
                 s.WinTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();

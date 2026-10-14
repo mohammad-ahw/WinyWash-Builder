@@ -194,13 +194,12 @@
                         <StackPanel x:Name="DashboardContentPanel" Spacing="10" HorizontalAlignment="Stretch" MaxWidth="960" Margin="24,0,24,20">
                         
                             <!-- 1. HERO CARD — هیروکارت داخل WebView2 (CleanC.hero.html) -->
-                            <!-- BorderThickness صفر است: کادر و radius را خود HTML (.hero) می‌کشد تا
-                                 کادر دوبار نشود و ارتفاع داخلی دقیقاً با height:100% داخل HTML بخواند. -->
                             <Border x:Name="HeroCard"
-                                    CornerRadius="12"
-                                    Height="170"
+                                    CornerRadius="14"
+                                    Height="205"
                                     Background="{ThemeResource AppCardBackgroundBrush}"
-                                    BorderThickness="0"
+                                    BorderBrush="{ThemeResource AppCardBorderBrush}"
+                                    BorderThickness="1"
                                     HorizontalAlignment="Stretch"
                                     Translation="0,0,32"
                                     Shadow="{StaticResource SharedCardShadow}">
@@ -212,15 +211,15 @@
                             <!-- ================================================================= -->
                             <!-- LIVE CLEANUP CARD & REPORT CARD (Preserved with exact contracts)  -->
                             <!-- ================================================================= -->
-                            <Border x:Name="LiveCleanupCard" Visibility="Collapsed" MinHeight="310" CornerRadius="12" Padding="20,16" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                            <Border x:Name="LiveCleanupCard" Visibility="Collapsed" MinHeight="330" CornerRadius="14" Padding="22,18" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                 <StackPanel Spacing="14" HorizontalAlignment="Stretch">
                                     <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
                                         <StackPanel Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
                                             <ProgressRing x:Name="LiveCleanSpinner" Width="20" Height="20" IsIndeterminate="True" />
                                             <FontIcon x:Name="LiveCleanDoneIcon" Glyph="&#xE73E;" FontSize="18" Foreground="{ThemeResource SystemFillColorSuccessBrush}" Visibility="Collapsed" />
                                             <StackPanel VerticalAlignment="Center" Spacing="2">
-                                                <TextBlock x:Name="LiveCleanStatusTitle" Text="در حال پویش هوشمند سرفصل های سیستم..." FontWeight="SemiBold" FontSize="13.5" />
-                                                <TextBlock x:Name="LiveCleanPhaseSubtitle" Text="در حال پردازش گام به گام سرفصل ها..." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                <TextBlock x:Name="LiveCleanStatusTitle" Text="در حال پویش هوشمند سرفصل‌های سیستم..." FontWeight="SemiBold" FontSize="14" />
+                                                <TextBlock x:Name="LiveCleanPhaseSubtitle" Text="در حال پردازش گام‌به‌گام سرفصل‌ها..." FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                         </StackPanel>
                                         <TextBlock x:Name="LiveFreedCounterText" Grid.Column="2" Text="+ 0 بایت آزاد شد" FontSize="15" FontWeight="Bold" Language="en-US" Foreground="{ThemeResource AccentFillColorDefaultBrush}" VerticalAlignment="Center" />
@@ -252,20 +251,20 @@
                                 </StackPanel>
                             </Border>
 
-                            <Border x:Name="CleanupReportCard" Visibility="Collapsed" CornerRadius="12" Padding="22,18" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
+                            <Border x:Name="CleanupReportCard" Visibility="Collapsed" CornerRadius="14" Padding="24,20" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" HorizontalAlignment="Stretch" Translation="0,0,16" Shadow="{StaticResource SharedCardShadow}">
                                 <StackPanel Spacing="16" HorizontalAlignment="Stretch">
                                     <Grid ColumnDefinitions="Auto,*,Auto" HorizontalAlignment="Stretch">
                                         <StackPanel Orientation="Horizontal" Spacing="12" VerticalAlignment="Center">
-                                            <Border Width="38" Height="38" CornerRadius="19" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
-                                                <FontIcon Glyph="&#xE73E;" FontSize="18" Foreground="{ThemeResource SystemFillColorSuccessBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                            <Border Width="40" Height="40" CornerRadius="20" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1">
+                                                <FontIcon Glyph="&#xE73E;" FontSize="19" Foreground="{ThemeResource SystemFillColorSuccessBrush}" HorizontalAlignment="Center" VerticalAlignment="Center" />
                                             </Border>
-                                            <StackPanel VerticalAlignment="Center" Spacing="2">
-                                                <TextBlock Text="گزارش نهایی و سلسله مراتبی بهینه سازی سیستم" FontWeight="SemiBold" FontSize="15" />
-                                                <TextBlock Text="عملیات با موفقیت پایان یافت؛ جزئیات سرفصل ها و تغییرات اعمال شده در زیر آمده است:" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                            <StackPanel VerticalAlignment="Center" Spacing="3">
+                                                <TextBlock Text="گزارش دستاوردهای بهینه‌سازی سیستم" FontWeight="SemiBold" FontSize="15" />
+                                                <TextBlock Text="عملیات با موفقیت پایان یافت؛ خلاصهٔ فضای آزادشده و اقدامات انجام‌شده در زیر آمده است:" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
                                             </StackPanel>
                                         </StackPanel>
-                                        <Border Grid.Column="2" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AccentFillColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="12,6" VerticalAlignment="Center">
-                                            <TextBlock x:Name="ReportTotalFreedText" Text="+ 0 بایت آزاد شد" FontSize="14" FontWeight="Bold" Language="en-US" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                        <Border Grid.Column="2" Background="{ThemeResource AppHeaderPillBrush}" BorderBrush="{ThemeResource AccentFillColorDefaultBrush}" BorderThickness="1" CornerRadius="8" Padding="14,6" VerticalAlignment="Center">
+                                            <TextBlock x:Name="ReportTotalFreedText" Text="+ 0 بایت آزاد شد" FontSize="14.5" FontWeight="Bold" Language="en-US" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
                                         </Border>
                                     </Grid>
                                     <Border Height="1" Background="{ThemeResource AppHeaderBorderBrush}" HorizontalAlignment="Stretch" />
