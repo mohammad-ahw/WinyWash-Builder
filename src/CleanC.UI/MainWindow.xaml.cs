@@ -3872,7 +3872,7 @@ namespace CleanC.UI
                 days[i] = byDate.TryGetValue(key, out var b) ? b : 0;
                 maxBytes = Math.Max(maxBytes, days[i]);
                 labels[i] = day.ToString("dd.MM", CultureInfo.InvariantCulture);
-                values[i] = days[i] > 0 ? SystemStats.FormatBytes(days[i]) : "—";
+                values[i] = days[i] > 0 ? SystemStats.FormatBytes(days[i]).Replace("گیگابایت", "گیگ") : "—";
             }
 
             // ستون ها به ترتیب در Children قرار دارند: TextBlock مقدار، Border نوار، TextBlock برچسب

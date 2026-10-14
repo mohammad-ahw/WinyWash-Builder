@@ -16,8 +16,8 @@ body{color:var(--fg);font-family:'Vazirmatn',system-ui,sans-serif;-webkit-font-s
 .hero{width:100%;height:100%;max-height:100%;border:none;border-radius:14px;box-sizing:border-box;background:radial-gradient(75% 150% at 38% 50%,color-mix(in srgb,var(--halo,var(--sc)) 28%,transparent),color-mix(in srgb,var(--halo,var(--sc)) 10%,transparent) 45%,transparent 75%);overflow:hidden;display:grid;grid-template-columns:1fr 240px auto;align-items:center;gap:12px;padding:8px 32px}
 .txt{min-width:0}
 .st{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mu)}.st i{width:7px;height:7px;border-radius:50%;background:var(--sc);box-shadow:0 0 0 4px color-mix(in srgb,var(--sc) 18%,transparent);transition:.4s}.st b{color:var(--fg);font-weight:500}
-h1{margin:6px 0 4px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weight:600;letter-spacing:-.01em;animation:fd .4s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.sub{font-size:13.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:22px;line-height:1.4;animation:fd .4s ease}
+h1{margin:6px 0 10px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weight:600;letter-spacing:-.01em;animation:fd .4s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{font-size:13.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:22px;line-height:1.4;margin-top:2px;animation:fd .4s ease}
 @keyframes fd{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
 .items{display:flex;align-items:center;gap:10px;margin-top:8px;font-size:12px;color:var(--mu);min-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .items b{color:var(--fg);font-weight:600}
@@ -338,8 +338,6 @@ function render(force){const v=pick();
  const rec=active.reduce((a,i)=>a+IT[i][5],0);
  const parts=[];
  if(rec>0)parts.push('قابل پاک‌سازی: <b>'+fmt(rec)+'</b>');
- if(lastTxt)parts.push('آخرین پاک‌سازی: <b>'+lastTxt+'</b>');
- if(total>0)parts.push('مجموع آزادشده: <b>'+total.toFixed(2)+' گیگابایت</b>');
  if(!parts.length)parts.push('وضعیت سیستم کاملاً پایدار و روان است');
  const meta=parts.join(' <span class="sep">·</span> ');
  const s=JSON.stringify(v)+tickI+meta+MR();if(!force&&s===sig)return;sig=s;
@@ -542,11 +540,11 @@ async function loadWeather(){if(ST.offline)return;try{const c=LS.g('cc_w',null);
 function wBucket(){const c=W.code,t=W.t;if(c>=95)return'storm';if((c>=71&&c<=77)||c==85||c==86)return'snow';if((c>=51&&c<=67)||(c>=80&&c<=82))return'rain';if(c==45||c==48)return'fog';if(t>=35)return'hot';if(t<=0)return'freeze';if(W.wind>=40)return'wind';if(t<=8)return'cold';if(c<=1)return W.day?'clearD':'clearN';if(c>=2)return'cloud';return'mild'}
 
 /* ---- speech bubble: 3 tones, no line repeats within the last 30 ---- */
-const TI=()=>({joke:0,serious:1,calm:2})[ST.tone]??0,used=[];let bubT=0;
+const TI=()=>({joke:0,serious:1,calm:2})[ST.tone]??0,used=[];let bubT=0,lastSayAt=0;
 const fill=s=>s.replace(/\{u\}/g,ST.uName||'رفیق').replace(/\{c\}/g,ST.cName||'سی‌سی').replace(/\{t\}/g,W.t).replace(/\{city\}/g,W.city||'اینجا');
 function pickLine(pool){if(!pool)return null;const all=(pool[TI()]||'').split('|').map(fill).filter(Boolean);if(!all.length)return null;let c=all.filter(s=>!used.includes(s));if(!c.length)c=all;const s=c[Math.random()*c.length|0];used.push(s);if(used.length>60)used.shift();return s}
-function bubble(t){const b=$('bub');b.textContent=t;b.classList.add('on');clearTimeout(bubT);bubT=setTimeout(()=>b.classList.remove('on'),2400+t.length*60)}
-function say(id,o){if(run)return;if(ST.calm&&!(o&&o.data))return;const s=pickLine(L[id])||pickLine(L.any);if(s)bubble(s)}
+function bubble(t){lastSayAt=T();const b=$('bub');b.textContent=t;b.classList.add('on');clearTimeout(bubT);bubT=setTimeout(()=>b.classList.remove('on'),2400+t.length*60)}
+function say(id,o){if(run)return;if(ST.calm&&!(o&&o.data))return;const t=T();if(!o?.urgent&&t-lastSayAt<1.8&&$('bub').classList.contains('on'))return;const s=pickLine(L[id])||pickLine(L.any);if(s)bubble(s)}
 
 /* ---- varied healthy-state headline: new pick on every open, avoids the last 10 shown ---- */
 let hl={head:SER[0],sub:SUBS[0],mood:'excellent'};
