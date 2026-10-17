@@ -103,7 +103,13 @@ namespace CleanC.Core.Services
             "bluetooth", "wireless", "wlan", "wifi", "ethernet"
         };
 
-        public static List<StartupItem> GetStartupItems()
+        /// <param name="includeExtraSources">
+        /// منابع اضافه (RunOnce/StartupTask MSIX/تسک‌های Logon-Boot با schtasks) فقط برای
+        /// نمایشِ کاملِ لیستِ مدیر استارتاپ لازم است؛ در بهینه‌سازی خودکار این موارد
+        /// عمداً دست‌نخورده می‌مانند و پیمایشِ گران‌شان (schtasks حدود چند ثانیه) مصرف
+        /// ندارد — درخواستِ فاز ۱۹: اجرای کامل هیرو چند ثانیه در «مرتب‌سازی استارتاپ» معطل نفماند.
+        /// </param>
+        public static List<StartupItem> GetStartupItems(bool includeExtraSources = true)
         {
             var list = new List<StartupItem>();
 
@@ -129,7 +135,10 @@ namespace CleanC.Core.Services
 
             // 6.5. A10: RunOnce + StartupTaskهای MSIX + تسک های Logon/Boot
             //      (قبل از ScanCleanCDisabledItems تا آیتم های غیرفعال شده توسط خودمان دوباره اضافه نشوند)
-            StartupExtraSources.Scan(list);
+            if (includeExtraSources)
+            {
+                StartupExtraSources.Scan(list);
+            }
 
             // 7. Items previously disabled and backed up by CleanC
             ScanCleanCDisabledItems(list);
@@ -149,7 +158,9 @@ namespace CleanC.Core.Services
             return await Task.Run(() =>
             {
                 int disabledCount = 0;
-                var items = GetStartupItems();
+                // بدون منابع اضافه: RunOnce/تسک زمان‌بندی‌شده/StartupTask MSIX در همین حلقه
+                // عمداً رد می شوند؛ طلبِ چند ثانیه‌ایِ schtasks برایشان بیهوده است
+                var items = GetStartupItems(includeExtraSources: false);
 
                 foreach (var item in items)
                 {

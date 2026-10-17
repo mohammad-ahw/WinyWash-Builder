@@ -98,5 +98,64 @@ namespace CleanC.Core.Services
             }
             return closedCount;
         }
+
+        /// <summary>
+        /// «سبک‌سازی واقعی پردازنده»: بعد از دو نمونه‌گیری از TotalProcessorTime (فاصلهٔ ۵۰۰ms —
+        /// همان روشِ نمونه‌گیرِ هیرو)، پردازه‌های سنگینِ امن (غیرِ لیستِ حیاتی، خودِ برنامه) را
+        /// به اولویت BelowNormal می‌برد؛ چیزی بسته نمی‌شود و کاملاً برگشت‌پذیر است، ولی زمان‌بند
+        /// ویندوز فشارِ آن‌ها را واقعاً کم می‌کند. نام پرمصرف‌ترین مورد هم برمی‌گردد.
+        /// </summary>
+        /// <param name="minPercent">حداقل درصد مصرف CPU (نسبت به کل هسته‌ها) برای مداخله</param>
+        public static (int Lowered, string TopName) EaseHighCpuProcesses(double minPercent = 12.0)
+        {
+            var first = new Dictionary<int, TimeSpan>();
+            var list = new List<Process>();
+            foreach (var p in Process.GetProcesses())
+            {
+                try
+                {
+                    if (p.Id <= 4 || p.HasExited || p.Id == Environment.ProcessId) continue;
+                    first[p.Id] = p.TotalProcessorTime;
+                    list.Add(p);
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                    try { p.Dispose(); } catch { }
+                }
+            }
+
+            System.Threading.Thread.Sleep(500);
+
+            int lowered = 0;
+            string topName = "";
+            double topPct = 0;
+            int cores = Math.Max(1, Environment.ProcessorCount);
+            foreach (var p in list)
+            {
+                try
+                {
+                    if (p.HasExited || !first.TryGetValue(p.Id, out var t0)) continue;
+                    double pct = (p.TotalProcessorTime - t0).TotalMilliseconds / 500.0 / cores * 100.0;
+                    if (pct > topPct) { topPct = pct; topName = p.ProcessName; }
+                    if (pct < minPercent) continue;
+                    if (CriticalProcesses.Contains(p.ProcessName)) continue;
+                    var pc = p.PriorityClass;
+                    if (pc == ProcessPriorityClass.Idle || pc == ProcessPriorityClass.BelowNormal || pc == ProcessPriorityClass.RealTime) continue;
+                    p.PriorityClass = ProcessPriorityClass.BelowNormal;
+                    lowered++;
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+                finally
+                {
+                    p.Dispose();
+                }
+            }
+
+            return (lowered, topName);
+        }
     }
 }

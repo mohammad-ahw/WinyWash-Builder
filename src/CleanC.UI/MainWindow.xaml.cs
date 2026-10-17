@@ -3338,7 +3338,7 @@ namespace CleanC.UI
             try
             {
                 // GetStartupItems اسکن رجیستری + schtasks است؛ روی UI thread نباید بایستد
-                var items = await Task.Run(StartupOptimizerService.GetStartupItems);
+                var items = await Task.Run(() => StartupOptimizerService.GetStartupItems());
                 string csv = ReportExportService.BuildStartupCsv(items);
                 ReportExportService.WriteUtf8Bom(path, csv);
                 ShowInfoBar("خروجی گزارش", $"فهرست {items.Count} آیتم استارت آپ در «{path}» ذخیره شد.", InfoBarSeverity.Success);

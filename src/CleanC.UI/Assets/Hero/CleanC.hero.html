@@ -58,7 +58,7 @@ const SC=['#9fb2ff','#5fc8ff','#f2c14e','#6fd6ff','#7ff0a0','#ff9a5a','#ff8fc8',
 class S{constructor(v=0,k=140,d=16){this.v=v;this.t=v;this.w=0;this.k=k;this.d=d}u(dt){this.w+=(-this.k*(this.v-this.t)-this.d*this.w)*dt;this.v+=this.w*dt}}
 const sp={};['ef','lx','ly','b0','b1','b2','wk','dots','pk'].forEach(n=>sp[n]=new S());['ew','eh','lt','tl','hp'].forEach(n=>sp[n]=new S(0,170,19));sp.ew.v=sp.ew.t=18;sp.eh.v=sp.eh.t=30;sp.sq=new S(0,220,10);
 const hx=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
-let mi=1,col=hx('#7fd8ff'),scn=null,prog=0,celeb=0,bt=1,nb=2,ph=0,sw=0,now=0,t0=performance.now()/1e3,last=t0,mx=0,my=0,lastSp=0,lastZ=0,jx=0,jy=0,nj=0,cpu=17,ramv=54,dsk=64;
+let mi=1,col=hx('#7fd8ff'),scn=null,prog=0,celeb=0,bt=1,nb=2,ph=0,sw=0,now=0,t0=performance.now()/1e3,last=t0,lastDraw=t0,mx=0,my=0,lastSp=0,lastZ=0,jx=0,jy=0,nj=0,cpu=17,ramv=54,dsk=64;
 const Pt=[],add=o=>RM||ST.calm||Pt.push(Object.assign({l:1,vx:0,vy:0,g:0,r:3,c:[255,255,255],t:'d',d:1,a:0,vr:0},o));
 const rr=(a,b,w,h,r)=>{x.beginPath();x.roundRect(a,b,w,h,r)},lp=(a,b,t)=>a+(b-a)*t,RA=(c,a)=>`rgba(${c.map(Math.round)},${a})`;
 /* رنگ هاله دور کاراکتر = Accent ویندوز (از میزبان می‌آید). رنگ حالت (mood) برای چشم/صحنه/وضعیت جداگانه می‌ماند */
@@ -83,7 +83,15 @@ g.restore();x.save();x.globalAlpha=al;x.shadowColor=RA(c,.9);x.shadowBlur=22;x.d
 function star(s){x.beginPath();x.moveTo(0,-s);x.quadraticCurveTo(0,0,s,0);x.quadraticCurveTo(0,0,0,s);x.quadraticCurveTo(0,0,-s,0);x.quadraticCurveTo(0,0,0,-s);x.fill()}
 function chk(a,b,s){x.beginPath();x.moveTo(a-s,b);x.lineTo(a-s*.3,b+s*.7);x.lineTo(a+s,b-s*.6);x.stroke()}
 const pc=document.createElement('canvas');pc.width=pc.height=2;pc.getContext('2d').fillStyle='rgba(255,255,255,.07)';pc.getContext('2d').fillRect(0,0,1,1);const pat=x.createPattern(pc,'repeat');
-function frame(){now=performance.now()/1e3;const dt=Math.min(now-last,.05);last=now;
+function frame(){requestAnimationFrame(frame);if(document.hidden)return;
+/* ترمز اقتصادی: وقتی رم/CPU/busy سنگین است، نرخ رسم به ~۳۰fps می‌افتد (نصفِ بارِ رندر
+   = سبک‌سازی واقعی WebView2). نرخِ ۱۱fps که اول گذاشتم روی سیستمِ «رم سنگین» همیشه
+   فعال می‌ماند و کاراکتر را یخ‌نما می‌کند — پس حداقلِ این ترمز ۳۰fps است تا کاراکتر
+   کاملاً زنده بماند؛ اگر سیستم واقعاً شلوغ نیست، ۶۰fps full speed. */
+const ntq=performance.now(),booting=(performance.now()/1e3-t0)<1.6,
+rq=booting?0:((ramHigh||ramv>=88||cpu>=88||window.CleanC.busy||run)?33:0);
+if(rq&&ntq-lastDraw<rq)return;lastDraw=ntq;
+now=performance.now()/1e3;const dt=Math.min(now-last,.05);last=now;
 const m=M[mi];let k=m[0],c=m[2],pose=m[3].slice(),bars=[cpu/100,ramv/100,dsk/100];
 if(celeb>now&&!MR()){k='celeb';pose=[22,30,0,0,1];c='#7dffbf';bars=[.1,.2,.2]}
 else if(scn!=null){k='work';const e2=sp.ef.t>.55;pose=e2?[22,22,.38,.12,0]:[20,26,.2,0,0];c=SC[scn];bars=[.3+.5*sp.ef.v,.4,.4]}
@@ -975,7 +983,7 @@ R.filter(r=>r.g=='occ').forEach(r=>{const oo=r.o;r.o=u=>{x.fillText=(s,a,b)=>{x.
 const AC=(id,n,ul,parts)=>({id,n,ul,parts:parts.map(p=>[new Path2D(p[0]),p[1],p[2],p[3]||1.4,p[4]])});
 const ACC=[AC('none','بدون اکسسوری',0,[]),
 AC('tech','تکنسین',0,[['M-12 0A12 10 0 0 1 12 0ZM-14 0H14',0,-46],['M-3-9A4 4 0 0 1 3-9L2-4L-2-4ZM0-4V9',52,30]]),
-AC('gamer','گیمر',1,[['M-34 5C-34-40 34-40 34 5M-38 0H-30V14H-38ZM30 0H38V14H30Z',0,-8,1]]),
+AC('gamer','گیمر',1,[['M-68-26C-58-76 58-76 68-26M-72-24H-60V10H-72ZM60-24H72V10H60Z',0,0,1]]),
 AC('student','دانشجو',2,[['M-18-4L0-12L18-4L0 4ZM-10 0V8C-4 12 4 12 10 8V0',0,-46]]),
 AC('formal','رسمی',3,[['M0 0L-12-7V7ZM0 0L12-7V7Z',0,48]]),
 AC('detective','کارآگاه',4,[['M-14-2C-14-12 14-12 14-2ZM-20-2H20',0,-44],['M0 0a7 7 0 1 0 .01 0M5 5L12 12',55,35]]),
@@ -995,7 +1003,7 @@ AC('disco','دیسکو',30,[['M0 0a8 8 0 1 0 .01 0M-8 0H8M0-8V8M0-18V-8',0,-60,1
 AC('crystal','کریستالی',32,[['M0-10L8 0L0 10L-8 0Z',-48,-30],['M0-10L8 0L0 10L-8 0Z',48,-30],['M0-10L8 0L0 10L-8 0Z',0,-58]])];
 const AI={};ACC.forEach(a=>AI[a.id]=a);Object.assign(OPT,{look:OPT.look||'none',occLook:OPT.occLook||'',size:OPT.size||1});
 let inkAt=0,ink='#888';const occToday=()=>R.some(r=>r.g=='occ'&&r.when());
-function ACCD(k){const id=(OPT.occLook&&occToday())?OPT.occLook:OPT.look,A=AI[id];if(!A||!A.parts.length||(A.ul>AGE()&&id!='none'))return;if(now-inkAt>1){ink=getComputedStyle(document.body).color;inkAt=now}x.save();x.shadowBlur=0;x.lineCap=x.lineJoin='round';x.strokeStyle=ink;x.translate((sp.dx&&sp.dx.v)||0,(sp.dy&&sp.dy.v)||0);A.parts.forEach(([P,tx,ty,s])=>{x.save();x.translate(tx,ty+(id=='music'?sn(now*3)*3:0));x.scale(s,s);x.lineWidth=1.5/s;x.stroke(P);x.restore()});x.restore()}
+function ACCD(k){const id=(OPT.occLook&&occToday())?OPT.occLook:OPT.look,A=AI[id];if(!A||!A.parts.length||(A.ul>AGE()&&id!='none'))return;if(now-inkAt>1){ink=getComputedStyle(document.body).color;inkAt=now}x.save();x.shadowBlur=0;x.lineCap=x.lineJoin='round';x.strokeStyle=ink;A.parts.forEach(([P,tx,ty,s])=>{x.save();x.translate(tx,ty+(id=='music'?sn(now*3)*3:0));x.scale(s,s);x.lineWidth=1.5/s;x.stroke(P);x.restore()});x.restore()}
 /* اندازه کاراکتر با گنجایش کارت هیرو هم‌خوان می شود: بالای ~۱.۲۵× از مرزِ
    کارت بیرون می زند؛ مقدارهای ذخیره شده قدیمی اینجا سقف می خورند */
 const applySize=()=>{OPT.size=Math.max(.7,Math.min(1.25,OPT.size||1));cv.style.transform='scale('+OPT.size+')'};applySize();

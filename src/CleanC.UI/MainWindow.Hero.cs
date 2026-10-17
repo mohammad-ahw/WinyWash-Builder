@@ -1432,13 +1432,20 @@ namespace CleanC.UI
                         ShowInfoBar("اصلاح اتصال اینترنت", "پراکسی نامعتبر ویندوز خاموش شد و تنظیمات شبکه نوسازی گردید.", InfoBarSeverity.Success);
                         break;
                     case "ram":
+                    {
                         var boost = await OptimizerService.BoostRamAsync();
+                        // هم‌زمان با رم، روندهای به‌روزرسانی پس‌زمینه هم بسته شوند تا CPU پشتِ رم
+                        // واقعاً سبک شود — طبق درخواست: «هم رم هم پردازش، نه الکی»
+                        int ramHelpers = await Task.Run(ProcessManagerService.CleanBackgroundHelpers);
                         _heroRamAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(5);
-                        string ramMsg = boost.FreedBytes > 0
-                            ? $"حافظهٔ رم با موفقیت بهینه‌سازی شد ({SystemStats.FormatBytes(boost.FreedBytes)} آزاد شد)."
-                            : "حافظهٔ رم بررسی و تمام کش‌های غیرضروری تخلیه شدند.";
+                        string ramMsg = ramHelpers > 0
+                            ? $"حافظه رم بهینه شد ({SystemStats.FormatBytes(boost.FreedBytes)} آزاد شد) و {ramHelpers} روندهای پس‌زمینه بسته شدند."
+                            : boost.FreedBytes > 0
+                                ? $"حافظه رم با موفقیت بهینه‌سازی شد ({SystemStats.FormatBytes(boost.FreedBytes)} آزاد شد)."
+                                : "حافظه رم بررسی و تمام کش‌های غیرضروری تخلیه شدند.";
                         ShowInfoBar("آزادسازی رم", ramMsg, InfoBarSeverity.Success);
                         break;
+                    }
                     case "browser":
                     {
                         long beforeBytes = 0;
@@ -1475,10 +1482,22 @@ namespace CleanC.UI
                         break;
                     }
                     case "cpu":
+                    {
+                        // «نه الکی»: اولویت پردازه‌های سنگین واقعاً به BelowNormal می‌رود و
+                        // روندهای به‌روزرسانی پس‌زمینه بسته می‌شوند — متن InfoBar دقیق گزارش می‌شود
+                        int helpers = await Task.Run(ProcessManagerService.CleanBackgroundHelpers);
+                        var (lowered, topName) = await Task.Run(() => ProcessManagerService.EaseHighCpuProcesses());
                         _heroTopCpu = "";
                         _heroCpuAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(5);
-                        ShowInfoBar("مدیریت پردازش‌ها", "وضعیت پردازنده پایش شد و پردازش‌های پس‌زمینه بهینه‌سازی شدند.", InfoBarSeverity.Informational);
+                        string top = string.IsNullOrEmpty(topName) ? "" : $" پرمصرف‌ترین: {topName}.";
+                        string cpuMsg = lowered > 0
+                            ? $"{lowered} پردازهٔ سنگین به اولویت پایین منتقل و {helpers} روندهای پس‌زمینه بسته شد.{top}"
+                            : helpers > 0
+                                ? $"{helpers} روندهای پس‌زمینه بسته شد و پردازنده پایش شد.{top}"
+                                : $"پردازنده پایش شد؛ پردازهٔ قابل مداخله‌ای پیدا نشد.{top}";
+                        ShowInfoBar("مدیریت پردازش‌ها", cpuMsg, InfoBarSeverity.Success);
                         break;
+                    }
                 }
             }
             catch (Exception ex)
