@@ -1004,8 +1004,9 @@ namespace CleanC.UI
                     if (await BloatwareService.RemoveAppAsync(app))
                     {
                         s.BorderlineRemoved++;
-                        s.BorderlineFreed += app.SizeBytes;
-                        freed += app.SizeBytes;
+                        // اندازه تخمینی در آمار آزادسازی واقعی حساب نمی شود
+                        s.BorderlineFreed += app.SizeIsEstimate ? 0 : app.SizeBytes;
+                        freed += app.SizeIsEstimate ? 0 : app.SizeBytes;
                     }
                 }
 

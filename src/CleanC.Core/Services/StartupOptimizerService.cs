@@ -292,7 +292,10 @@ namespace CleanC.Core.Services
                         // قالب v3: v3|Location|ServiceKey|OriginalValue|Command|OriginalKind
                         // (v2 و قالب قدیمی فقط برای خواندن رکوردهای موجود پشتیبانی می شوند)
                         string entryData = $"v3|{item.Location}|{serviceKey}|{originalValue}|{item.Command}|{originalKind}";
-                        bkKey.SetValue(item.Name, entryData, RegistryValueKind.String);
+                        // کلید رکورد بکاپ پیش‌تر صرفاً Name بود؛ برنامه های هم‌نام در
+                        // مکان های مختلف (HKCU/HKLM/…) بکاپ یکدیگر را بازنویسی می کردند
+                        // و فعال‌سازی فقط یکی از آن ها بازگردانیِ درست داشت.
+                        bkKey.SetValue(BuildBackupToken(item.Location, item.Name), entryData, RegistryValueKind.String);
                     }
                 }
 
@@ -397,42 +400,58 @@ namespace CleanC.Core.Services
             return true;
         }
 
-        public static bool RestoreStartupItem(string itemName)
+        // کلید رکورد بکاپ: «Location|Name» تا هم‌نام‌ها از هم جدا بمانند
+        private static string BuildBackupToken(string location, string name)
+            => $"{location}|{name}";
+
+        public static bool RestoreStartupItem(string itemName, string? location = null)
         {
             try
             {
                 using var bkKey = Registry.CurrentUser.OpenSubKey(CleanCBackupKey, true);
                 if (bkKey == null) return false;
 
-                string? val = bkKey.GetValue(itemName) as string;
+                // رکوردهای جدید با کلید «Location|Name» ذخیره شده اند؛ رکوردهای
+                // نسخه های قبلی فقط «Name» — اول جدید و بعد قدیمی جستجو می شود
+                string recordKey = itemName;
+                if (!string.IsNullOrEmpty(location))
+                {
+                    string token = BuildBackupToken(location, itemName);
+                    string? tokenVal = bkKey.GetValue(token) as string;
+                    if (!string.IsNullOrEmpty(tokenVal))
+                    {
+                        recordKey = token;
+                    }
+                }
+                string? val = bkKey.GetValue(recordKey) as string;
                 if (string.IsNullOrEmpty(val)) return false;
 
-                if (!TryParseBackup(val, out string location, out string serviceKey, out string originalValue,
+                if (!TryParseBackup(val, out string bkLocation, out string serviceKey, out string originalValue,
                         out string command, out string originalKind))
                     return false;
 
                 // نوع مقدار اصلی (REG_EXPAND_SZ در برابر REG_SZ) را حفظ می کنیم
                 RegistryValueKind kind = ParseKind(originalKind);
 
-                if (location == "HKCU")
+                if (bkLocation == "HKCU")
                 {
                     using var runKey = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
                     if (runKey == null) return false;
                     runKey.SetValue(itemName, command, kind);
                 }
-                else if (location == "HKLM")
+                else if (bkLocation == "HKLM")
                 {
                     using var runKey = Registry.LocalMachine.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run");
                     if (runKey == null) return false;
                     runKey.SetValue(itemName, command, kind);
                 }
-                else if (location == "HKLM (32-bit)")
+                else if (bkLocation == "HKLM (32-bit)")
                 {
                     using var runKey = Registry.LocalMachine.CreateSubKey(@"Software\WOW6432Node\Microsoft\Windows\CurrentVersion\Run");
                     if (runKey == null) return false;
                     runKey.SetValue(itemName, command, kind);
                 }
-                else if (location == "WindowsService")
+                else if (bkLocation == "WindowsService")
                 {
                     // ServiceKey واقعی نام کلید است، نه DisplayName
                     string keyName = string.IsNullOrEmpty(serviceKey) ? itemName : serviceKey;
@@ -443,7 +462,7 @@ namespace CleanC.Core.Services
                     int restoreStart = int.TryParse(originalValue, out int ov) ? ov : 2;
                     svcKey.SetValue("Start", restoreStart, RegistryValueKind.DWord);
                 }
-                else if (location == "UserStartupFolder" || location == "CommonStartupFolder")
+                else if (bkLocation == "UserStartupFolder" || bkLocation == "CommonStartupFolder")
                 {
                     string disabledPath = command + ".disabled";
                     if (File.Exists(disabledPath))
@@ -453,19 +472,19 @@ namespace CleanC.Core.Services
                     }
                 }
                 // A10
-                else if (location == "HKCU RunOnce" || location == "HKLM RunOnce")
+                else if (bkLocation == "HKCU RunOnce" || bkLocation == "HKLM RunOnce")
                 {
-                    var runRoot = location == "HKCU RunOnce" ? Registry.CurrentUser : Registry.LocalMachine;
+                    var runRoot = bkLocation == "HKCU RunOnce" ? Registry.CurrentUser : Registry.LocalMachine;
                     using var runKey = runRoot.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\RunOnce");
                     if (runKey == null) return false;
                     runKey.SetValue(itemName, command, kind);
                 }
-                else if (location == "TaskScheduler")
+                else if (bkLocation == "TaskScheduler")
                 {
                     if (string.IsNullOrWhiteSpace(serviceKey)) return false;
                     if (!StartupExtraSources.RunSchtasks($"/change /tn \"{serviceKey}\" /enable", out _)) return false;
                 }
-                else if (location == "StartupTask")
+                else if (bkLocation == "StartupTask")
                 {
                     if (string.IsNullOrWhiteSpace(serviceKey)) return false;
                     using var uwpKey = Registry.CurrentUser.CreateSubKey(
@@ -479,7 +498,7 @@ namespace CleanC.Core.Services
                     return false;
                 }
 
-                bkKey.DeleteValue(itemName, false);
+                bkKey.DeleteValue(recordKey, false);
                 return true;
             }
             catch
@@ -633,7 +652,14 @@ namespace CleanC.Core.Services
 
                 foreach (var valName in bkKey.GetValueNames())
                 {
-                    if (list.Any(x => x.Name.Equals(valName, StringComparison.OrdinalIgnoreCase))) continue;
+                    // رکوردهای جدید کلیدشان «Location|Name» است؛ نام نمایشی = بخش بعد از آخرین «|»
+                    string displayName = valName;
+                    int tokIdx = valName.LastIndexOf('|');
+                    if (tokIdx > 0)
+                        displayName = valName.Substring(tokIdx + 1);
+                    if (displayName.Length == 0) continue;
+
+                    if (list.Any(x => x.Name.Equals(displayName, StringComparison.OrdinalIgnoreCase))) continue;
 
                     string? data = bkKey.GetValue(valName)?.ToString();
                     if (string.IsNullOrWhiteSpace(data)) continue;
@@ -642,13 +668,13 @@ namespace CleanC.Core.Services
                     if (!TryParseBackup(data, out string loc, out string skey, out string _, out string cmd, out string _))
                         continue;
 
-                    bool isVpn = IsVpnApp(valName, cmd);
-                    string cat = ResolveStartupCategory(valName, cmd, false);
+                    bool isVpn = IsVpnApp(displayName, cmd);
+                    string cat = ResolveStartupCategory(displayName, cmd, false);
 
                     list.Add(new StartupItem
                     {
                         Id = $"CleanC_{valName}",
-                        Name = valName,
+                        Name = displayName,
                         Command = cmd,
                         Location = loc,
                         ServiceKey = skey,

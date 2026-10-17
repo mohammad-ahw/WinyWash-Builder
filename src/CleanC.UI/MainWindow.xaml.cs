@@ -867,7 +867,8 @@ namespace CleanC.UI
                         Margin = new Thickness(8, 0, 0, 0),
                         Child = new TextBlock
                         {
-                            Text = app.FormattedSize,
+                            // وقتی اندازه هاردکد تخمینی است، صادقانه به کاربر گفته می شود
+                            Text = app.FormattedSize + (app.SizeIsEstimate ? " (تخمینی)" : ""),
                             FontSize = 10.5,
                             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                             FlowDirection = FlowDirection.LeftToRight
@@ -911,7 +912,8 @@ namespace CleanC.UI
                             if (await BloatwareService.RemoveAppAsync(app))
                             {
                                 removed++;
-                                freed += app.SizeBytes;
+                                // اندازه تخمینی هرگز به «آزاد شده واقعی» افزوده نمی شود
+                                if (!app.SizeIsEstimate) freed += app.SizeBytes;
                             }
                         }
                         catch (Exception ex)
@@ -1515,7 +1517,8 @@ namespace CleanC.UI
                             if (success)
                             {
                                 removed++;
-                                freedBytes += app.SizeBytes;
+                                // اندازه تخمینی در آمار آزادسازی واقعی حساب نمی شود
+                                if (!app.SizeIsEstimate) freedBytes += app.SizeBytes;
                             }
                         }
 
@@ -3168,9 +3171,9 @@ namespace CleanC.UI
                 if (DeepStorageTabMessText != null) DeepStorageTabMessText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
                 if (DeepStorageTabLargeFilesText != null) DeepStorageTabLargeFilesText.Text = LocalizationService.Get("DeepStorageLargeFilesLabel", "فایل های حجیم");
                 if (DeepStorageSortLabel != null) DeepStorageSortLabel.Text = LocalizationService.Get("DeepStorageSortLabel", "مرتب سازی:");
-                if (DeepStorageSortSizeBtnText != null) DeepStorageSortSizeBtnText.Text = LocalizationService.Get("DeepStorageSortSize", "حجم 🔻");
-                if (DeepStorageSortDateBtnText != null) DeepStorageSortDateBtnText.Text = LocalizationService.Get("DeepStorageSortDate", "تاریخ 📅");
-                if (DeepStorageSortNameBtnText != null) DeepStorageSortNameBtnText.Text = LocalizationService.Get("DeepStorageSortName", "نام 🔤");
+                if (DeepStorageSortSizeBtnText != null) DeepStorageSortSizeBtnText.Text = LocalizationService.Get("DeepStorageSortSize", "حجم");
+                if (DeepStorageSortDateBtnText != null) DeepStorageSortDateBtnText.Text = LocalizationService.Get("DeepStorageSortDate", "تاریخ");
+                if (DeepStorageSortNameBtnText != null) DeepStorageSortNameBtnText.Text = LocalizationService.Get("DeepStorageSortName", "نام");
                 if (DeepStorageSelectAllCheck != null) DeepStorageSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
                 if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("CleanSelectedItems", "پاکسازی موارد انتخابی");
                 if (DeepStorageScanStatusText != null) DeepStorageScanStatusText.Text = LocalizationService.Get("DeepStorageScanStatus", "در حال پویش عمیق ساختار فایل ها و محاسبه هش محتوا...");
@@ -3787,7 +3790,12 @@ namespace CleanC.UI
                     heroBrowserSnoozeUntil = (_heroBrowserAlertSuppressedUntil == DateTime.MinValue ? "" : _heroBrowserAlertSuppressedUntil.ToString("o")),
                     history = _cleanupHistory.Select(h => new { date = h.Date, bytes = h.Bytes })
                 };
-                File.WriteAllText(statsFile, System.Text.Json.JsonSerializer.Serialize(obj));
+                // نوشتن اتمیک: اول فایل موقت و بعد جایگزینی کامل؛ اگر برنامه حین
+                // نوشتن بسته شود یا برق قطع شود، فایل قبلی سالم می ماند نه نیمه تمام
+                string json = System.Text.Json.JsonSerializer.Serialize(obj);
+                string tmpFile = statsFile + ".tmp";
+                File.WriteAllText(tmpFile, json);
+                File.Move(tmpFile, statsFile, true);
             }
             catch (Exception __ex)
             {

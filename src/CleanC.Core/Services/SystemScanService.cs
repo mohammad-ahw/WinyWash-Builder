@@ -486,12 +486,13 @@ namespace CleanC.Core.Services
                     {
                         Id = "telegramCache",
                         GroupId = "apps",
-                        Title = "کش پیام رسان تلگرام (Telegram)",
-                        Description = "پروفایل ها و رسانه های موقت کش شده تلگرام",
+                        Title = "دیتای پیام رسان تلگرام (Telegram Desktop)",
+                        Description = "پروفایل و رسانه های کش شده تلگرام؛ حاوی نشست ورود حساب شماست - پاکسازی خودکار عمداً غیرفعال است و فقط با تیک دستی انجام می شود",
                         Path = tgPath,
                         TargetPaths = new List<string> { tgPath },
                         Bytes = tgBytes,
-                        IconGlyph = "\uE71D"
+                        IconGlyph = "\uE71D",
+                        IsChecked = false
                     });
                 }
 
@@ -561,13 +562,13 @@ namespace CleanC.Core.Services
                     GroupId = "apps",
                     Title = "بکاپ‌های قدیمی گوشی و تبلت (Apple، سامسونگ، هواوی)",
                     Description = phoneBytes > 0
-                        ? "نسخه‌های پشتیبان حجیم و قدیمی دستگاه‌های موبایل و تبلت در کامپیوتر"
+                        ? "نسخه‌های پشتیبان حجیم دستگاه‌های موبایل؛ این تنها نسخه پشتیبان شماست - حذف خودکار عمداً غیرفعال است و فقط بعد از تیک دستی و مرور مسیر انجام می شود"
                         : "هیچ بکاپ قدیمی از گوشی یا تبلت در کامپیوتر یافت نشد",
                     Path = phoneBackupPaths.FirstOrDefault() ?? Path.Combine(userProfile, @"Apple\MobileSync\Backup"),
                     TargetPaths = phoneBackupPaths,
                     Bytes = phoneBytes,
                     IconGlyph = "\uE71D",
-                    IsChecked = phoneBytes > 0
+                    IsChecked = false
                 });
 
                 // Browser Dead Extensions & Orphaned IndexedDB Storage
@@ -1001,28 +1002,48 @@ namespace CleanC.Core.Services
             });
         }
 
+        // گارد پیمایش پوشه‌ها: تحلیلگر اندازه هرگز نباید روی درخت‌های پوشه‌های
+        // پهن/گودافتاده (مثل کش‌های سنگین) چند ده ثانیه گیر کند
+        private const int ScanMaxDepth = 6;
+        private const int ScanMaxFiles = 20000;
+        private static readonly TimeSpan ScanTimeBudget = TimeSpan.FromSeconds(2);
+
         public static long SafeGetDirectorySize(string path)
         {
             if (string.IsNullOrWhiteSpace(path) || !Directory.Exists(path))
                 return 0;
 
             long size = 0;
-            try
+            int files = 0;
+            var sw = System.Diagnostics.Stopwatch.StartNew();
+
+            void Walk(string dir, int depth)
             {
-                var dir = new DirectoryInfo(path);
-                foreach (var file in dir.EnumerateFiles("*", new EnumerationOptions { IgnoreInaccessible = true, RecurseSubdirectories = true }))
+                if (files >= ScanMaxFiles || sw.Elapsed > ScanTimeBudget) return;
+                var opts = new EnumerationOptions { IgnoreInaccessible = true };
+                try
                 {
-                    try { size += file.Length; } catch (Exception __ex)
+                    foreach (var file in new DirectoryInfo(dir).EnumerateFiles("*", opts))
+                    {
+                        if (files >= ScanMaxFiles || sw.Elapsed > ScanTimeBudget) return;
+                        try { size += file.Length; files++; } catch (Exception __ex)
 {
     CcLog.Ignore(__ex);
 }
+                    }
+                    if (depth < ScanMaxDepth)
+                    {
+                        foreach (var sub in new DirectoryInfo(dir).EnumerateDirectories("*", opts))
+                            Walk(sub.FullName, depth + 1);
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
                 }
             }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
 
+            Walk(path, 0);
             return size;
         }
 

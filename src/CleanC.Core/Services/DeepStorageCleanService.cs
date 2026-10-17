@@ -369,30 +369,36 @@ namespace CleanC.Core.Services
 
                     foreach (var hashGroup in filesByHash.Where(kvp => kvp.Value.Count > 1))
                     {
-                        var sortedFiles = hashGroup.Value.OrderBy(f => f.CreationTime).ToList();
-                        var group = new DuplicateFileGroup
+                        // مرحله دوم — هش کامل فایل: هش ۶۴ کیلوبایتی نخست فقط «نامزدِ»
+                        // یکی بودن را پیدا می کند؛ فایل هایی که فقط ۶۴ کیلوبایت اولشان
+                        // یکسان است ولی ادامه شان متفاوت (ایزو، ستاپ، آتلاس تصویری)
+                        // باید با هش کامل جدا شوند وگرنه بین دوتایی های واقعی جعل می شدند.
+                        var filesByFullHash = new Dictionary<string, List<FileInfo>>();
+                        foreach (var file in hashGroup.Value.OrderBy(f => f.CreationTime))
                         {
-                            FileHash = hashGroup.Key,
-                            SampleName = sortedFiles[0].Name,
-                            SingleSizeBytes = sortedFiles[0].Length
-                        };
-
-                        for (int i = 0; i < sortedFiles.Count; i++)
-                        {
-                            var f = sortedFiles[i];
-                            group.Files.Add(new DuplicateFileInfo
+                            try
                             {
-                                FilePath = f.FullName,
-                                FileName = f.Name,
-                                DirectoryPath = f.DirectoryName ?? string.Empty,
-                                SizeBytes = f.Length,
-                                LastModified = f.LastWriteTime,
-                                IsOriginal = (i == 0),
-                                IsSelectedForDeletion = (i > 0)
-                            });
+                                string fullHash = ComputeFullFileHash(file.FullName, md5);
+                                if (string.IsNullOrEmpty(fullHash)) continue;
+                                if (!filesByFullHash.TryGetValue(fullHash, out var list))
+                                {
+                                    list = new List<FileInfo>();
+                                    filesByFullHash[fullHash] = list;
+                                }
+                                list.Add(file);
+                            }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
                         }
 
-                        duplicateGroups.Add(group);
+                        foreach (var fullGroup in filesByFullHash.Where(kvp => kvp.Value.Count > 1))
+                        {
+                            duplicateGroups.Add(BuildDuplicateGroup(
+                                fullGroup.Key,
+                                fullGroup.Value.OrderBy(f => f.CreationTime).ToList()));
+                        }
                     }
                 }
 
@@ -425,6 +431,50 @@ namespace CleanC.Core.Services
                 CcLog.Ignore(__ex);
             }
             return string.Empty;
+        }
+
+        // هش کامل — فقط برای گروه های کوچکی که از فیلتر اول (۶۴KB اول + هم اندازه بودن) رد شده اند؛
+        // هزینه واقعی خواندن تمام فایل فقط برای همین نومزدهای نهایی پرداخته می شود.
+        private static string ComputeFullFileHash(string filePath, MD5 md5)
+        {
+            try
+            {
+                using var stream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read, 64 * 1024);
+                byte[] hash = md5.ComputeHash(stream);
+                return Convert.ToHexString(hash);
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return string.Empty;
+        }
+
+        private static DuplicateFileGroup BuildDuplicateGroup(string hash, List<FileInfo> sortedFiles)
+        {
+            if (sortedFiles.Count == 0) throw new ArgumentException(nameof(sortedFiles));
+            var group = new DuplicateFileGroup
+            {
+                FileHash = hash,
+                SampleName = sortedFiles[0].Name,
+                SingleSizeBytes = sortedFiles[0].Length
+            };
+
+            for (int i = 0; i < sortedFiles.Count; i++)
+            {
+                var f = sortedFiles[i];
+                group.Files.Add(new DuplicateFileInfo
+                {
+                    FilePath = f.FullName,
+                    FileName = f.Name,
+                    DirectoryPath = f.DirectoryName ?? string.Empty,
+                    SizeBytes = f.Length,
+                    LastModified = f.LastWriteTime,
+                    IsOriginal = (i == 0),
+                    IsSelectedForDeletion = (i > 0)
+                });
+            }
+            return group;
         }
 
         // F3 — همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند تا
@@ -502,8 +552,10 @@ namespace CleanC.Core.Services
                     };
                     using var p = Process.Start(psi);
                     if (p == null) return (false, "سرویس Docker روی سیستم نصب یا فعال نیست.");
-                    p.WaitForExit(30000);
-                    return p.ExitCode == 0
+                    // پراِن داکر روی کش های حجیم می تواند طولانی باشد؛ تایم اوت قبلی
+                    // سرانجام فریم های خروجی را نصفه می گرداند و خطای ناشناخته می داد
+                    bool ok = CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 300000, out int dockerCode);
+                    return ok && dockerCode == 0
                         ? (true, "کش داکر، ایمیج های بی استفاده و کانتینرهای متوقف شده با موفقیت پاکسازی شدند.")
                         : (false, "خطا در پاکسازی کش Docker.");
                 }
@@ -577,7 +629,7 @@ namespace CleanC.Core.Services
                     };
                     using (var p = Process.Start(psi))
                     {
-                        p?.WaitForExit(10000);
+                        CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 30000, out _);
                     }
 
                     string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
@@ -607,6 +659,7 @@ namespace CleanC.Core.Services
                     }
 
                     int compacted = 0;
+                    int compactionFailures = 0;
                     foreach (var vhdx in vhdxFiles)
                     {
                         string script = $"select vdisk file=\"{vhdx}\"\r\nattach vdisk readonly\r\ncompact vdisk\r\ndetach vdisk\r\n";
@@ -620,8 +673,16 @@ namespace CleanC.Core.Services
                                 CreateNoWindow = true
                             };
                             using var dp = Process.Start(dpPsi);
-                            dp?.WaitForExit(60000);
-                            compacted++;
+                            // متراکم‌سازی دیسک مجازی حجیم می‌تواند چند دقیقه طول بکشد؛
+                            // قبلاً ۶۰ ثانیه‌ای بود و وسط کار کشیده می‌شد و از موفقیت هم شمرده می‌شد!
+                            if (!CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(dp, 900000, out _))
+                            {
+                                compactionFailures++;
+                            }
+                            else
+                            {
+                                compacted++;
+                            }
                         }
                         finally
                         {
@@ -629,7 +690,10 @@ namespace CleanC.Core.Services
                         }
                     }
 
-                    return (true, $"تعداد {compacted} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد.");
+                    string finalMsg = compactionFailures > 0
+                        ? $"تعداد {compacted} دیسک مجازی WSL2 متراکم شد؛ {compactionFailures} مورد کامل نشد (دیسک حجم غالب می تواند کامل نشود)."
+                        : $"تعداد {compacted} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد.";
+                    return (true, finalMsg);
                 }
                 catch (Exception ex)
                 {
@@ -652,10 +716,12 @@ namespace CleanC.Core.Services
                     };
                     using var p = Process.Start(psi);
                     if (p == null) return (false, "امکان اجرای ابزار DISM وجود ندارد.");
-                    p.WaitForExit(90000);
-                    return p.ExitCode == 0
+                    // پاکسازی WinSxS معمولاً چند دقیقه طول می کشد؛ ۹۰ ثانیه ی قبلی
+                    // Escaped زمان خروج را نصفه می کشید و بی سر و صدا «خطا» می گذاشت.
+                    bool ok = CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 900000, out int code);
+                    return ok && code == 0
                         ? (true, "فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته های قدیمی حذف شدند.")
-                        : (false, "عملیات DISM با خطا یا نیاز به دسترسی Administrator پایان یافت.");
+                        : (false, "عملیات DISM با خطا، تایم اوت یا نیاز به دسترسی Administrator پایان یافت.");
                 }
                 catch (Exception ex)
                 {

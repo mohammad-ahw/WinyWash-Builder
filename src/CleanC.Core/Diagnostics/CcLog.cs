@@ -24,6 +24,7 @@ namespace CleanC.Core.Diagnostics
         private const int FlushIntervalMs = 500;
 
         private static readonly object _gate = new();
+        private static readonly object _fileGate = new();
         private static readonly Queue<string> _recent = new();
         private static readonly Queue<string> _pending = new();
 
@@ -122,27 +123,33 @@ namespace CleanC.Core.Diagnostics
                 _pending.Clear();
             }
 
-            string dir = LogDirectory;
-            Directory.CreateDirectory(dir);
-            string logPath = Path.Combine(dir, "ignored.log");
-
-            // حجم لاگ کنترل می شود تا پوشه CleanC به مرور زمان سنگین نشود (حداکثر ۱.۵ مگابایت)
-            try
+            // قفل نوشتن جداگانه: دو Thread همزمان ممکن است دسته ی متفاوتی از
+            // _pending را بگیرند؛ بدون این قفل خروجی فایل ترکیب نمی شود و
+            // چرخش لاگ هم با Append تداخل می کرد
+            lock (_fileGate)
             {
-                var fi = new FileInfo(logPath);
-                if (fi.Exists && fi.Length > 1_500_000)
+                string dir = LogDirectory;
+                Directory.CreateDirectory(dir);
+                string logPath = Path.Combine(dir, "ignored.log");
+
+                // حجم لاگ کنترل می شود تا پوشه CleanC به مرور زمان سنگین نشود (حداکثر ۱.۵ مگابایت)
+                try
                 {
-                    var existing = File.ReadAllLines(logPath);
-                    var retained = existing.Skip(Math.Max(0, existing.Length - 500));
-                    File.WriteAllLines(logPath, retained);
+                    var fi = new FileInfo(logPath);
+                    if (fi.Exists && fi.Length > 1_500_000)
+                    {
+                        var existing = File.ReadAllLines(logPath);
+                        var retained = existing.Skip(Math.Max(0, existing.Length - 500));
+                        File.WriteAllLines(logPath, retained);
+                    }
                 }
-            }
-            catch
-            {
-                // نادیده گرفتن خطای چرخش لاگ
-            }
+                catch
+                {
+                    // نادیده گرفتن خطای چرخش لاگ
+                }
 
-            File.AppendAllLines(logPath, lines);
+                File.AppendAllLines(logPath, lines);
+            }
         }
     }
 }

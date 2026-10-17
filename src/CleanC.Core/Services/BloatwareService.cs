@@ -26,6 +26,8 @@ namespace CleanC.Core.Services
         public string PackageFullName { get; set; } = string.Empty;
         public string UninstallString { get; set; } = string.Empty;
         public long SizeBytes { get; set; }
+        // صادقانه بودن آمار: اندازه تخمینی (هاردکد) هرگز نباید به «آزاد شده واقعی» اضافه شود
+        public bool SizeIsEstimate { get; set; }
         public string FormattedSize => SystemStats.FormatBytes(SizeBytes);
         public AppCategoryType CategoryType { get; set; }
         public string CategoryLabel { get; set; } = "Bloatware";
@@ -167,13 +169,14 @@ namespace CleanC.Core.Services
                 {
                     if (packageName.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase))
                     {
-                        long size = EstimatePackageSize(packageFullName);
+                        long size = EstimatePackageSize(packageFullName, out bool sizeIsEstimate);
                         result.Add(new CandidateAppItem
                         {
                             Id = packageFullName,
                             DisplayName = kvp.Value.Name,
                             PackageFullName = packageFullName,
                             SizeBytes = size,
+                            SizeIsEstimate = sizeIsEstimate,
                             CategoryType = AppCategoryType.Bloatware,
                             CategoryLabel = "تبلیغاتی / پیش فرض",
                             Description = kvp.Value.Desc,
@@ -189,13 +192,14 @@ namespace CleanC.Core.Services
                 {
                     if (packageName.Equals(kvp.Key, StringComparison.OrdinalIgnoreCase))
                     {
-                        long size = EstimatePackageSize(packageFullName);
+                        long size = EstimatePackageSize(packageFullName, out bool sizeIsEstimate);
                         result.Add(new CandidateAppItem
                         {
                             Id = packageFullName,
                             DisplayName = kvp.Value.Name,
                             PackageFullName = packageFullName,
                             SizeBytes = size,
+                            SizeIsEstimate = sizeIsEstimate,
                             CategoryType = AppCategoryType.Bloatware,
                             CategoryLabel = "ویندوز (غیرضروری)",
                             Description = kvp.Value.Desc,
@@ -257,6 +261,7 @@ namespace CleanC.Core.Services
                                 DisplayName = displayName,
                                 UninstallString = uninstallString ?? string.Empty,
                                 SizeBytes = 250 * 1024 * 1024,
+                                SizeIsEstimate = true,
                                 CategoryType = AppCategoryType.OemTrial,
                                 CategoryLabel = "نرم افزار لپ تاپ / تریال",
                                 Description = "نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم",
@@ -379,13 +384,14 @@ namespace CleanC.Core.Services
                                 {
                                     if (!list.Any(x => x.DisplayName.Equals(kvp.Value.Name, StringComparison.OrdinalIgnoreCase)))
                                     {
-                                        long size = EstimatePackageSize(packageFullName);
+                                        long size = EstimatePackageSize(packageFullName, out bool sizeIsEstimate);
                                         list.Add(new CandidateAppItem
                                         {
                                             Id = packageFullName,
                                             DisplayName = kvp.Value.Name,
                                             PackageFullName = packageFullName,
                                             SizeBytes = size,
+                                            SizeIsEstimate = sizeIsEstimate,
                                             CategoryType = AppCategoryType.BorderlineOptional,
                                             CategoryLabel = "اختیاری / در صورت عدم نیاز",
                                             Description = kvp.Value.Desc,
@@ -443,7 +449,8 @@ namespace CleanC.Core.Services
                     if (await RemoveAppAsync(app))
                     {
                         removed++;
-                        freed += app.SizeBytes;
+                        // اندازه تخمینی را به «آزادسازی واقعی» نمی افزاییم
+                        if (!app.SizeIsEstimate) freed += app.SizeBytes;
                     }
                 }
                 catch (Exception ex)
@@ -464,8 +471,10 @@ namespace CleanC.Core.Services
                     CreateNoWindow = true
                 };
                 using var p = Process.Start(psi);
-                p?.WaitForExit(15000);
-                return p?.ExitCode == 0;
+                // حذف پکیج سنگین (مثلاً اپ فایننس دستی) می تواند چند ده ثانیه طول بکشد؛
+                // تایم اوت ۱۵ ثانیه پیش‌خوان، حذف در حال پیشرفت را «شکست» حساب می کرد
+                // و ExitCode پردازه هنوز زنده خوانده می شود -> خطای InvalidOperationException
+                return CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 120000, out int code) && code == 0;
             }
             catch
             {
@@ -522,13 +531,14 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        private static long EstimatePackageSize(string packageFullName)
+        private static long EstimatePackageSize(string packageFullName, out bool isEstimate)
         {
             try
             {
                 string path = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "WindowsApps", packageFullName);
                 if (Directory.Exists(path))
                 {
+                    isEstimate = false;
                     return GetDirectorySizeFast(path);
                 }
             }
@@ -536,7 +546,9 @@ namespace CleanC.Core.Services
             {
                 CcLog.Ignore(__ex);
             }
-            return 85 * 1024 * 1024; // Default estimate 85 MB
+            // تخمین هاردکد: نه اندازه واقعی، فقط عدد تقریبی برای نمایش
+            isEstimate = true;
+            return 85 * 1024 * 1024;
         }
 
         private static long GetDirectorySizeFast(string dirPath)

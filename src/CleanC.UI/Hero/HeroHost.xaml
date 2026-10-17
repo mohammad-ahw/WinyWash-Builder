@@ -7,11 +7,24 @@
     mc:Ignorable="d">
 
     <!--
-      WebView2 فقط هیروکارت را می‌پوشاند (۱۷۰ پیکسل). پسزمینهٔ WebView شفاف است تا
+      WebView2 فقط هیروکارت را می‌پوشاند (۲۰۵ پیکسل). پسزمینهٔ WebView شفاف است تا
       گوشه‌های گِرد و حاشیهٔ کارت دقیقاً از CSS خود CleanC.hero.html بیاید؛
       اگر شفافیت روی دستگاهی اجرا نشد، رنگ کارت در HeroHost.cs جایگزین می‌شود.
     -->
     <Grid x:Name="RootGrid" Background="Transparent" CornerRadius="14">
         <WebView2 x:Name="WebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <!--
+          جایگزینِ بی‌نقص: اگر WebView2 Runtime روی دستگاه نصب نباشد یا راه‌اندازی
+          شکست بخورد، کارت هیرو به یک کارت متنی ساده و صادقانه سقوط می کند
+          (قبلاً در این حالت برای همیشه یک کارت خالی سفید/سیاه نشان داده می شد).
+        -->
+        <Border x:Name="FallbackPanel" Background="Transparent" Visibility="Collapsed" Padding="18,8">
+            <StackPanel Spacing="5" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <TextBlock Text="CleanC در حال مراقبت از سیستم شماست" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" TextWrapping="Wrap" />
+                <TextBlock x:Name="FallbackSubtitle"
+                           Text="نمایش گرافیکی داروگ بر روی این دستگاه در دسترس نیست؛ بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر فعال هستند."
+                           FontSize="11" Opacity="0.75" TextWrapping="Wrap" TextAlignment="Center" />
+            </StackPanel>
+        </Border>
     </Grid>
 </UserControl>

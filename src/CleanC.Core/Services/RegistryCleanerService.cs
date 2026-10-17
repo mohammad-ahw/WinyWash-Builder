@@ -318,7 +318,7 @@ namespace CleanC.Core.Services
                         string? root = Path.GetPathRoot(exePath);
                         if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
 
-                        if (!File.Exists(exePath))
+                        if (IsExeReallyMissing(exePath))
                         {
                             string disp = svcKey.GetValue("DisplayName")?.ToString() ?? subName;
                             list.Add(new OrphanedServiceItem
@@ -341,6 +341,34 @@ namespace CleanC.Core.Services
                 CcLog.Ignore(__ex);
             }
             return list;
+        }
+
+        // تشخیص واقعی «فایل اجرایی ناموجود» برای صدور حکم «سرویس یتیم»:
+        // File.Exists کافی نیست؛ خطای دسترسی (بدون ادمین) نباید یتیم حساب شود.
+        // همچنین در پروسس ۳۲ بیتی، System32 به SysWOW64 ریدایرکت می شود و
+        // سرویس های ۶۴ بیتی سالم باید از مسیر Sysnative سنجیده شوند.
+        private static bool IsExeReallyMissing(string exePath)
+        {
+            string probe = exePath;
+            if (Environment.Is64BitOperatingSystem && !Environment.Is64BitProcess)
+            {
+                const string sys32 = @"C:\Windows\System32";
+                if (probe.StartsWith(sys32, StringComparison.OrdinalIgnoreCase))
+                    probe = string.Concat(@"C:\Windows\Sysnative", probe.AsSpan(sys32.Length));
+            }
+            try
+            {
+                using var fs = File.OpenRead(probe);
+                return false;
+            }
+            catch (FileNotFoundException) { return true; }
+            catch (DirectoryNotFoundException) { return true; }
+            // دسترسی/قفل بودن، حکم یتیم بودن را ثابت نمی کند → نادیده بگیر
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+                return false;
+            }
         }
 
         public static int DisableOrphanedServices(IEnumerable<string>? serviceNames = null)

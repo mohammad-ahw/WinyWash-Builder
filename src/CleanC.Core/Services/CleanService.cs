@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
@@ -54,9 +55,37 @@ namespace CleanC.Core.Services
                 {
                     // D5: تأیید خالی کردن سطل بازیافت را به خود ویندوز می سپاریم
                     // (SHERB_NOCONFIRMATION حذف شد) تا کاربر قبل از پاکسازی دائمی بداند چه می کند.
-                    int hr = Win32.SHEmptyRecycleBin(IntPtr.Zero, null,
-                        Win32.SHERB_NOPROGRESSUI | Win32.SHERB_NOSOUND);
+                    //
+                    // SHEmptyRecycleBin نیازمند apartment سازگار با شل (STA/MMSTA) است؛
+                    // صدا زدن مستقیم روی Thread موجود در Task.Run دچار خطای E_UNEXPECTED
+                    // می شود، پس روی Thread مخصوص STA اجرا می کنیم و نتیجه برمی گردد.
+                    int hr = -1;
+                    var staThread = new Thread(() =>
+                    {
+                        try
+                        {
+                            hr = Win32.SHEmptyRecycleBin(IntPtr.Zero, null,
+                                Win32.SHERB_NOPROGRESSUI | Win32.SHERB_NOSOUND);
+                        }
+                        catch
+                        {
+                            hr = -1;
+                        }
+                    })
+                    {
+                        IsBackground = true,
+                        Name = "CleanC-RecycleBin-STA"
+                    };
+                    staThread.SetApartmentState(System.Threading.ApartmentState.STA);
+                    staThread.Start();
+                    if (!staThread.Join(TimeSpan.FromSeconds(120)))
+                    {
+                        // ویندوز دیالوگ حذف امنیت را باز نگه داشته است؛ برای گیر نکردن کل
+                        // روند پاکسازی صرفنظر می کنیم (Thread پس زمینه است و می ماند)
+                        return 0;
+                    }
                     // فقط در صورت موفقیت (S_OK) فضای تخمینی را به عنوان آزادشده بپذیر
+                    // (بر خلاف قبل، فضای واقعی سنجیده نمی شود چون شل خودش حساب می کند)
                     return hr == 0 ? item.Bytes : 0;
                 }
                 catch

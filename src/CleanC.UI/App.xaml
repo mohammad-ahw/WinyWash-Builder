@@ -189,31 +189,76 @@
                     <SolidColorBrush x:Key="AppAccentTintBrush" Color="#2460CDFF" />
                     <SolidColorBrush x:Key="AppAccentBorderBrush" Color="#6660CDFF" />
                 </ResourceDictionary>
+
+                <!-- =================================================================
+                     HighContrast: همه سطوح کاملاً مات تعریف می شوند (بدون شیشه/آکریلیک)
+                     تا روی طرح‌های High Contrast ویندوز متن ها خوانا بمانند
+                     ================================================================= -->
+                <ResourceDictionary x:Key="HighContrast">
+                    <SolidColorBrush x:Key="WindowCanvasBrush" Color="#FF000000" />
+                    <SolidColorBrush x:Key="TextFillColorPrimaryBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="TextFillColorSecondaryBrush" Color="#FFE8E8E8" />
+                    <SolidColorBrush x:Key="TextFillColorTertiaryBrush" Color="#FFD0D0D0" />
+                    <SolidColorBrush x:Key="DefaultTextForegroundThemeBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="ButtonForeground" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="ButtonForegroundPointerOver" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="ButtonForegroundPressed" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="AppCardBackgroundBrush" Color="#FF121212" />
+                    <SolidColorBrush x:Key="AppCardBorderBrush" Color="#FF737373" />
+                    <SolidColorBrush x:Key="AppCardSecondaryBrush" Color="#FF1F1F1F" />
+                    <SolidColorBrush x:Key="AppHeaderBackgroundBrush" Color="#FF101010" />
+                    <SolidColorBrush x:Key="AppHeaderBorderBrush" Color="#FF5A5A5A" />
+                    <SolidColorBrush x:Key="AppHeaderPillBrush" Color="#FF2A2A2A" />
+                    <SolidColorBrush x:Key="AppHeaderPillHoverBrush" Color="#FF3A3A3A" />
+                    <SolidColorBrush x:Key="AdminBadgeBackgroundBrush" Color="#FF2A2A2A" />
+                    <SolidColorBrush x:Key="AdminBadgeBorderBrush" Color="#FF737373" />
+                    <SolidColorBrush x:Key="AdminBadgeForegroundBrush" Color="#FFFFFFFF" />
+                    <SolidColorBrush x:Key="AppToastBackgroundBrush" Color="#FF101010" />
+                    <SolidColorBrush x:Key="AppToastBorderBrush" Color="#FF737373" />
+                    <SolidColorBrush x:Key="HeroCardBackgroundBrush" Color="#FF0E1726" />
+                    <LinearGradientBrush x:Key="HeroScrimBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#00000000" Offset="0.0" />
+                        <GradientStop Color="#00000000" Offset="0.45" />
+                        <GradientStop Color="#9905070C" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="HeroTitleBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroSubtitleBrush" Color="#D9FFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipLabelBrush" Color="#CCFFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipValueBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroChipBackgroundBrush" Color="#47000000" />
+                    <SolidColorBrush x:Key="HeroChipBorderBrush" Color="#24FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetryLabelBrush" Color="#D9FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetryValueBrush" Color="#FFFFFF" />
+                    <SolidColorBrush x:Key="HeroTelemetrySeparatorBrush" Color="#A0FFFFFF" />
+                    <Color x:Key="ExpanderHeaderHoverColor">#2A2A2A</Color>
+                    <Color x:Key="ExpanderHeaderPressedColor">#3A3A3A</Color>
+                    <SolidColorBrush x:Key="HealthGaugeTrackBrush" Color="#FF2F2F2F" />
+                    <LinearGradientBrush x:Key="AppSparklineFillBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#60FFFFFF" Offset="0.0" />
+                        <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="SparklineStrokeRamBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="SparklineStrokeCpuBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <SolidColorBrush x:Key="SparklineStrokeDiskBrush" Color="{ThemeResource SystemAccentColor}" />
+                    <LinearGradientBrush x:Key="SparklineFillRamBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#60FFFFFF" Offset="0.0" />
+                        <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="SparklineFillCpuBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#60FFFFFF" Offset="0.0" />
+                        <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <LinearGradientBrush x:Key="SparklineFillDiskBrush" StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#60FFFFFF" Offset="0.0" />
+                        <GradientStop Color="#00FFFFFF" Offset="1.0" />
+                    </LinearGradientBrush>
+                    <SolidColorBrush x:Key="AppAccentTintBrush" Color="#60FFFFFF" />
+                    <SolidColorBrush x:Key="AppAccentBorderBrush" Color="#FF737373" />
+                </ResourceDictionary>
             </ResourceDictionary.ThemeDictionaries>
 
-            <!-- Professional Windows 11 Boost Button Brushes -->
-            <LinearGradientBrush x:Key="BoostGradientBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#0067C0" Offset="0.0" />
-                <GradientStop Color="#0078D4" Offset="1.0" />
-            </LinearGradientBrush>
-
-            <LinearGradientBrush x:Key="BoostHoverGradientBrush" StartPoint="0,0" EndPoint="1,1">
-                <GradientStop Color="#0078D4" Offset="0.0" />
-                <GradientStop Color="#1084E3" Offset="1.0" />
-            </LinearGradientBrush>
-
-            <SolidColorBrush x:Key="BoostBorderBrush" Color="#300078D4" />
-
-            <SolidColorBrush x:Key="AppAccentTintBrush" Color="#2460CDFF" />
-            <SolidColorBrush x:Key="AppAccentBorderBrush" Color="#6660CDFF" />
-
             <!-- Fluent 2 / Glassmorphism Design Tokens -->
-            <CornerRadius x:Key="CardCornerRadius">16</CornerRadius>
-            <CornerRadius x:Key="HeroCornerRadius">20</CornerRadius>
-            <CornerRadius x:Key="ButtonCornerRadius">8</CornerRadius>
             <FontFamily x:Key="AppFontFamily">Segoe UI Variable Text, Segoe UI, Microsoft YaHei, Yu Gothic UI, Malgun Gothic, Tahoma</FontFamily>
-            <FontFamily x:Key="AppFontBold">Segoe UI Variable Display, Segoe UI, Microsoft YaHei, Yu Gothic UI, Malgun Gothic, Tahoma</FontFamily>
-            <FontFamily x:Key="AppFontSemiBold">Segoe UI Variable Text, Segoe UI, Microsoft YaHei, Yu Gothic UI, Malgun Gothic, Tahoma</FontFamily>
 
             <Style TargetType="TextBlock">
                 <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />

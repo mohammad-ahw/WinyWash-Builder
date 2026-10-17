@@ -31,13 +31,8 @@ namespace CleanC.Core.Services
                     .ToList();
             }
 
-            // Fallback if system is already ultra-clean
-            if (itemsToClean.Count == 0)
-            {
-                var scan = await SystemScanService.ScanAsync();
-                itemsToClean = scan.Groups.SelectMany(g => g.Items).ToList();
-            }
-
+            // اگر هیچ موردی انتخاب نشده باشد: اسکن دوباره یا تیک‌زدن اجباری
+            // همه‌ی موارد انجام نمی‌شود؛ فقط فازهای بهینه‌سازی (بوست) اجرا می‌شوند
             int totalCount = itemsToClean.Count;
 
             // Report initial items so UI renders all candidate cards
@@ -51,7 +46,7 @@ namespace CleanC.Core.Services
                 InitialItems = itemsToClean
             });
 
-            await Task.Delay(300);
+            await Task.Delay(150);
 
             // =================================================================
             // PHASE 1: Sequential Probing (دونه دونه تیک خوردن تمام سرفصل ها)
@@ -73,7 +68,7 @@ namespace CleanC.Core.Services
                     ProgressPercent = pct
                 });
 
-                await Task.Delay(120);
+                await Task.Delay(60);
 
                 // Show item PROBED with GREEN CHECKMARK (✓) and formatted size
                 progress?.Report(new CleanupStepResult
@@ -88,7 +83,7 @@ namespace CleanC.Core.Services
                 });
 
                 // Delightful delay so the user experiences the satisfying check-off of each item
-                await Task.Delay(320);
+                await Task.Delay(160);
             }
 
             // Intermission
@@ -101,7 +96,7 @@ namespace CleanC.Core.Services
                 ProgressPercent = 48
             });
 
-            await Task.Delay(500);
+            await Task.Delay(150);
 
             // =================================================================
             // PHASE 2: Sequential Deletion & Animated Removal (دونه دونه حذف شدن)
@@ -126,11 +121,7 @@ namespace CleanC.Core.Services
 
                 // Perform real physical deletion
                 long freed = CleanService.CleanCategory(item);
-                if (freed <= 0 && item.Bytes > 0)
-                {
-                    freed = item.Bytes;
-                }
-                cumulativeFreed += freed;
+                cumulativeFreed += Math.Max(0, freed);
 
                 // Notify item cleaned (UI shows success highlight, updates counter, then removes with animation)
                 progress?.Report(new CleanupStepResult
@@ -147,7 +138,7 @@ namespace CleanC.Core.Services
                 });
 
                 // Pacing so the deletion and row collapse animation is visible and satisfying
-                await Task.Delay(340);
+                await Task.Delay(120);
             }
 
             // =================================================================
@@ -167,7 +158,7 @@ namespace CleanC.Core.Services
             OptimizerService.FlushDns();
             cumulativeFreed += boostResult.FreedBytes;
 
-            await Task.Delay(250);
+            await Task.Delay(150);
 
             // =================================================================
             // PHASE 4: Browser Background Preloading Suppression
@@ -186,7 +177,7 @@ namespace CleanC.Core.Services
             long extFreed = BrowserOptimizerService.CleanInactiveChromeExtensions();
             cumulativeFreed += extFreed;
             ProcessManagerService.CleanBackgroundHelpers();
-            await Task.Delay(250);
+            await Task.Delay(150);
 
             // =================================================================
             // PHASE 5: Startup Apps & Launchers Optimization
@@ -202,7 +193,7 @@ namespace CleanC.Core.Services
             });
 
             int disabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
-            await Task.Delay(250);
+            await Task.Delay(150);
 
             // =================================================================
             // PHASE 6: Windows Low-Risk Performance Tweaks
@@ -220,7 +211,7 @@ namespace CleanC.Core.Services
             int winTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
             int telemetryTweaks = await TelemetryOptimizerService.DisableTelemetryAndDiagTrackAsync();
             winTweaks += telemetryTweaks;
-            await Task.Delay(250);
+            await Task.Delay(150);
 
             // =================================================================
             // PHASE 7: GPU Graphics Preference Optimization
@@ -236,7 +227,7 @@ namespace CleanC.Core.Services
             });
 
             var gpuResult = await GpuOptimizerService.OptimizeGpuPreferencesAsync();
-            await Task.Delay(200);
+            await Task.Delay(120);
 
             // =================================================================
             // PHASE 8: Hardware, Display & Power Diagnostics
@@ -252,12 +243,14 @@ namespace CleanC.Core.Services
             });
 
             var attentionList = await HardwareDiagnosticService.RunDiagnosticsAsync();
-            await Task.Delay(200);
+            await Task.Delay(120);
 
             // =================================================================
             // PHASE 9: Completion Summary
             // =================================================================
             var descParts = new List<string>();
+            if (totalCount == 0)
+                descParts.Add("مورد پاکسازی جدیدی انتخاب نشده بود؛ فقط فازهای بهینه سازی (رم، مرورگر، استارتاپ) اجرا شد.");
             descParts.Add($"مجموعاً {SystemStats.FormatBytes(cumulativeFreed)} از حافظه رم و دیسک آزاد شد.");
             if (disabledStartups > 0) descParts.Add($"{disabledStartups} برنامه استارتاپ بهینه سازی شد.");
             if (gpuResult.ConfiguredAppsCount > 0) descParts.Add($"{gpuResult.ConfiguredAppsCount} برنامه به کارت گرافیک قدرتمند تخصیص یافت.");

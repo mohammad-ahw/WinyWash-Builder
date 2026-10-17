@@ -1780,7 +1780,7 @@ namespace CleanC.UI
         ///
         /// نسخه های قبلی با هش randomize شده ی <c>GetHashCode()</c> فایل می ساختند که
         /// هیچ وقت دوباره پیدا نمی شد؛ در نتیجه پوشه ی کش انباشته می شد.
-        /// فایل های بالای ۷ روز امن حذف می شوند چون در صورت نیاز بازسازی می شوند.
+        /// فایل های بالای ۳ روز امن حذف می شوند چون در صورت نیاز بازسازی می شوند.
         /// </summary>
         private static void PurgeStaleIconCache(string cacheDir)
         {
@@ -2083,7 +2083,9 @@ namespace CleanC.UI
                     }
                     else
                     {
-                        ok = StartupOptimizerService.RestoreStartupItem(item.Name);
+                        // رکورد بکاپ با کلید «Location|Name» ذخیره شده؛ مکان هم جستجو می
+                        // شود وگرنه برمی گردد به فرمت قدیمی «فقط نام»
+                        ok = StartupOptimizerService.RestoreStartupItem(item.Name, item.Location);
                         if (!ok)
                         {
                             toggleGuard = true;

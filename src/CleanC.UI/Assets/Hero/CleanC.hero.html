@@ -15,7 +15,8 @@ body{color:var(--fg);font-family:'Vazirmatn',system-ui,sans-serif;-webkit-font-s
 .app{width:100%;height:100%;max-height:100%;padding:0;box-sizing:border-box;background:transparent!important;overflow:hidden}
 .hero{width:100%;height:100%;max-height:100%;border:none;border-radius:14px;box-sizing:border-box;background:radial-gradient(75% 150% at 38% 50%,color-mix(in srgb,var(--halo,var(--sc)) 28%,transparent),color-mix(in srgb,var(--halo,var(--sc)) 10%,transparent) 45%,transparent 75%);overflow:hidden;display:grid;grid-template-columns:1fr 240px auto;align-items:center;gap:12px;padding:8px 32px}
 .txt{min-width:0}
-.st{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mu)}.st i{width:7px;height:7px;border-radius:50%;background:var(--sc);box-shadow:0 0 0 4px color-mix(in srgb,var(--sc) 18%,transparent);transition:.4s}.st b{color:var(--fg);font-weight:500}
+.st{display:flex;align-items:center;gap:8px;font-size:12.5px;color:var(--mu);min-width:0}.st i{width:7px;height:7px;border-radius:50%;background:var(--sc);box-shadow:0 0 0 4px color-mix(in srgb,var(--sc) 18%,transparent);transition:.4s;flex:none}.st b{color:var(--fg);font-weight:500}
+#st{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 h1{margin:6px 0 10px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weight:600;letter-spacing:-.01em;animation:fd .4s ease;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sub{font-size:13.5px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-height:22px;line-height:1.4;margin-top:2px;animation:fd .4s ease}
 @keyframes fd{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
@@ -46,6 +47,10 @@ h1{margin:6px 0 10px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weig
 </div>
 <script>
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,$=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d'),PI=Math.PI,K=3,U=.95*K;cv.width=290*K;cv.height=195*K;
+/* ناحیهٔ نزدیک کاراکتر: کلیک/لمس/کورسور فقط تا شعاع ~۱۰۰px از مرکز کاراکتر
+   واکنش می‌گیرد؛ باقی سطح شفاف استیجِ ۲۹۰×۱۹۵ دیگر کلیک‌های نامرئی نمی‌گیرد
+   (پس‌زمینهٔ خالی، دکمه‌ها و چیپ‌های اطراف را نمی‌دزدد و cursor:=defined می‌ماند) */
+const dz=e=>{try{const b=cv.getBoundingClientRect();return Math.hypot(e.clientX-(b.left+b.width/2),e.clientY-(b.top+b.height/2))<100}catch(_){return true}}
 const M=[['excellent','عالی','#5af2c0',[20,30,0,0,.9]],['good','روان','#7fd8ff',[18,30,0,0,0]],['relaxed','آرام','#8fb4ff',[20,26,.3,0,0]],['focus','تمرکز','#8b9bff',[20,24,.2,.1,0]],['turbo','توربو','#c07bff',[22,24,.25,.28,0]],['think','تحلیل','#9fb2ff',[18,30,0,0,0]],['warm','داغ','#ffa45a',[20,26,.3,.24,0]],['ram','رم پر','#ffd166',[22,38,0,0,0]],['disk','دیسک پر','#ffb454',[22,28,.42,0,0]],['idle','بیکار','#9db4c4',[18,30,0,0,0]],['sleep','خواب','#8f84d6',[22,4,0,0,0]],['alert','هشدار','#ff8a4a',[20,32,.22,-.14,0]],['critical','بحرانی','#ff4d5e',[21,34,.18,-.2,0]],
 ['proxy','پراکسی','#ff4d5e',[21,34,.18,-.2,0]],['battery','باتری کم','#ff9f3d',[20,24,.38,-.1,0]],['restart','ریستارت','#b48cff',[20,28,.2,.1,0]],['yawn','خمیازه','#9db4c4',[20,28,.15,0,0]],['drowsy','خواب‌آلود','#8f9bc4',[20,22,.38,0,0]],['wait','منتظر','#8b9bff',[20,32,0,0,0]],['curious','کنجکاو','#8fd4ff',[22,34,0,0,0]],['smile','لبخند','#7ff0c0',[20,26,0,0,.8]],['offline','آفلاین','#8a95a5',[18,22,.25,0,0]],['mourn','سوگ','#8d9ab0',[19,26,.3,-.34,0]]];
 const SYM={alert:'!',battery:'!',restart:'!',wait:'?',curious:'?'};
@@ -66,7 +71,8 @@ function syncHalo(v){
   else{const m=v.match(/\d+/g);if(m&&m.length>=3)HALO=[+m[0],+m[1],+m[2]]}
  }catch(e){}
 }
-cv.addEventListener('pointerdown',()=>{sp.sq.w+=3;sp.pk.w+=9});
+cv.addEventListener('pointerdown',e=>{if(!dz(e))return;sp.sq.w+=3;sp.pk.w+=9});
+cv.addEventListener('pointermove',e=>{cv.style.cursor=dz(e)?'pointer':'default'});
 const ECS=Math.ceil(64*U),ec=document.createElement('canvas');ec.width=ec.height=ECS;const g=ec.getContext('2d');
 function eye(w,h,lt,tl,hp,c,sd,al){g.clearRect(0,0,ECS,ECS);g.save();g.scale(U,U);g.translate(32,32);g.globalCompositeOperation='source-over';
 const gr=g.createLinearGradient(0,-h/2,0,h/2),lc=c.map(v=>v+(255-v)*.5);gr.addColorStop(0,RA(lc,1));gr.addColorStop(.55,RA(c,1));gr.addColorStop(1,RA(c,.92));g.fillStyle=gr;g.beginPath();g.roundRect(-w/2,-h/2,w,h,Math.min(w,h)/2);g.fill();
@@ -125,7 +131,7 @@ if(scn!=null)scene(RA(col,1),col);else if(cur&&cur.iss&&!run)issScene(cur.iss);i
 x.restore();
 if(run){x.save();x.lineCap='round';x.strokeStyle=RA(col,.15);x.lineWidth=1.2;rr(-75,-59,150,118,38);x.stroke();x.strokeStyle=RA(col,1);x.shadowColor=RA(col,.9);x.shadowBlur=8;x.lineWidth=2.2;x.setLineDash([oprog*470,1000]);x.stroke();x.restore()}
 x.fillStyle=RA(cc,(.6+.4*Math.sin(now*2))*bz);x.shadowColor=RA(cc,1);x.shadowBlur=6;x.beginPath();x.arc(0,56.2,1.4,0,7);x.fill();x.shadowBlur=0;
-ACCD(k);x.restore();ROUT(k);x.save();if(SYM[k]){x.save();x.translate(62,-58+Math.sin(now*6)*2);x.strokeStyle=RA(col,1);x.fillStyle=RA(col,1);x.lineWidth=1.8;x.beginPath();x.arc(0,0,9,0,7);x.stroke();if(SYM[k]=='?'){x.font='700 12px Inter,Vazirmatn,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('?',0,.5)}else{x.fillRect(-1,-5,2,6);x.beginPath();x.arc(0,5,1.3,0,7);x.fill()}x.restore()}
+ACCD(k);x.restore();ROUT(k);x.save();if(SYM[k]){x.save();x.translate(62,-58+Math.sin(now*6)*2);x.strokeStyle=RA(col,1);x.fillStyle=RA(col,1);x.lineWidth=1.8;x.beginPath();x.arc(0,0,9,0,7);x.stroke();if(SYM[k]=='?'){x.font='700 12px Vazirmatn,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText('?',0,.5)}else{x.fillRect(-1,-5,2,6);x.beginPath();x.arc(0,5,1.3,0,7);x.fill()}x.restore()}
 x.restore();
 Pt.forEach(o=>{x.save();x.globalAlpha=Math.max(0,Math.min(1,o.l*1.5));x.translate(o.x,o.y);x.rotate(o.a);const s=RA(o.c,1);x.fillStyle=x.strokeStyle=s;x.lineWidth=1.3;x.lineCap='round';
 if(o.t=='d'){x.beginPath();x.arc(0,0,o.r*(.5+o.l*.5),0,7);x.fill()}
@@ -135,7 +141,7 @@ else if(o.t=='c'){rr(-5,-3.5,10,7,1.5);x.stroke();for(let i=-1;i<2;i++){x.beginP
 else if(o.t=='tr'){x.beginPath();x.ellipse(0,0,1.5,2.3,0,0,7);x.fill()}else if(o.t=='st')star(o.r*(.4+o.l*.6));
 else if(o.t=='ln'){x.beginPath();x.moveTo(0,0);x.lineTo(-Math.sign(o.vx)*16,0);x.stroke()}
 else if(o.t=='rg'){x.beginPath();x.arc(0,0,20+(1-o.l)*100,0,7);x.lineWidth=2;x.stroke()}
-else if(o.t=='h')heartP(o.r);else if(o.t=='nt'){x.font='700 11px Inter,sans-serif';x.textAlign='center';x.fillText('♪',0,0)}else if(o.t=='bb'){x.beginPath();x.arc(0,0,o.r,0,7);x.stroke()}else if(o.t=='dr'){x.beginPath();x.moveTo(0,-3);x.lineTo(0,3);x.stroke()}else if(o.t=='j')jicon(o.k,o.r);else if(o.t=='pz'){rr(-4,-4,8,8,1.5);x.stroke();x.beginPath();x.arc(0,-5.2,1.8,0,7);x.stroke()}else if(o.t=='z'){const q=5+(1-o.l)*3;x.beginPath();x.moveTo(-q,-q);x.lineTo(q,-q);x.lineTo(-q,q);x.lineTo(q,q);x.stroke()}
+else if(o.t=='h')heartP(o.r);else if(o.t=='nt'){x.font='700 11px Vazirmatn,sans-serif';x.textAlign='center';x.fillText('♪',0,0)}else if(o.t=='bb'){x.beginPath();x.arc(0,0,o.r,0,7);x.stroke()}else if(o.t=='dr'){x.beginPath();x.moveTo(0,-3);x.lineTo(0,3);x.stroke()}else if(o.t=='j')jicon(o.k,o.r);else if(o.t=='pz'){rr(-4,-4,8,8,1.5);x.stroke();x.beginPath();x.arc(0,-5.2,1.8,0,7);x.stroke()}else if(o.t=='z'){const q=5+(1-o.l)*3;x.beginPath();x.moveTo(-q,-q);x.lineTo(q,-q);x.lineTo(-q,q);x.lineTo(q,q);x.stroke()}
 x.restore()});
 x.restore();requestAnimationFrame(frame)}
 /* ===== Extra drawing helpers ===== */
@@ -201,7 +207,7 @@ requestAnimationFrame(frame);
 
 /* ===== Card logic: state -> text + mood + scene ===== */
 const $$=s=>document.querySelectorAll(s),sleep=ms=>new Promise(r=>setTimeout(r,ms)),T=()=>performance.now()/1e3;
-let yw=0,stch=0,wk0=0,waitStart=0,tapN=0,idleS=0,oprog=0,fired={},lastCi=-1,active=[],run=null,thinkUntil=0,alreadyUntil=0,curiousUntil=0,turboUntil=0,recheckedCleanUntil=0,lastMove=T(),total=0,lastTxt='',tickI=0,sig='',lastSub='',afterMsg='',cur=null,curSince=0,ramHigh=false,hotSince=0,cfm=null;
+let yw=0,stch=0,wk0=0,waitStart=0,tapN=0,idleS=0,oprog=0,fired={},lastCi=-1,active=[],run=null,thinkUntil=0,alreadyUntil=0,curiousUntil=0,turboUntil=0,recheckedCleanUntil=0,lastMove=T(),total=0,lastTxt='',tickI=0,sig='',lastSub='',afterMsg='',cur=null,curSince=0,ramHigh=false,hotSince=0,ramSevHold=0,hotPeakSev=0,featuredId='',cfm=null;
 
 /* 14 real steps: [short name, headline while running, "why?" subtitle] — scene index = step index */
 const STEPS=[
@@ -315,10 +321,19 @@ function view(){
  const go=n?['بهینه‌سازی سیستم'+(n>1?' · '+n+' مورد':''),'','go']:['بررسی مجدد','ghost','re'];
  /* every problem (live sensors + maintenance items) becomes one entry; the most severe is featured, the rest are chips */
  if(busyUntil>T())return V('busy','focus',busyMsg,'چند لحظه صبر کن',['در حال انجام','#8b9bff'],{fast:1,btn:['در حال انجام …','ghost','dis']});
- const L=issues();
- if(L.length){const pn=pinned&&pinUntil>T()?L.find(i=>i.id==pinned):null,p=pn||L[0],c3=L.filter(i=>i.sev>=3).length,runN=L.filter(i=>i.act=='run').length,
-  btn=p.btn||(p.act=='run'?['بهینه‌سازی سیستم'+(runN>1?' · '+runN+' مورد':''),'','go']:go);
-  return V('iss_'+p.id,p.mood,p.title,p.detail,[p.sev>=3?'نیاز به اقدام فوری':p.sev==2?'نیاز به توجه':'پیشنهاد',SEVC[p.sev],L.length>1?L.length+' مورد'+(c3?' · '+c3+' بحرانی':''):''],{warn:1,crit:p.sev>=3,iss:p.scene,list:L,pid:p.id,btn})}
+  const L=issues();
+  if(L.length){
+   const pn=pinned&&pinUntil>T()?L.find(i=>i.id==pinned):null,
+   prev=featuredId?L.find(i=>i.id==featuredId):null,
+   /* کارت شاخص با هر تیک سنسور جابه‌جا نشود: تا وقتی موردِ شاخصِ قبلی هنوز
+      در لیست است (در همان سطح یا سطحِ بالاتر) همان می‌ماند؛ جابجایی فقط
+      برای مشکلِ تازه‌ای که جدی‌تر از همه است یا وقتی مورد قبلی رفع شده */
+   p=pn||(prev&&L[0].sev<=prev.sev?prev:L[0]);
+   featuredId=pn?'':p.id;
+   const c3=L.filter(i=>i.sev>=3).length,runN=L.filter(i=>i.act=='run').length,
+   btn=p.btn||(p.act=='run'?['بهینه‌سازی سیستم'+(runN>1?' · '+runN+' مورد':''),'','go']:go);
+   return V('iss_'+p.id,p.mood,p.title,p.detail,[p.sev>=3?'نیاز به اقدام فوری':p.sev==2?'نیاز به توجه':'پیشنهاد',SEVC[p.sev],c3?'· '+c3+' بحرانی':''],{warn:1,crit:p.sev>=3,iss:p.scene,list:L,pid:p.id,btn})}
+  featuredId='';
  /* healthy tier */
  if(idleS>=300)return V('sleep','sleep','در حال استراحت','برای بیدار کردنش یه حرکت موس کافیه',['حالت خواب','#8f84d6'],{btn:go});
  if(idleS>=180)return V('drowsy','drowsy','خوابش می‌آد …','چند لحظهٔ دیگه می‌خوابه',['بیکار','#8f9bc4'],{btn:go});
@@ -382,7 +397,7 @@ $('sn').onclick=()=>{const nowMs=Date.now(),snooze24h=nowMs+24*36e5;SNZ['hero_al
 function live(){const nz=()=>Math.random()-.5;
  if(ST.sim){cpu=Math.max(4,Math.min(99,ST.cpu+(run?35:0)+nz()*6));ramv=Math.max(20,Math.min(97,ST.ram+nz()*3))}else{cpu=ST.cpu;ramv=ST.ram}
  ramHist.push(ramv);if(ramHist.length>4)ramHist.shift();dsk=100-ST.cFree;}
-function sense(){ramHigh=ramv>=92?true:ramv<=78?false:ramHigh;if(cpu>=92){if(!hotSince)hotSince=T()}else if(cpu<75)hotSince=0}   /* RAM: on >=92, off <=78 · CPU hot: >=92 for 12 s */
+function sense(){ramHigh=ramv>=92?true:ramv<=78?false:ramHigh;ramSevHold=ramHigh?(ramSevHold||(ramv>=92?3:2)):0;if(cpu>=92){if(!hotSince)hotSince=T();hotPeakSev=cpu>=95?(hotPeakSev||3):hotPeakSev}else if(cpu<75)hotSince=0,hotPeakSev=0}
 setInterval(live,2500);setInterval(sense,500);
 setInterval(()=>{idleS=now-lastMove;oprog=run?Math.min(1,(run.i+prog)/14):0;
  if(run&&run.i==2&&scn==2){run.ci=Math.min(7,Math.floor(prog*8));if(run.ci!=lastCi){lastCi=run.ci;for(let n=0;n<5;n++){const s=Math.random()<.5?-1:1;add({t:'j',k:run.ci,r:1.15,x:s*(100+Math.random()*30),y:-40+Math.random()*80,vx:-s*40,tx:(Math.random()-.5)*20,ty:34,c:hx(SC[2]),d:.35,vr:(Math.random()-.5)*4})}}}
@@ -583,7 +598,7 @@ const R=[
 {id:'selfie',g:'special',r:0,n:'سلفی',d:1.1,f:(u,p)=>{p[4]=.9},s:u=>{x.fillStyle='rgba(255,255,255,'+Math.max(0,1-Math.abs(u-.25)*7)*.95+')';x.fillRect(-70,-54,140,108)}},
 /* mouse */
 {id:'cross',g:'mouse',r:0,n:'لوچ شدن',d:2.4,f:(u,p,o)=>{o.cross=9*(u<.15?u/.15:u>.85?(1-u)/.15:1);p[0]=17}},
-{id:'search',g:'mouse',r:0,n:'جست‌وجوی موس',d:3,f:(u,p,o)=>{o.look=[sn(u*PI*5),.15];p[0]=21},o:u=>{x.font='700 14px Inter,sans-serif';x.textAlign='center';x.globalAlpha=.85;x.fillText('?',62,-62+sn(u*10)*2)}},
+{id:'search',g:'mouse',r:0,n:'جست‌وجوی موس',d:3,f:(u,p,o)=>{o.look=[sn(u*PI*5),.15];p[0]=21},o:u=>{x.font='700 14px Vazirmatn,sans-serif';x.textAlign='center';x.globalAlpha=.85;x.fillText('?',62,-62+sn(u*10)*2)}},
 {id:'startle',g:'mouse',r:0,n:'ترسیدن',d:.6,ev:[[0,()=>sp.sq.w-=4]],f:(u,p)=>{p[0]=24;p[1]=40}},
 /* idle: common */
 {id:'yawnM',g:'idle',r:0,n:'خمیازه',d:2.4,f:(u,p,o)=>{const e=sn(u*PI);yw=e;p[2]=.15+.45*e;o.sq=-.03*e}},
@@ -647,7 +662,7 @@ function ROUT(k){x.save();x.lineCap=x.lineJoin='round';x.strokeStyle=x.fillStyle
 
 /* ---- input: click / combos / hold / double-click / drag / mouse behaviours ---- */
 function touch(){const t=T();if(t-lastMove>600&&rxOK()&&!ST.calm)start('welcome');lastMove=t}
-cv.addEventListener('pointerdown',e=>{pdn={x:e.clientX,y:e.clientY,t:T(),moved:0}});
+cv.addEventListener('pointerdown',e=>{pdn={x:e.clientX,y:e.clientY,t:T(),moved:0,z:dz(e)}});
 addEventListener('pointerdown',touch);
 addEventListener('pointermove',e=>{const t=T(),dt=Math.max(.001,t-pmt),dx=e.clientX-mx;pvs=Math.hypot(dx,e.clientY-my)/dt;pmt=t;
  if(Math.abs(dx)>6){if(lastDx&&Math.sign(dx)!=Math.sign(lastDx))shakes.push(t);lastDx=dx}
@@ -656,8 +671,8 @@ addEventListener('pointermove',e=>{const t=T(),dt=Math.max(.001,t-pmt),dx=e.clie
 addEventListener('pointerup',()=>{if(!pdn)return;const p=pdn,c0=chg,t=T();pdn=null;chg=0;
  if(p.moved){sp.dx.t=0;sp.dy.t=0;found('drag');if(!ST.calm&&rxOK())say('drag');return}
  if(c0>.12){release(c0);return}
- if(t-p.t<.35)clickR()});
-cv.addEventListener('dblclick',()=>{if(!ST.calm&&rxOK())start('selfie',{say:1})});
+ if(t-p.t<.35&&p.z)clickR()});
+cv.addEventListener('dblclick',e=>{if(!ST.calm&&rxOK()&&dz(e))start('selfie',{say:1})});
 document.documentElement.addEventListener('mouseleave',()=>{if(!ST.calm&&rxOK()&&calmTier()&&!RX)start('search')});
 function release(c){found('charge');sp.sq.w-=4*c;const n=1+Math.floor(c*3);for(let i=0;i<n;i++)add({t:'rg',x:0,y:0,d:.5-i*.06,c:i%2?hx('#ffffff'):col});if(!ST.calm)say('release')}
 function clickR(){const t=T();if(ckt.length&&t-ckt[ckt.length-1]>.9)ckt=[];ckt.push(t);lastClick=t;const n=ckt.length;
@@ -981,7 +996,9 @@ AC('crystal','کریستالی',32,[['M0-10L8 0L0 10L-8 0Z',-48,-30],['M0-10L8 0
 const AI={};ACC.forEach(a=>AI[a.id]=a);Object.assign(OPT,{look:OPT.look||'none',occLook:OPT.occLook||'',size:OPT.size||1});
 let inkAt=0,ink='#888';const occToday=()=>R.some(r=>r.g=='occ'&&r.when());
 function ACCD(k){const id=(OPT.occLook&&occToday())?OPT.occLook:OPT.look,A=AI[id];if(!A||!A.parts.length||(A.ul>AGE()&&id!='none'))return;if(now-inkAt>1){ink=getComputedStyle(document.body).color;inkAt=now}x.save();x.shadowBlur=0;x.lineCap=x.lineJoin='round';x.strokeStyle=ink;x.translate((sp.dx&&sp.dx.v)||0,(sp.dy&&sp.dy.v)||0);A.parts.forEach(([P,tx,ty,s])=>{x.save();x.translate(tx,ty+(id=='music'?sn(now*3)*3:0));x.scale(s,s);x.lineWidth=1.5/s;x.stroke(P);x.restore()});x.restore()}
-const applySize=()=>{cv.style.transform='scale('+OPT.size+')'};applySize();
+/* اندازه کاراکتر با گنجایش کارت هیرو هم‌خوان می شود: بالای ~۱.۲۵× از مرزِ
+   کارت بیرون می زند؛ مقدارهای ذخیره شده قدیمی اینجا سقف می خورند */
+const applySize=()=>{OPT.size=Math.max(.7,Math.min(1.25,OPT.size||1));cv.style.transform='scale('+OPT.size+')'};applySize();
 /* bars of personality now rendered natively from codexModel().pers */
 /* registration of new entries + appearance controls */
 R.slice(m1).forEach(r=>{if(r.g=='idle'||r.g=='occ'){if(!L[r.id])L[r.id]=LN[r.g=='occ'?'occ':'s'];if(r.sy==null)r.sy=.3}if(r.ul==null&&(r.g=='idle'||r.r>=2))r.ul=r.r>=2?9:[0,.5,1,2][R.indexOf(r)%4];RI[r.id]=r;NAMES[r.id]=r.n;FIRE.push([r.id,r.n+' (جدید)'])});
@@ -1045,8 +1062,8 @@ function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],
  if(ST.proxyDead)P({id:'proxy',sev:3,name:'اینترنت',val:'قطع',title:'اینترنت به‌خاطر پراکسی قطعه',detail:'پراکسی ویندوز به سروری اشاره می‌کنه که جواب نمی‌ده؛ با یک کلیک خاموشش می‌کنم',mood:'proxy',scene:'proxy',act:'fixproxy',btn:['اتصال را درست کن','','fixproxy']});
  if(ST.cFree<=20){const c=ST.cFree<=10;P({id:'disk',sev:c?3:2,name:'دیسک C',val:(100-ST.cFree)+'% پر',title:c?'فضای دیسک C رو به اتمام است':'فضای دیسک C کم شده',detail:'فقط '+ST.cFree+'٪ آزاد مانده'+(rec>0?'؛ حدود '+fmt(rec)+' قابل آزادسازی است':'؛ ویندوز با کمبود فضا کند و ناپایدار می‌شه'),mood:c?'critical':'disk',scene:'disk',act:'run'})}
  if(!ST.charging&&ST.batt<=20){const c=ST.batt<=10;P({id:'batt',sev:c?3:2,name:'باتری',val:ST.batt+'%',title:c?'باتری تقریباً تموم شده':'باتری کم است',detail:'شارژر وصل نیست؛ بهینه‌سازی سنگین رو بذار برای بعد از شارژ',mood:'battery',scene:'battery',act:null})}
- if(ramHigh)P({id:'ram',sev:ramv>=92?3:2,name:'رم',val:Math.round(ramv)+'%',title:'مصرف رم بالاست',detail:(ST.topRam?'بیشترین مصرف: '+ST.topRam+'؛ ':'')+'پردازش‌های پس‌زمینه رو می‌شه آزاد کرد',mood:'ram',scene:'ram',act:'ram',btn:['رم را آزاد کن','','ram']});
- if(hotSince&&T()-hotSince>=12&&!(recheckedCleanUntil>now))P({id:'cpu',sev:cpu>=95?3:2,name:'شلوغی سیستم',val:Math.round(cpu)+'%',title:'سیستم شلوغه',detail:ST.topCpu?'بیشترین مصرف: '+ST.topCpu:'پردازنده بیش از ۱۲ ثانیه روی بیش از ۹۰٪ مانده است',mood:'warm',scene:'cpu',act:'cpu',btn:['برنامه‌های سنگین','','cpu']});
+ if(ramHigh)P({id:'ram',sev:ramSevHold||2,name:'رم',val:Math.round(ramv)+'%',title:'مصرف رم بالاست',detail:(ST.topRam?'بیشترین مصرف: '+ST.topRam+'؛ ':'')+'پردازش‌های پس‌زمینه رو می‌شه آزاد کرد',mood:'ram',scene:'ram',act:'ram',btn:['رم را آزاد کن','','ram']});
+ if(hotSince&&T()-hotSince>=12&&!(recheckedCleanUntil>now))P({id:'cpu',sev:hotPeakSev||2,name:'شلوغی سیستم',val:Math.round(cpu)+'%',title:'سیستم شلوغه',detail:ST.topCpu?'بیشترین مصرف: '+ST.topCpu:'پردازنده بیش از ۱۲ ثانیه روی بیش از ۹۰٪ مانده است',mood:'warm',scene:'cpu',act:'cpu',btn:['برنامه‌های سنگین','','cpu']});
  if(bh)P({id:'bheavy',sev:1,name:'مرورگر',val:ST.tabs?ST.tabs+' تب':fmt(ST.browserMB),title:'مرورگر سنگین شده',detail:(ST.tabs?ST.tabs+' تب باز':'تب‌ها و افزونه‌ها')+' حدود '+fmt(ST.browserMB)+' رم می‌گیرن؛ تب‌های بی‌استفاده رو می‌شه سبک کرد',mood:'ram',scene:'browser',act:'browser',btn:['مرورگر را سبک کن','','browser']});
  if(ST.offline)P({id:'offline',sev:1,name:'اینترنت',val:'آفلاین',title:'اینترنت وصل نیست',detail:'کارهای آفلاین کار می‌کنن؛ بررسی‌های آنلاین موقتاً متوقف شدن',mood:'offline',scene:'wifi',act:null});
  if(ST.uptimeDays>=14&&active.length>0)P({id:'uptime',sev:1,name:'آپ‌تایم',val:ST.uptimeDays+' روز',title:ST.uptimeDays+' روزه که سیستم روشنه',detail:'یه وقفهٔ کوتاه هم سیستم رو سرحال‌تر می‌کنه؛ ترجیحاً وقتی کاری نداری',mood:'yawn',scene:null,act:null,btn:['بررسی مجدد','ghost','re']});
@@ -1064,11 +1081,11 @@ function issScene(kind){const S=now,cs=RA(col,1);x.save();x.strokeStyle=x.fillSt
   for(let i=0;i<2;i++){const p=((S*.5+i/2)%1);x.globalAlpha=(1-p)*.45;x.beginPath();x.arc(0,30,16+p*9,PI*.82,PI*1.18);x.stroke();x.beginPath();x.arc(0,30,16+p*9,-.18*PI,.18*PI);x.stroke()}
   x.globalAlpha=1;x.strokeStyle=RED;x.shadowColor=RED;x.lineWidth=2.2;x.beginPath();x.moveTo(-13,42);x.lineTo(13,18);x.stroke();break}
  case'wifi':{for(let i=1;i<=3;i++){x.globalAlpha=.4+.2*(i==1);x.beginPath();x.arc(0,42,i*6.5,PI*1.25,PI*1.75);x.stroke()}x.globalAlpha=1;x.beginPath();x.arc(0,42,1.5,0,7);x.fill();x.strokeStyle=RED;x.shadowColor=RED;x.lineWidth=2;x.beginPath();x.moveTo(-14,44);x.lineTo(14,20);x.stroke();break}
- case'disk':{const pc=Math.max(0,Math.min(1,dsk/100)),c=pc>=.9?'rgb(255,90,100)':'rgb(255,180,84)';x.globalAlpha=.25;x.beginPath();x.arc(0,30,11,0,7);x.stroke();x.globalAlpha=1;x.strokeStyle=c;x.shadowColor=c;x.lineWidth=3.2;x.beginPath();x.arc(0,30,11,-PI/2,-PI/2+2*PI*pc);x.stroke();x.shadowBlur=0;x.fillStyle=cs;x.font='700 8px Inter,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(Math.round(pc*100),0,30.5);break}
- case'ram':{const pc=Math.max(0,Math.min(1,ramv/100)),c=pc>=.9?'rgb(255,90,100)':'rgb(255,209,102)';x.globalAlpha=.3;rr(-30,29,60,7,3.5);x.stroke();x.globalAlpha=1;x.fillStyle=c;x.shadowColor=c;rr(-30,29,Math.max(7,60*pc),7,3.5);x.fill();x.globalAlpha=.3;x.shadowBlur=0;x.lineWidth=1;[.25,.5,.75].forEach(q=>{x.beginPath();x.moveTo(-30+60*q,27);x.lineTo(-30+60*q,38);x.stroke()});x.globalAlpha=1;x.fillStyle=cs;x.font='700 8.5px Inter,sans-serif';x.textAlign='center';x.fillText(Math.round(ramv)+'%',0,23);break}
+ case'disk':{const pc=Math.max(0,Math.min(1,dsk/100)),c=pc>=.9?'rgb(255,90,100)':'rgb(255,180,84)';x.globalAlpha=.25;x.beginPath();x.arc(0,30,11,0,7);x.stroke();x.globalAlpha=1;x.strokeStyle=c;x.shadowColor=c;x.lineWidth=3.2;x.beginPath();x.arc(0,30,11,-PI/2,-PI/2+2*PI*pc);x.stroke();x.shadowBlur=0;x.fillStyle=cs;x.font='700 8px Vazirmatn,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(Math.round(pc*100),0,30.5);break}
+ case'ram':{const pc=Math.max(0,Math.min(1,ramv/100)),c=pc>=.9?'rgb(255,90,100)':'rgb(255,209,102)';x.globalAlpha=.3;rr(-30,29,60,7,3.5);x.stroke();x.globalAlpha=1;x.fillStyle=c;x.shadowColor=c;rr(-30,29,Math.max(7,60*pc),7,3.5);x.fill();x.globalAlpha=.3;x.shadowBlur=0;x.lineWidth=1;[.25,.5,.75].forEach(q=>{x.beginPath();x.moveTo(-30+60*q,27);x.lineTo(-30+60*q,38);x.stroke()});x.globalAlpha=1;x.fillStyle=cs;x.font='700 8.5px Vazirmatn,sans-serif';x.textAlign='center';x.fillText(Math.round(ramv)+'%',0,23);break}
  case'cpu':{x.translate(0,30);x.globalAlpha=.5;x.beginPath();x.arc(0,0,11.5,0,7);x.stroke();x.globalAlpha=1;const a=S*(2+cpu/11);for(let i=0;i<3;i++){x.save();x.rotate(a+i*2*PI/3);x.beginPath();x.ellipse(0,-5.5,2.8,5.5,0,0,7);x.stroke();x.restore()}x.beginPath();x.arc(0,0,1.8,0,7);x.fill();if(cpu>=90){const d=(S*9)%12;x.globalAlpha=1-d/12;x.beginPath();x.ellipse(17,-10+d,1.8,2.6,0,0,7);x.fill()}break}
  case'battery':{const lo=ST.batt<=20,n=lo?1:Math.max(1,Math.ceil(ST.batt/25)),c=lo?'rgb(255,90,100)':cs;rr(-15,23,28,14,3);x.stroke();rr(13,27,3,6,1);x.fill();x.fillStyle=c;x.shadowColor=c;for(let i=0;i<n;i++){x.globalAlpha=(lo&&i==0)?.4+.6*Math.abs(Math.sin(S*1.6)):1;rr(-12+i*6,26,4.6,8,1);x.fill()}break}
- case'browser':{rr(-20,23,40,18,3);x.stroke();for(let i=0;i<3;i++){x.globalAlpha=.7;rr(-18+i*13,19.5,11,4,2);x.stroke()}x.globalAlpha=.5;x.lineWidth=1.2;x.beginPath();x.moveTo(-14,30);x.lineTo(14,30);x.moveTo(-14,35);x.lineTo(6,35);x.stroke();if(ST.tabs>0){x.globalAlpha=1;x.fillStyle='rgb(255,110,110)';x.shadowColor='rgb(255,110,110)';x.beginPath();x.arc(20,22,6.5,0,7);x.fill();x.shadowBlur=0;x.fillStyle='#fff';x.font='700 7.5px Inter,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(Math.min(99,ST.tabs),20,22.3)}break}
+ case'browser':{rr(-20,23,40,18,3);x.stroke();for(let i=0;i<3;i++){x.globalAlpha=.7;rr(-18+i*13,19.5,11,4,2);x.stroke()}x.globalAlpha=.5;x.lineWidth=1.2;x.beginPath();x.moveTo(-14,30);x.lineTo(14,30);x.moveTo(-14,35);x.lineTo(6,35);x.stroke();if(ST.tabs>0){x.globalAlpha=1;x.fillStyle='rgb(255,110,110)';x.shadowColor='rgb(255,110,110)';x.beginPath();x.arc(20,22,6.5,0,7);x.fill();x.shadowBlur=0;x.fillStyle='#fff';x.font='700 7.5px Vazirmatn,sans-serif';x.textAlign='center';x.textBaseline='middle';x.fillText(Math.min(99,ST.tabs),20,22.3)}break}
  }
  x.restore()}
 

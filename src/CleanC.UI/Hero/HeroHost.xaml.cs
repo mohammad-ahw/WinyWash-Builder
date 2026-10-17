@@ -109,15 +109,40 @@ namespace CleanC.UI.Hero
                 _coreReady = true;
                 FlushOutbox();
             }
+            catch (Exception ex)
+            {
+                // WebView2 Runtime نصب نیست / فایل‌های asset مفقودند / خطای سخت هسته:
+                // به‌جای یک کارت خالی ابدی، پنل متنی جایگزین را نشان می‌دهیم
+                CcLog.Ignore(ex, "HeroHost.EnsureCore");
+                ShowFallbackPanel();
+            }
             finally
             {
                 _initializing = false;
             }
         }
 
-        /// <summary>%LOCALAPPDATA%\CleanC\WebView2 — جدا از کش مرورگر کاربر تا پاک‌سازی آن به اپ آسیب نزند.</summary>
-        private static string UserDataFolder()
-            => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC", "WebView2");
+        /// <summary>
+        /// وقتی هستهٔ وب در دسترس نیست، یک کارت متنی ساده جای هیرو نمایش داده می‌شود.
+        /// پیام‌های خروجی همچنان در outbox می‌مانند و بی‌ذات نمی‌شوند؛ فقط UI می‌Disabled است.
+        /// </summary>
+        private void ShowFallbackPanel()
+        {
+            try
+            {
+                if (FallbackPanel != null)
+                {
+                    FallbackSubtitle.Text = "نمایش گرافیکی داروگ روی این دستگاه در دسترس نیست"
+                        + " (راهنما: نصب «Microsoft WebView2 Runtime»)، ولی بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر کار می‌کنند.";
+                    FallbackPanel.Visibility = Visibility.Visible;
+                }
+                if (WebView != null) WebView.Visibility = Visibility.Collapsed;
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "HeroHost.Fallback");
+            }
+        }
 
         private void OnWebMessageReceived(CoreWebView2 sender, CoreWebView2WebMessageReceivedEventArgs args)
         {

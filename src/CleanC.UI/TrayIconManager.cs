@@ -271,10 +271,20 @@ namespace CleanC.UI
                     break;
 
                 case IDM_BOOST_RAM:
+                    // lambda ی ناهمگام async void است؛ استثنای داخلی اگر مهار نشود
+                    // کل app را می کُشد — پس مشکل از منبعِ آن اینجا مهار می شود
                     _window.DispatcherQueue?.TryEnqueue(async () =>
                     {
-                        var res = await OptimizerService.BoostRamAsync();
-                        ShowBalloonNotification("آزادسازی حافظه رم", $"مقدار {SystemStats.FormatBytes(res.FreedBytes)} حافظه رم با موفقیت آزاد شد.");
+                        try
+                        {
+                            var res = await OptimizerService.BoostRamAsync();
+                            ShowBalloonNotification("آزادسازی حافظه رم", $"مقدار {SystemStats.FormatBytes(res.FreedBytes)} حافظه رم با موفقیت آزاد شد.", WinNotifySeverity.Info);
+                        }
+                        catch (Exception boostEx)
+                        {
+                            CcLog.Ignore(boostEx, "Tray.BoostRam");
+                            ShowBalloonNotification("آزادسازی حافظه رم", "اجرای آزادسازی رم با خطا مواجه شد — جزئیات در crash.log ثبت شد.", WinNotifySeverity.Warning);
+                        }
                     });
                     break;
 

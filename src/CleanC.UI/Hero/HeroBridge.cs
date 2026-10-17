@@ -80,15 +80,26 @@ namespace CleanC.UI.Hero
         private static string? ReadString(JsonElement e, string name)
             => e.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
 
+        // جاوااسکریپت اعداد اعشاری (مثل 55.5) می فرستد؛ GetInt32 مستقیم روی
+        // مقدار اعشاری استثنا می دهد، پس TryGetInt32 و در صورت شکست گرد کردنی
         private static int? ReadInt(JsonElement e, string name)
         {
             if (!e.TryGetProperty(name, out var v)) return null;
-            return v.ValueKind switch
+            switch (v.ValueKind)
             {
-                JsonValueKind.Number => v.GetInt32(),
-                JsonValueKind.String when int.TryParse(v.GetString(), out var n) => n,
-                _ => null
-            };
+                case JsonValueKind.Number:
+                    if (v.TryGetInt32(out var asInt)) return asInt;
+                    try { return (int)Math.Round(v.GetDouble()); }
+                    catch (Exception ex)
+                    {
+                        CcLog.Ignore(ex, "HeroBridge.ReadInt");
+                        return null;
+                    }
+                case JsonValueKind.String when int.TryParse(v.GetString(), out var n):
+                    return n;
+                default:
+                    return null;
+            }
         }
 
         private static int[] ReadIntArray(JsonElement e, string name)

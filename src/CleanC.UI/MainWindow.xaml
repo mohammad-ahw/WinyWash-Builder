@@ -227,7 +227,9 @@
 
                                     <ProgressBar x:Name="LiveCleanProgressBar" Minimum="0" Maximum="100" Value="0" Height="4" CornerRadius="2" HorizontalAlignment="Stretch" />
 
-                                    <ListView x:Name="LiveCleanListView" SelectionMode="None" Height="220" HorizontalAlignment="Stretch">
+                                    <!-- ارتفاع ثابت حذف شد: کارت دو اسکرول کامل (Probe + Delete) را نمی توانید
+                                         در ۲۲۰ پیکسل فشرده نگه دارید؛ کارت به محتوا رشد می کند و صفحه کل آن را اسکرول می کند -->
+                                    <ListView x:Name="LiveCleanListView" SelectionMode="None" HorizontalAlignment="Stretch">
                                         <ListView.ItemTemplate>
                                             <DataTemplate>
                                                 <Border Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{Binding ItemBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="14,10" Margin="0,2,0,4" HorizontalAlignment="Stretch">
@@ -310,7 +312,7 @@
                                         <Grid ColumnDefinitions="*,Auto">
                                             <TextBlock x:Name="CardHealthTitle" Text="امتیاز سلامت سیستم" FontWeight="SemiBold" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
                                             <Border x:Name="HealthScoreStatusBadge" Grid.Column="1" HorizontalAlignment="Right" Background="#25F5A524" BorderBrush="#50F5A524" BorderThickness="1" CornerRadius="5" Padding="7,2">
-                                                <TextBlock x:Name="HealthScoreStatusPill" Text="متوسط" FontSize="10.5" FontWeight="SemiBold" Foreground="#F5A524" />
+                                                <TextBlock x:Name="HealthScoreStatusPill" Text="متوسط" FontSize="12" FontWeight="SemiBold" Foreground="#F5A524" />
                                             </Border>
                                         </Grid>
 
@@ -510,7 +512,9 @@
 
                                         <!-- Segmented Storage Bar (Height 12, CornerRadius 6, gap 2px) — عرض ها در کد بر اساس داده واقعی ست می شود -->
                                         <Border Height="12" CornerRadius="6" HorizontalAlignment="Stretch" Margin="0,4,0,2">
-                                            <Grid x:Name="DiskBreakdownBar" HorizontalAlignment="Stretch">
+                                            <!-- نوار سگمنت‌ها از چپ به راست رسم می شود؛ داخل یک کلید LTR
+                                                 تا سگمنت ها با درصد ها روی هم بخوابند و در RTL جا نپرند -->
+                                            <Grid x:Name="DiskBreakdownBar" HorizontalAlignment="Stretch" FlowDirection="LeftToRight" Language="en-US">
                                                 <Grid.ColumnDefinitions>
                                                     <ColumnDefinition Width="60*" />
                                                     <ColumnDefinition Width="20*" />
@@ -1507,14 +1511,25 @@
                                             <!-- Sorting Controls -->
                                             <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                                 <TextBlock x:Name="DeepStorageSortLabel" Text="مرتب سازی:" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" Margin="0,0,4,0" />
+                                                <!-- ایموجی به آیکن برداری Segoe MDL2 تغییر کرد: در فونت‌ها/ضخامت‌های
+                                                     درست با متن هم‌راستا می شود و در High Contrast هم رنگ می گیرد -->
                                                 <Button x:Name="DeepStorageSortSizeBtn" Click="DeepStorageSort_Click" Tag="size" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Style="{ThemeResource AccentButtonStyle}">
-                                                    <TextBlock x:Name="DeepStorageSortSizeBtnText" Text="حجم 🔻" />
+                                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                                        <TextBlock x:Name="DeepStorageSortSizeBtnText" Text="حجم" />
+                                                        <FontIcon Glyph="&#xE70D;" FontSize="9" Margin="0,2,0,0" />
+                                                    </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeepStorageSortDateBtn" Click="DeepStorageSort_Click" Tag="date" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                    <TextBlock x:Name="DeepStorageSortDateBtnText" Text="تاریخ 📅" />
+                                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                                        <TextBlock x:Name="DeepStorageSortDateBtnText" Text="تاریخ" />
+                                                        <FontIcon Glyph="&#xE70D;" FontSize="9" Margin="0,2,0,0" />
+                                                    </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeepStorageSortNameBtn" Click="DeepStorageSort_Click" Tag="name" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
-                                                    <TextBlock x:Name="DeepStorageSortNameBtnText" Text="نام 🔤" />
+                                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                                        <TextBlock x:Name="DeepStorageSortNameBtnText" Text="نام" />
+                                                        <FontIcon Glyph="&#xE70D;" FontSize="9" Margin="0,2,0,0" />
+                                                    </StackPanel>
                                                 </Button>
                                             </StackPanel>
                                         </Grid>
@@ -1669,17 +1684,19 @@
                                     <TextBlock x:Name="SettingsLangDesc" Text="انتخاب زبان رابط کاربری، جهت نوشتاری (RTL / LTR) و تایپوگرافی نیتیو سیستم عامل." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" MaxWidth="520" />
                                 </StackPanel>
                                 <ComboBox x:Name="LanguageComboBox" Grid.Column="1" Width="210" VerticalAlignment="Center" SelectionChanged="LanguageComboBox_SelectionChanged">
+                                    <!-- پرچم‌ها حذف شدند: بدون فونت Segoe UI Emoji بصری شکل مربعی می گیرند؛
+                                         نام زبان خودش هویت کافی و فارغ از محدودیت فونت کنترل دارد -->
                                     <ComboBoxItem Tag="Auto" Content="خودکار (بر اساس ساعت و منطقه)" />
-                                    <ComboBoxItem Tag="fa-IR" Content="🇮🇷 فارسی" />
-                                    <ComboBoxItem Tag="en-US" Content="🇬🇧 English" />
-                                    <ComboBoxItem Tag="ar-SA" Content="🇸🇦 العربية" />
-                                    <ComboBoxItem Tag="zh-CN" Content="🇨🇳 简体中文" />
-                                    <ComboBoxItem Tag="ja-JP" Content="🇯🇵 日本語" />
-                                    <ComboBoxItem Tag="ko-KR" Content="🇰🇷 한국어" />
-                                    <ComboBoxItem Tag="ru-RU" Content="🇷🇺 Русский" />
-                                    <ComboBoxItem Tag="de-DE" Content="🇩🇪 Deutsch" />
-                                    <ComboBoxItem Tag="fr-FR" Content="🇫🇷 Français" />
-                                    <ComboBoxItem Tag="es-ES" Content="🇪🇸 Español" />
+                                    <ComboBoxItem Tag="fa-IR" Content="فارسی" />
+                                    <ComboBoxItem Tag="en-US" Content="English" />
+                                    <ComboBoxItem Tag="ar-SA" Content="العربية" />
+                                    <ComboBoxItem Tag="zh-CN" Content="简体中文" />
+                                    <ComboBoxItem Tag="ja-JP" Content="日本語" />
+                                    <ComboBoxItem Tag="ko-KR" Content="한국어" />
+                                    <ComboBoxItem Tag="ru-RU" Content="Русский" />
+                                    <ComboBoxItem Tag="de-DE" Content="Deutsch" />
+                                    <ComboBoxItem Tag="fr-FR" Content="Français" />
+                                    <ComboBoxItem Tag="es-ES" Content="Español" />
                                 </ComboBox>
                             </Grid>
                         </Border>
@@ -1748,10 +1765,11 @@
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                     <TextBlock x:Name="CharSizeText" Text="اندازه کاراکتر" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center">
-                                        <Slider x:Name="CharSizeSlider" Width="170" Minimum="0.7" Maximum="1.4" StepFrequency="0.05"
+                                        <Slider x:Name="CharSizeSlider" Width="170" Minimum="0.7" Maximum="1.25" StepFrequency="0.05"
+                                                ToolTipService.ToolTip="حجم بالای ۱.۲۵× از درون کارت بیرون می زند"
                                                 Value="{x:Bind SettingsVm.CharacterSize, Mode=TwoWay}"
                                                 ValueChanged="CharSizeSlider_ValueChanged" />
-                                        <TextBlock x:Name="CharSizeValueText" Width="38" FontSize="11.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock x:Name="CharSizeValueText" Width="38" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" VerticalAlignment="Center" />
                                     </StackPanel>
                                 </Grid>
 
