@@ -1611,7 +1611,57 @@
                                     </StackPanel>
                                 </Border>
 
-                                <!-- Items Container -->
+                                <!-- B2: لیست مجازی پویش عمیق (زائد/پوشه خالی/فایل حجیم) — فقط کارت های داخل viewport ساخته می شوند -->
+                                <ListView x:Name="DeepStorageItemsList" Visibility="Collapsed" SelectionMode="None" MaxHeight="640" HorizontalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="MinHeight" Value="0" />
+                                            <Setter Property="Margin" Value="0,2,0,2" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="12,8" HorizontalAlignment="Stretch">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Center" Margin="0,0,8,0" Click="DeepStorageItemCheck_Click" />
+
+                                                    <FontIcon Grid.Column="1" Glyph="{Binding Glyph}" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}" Margin="0,0,10,0" VerticalAlignment="Center" />
+
+                                                    <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="1">
+                                                        <TextBlock Text="{Binding FileName}" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis" TextAlignment="Start" />
+                                                        <TextBlock Text="{Binding DirectoryPath}" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis" FlowDirection="LeftToRight" TextAlignment="Start" />
+                                                        <TextBlock Text="{Binding EvidenceText}" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis" Visibility="{Binding EvidenceVisibility}" TextAlignment="Start" />
+                                                    </StackPanel>
+
+                                                    <Border Grid.Column="3" Background="{ThemeResource AppAccentTintBrush}" CornerRadius="4" Padding="6,2" VerticalAlignment="Center" Margin="0,0,8,0" Visibility="{Binding PillVisibility}">
+                                                        <TextBlock Text="{Binding PillText}" FontSize="10" Foreground="{ThemeResource AccentFillColorDefaultBrush}" />
+                                                    </Border>
+
+                                                    <Border Grid.Column="4" Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="4" Padding="7,2" VerticalAlignment="Center" Visibility="{Binding SizeVisibility}">
+                                                        <TextBlock Text="{Binding SizeText}" FontSize="10.5" FontWeight="SemiBold" FlowDirection="LeftToRight" />
+                                                    </Border>
+
+                                                    <Button Grid.Column="5" Visibility="{Binding LockVisibility}" Click="DeepStorageItemLock_Click" Background="Transparent" BorderThickness="0" Padding="6,4" Margin="6,0,0,0" VerticalAlignment="Center" ToolTipService.ToolTip="{Binding LockTooltip}">
+                                                        <FontIcon Glyph="{Binding LockGlyph}" FontSize="12" Foreground="{Binding LockBrush}" />
+                                                    </Button>
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <!-- ظرف غیرمجازی: مود تکراری ها، بخش فایل های حساس (فقط گزارش) و پیام های حالت خالی -->
                                 <StackPanel x:Name="DeepStorageItemsStack" Spacing="6" />
 
 

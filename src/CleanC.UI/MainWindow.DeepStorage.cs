@@ -58,6 +58,11 @@ namespace CleanC.UI
             if (DeepStorageLoadingPanel != null) DeepStorageLoadingPanel.Visibility = Visibility.Visible;
             if (DeepStorageScanBtn != null) DeepStorageScanBtn.IsEnabled = false;
             DeepStorageItemsStack.Children.Clear();
+            if (DeepStorageItemsList != null)
+            {
+                DeepStorageItemsList.ItemsSource = null;
+                DeepStorageItemsList.Visibility = Visibility.Collapsed;
+            }
 
             try
             {
@@ -149,6 +154,11 @@ namespace CleanC.UI
         private void RenderDeepStorageItems()
         {
             DeepStorageItemsStack.Children.Clear();
+            if (DeepStorageItemsList != null)
+            {
+                DeepStorageItemsList.ItemsSource = null;
+                DeepStorageItemsList.Visibility = Visibility.Collapsed;
+            }
             if (DeepStorageSelectAllCheck != null) DeepStorageSelectAllCheck.IsChecked = false;
 
             if (_deepScanResult == null) return;
@@ -315,85 +325,24 @@ namespace CleanC.UI
                 _ => _deepScanResult.EmptyFolders.OrderBy(f => f.FolderPath).ToList()
             };
 
+            // B2: ViewModel — ListView مجازی فقط کارت های داخل viewport را می سازد
+            var vms = new List<DeepStorageItemViewModel>(sortedFolders.Count);
             foreach (var folder in sortedFolders)
             {
-                var card = new Border
-                {
-                    Background = GetThemeBrush("AppCardBackgroundBrush"),
-                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8),
-                    Padding = new Thickness(12, 8, 12, 8),
-                    Margin = new Thickness(0, 0, 0, 4)
-                };
-
-                var grid = new Grid();
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                var chk = new CheckBox
-                {
-                    IsChecked = folder.IsSelected,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 8, 0)
-                };
                 var capturedFolder = folder;
-                chk.Click += (s, e) =>
-                {
-                    capturedFolder.IsSelected = chk.IsChecked == true;
-                    UpdateDeepStorageSelectionCount();
-                };
-                Grid.SetColumn(chk, 0);
-                grid.Children.Add(chk);
-
-                var icon = new FontIcon
-                {
-                    Glyph = "\uE8B7",
-                    FontSize = 14,
-                    Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(icon, 1);
-                grid.Children.Add(icon);
-
-                var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
-                info.Children.Add(new TextBlock { Text = folder.FolderName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12 });
-                info.Children.Add(new TextBlock { Text = folder.FolderPath, FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, FlowDirection = FlowDirection.LeftToRight });
-
-                // شاهد D09 — «چرا» این پوشه پیشنهاد شده (گیت زمانی ۳۰ روزه)
-                if (!string.IsNullOrEmpty(folder.Evidence))
-                {
-                    info.Children.Add(new TextBlock { Text = folder.Evidence, FontSize = 10, Foreground = GetThemeBrush("TextFillColorTertiaryBrush") });
-                }
-                Grid.SetColumn(info, 2);
-                grid.Children.Add(info);
-
-                var pill = new Border
-                {
-                    Background = GetThemeBrush("AppCardSecondaryBrush"),
-                    CornerRadius = new CornerRadius(4),
-                    Padding = new Thickness(7, 2, 7, 2),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Child = new TextBlock { Text = "پوشه خالی", FontSize = 10, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") }
-                };
-                Grid.SetColumn(pill, 3);
-                grid.Children.Add(pill);
-
-                var folderLockBtn = CreateLockToggleButton(folder.FolderPath, () =>
-                {
-                    folder.IsSelected = false;
-                    RenderDeepStorageItems();
-                });
-                Grid.SetColumn(folderLockBtn, 4);
-                grid.Children.Add(folderLockBtn);
-
-                card.Child = grid;
-                DeepStorageItemsStack.Children.Add(card);
+                vms.Add(new DeepStorageItemViewModel(
+                    glyph: "\uE8B7",
+                    fileName: folder.FolderName,
+                    directoryPath: folder.FolderPath,
+                    evidenceText: folder.Evidence,
+                    pillText: "پوشه خالی",
+                    sizeText: string.Empty,
+                    filePath: folder.FolderPath,
+                    hasLock: true,
+                    getSelected: () => capturedFolder.IsSelected,
+                    setSelected: v => capturedFolder.IsSelected = v));
             }
+            SetDeepStorageItemsSource(vms);
         }
 
         private void RenderStorageMess()
@@ -412,161 +361,71 @@ namespace CleanC.UI
                 _ => _deepScanResult.MessItems.OrderByDescending(m => m.SizeBytes).ToList()
             };
 
+            // B2: ViewModel — لیست مجازی؛ شواهد و ستون های pill/size/lock داخل تمپلیت مشترک
+            var vms = new List<DeepStorageItemViewModel>(sortedMess.Count);
             foreach (var item in sortedMess)
             {
-                var card = new Border
-                {
-                    Background = GetThemeBrush("AppCardBackgroundBrush"),
-                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8),
-                    Padding = new Thickness(12, 8, 12, 8),
-                    Margin = new Thickness(0, 0, 0, 4)
-                };
-
-                var grid = new Grid();
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                var chk = new CheckBox
-                {
-                    IsChecked = item.IsSelected,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 8, 0)
-                };
                 var capturedItem = item;
-                chk.Click += (s, e) =>
-                {
-                    capturedItem.IsSelected = chk.IsChecked == true;
-                    UpdateDeepStorageSelectionCount();
-                };
-                Grid.SetColumn(chk, 0);
-                grid.Children.Add(chk);
-
-                var icon = new FontIcon
-                {
-                    Glyph = "\uE896",
-                    FontSize = 14,
-                    Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(icon, 1);
-                grid.Children.Add(icon);
-
-                var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
-                info.Children.Add(new TextBlock { Text = item.FileName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis });
-                info.Children.Add(new TextBlock { Text = item.DirectoryPath, FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, FlowDirection = FlowDirection.LeftToRight });
-
-                // شواهد تشخیص — کاربر با اطلاعات کامل تصمیم بگیرد (خصیصه ی Evidence دیتکتورهای فاز ۶)
-                if (!string.IsNullOrEmpty(item.Evidence))
-                {
-                    string evidenceText = item.RequiresAdmin
+                string evidenceText = string.IsNullOrEmpty(item.Evidence)
+                    ? string.Empty
+                    : item.RequiresAdmin
                         ? $"{LocalizationService.Get("AdminRequired", "نیازمند دسترسی ادمین")} · {item.Evidence}"
                         : item.Evidence;
-                    info.Children.Add(new TextBlock
-                    {
-                        Text = evidenceText,
-                        FontSize = 10,
-                        Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
-                        TextTrimming = TextTrimming.CharacterEllipsis
-                    });
-                }
-                Grid.SetColumn(info, 2);
-                grid.Children.Add(info);
 
-                var catPill = new Border
-                {
-                    Background = GetThemeBrush("AppAccentTintBrush"),
-                    CornerRadius = new CornerRadius(4),
-                    Padding = new Thickness(6, 2, 6, 2),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 8, 0),
-                    Child = new TextBlock { Text = item.CategoryTitle, FontSize = 10, Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] }
-                };
-                Grid.SetColumn(catPill, 3);
-                grid.Children.Add(catPill);
-
-                var sizeBadge = new Border
-                {
-                    Background = GetThemeBrush("AppCardSecondaryBrush"),
-                    CornerRadius = new CornerRadius(4),
-                    Padding = new Thickness(7, 2, 7, 2),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Child = new TextBlock { Text = item.FormattedSize, FontSize = 10.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FlowDirection = FlowDirection.LeftToRight }
-                };
-                Grid.SetColumn(sizeBadge, 4);
-                grid.Children.Add(sizeBadge);
-
-                // دکمه ی قفل/آنلاک (فاز ۶ قدم ۴): قفل کاربر یعنی این مسیر هرگز
-                // پیشنهاد نمی شود و حذفش وتو می شود (SafeDeleteService هم احترام می گذارد)
-                var lockBtn = CreateLockToggleButton(item.FilePath, () =>
-                {
-                    item.IsSelected = false;
-                    RenderDeepStorageItems();
-                });
-                Grid.SetColumn(lockBtn, 5);
-                grid.Children.Add(lockBtn);
-
-                card.Child = grid;
-                DeepStorageItemsStack.Children.Add(card);
+                vms.Add(new DeepStorageItemViewModel(
+                    glyph: "\uE896",
+                    fileName: item.FileName,
+                    directoryPath: item.DirectoryPath,
+                    evidenceText: evidenceText,
+                    pillText: item.CategoryTitle,
+                    sizeText: item.FormattedSize,
+                    filePath: item.FilePath,
+                    hasLock: true,
+                    getSelected: () => capturedItem.IsSelected,
+                    setSelected: v => capturedItem.IsSelected = v));
             }
+            SetDeepStorageItemsSource(vms);
 
             RenderSensitiveFilesSection();
         }
 
-        /// <summary>
-        /// دکمه ی قفل/آنلاکِ مسیر — مشترک بین کارت های پویش عمیق.
-        /// کلیک = افزودن/حذف قفل کاربر در locks.json + تازه سازی لیست.
-        /// </summary>
-        private Button CreateLockToggleButton(string path, Action onChanged)
+        // B2: اتصال لیست مجازی پویش عمیق
+        private void SetDeepStorageItemsSource(List<DeepStorageItemViewModel> vms)
         {
-            bool isLocked = LockRegistryService.IsUserLockedPath(path);
+            DeepStorageItemsList.ItemsSource = vms;
+            DeepStorageItemsList.Visibility = Visibility.Visible;
+        }
 
-            var btn = new Button
+        // B2: کلیک چک باکس — مقدار از طریق TwoWay binding در VM و مدل اصلی نوشته شده؛ فقط شمارش تازه می شود
+        private void DeepStorageItemCheck_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateDeepStorageSelectionCount();
+        }
+
+        /// <summary>
+        /// B2: کلیک دکمه ی قفل داخل تمپلیت — همان رفتار قبلی CreateLockToggleButton:
+        /// افزودن/حذف قفل در locks.json + برداشتن انتخاب + به روزرسانی آیکن (بدون رندر کل لیست).
+        /// </summary>
+        private void DeepStorageItemLock_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.DataContext is not DeepStorageItemViewModel vm) return;
+
+            bool currentlyLocked = LockRegistryService.IsUserLockedPath(vm.FilePath);
+            bool ok = currentlyLocked
+                ? LockRegistryService.RemoveLock(vm.FilePath)
+                : LockRegistryService.AddLock(vm.FilePath, LockTypes.Folder, LocalizationService.Get("LockReasonDeepScan", "قفل شده از صفحه ی پویش عمیق"));
+
+            if (ok)
             {
-                Content = new FontIcon
-                {
-                    Glyph = isLocked ? "\uE785" : "\uE72E",
-                    FontSize = 12,
-                    Foreground = isLocked
-                        ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"]
-                        : GetThemeBrush("TextFillColorTertiaryBrush")
-                },
-                Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
-                BorderThickness = new Thickness(0),
-                Padding = new Thickness(6, 4, 6, 4),
-                VerticalAlignment = VerticalAlignment.Center,
-                Margin = new Thickness(6, 0, 0, 0)
-            };
-
-            ToolTipService.SetToolTip(btn, isLocked
-                ? LocalizationService.Get("LockTooltipUnlock", "رفع قفل — این مسیر دوباره قابل پیشنهاد می شود")
-                : LocalizationService.Get("LockTooltipLock", "قفل کردن — این مسیر هرگز پیشنهاد یا حذف نمی شود"));
-
-            btn.Click += (s, e) =>
+                vm.IsSelected = false; // رفتار قبلی: بعد از قفل/رفع قفل، مورد از انتخاب خارج می شود
+                vm.RefreshLockState();
+                UpdateDeepStorageSelectionCount();
+            }
+            else
             {
-                bool currentlyLocked = LockRegistryService.IsUserLockedPath(path);
-                bool ok = currentlyLocked
-                    ? LockRegistryService.RemoveLock(path)
-                    : LockRegistryService.AddLock(path, LockTypes.Folder, LocalizationService.Get("LockReasonDeepScan", "قفل شده از صفحه ی پویش عمیق"));
-
-                if (ok)
-                {
-                    onChanged();
-                }
-                else
-                {
-                    ShowInfoBar(LocalizationService.Get("LockInfoBarTitle", "قفل مسیر"),
-                        LocalizationService.Get("LockSaveFailed", "ذخیره ی قفل ناموفق بود — دسترسی به locks.json بررسی شود."), InfoBarSeverity.Warning);
-                }
-            };
-
-            return btn;
+                ShowInfoBar(LocalizationService.Get("LockInfoBarTitle", "قفل مسیر"),
+                    LocalizationService.Get("LockSaveFailed", "ذخیره ی قفل ناموفق بود — دسترسی به locks.json بررسی شود."), InfoBarSeverity.Warning);
+            }
         }
 
         /// <summary>
@@ -685,70 +544,24 @@ namespace CleanC.UI
                     break;
             }
 
+            // B2: ViewModel — قفل مسیر برای فایل های حجیم ارائه نمی شود (hasLock: false)
+            var vms = new List<DeepStorageItemViewModel>(_deepScanResult.LargeFiles.Count);
             foreach (var item in files)
             {
-                var card = new Border
-                {
-                    Background = GetThemeBrush("AppCardBackgroundBrush"),
-                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(8),
-                    Padding = new Thickness(12, 8, 12, 8),
-                    Margin = new Thickness(0, 0, 0, 4)
-                };
-
-                var grid = new Grid();
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-
-                var chk = new CheckBox
-                {
-                    IsChecked = item.IsSelected,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Margin = new Thickness(0, 0, 8, 0)
-                };
                 var capturedItem = item;
-                chk.Click += (s, e) =>
-                {
-                    capturedItem.IsSelected = chk.IsChecked == true;
-                    UpdateDeepStorageSelectionCount();
-                };
-                Grid.SetColumn(chk, 0);
-                grid.Children.Add(chk);
-
-                var icon = new FontIcon
-                {
-                    Glyph = "\uE7C3",
-                    FontSize = 14,
-                    Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
-                    Margin = new Thickness(0, 0, 10, 0),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                Grid.SetColumn(icon, 1);
-                grid.Children.Add(icon);
-
-                var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
-                info.Children.Add(new TextBlock { Text = item.FileName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis });
-                info.Children.Add(new TextBlock { Text = item.DirectoryPath, FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, FlowDirection = FlowDirection.LeftToRight });
-                Grid.SetColumn(info, 2);
-                grid.Children.Add(info);
-
-                var sizeBadge = new Border
-                {
-                    Background = GetThemeBrush("AppCardSecondaryBrush"),
-                    CornerRadius = new CornerRadius(4),
-                    Padding = new Thickness(8, 2, 8, 2),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Child = new TextBlock { Text = item.FormattedSize, FontSize = 11, FontWeight = Microsoft.UI.Text.FontWeights.Bold, Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"], FlowDirection = FlowDirection.LeftToRight }
-                };
-                Grid.SetColumn(sizeBadge, 3);
-                grid.Children.Add(sizeBadge);
-
-                card.Child = grid;
-                DeepStorageItemsStack.Children.Add(card);
+                vms.Add(new DeepStorageItemViewModel(
+                    glyph: "\uE7C3",
+                    fileName: item.FileName,
+                    directoryPath: item.DirectoryPath,
+                    evidenceText: string.Empty,
+                    pillText: string.Empty,
+                    sizeText: item.FormattedSize,
+                    filePath: item.FilePath,
+                    hasLock: false,
+                    getSelected: () => capturedItem.IsSelected,
+                    setSelected: v => capturedItem.IsSelected = v));
             }
+            SetDeepStorageItemsSource(vms);
         }
 
         /// <summary>
