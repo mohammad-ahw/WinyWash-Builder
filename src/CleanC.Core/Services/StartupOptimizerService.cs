@@ -214,7 +214,7 @@ namespace CleanC.Core.Services
 
         // استخراج مسیر فایل اجرایی از رشته ی فرمان (با پشتیبانی از کوتیشن، آرگومان و متغیر محیطی).
         // false یعنی قابل استخراج نبود (مثل rundll32/msiexec) و در آن صورت عمداً قضاوت نمی کنیم.
-        private static bool TryResolveExecutablePath(string command, out string exePath)
+        internal static bool TryResolveExecutablePath(string command, out string exePath)
         {
             exePath = string.Empty;
             if (string.IsNullOrWhiteSpace(command)) return false;

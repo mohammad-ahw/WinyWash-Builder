@@ -641,7 +641,7 @@ namespace CleanC.Core.Services
         // تطبیق فازی نام فایل نصب کننده با نام محصولات نصب شده (D05):
         // توکن های ≥۴ حرفی و غیرعمومی نام فایل را در نام محصولات جستجو می کنیم.
         // برگشت: نام محصول منطبق — یا null اگر تطبیق مطمئنی پیدا نشد.
-        private static string? MatchInstalledProduct(string fileName, List<string> installedProducts)
+        internal static string? MatchInstalledProduct(string fileName, List<string> installedProducts)
         {
             if (installedProducts.Count == 0) return null;
 
@@ -689,8 +689,7 @@ namespace CleanC.Core.Services
         /// </summary>
         private static List<StorageMessItem> ScanOemDriveRootLeftovers()
         {
-            var found = new List<StorageMessItem>();
-
+            var roots = new List<string>();
             try
             {
                 foreach (var drive in DriveInfo.GetDrives())
@@ -698,42 +697,7 @@ namespace CleanC.Core.Services
                     try
                     {
                         if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue;
-                        string root = drive.RootDirectory.FullName;
-
-                        foreach (var dir in Directory.EnumerateDirectories(root))
-                        {
-                            try
-                            {
-                                string name = Path.GetFileName(dir);
-                                if (!OemRootFolderAllowlist.TryGetValue(name, out string? vendor)) continue;
-
-                                // قفل پیش فرض یا کاربر = اصلاً پیشنهاد نده
-                                if (LockRegistryService.IsLockedPath(dir)) continue;
-
-                                string? evidence = FindDriveRootEvidence(dir, vendor, maxDepth: 3);
-                                if (evidence == null) continue; // بدون مدرک قطعی، سکوت می کنیم
-
-                                long size = RecycleBinService.ComputeDirectorySize(dir);
-                                if (size <= 0) continue;
-
-                                found.Add(new StorageMessItem
-                                {
-                                    FilePath = dir,
-                                    FileName = name,
-                                    DirectoryPath = root,
-                                    SizeBytes = size,
-                                    LastModified = Directory.GetLastWriteTime(dir),
-                                    Category = StorageMessCategory.OemDriveRootLeftover,
-                                    Evidence = string.Format(LocalizationService.Get("EvDriveRootLeftover", "پوشه ی ریشه ی درایو با نام سازنده ی {0} — مدرک قطعی: {1}"), vendor, evidence),
-                                    RequiresAdmin = true,
-                                    IsSelected = true
-                                });
-                            }
-                            catch (Exception __ex)
-                            {
-                                CcLog.Ignore(__ex);
-                            }
-                        }
+                        roots.Add(drive.RootDirectory.FullName);
                     }
                     catch (Exception __ex)
                     {
@@ -746,6 +710,62 @@ namespace CleanC.Core.Services
                 CcLog.Ignore(__ex);
             }
 
+            return ScanOemDriveRootLeftovers(roots);
+        }
+
+        /// <summary>
+        /// نسخه ی تست پذیر D10 — ریشه های درایو پارامتر می شوند تا تست ها
+        /// با پوشه ی موقت همان منطق واقعی را اجرا کنند.
+        /// </summary>
+        internal static List<StorageMessItem> ScanOemDriveRootLeftovers(IEnumerable<string> driveRoots)
+        {
+            var found = new List<StorageMessItem>();
+
+            foreach (var root in driveRoots)
+            {
+                try
+                {
+                    foreach (var dir in Directory.EnumerateDirectories(root))
+                    {
+                        try
+                        {
+                            string name = Path.GetFileName(dir);
+                            if (!OemRootFolderAllowlist.TryGetValue(name, out string? vendor)) continue;
+
+                            // قفل پیش فرض یا کاربر = اصلاً پیشنهاد نده
+                            if (LockRegistryService.IsLockedPath(dir)) continue;
+
+                            string? evidence = FindDriveRootEvidence(dir, vendor, maxDepth: 3);
+                            if (evidence == null) continue; // بدون مدرک قطعی، سکوت می کنیم
+
+                            long size = RecycleBinService.ComputeDirectorySize(dir);
+                            if (size <= 0) continue;
+
+                            found.Add(new StorageMessItem
+                            {
+                                FilePath = dir,
+                                FileName = name,
+                                DirectoryPath = root,
+                                SizeBytes = size,
+                                LastModified = Directory.GetLastWriteTime(dir),
+                                Category = StorageMessCategory.OemDriveRootLeftover,
+                                Evidence = string.Format(LocalizationService.Get("EvDriveRootLeftover", "پوشه ی ریشه ی درایو با نام سازنده ی {0} — مدرک قطعی: {1}"), vendor, evidence),
+                                RequiresAdmin = true,
+                                IsSelected = true
+                            });
+                        }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+            }
+
             return found;
         }
 
@@ -755,7 +775,7 @@ namespace CleanC.Core.Services
         //      (مثل AomeiBoot.wim برای AOMEI یا بسته های درایور)
         // FirstOrDefault باعث می شود به محض پیدا شدن اولین مدرک، پیمایش فایل ها قطع شود
         // (پوشه های NVIDIA می توانند چند گیگابایت فایل داشته باشند).
-        private static string? FindDriveRootEvidence(string dir, string vendor, int maxDepth)
+        internal static string? FindDriveRootEvidence(string dir, string vendor, int maxDepth)
         {
             try
             {
@@ -810,12 +830,18 @@ namespace CleanC.Core.Services
         /// همیشه پیش فرض «خاموش» (تصمیم T3) — فقط کاربر خودش با تیک دستی انتخاب می کند.
         /// </summary>
         private static List<StorageMessItem> ScanUpdaterLeftovers()
+            => ScanUpdaterLeftovers(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData));
+
+        /// <summary>
+        /// نسخه ی تست پذیر D04 — ریشه ی LocalAppData پارامتر می شود تا تست ها
+        /// با پوشه ی موقت همان منطق واقعی را اجرا کنند.
+        /// </summary>
+        internal static List<StorageMessItem> ScanUpdaterLeftovers(string localApp)
         {
             var found = new List<StorageMessItem>();
 
             try
             {
-                string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 if (string.IsNullOrEmpty(localApp) || !Directory.Exists(localApp)) return found;
 
                 // 1) پوشه های *-updater و SquirrelTemp
@@ -993,7 +1019,7 @@ namespace CleanC.Core.Services
             return found.OrderByDescending(f => f.LastModified).ToList();
         }
 
-        private static string? GetSensitiveMatchReason(string fileName)
+        internal static string? GetSensitiveMatchReason(string fileName)
         {
             string lower = fileName.ToLowerInvariant();
 

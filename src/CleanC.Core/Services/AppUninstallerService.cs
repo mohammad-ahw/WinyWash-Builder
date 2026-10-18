@@ -243,7 +243,7 @@ namespace CleanC.Core.Services
 
         // D18 — تشخیص برنامه ی trial از نام نمایشی (فقط badge نمایشی؛ حذف خودکار وجود ندارد).
         // الگوی \btrial\b با مرز کلمه است تا چیزهایی مثل «Trials» یا «Triathlon» مثبت کاذب ندهند.
-        private static bool IsTrialProduct(string displayName, out string evidence)
+        internal static bool IsTrialProduct(string displayName, out string evidence)
         {
             evidence = string.Empty;
             if (string.IsNullOrWhiteSpace(displayName)) return false;
