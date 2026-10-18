@@ -1004,18 +1004,7 @@ namespace CleanC.UI
                     VerticalAlignment = VerticalAlignment.Center
                 };
 
-                uninstBtn.Click += (s, e) =>
-                {
-                    bool launched = AppUninstallerService.LaunchUninstall(app);
-                    if (launched)
-                    {
-                        ShowInfoBar("حذف نرم افزار", $"آنیستالر رسمی {app.DisplayName} با موفقیت اجرا گردید.", InfoBarSeverity.Informational);
-                    }
-                    else
-                    {
-                        ShowInfoBar("خطا در حذف", $"امکان اجرای آنیستالر برای {app.DisplayName} وجود ندارد.", InfoBarSeverity.Warning);
-                    }
-                };
+                uninstBtn.Click += (s, e) => SafeInvoker.Run(UninstallSingleAppAsync(app));
                 Grid.SetColumn(uninstBtn, 4);
                 grid.Children.Add(uninstBtn);
 
@@ -1117,6 +1106,39 @@ namespace CleanC.UI
             UninstallerBatchDeleteBtn.IsEnabled = true;
             ShowInfoBar("پایان عملیات حذف", $"تمام برنامه های انتخاب شده ({total} مورد) در صف آنیستال قرار گرفتند.", InfoBarSeverity.Success);
             await LoadAppUninstallerPageAsync();
+        }
+
+        // D5: حذف تکی نرم افزار هم مثل حذف گروهی نیاز به تأیید صریح کاربر دارد
+        private async Task UninstallSingleAppAsync(InstalledAppInfo app)
+        {
+            var confirmDialog = new ContentDialog
+            {
+                Title = "تأیید حذف نرم افزار",
+                Content = new TextBlock
+                {
+                    Text = $"آیا از حذف «{app.DisplayName}» اطمینان دارید؟\nآنیستالر رسمی برنامه باز خواهد شد و ادامه ی حذف در اختیار خودش است.",
+                    FontSize = 13,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 20
+                },
+                PrimaryButtonText = "حذف",
+                CloseButtonText = "انصراف",
+                DefaultButton = ContentDialogButton.Close,
+                XamlRoot = this.Content.XamlRoot,
+                FlowDirection = FlowDirection.RightToLeft
+            };
+
+            if (await confirmDialog.ShowAsync() != ContentDialogResult.Primary) return;
+
+            bool launched = AppUninstallerService.LaunchUninstall(app);
+            if (launched)
+            {
+                ShowInfoBar("حذف نرم افزار", $"آنیستالر رسمی {app.DisplayName} با موفقیت اجرا گردید.", InfoBarSeverity.Informational);
+            }
+            else
+            {
+                ShowInfoBar("خطا در حذف", $"امکان اجرای آنیستالر برای {app.DisplayName} وجود ندارد.", InfoBarSeverity.Warning);
+            }
         }
 
         private void UninstallerSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)

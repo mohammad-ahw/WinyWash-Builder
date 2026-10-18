@@ -64,7 +64,7 @@
 ### A) زیرساخت ایمنی (پیش‌نیاز همه)
 1. **فایل قفل ماشین‌خوان** `%LOCALAPPDATA%\CleanC\locks.json` با ساختار `{path, lockType, reason, createdAt}` — معادل فعلی: لیست‌های هاردکد (`LeftoverCleanerService.cs:21-65`، `CleanService.cs:239`).
 2. افزودن فیلدهای `requiresAdmin` / `confidence` / `evidence[]` به مدل‌های دیتکتور جدید (طبق قرارداد JSON بریف).
-3. تأیید/افزودن Restore Point قبل از پاکسازی Deep (فعلاً فقط DriverManager دارد).
+3. ~~تأیید/افزودن Restore Point قبل از پاکسازی Deep (فعلاً فقط DriverManager دارد).~~ **تصمیم نهایی ۲۰۲۶/۱۰/۱۸: اضافه نمی‌شود** — چرخه‌ی Deep برای فایل‌های کاربر از سطل بازیافت/قرنطینه (`SafeDeleteService`) رد می‌شود که مؤثرتر از System Restore است (Restore Point فقط سیستم/رجیستری را برمی‌گرداند، نه فایل کاربر). عملیات DriverStore همچنان Restore Point خودکار دارد (`MainWindow.Tools.cs`).
 
 ### B) دیتکتورهای جدید
 - D04 (بازمانده آپدیترها)، D10 (ریشه درایوها/OEM)، D17 (فایل‌های حساس report-only)، D03-افزودنی (LiveKernelReports).
@@ -88,7 +88,7 @@
 | بدون حذف مستقیم؛ سطل بازیافت/قرنطینه | رعایت شده | `SafeDeleteService.cs:357-359` |
 | عبور از reparse/junction | رعایت شده | `DeepStorageCleanService.cs:38`، `LargeFileScannerService.cs:41`، `LeftoverCleanerService.cs:140,194,262`، `CleanService.cs:184` |
 | junk سیستمی = حذف دائمی (طبق طراحی) | رعایت شده | متن `DeleteBehaviorSub` در Localization |
-| Restore Point قبل از عملیات | فقط درایورها | `DriverManagerService` — برای Deep باید اضافه/تأیید شود |
+| Restore Point قبل از عملیات | فقط درایورها (Deep: سطل/قرنطینه به‌جای آن — تصمیم ۲۰۲۶/۱۰/۱۸) | `DriverManagerService` + متن بند ۴-الف-۳ |
 | قفل‌ها (locks) | ناقص — لیست‌های هاردکد | نیاز به `locks.json` |
 | آستانه‌ها (24h/72h) | ناهماهنگ | D06 |
 | requiresAdmin | پراکنده (UAC manifest اپ) | در دیتکتورهای جدید صریح شود |
@@ -132,5 +132,7 @@
 2. **پیش‌فرض دیتکتورها**: D10 و D12 با مدرک قطعی پیش‌فرض روشن (T2). D04 و D16 **همیشه پیش‌فرض خاموش** و فقط با تیک دستی کاربر فعال می‌شوند (T3).
 3. **`LiveKernelReports`**: تب Clean — حذف دائمی.
 4. **تشخیص trial (D18)**: در همین فاز پیاده می‌شود — فقط نمایش badge در تب Apps، بدون حذف خودکار.
+5. **تأیید حذف تکی نرم‌افزار (D5)**: دیالوگ تأیید صریح اضافه شد — هم‌سان با حذف گروهی.
+6. **Restore Point دیپ‌کلین**: اضافه نمی‌شود — سطل بازیافت/قرنطینه محافظت مؤثرتر و متناسب‌تری برای فایل‌های کاربر است.
 
-وضعیت سند: تأییدشده — در حال پیاده‌سازی.
+وضعیت سند: تأییدشده — **فاز ۶ پیاده‌سازی و Acceptance شد (۲۰۲۶/۱۰/۱۸)؛ همه‌ی بندها بسته شدند.**
