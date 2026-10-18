@@ -45,7 +45,11 @@ namespace CleanC.Core.Models
         TempJunk,
         LargeFile,
         ExtractedArchiveDuplicate,
-        IncompleteDownload
+        IncompleteDownload,
+        // D10 — بازمانده ی نصاب سازنده در ریشه ی درایو (C:\NVIDIA, C:\Aomei, ...)
+        OemDriveRootLeftover,
+        // D04 — بازمانده ی آپدیترهای Electron/Squirrel در LocalAppData
+        UpdaterLeftover
     }
 
     public class StorageMessItem
@@ -67,10 +71,35 @@ namespace CleanC.Core.Models
             StorageMessCategory.LargeFile => "فایل بسیار حجیم (>200MB)",
             StorageMessCategory.ExtractedArchiveDuplicate => "فایل آرشیو آنزیپ‌شده (پوشه هم‌نام موجود است)",
             StorageMessCategory.IncompleteDownload => "دانلود ناتمام و موقت (crdownload / part)",
+            StorageMessCategory.OemDriveRootLeftover => "بازمانده ی نصب سازنده در ریشه ی درایو",
+            StorageMessCategory.UpdaterLeftover => "بازمانده ی آپدیتر (Electron / Squirrel)",
             _ => "سایر"
         };
         public string CategoryTitle => CategoryName;
         public bool IsSelected { get; set; } = false;
+
+        // شواهد تشخیص — «چرا» این مورد پیشنهاد شده (مثلاً نام فایل نصب پیدا شده).
+        // UI این متن را کنار آیتم نشان می دهد تا کاربر با اطلاعات کامل تصمیم بگیرد.
+        public string Evidence { get; set; } = string.Empty;
+
+        // حذف این مورد برای انجام شدن نیاز به دسترسی ادمین دارد (مثلاً ریشه ی درایو).
+        public bool RequiresAdmin { get; set; } = false;
+    }
+
+    /// <summary>
+    /// D17 — فایل حساس کاربر (لایسنس/سریال/کلید خصوصی/دیتابیس رمز).
+    /// عمداً از StorageMessItem جدا است تا «فقط گزارش» بماند:
+    /// هیچ مسیر حذفی برای این نوع وجود ندارد و UI چک‌باکس نمی دهد.
+    /// </summary>
+    public class SensitiveFileInfo
+    {
+        public string FilePath { get; set; } = string.Empty;
+        public string FileName { get; set; } = string.Empty;
+        public string DirectoryPath { get; set; } = string.Empty;
+        public long SizeBytes { get; set; }
+        public string FormattedSize => SystemStats.FormatBytes(SizeBytes);
+        public DateTime LastModified { get; set; }
+        public string MatchReason { get; set; } = string.Empty;
     }
 
     public class DeepStorageScanResult
@@ -79,6 +108,9 @@ namespace CleanC.Core.Models
         public List<DuplicateFileGroup> Duplicates => DuplicateGroups;
         public List<EmptyFolderInfo> EmptyFolders { get; set; } = new();
         public List<StorageMessItem> MessItems { get; set; } = new();
+
+        // D17 — فایل های حساس: فقط برای نمایش گزارش؛ برای حذف در هیچ جای UI نمی آیند.
+        public List<SensitiveFileInfo> SensitiveFiles { get; set; } = new();
 
         public List<StorageMessItem> LargeFiles => MessItems.FindAll(m => m.Category == StorageMessCategory.LargeFile);
         public List<StorageMessItem> OrganizationMess => MessItems.FindAll(m => m.Category != StorageMessCategory.LargeFile);

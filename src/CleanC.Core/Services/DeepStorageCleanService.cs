@@ -409,6 +409,18 @@ namespace CleanC.Core.Services
                     }
                 }
 
+                // -------------------------------------------------------------
+                // 2.5 Detectors فاز ۶ — D10 (ریشه ی درایو) / D04 (بازمانده ی آپدیتر) / D17 (فایل حساس)
+                //     (D03 یعنی LiveKernelReports در تب Clean و SystemScanService است، نه اینجا)
+                // -------------------------------------------------------------
+                progress?.Invoke("در حال بررسی ریشه ی درایوها و بازمانده ی آپدیترها...");
+                messItems.AddRange(ScanOemDriveRootLeftovers());
+                messItems.AddRange(ScanUpdaterLeftovers());
+
+                // D17: فایل های حساس از دل همان فایل های اسکن شده ی قبلی جدا می شوند (بدون IO اضافه)
+                // و فقط در SensitiveFiles می نشینند — نه در MessItems، چون باید صرفاً گزارش باشند.
+                result.SensitiveFiles = ScanSensitiveFiles(filesBySize);
+
                 result.DuplicateGroups = duplicateGroups.OrderByDescending(g => g.WastedSizeBytes).ToList();
                 result.EmptyFolders = emptyFolders.Take(150).ToList();
                 result.MessItems = messItems.OrderByDescending(m => m.SizeBytes).Take(150).ToList();
@@ -482,6 +494,356 @@ namespace CleanC.Core.Services
                 });
             }
             return group;
+        }
+
+        // ====================================================================
+        // Detectors فاز ۶ (قدم ۲): D10 / D04 / D17
+        // ====================================================================
+
+        // نام پوشه های ریشه ی درایو که «بازمانده ی نصب سازنده» محسوب می شوند.
+        // عمداً فقط همین ۵ مورد (طبق SPEC) — لیست بسته، بدون الگوی باز، تا
+        // هیچ وقت سراغ پوشه های عادی کاربر در ریشه ی درایو نرویم.
+        private static readonly Dictionary<string, string> OemRootFolderAllowlist = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ["NVIDIA"] = "NVIDIA",
+            ["Aomei"] = "AOMEI",
+            ["Intel"] = "Intel",
+            ["AMD"] = "AMD",
+            ["MSI"] = "MSI"
+        };
+
+        /// <summary>
+        /// D10 — بازمانده ی نصاب سازنده ها در «ریشه ی» درایوهای ثابت (C:\NVIDIA، C:\Aomei، ...).
+        /// فقط وقتی پیشنهاد می شود که مدرک قطعی وجود داشته باشد: یک فایل Setup/install/msi
+        /// در چند سطح اول پوشه پیدا شود. چون مدرک قطعی است، پیش فرض تیک خورده (تصمیم T2).
+        /// </summary>
+        private static List<StorageMessItem> ScanOemDriveRootLeftovers()
+        {
+            var found = new List<StorageMessItem>();
+
+            try
+            {
+                foreach (var drive in DriveInfo.GetDrives())
+                {
+                    try
+                    {
+                        if (!drive.IsReady || drive.DriveType != DriveType.Fixed) continue;
+                        string root = drive.RootDirectory.FullName;
+
+                        foreach (var dir in Directory.EnumerateDirectories(root))
+                        {
+                            try
+                            {
+                                string name = Path.GetFileName(dir);
+                                if (!OemRootFolderAllowlist.TryGetValue(name, out string? vendor)) continue;
+
+                                // قفل پیش فرض یا کاربر = اصلاً پیشنهاد نده
+                                if (LockRegistryService.IsLockedPath(dir)) continue;
+
+                                string? evidence = FindDriveRootEvidence(dir, vendor, maxDepth: 3);
+                                if (evidence == null) continue; // بدون مدرک قطعی، سکوت می کنیم
+
+                                long size = RecycleBinService.ComputeDirectorySize(dir);
+                                if (size <= 0) continue;
+
+                                found.Add(new StorageMessItem
+                                {
+                                    FilePath = dir,
+                                    FileName = name,
+                                    DirectoryPath = root,
+                                    SizeBytes = size,
+                                    LastModified = Directory.GetLastWriteTime(dir),
+                                    Category = StorageMessCategory.OemDriveRootLeftover,
+                                    Evidence = $"پوشه ی ریشه ی درایو با نام سازنده ی {vendor} — مدرک قطعی: {evidence}",
+                                    RequiresAdmin = true,
+                                    IsSelected = true
+                                });
+                            }
+                            catch (Exception __ex)
+                            {
+                                CcLog.Ignore(__ex);
+                            }
+                        }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+
+            return found;
+        }
+
+        // جستجوی «مدرک قطعی» برای D10 در عمق محدود. دو نوع مدرک قابل قبول است:
+        //   1) فایل نصاب واقعی: نامش شامل setup/install باشد و پسوندش exe/msi باشد
+        //   2) آرتیفکت اختصاصی سازنده: نام فایل با نام سازنده شروع شود و تصویر/بسته باشد
+        //      (مثل AomeiBoot.wim برای AOMEI یا بسته های درایور)
+        // FirstOrDefault باعث می شود به محض پیدا شدن اولین مدرک، پیمایش فایل ها قطع شود
+        // (پوشه های NVIDIA می توانند چند گیگابایت فایل داشته باشند).
+        private static string? FindDriveRootEvidence(string dir, string vendor, int maxDepth)
+        {
+            try
+            {
+                var options = new EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    MaxRecursionDepth = maxDepth,
+                    IgnoreInaccessible = true,
+                    AttributesToSkip = FileAttributes.ReparsePoint | FileAttributes.System | FileAttributes.Hidden
+                };
+
+                string? hit = Directory.EnumerateFiles(dir, "*", options).FirstOrDefault(file =>
+                {
+                    string n = Path.GetFileName(file);
+                    string lower = n.ToLowerInvariant();
+
+                    bool looksLikeInstaller =
+                        (lower.Contains("setup", StringComparison.Ordinal) || lower.Contains("install", StringComparison.Ordinal)) &&
+                        (lower.EndsWith(".exe", StringComparison.Ordinal) || lower.EndsWith(".msi", StringComparison.Ordinal));
+
+                    bool isVendorArtifact =
+                        lower.StartsWith(vendor.ToLowerInvariant(), StringComparison.Ordinal) &&
+                        (lower.EndsWith(".wim", StringComparison.Ordinal) || lower.EndsWith(".sdi", StringComparison.Ordinal) ||
+                         lower.EndsWith(".esd", StringComparison.Ordinal) || lower.EndsWith(".iso", StringComparison.Ordinal) ||
+                         lower.EndsWith(".img", StringComparison.Ordinal) || lower.EndsWith(".exe", StringComparison.Ordinal) ||
+                         lower.EndsWith(".msi", StringComparison.Ordinal));
+
+                    return looksLikeInstaller || isVendorArtifact;
+                });
+
+                if (hit == null) return null;
+
+                string hitName = Path.GetFileName(hit);
+                string hitLower = hitName.ToLowerInvariant();
+                bool isInstaller = (hitLower.Contains("setup", StringComparison.Ordinal) || hitLower.Contains("install", StringComparison.Ordinal)) &&
+                                   (hitLower.EndsWith(".exe", StringComparison.Ordinal) || hitLower.EndsWith(".msi", StringComparison.Ordinal));
+
+                return isInstaller
+                    ? $"فایل نصب باقی مانده «{hitName}»"
+                    : $"آرتیفکت اختصاصی سازنده «{hitName}» (تصویر بوت/بسته ی درایور)";
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// D04 — بازمانده ی آپدیترهای Electron/Squirrel در LocalAppData:
+        /// پوشه های *-updater، پوشه ی SquirrelTemp و فایل های .blockmap قدیمی.
+        /// همیشه پیش فرض «خاموش» (تصمیم T3) — فقط کاربر خودش با تیک دستی انتخاب می کند.
+        /// </summary>
+        private static List<StorageMessItem> ScanUpdaterLeftovers()
+        {
+            var found = new List<StorageMessItem>();
+
+            try
+            {
+                string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                if (string.IsNullOrEmpty(localApp) || !Directory.Exists(localApp)) return found;
+
+                // 1) پوشه های *-updater و SquirrelTemp
+                foreach (var dir in Directory.EnumerateDirectories(localApp))
+                {
+                    try
+                    {
+                        string name = Path.GetFileName(dir);
+                        bool looksLikeUpdater =
+                            name.EndsWith("-updater", StringComparison.OrdinalIgnoreCase) ||
+                            name.Equals("SquirrelTemp", StringComparison.OrdinalIgnoreCase);
+                        if (!looksLikeUpdater) continue;
+
+                        if (LockRegistryService.IsLockedPath(dir)) continue;
+
+                        long size = RecycleBinService.ComputeDirectorySize(dir);
+                        if (size < 1024 * 1024) continue; // زیر ۱ مگابایت ارزش پیشنهاد ندارد
+
+                        string? pendingInstaller = FindUpdaterInstallerEvidence(dir);
+
+                        found.Add(new StorageMessItem
+                        {
+                            FilePath = dir,
+                            FileName = name,
+                            DirectoryPath = localApp,
+                            SizeBytes = size,
+                            LastModified = Directory.GetLastWriteTime(dir),
+                            Category = StorageMessCategory.UpdaterLeftover,
+                            Evidence = pendingInstaller != null
+                                ? $"پوشه ی آپدیتر شامل نصب کننده ی باقی مانده «{pendingInstaller}» — آپدیت نیمه تمام"
+                                : "پوشه ی آپدیتر با الگوی *-updater / SquirrelTemp (نصب در انتظاری پیدا نشد)",
+                            RequiresAdmin = false,
+                            IsSelected = false
+                        });
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+
+                // 2) فایل های .blockmap قدیمی (بازمانده ی دانلود آپدیت Squirrel)
+                foreach (var file in Directory.EnumerateFiles(localApp, "*.blockmap", SearchOption.TopDirectoryOnly))
+                {
+                    try
+                    {
+                        var fi = new FileInfo(file);
+                        if ((DateTime.Now - fi.LastWriteTime).TotalDays < 30) continue;
+                        if (LockRegistryService.IsLockedPath(file)) continue;
+
+                        found.Add(new StorageMessItem
+                        {
+                            FilePath = fi.FullName,
+                            FileName = fi.Name,
+                            DirectoryPath = fi.DirectoryName ?? localApp,
+                            SizeBytes = fi.Length,
+                            LastModified = fi.LastWriteTime,
+                            Category = StorageMessCategory.UpdaterLeftover,
+                            Evidence = "فایل .blockmap بازمانده ی آپدیتر الکترون (بیش از ۳۰ روز دست نخورده)",
+                            RequiresAdmin = false,
+                            IsSelected = false
+                        });
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+
+            return found;
+        }
+
+        // آیا پوشه ی آپدیتر «نصب در انتظار» دارد؟ (pending/*.exe|msi|nupkg یا installer/setup در سطح اول)
+        private static string? FindUpdaterInstallerEvidence(string dir)
+        {
+            try
+            {
+                string pending = Path.Combine(dir, "pending");
+                if (Directory.Exists(pending))
+                {
+                    string? pendingHit = Directory.EnumerateFiles(pending, "*", SearchOption.TopDirectoryOnly).FirstOrDefault(f =>
+                        f.EndsWith(".exe", StringComparison.OrdinalIgnoreCase) ||
+                        f.EndsWith(".msi", StringComparison.OrdinalIgnoreCase) ||
+                        f.EndsWith(".nupkg", StringComparison.OrdinalIgnoreCase));
+                    if (pendingHit != null) return Path.GetFileName(pendingHit);
+                }
+
+                string? topHit = Directory.EnumerateFiles(dir, "*", SearchOption.TopDirectoryOnly).FirstOrDefault(f =>
+                {
+                    string n = Path.GetFileName(f);
+                    return n.StartsWith("install", StringComparison.OrdinalIgnoreCase)
+                        || n.StartsWith("setup", StringComparison.OrdinalIgnoreCase);
+                });
+                return topHit == null ? null : Path.GetFileName(topHit);
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+                return null;
+            }
+        }
+
+        // الگوهای نامِ فایل حساس (D17). اگر نام فایل یکی از این توکن ها را داشته باشد
+        // یا پسوندش جزو پسوندهای امنیتی باشد، فقط «گزارش» می شود.
+        private static readonly (string Token, string Label)[] SensitiveNamePatterns =
+        {
+            ("license", "فایل لایسنس نرم‌افزار"),
+            ("serial", "شماره سریال نرم‌افزار"),
+            ("productkey", "کلید محصول (Product Key)"),
+            ("product key", "کلید محصول (Product Key)"),
+            ("activation", "کد فعال‌سازی"),
+            ("passwords", "فایل رمزهای عبور"),
+            ("id_rsa", "کلید خصوصی SSH"),
+            ("privatekey", "کلید خصوصی"),
+            ("private key", "کلید خصوصی")
+        };
+
+        private static readonly string[] SensitiveExtensions = { ".kdbx", ".pem", ".pfx", ".key", ".pgp" };
+
+        /// <summary>
+        /// D17 — فایل های حساس در پوشه های کاربری (Downloads / Desktop / Documents).
+        /// داده از همان فایل های اسکن اصلی می آید (filesBySize) پس IO اضافه ای ندارد.
+        /// این لیست «فقط گزارش» است؛ UI هیچ گزینه ی حذفی برایش نشان نمی دهد و
+        /// عمداً از MessItems جدا نگه داشته می شود.
+        /// </summary>
+        private static List<SensitiveFileInfo> ScanSensitiveFiles(Dictionary<long, List<FileInfo>> filesBySize)
+        {
+            var found = new List<SensitiveFileInfo>();
+
+            try
+            {
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string downloads = Path.Combine(userProfile, "Downloads");
+                string desktop = Path.Combine(userProfile, "Desktop");
+                string documents = Path.Combine(userProfile, "Documents");
+
+                foreach (var list in filesBySize.Values)
+                {
+                    foreach (var fi in list)
+                    {
+                        if (found.Count >= 100) break;
+
+                        // فقط پوشه های کاربری — Temp و مسیرهای سیستمی کاری نداریم
+                        string full = fi.FullName;
+                        if (!IsUnderPath(full, downloads) && !IsUnderPath(full, desktop) && !IsUnderPath(full, documents))
+                            continue;
+
+                        string? reason = GetSensitiveMatchReason(fi.Name);
+                        if (reason == null) continue;
+
+                        found.Add(new SensitiveFileInfo
+                        {
+                            FilePath = full,
+                            FileName = fi.Name,
+                            DirectoryPath = fi.DirectoryName ?? string.Empty,
+                            SizeBytes = fi.Length,
+                            LastModified = fi.LastWriteTime,
+                            MatchReason = reason
+                        });
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+
+            return found.OrderByDescending(f => f.LastModified).ToList();
+        }
+
+        private static string? GetSensitiveMatchReason(string fileName)
+        {
+            string lower = fileName.ToLowerInvariant();
+
+            foreach (var (token, label) in SensitiveNamePatterns)
+            {
+                if (lower.Contains(token, StringComparison.Ordinal)) return label;
+            }
+
+            string ext = Path.GetExtension(lower);
+            foreach (var sensitiveExt in SensitiveExtensions)
+            {
+                if (ext == sensitiveExt) return $"فایل کلید/امنیتی ({sensitiveExt})";
+            }
+
+            return null;
+        }
+
+        private static bool IsUnderPath(string fullPath, string root)
+        {
+            if (string.IsNullOrEmpty(fullPath) || string.IsNullOrEmpty(root)) return false;
+            string prefix = root.TrimEnd('\\', '/') + Path.DirectorySeparatorChar;
+            return fullPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
         }
 
         // همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند تا

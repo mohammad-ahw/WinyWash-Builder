@@ -64,11 +64,14 @@ namespace CleanC.Core.Services
                 });
 
                 // Crash Logs & WER - Always include
+                // D03: LiveKernelReports هم اضافه شد — گزارش های کرش کرنل که روی برخی
+                // سیستم ها به چند گیگابایت می رسند و حذف آنها با SafeCleanFolder امن است.
                 var crashPaths = new List<string>
                 {
                     Path.Combine(localApp, "CrashDumps"),
                     Path.Combine(localApp, @"Microsoft\Windows\WER"),
-                    @"C:\Windows\Minidump"
+                    @"C:\Windows\Minidump",
+                    @"C:\Windows\LiveKernelReports"
                 };
                 long crashBytes = SafeGetPathsSize(crashPaths);
                 grpRec.Items.Add(new JunkCategory
@@ -76,7 +79,7 @@ namespace CleanC.Core.Services
                     Id = "crashLogs",
                     GroupId = "recommended",
                     Title = "گزارش های خطا و کرش دامپ ها",
-                    Description = "لاگ های گزارش خرابی، فایل های WER و دامپ های حافظه",
+                    Description = "لاگ های گزارش خرابی، فایل های WER، دامپ های حافظه و گزارش های کرنل (LiveKernelReports)",
                     Path = crashPaths[0],
                     TargetPaths = crashPaths,
                     Bytes = crashBytes,
