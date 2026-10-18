@@ -46,6 +46,11 @@ h1{margin:6px 0 10px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weig
 <div class="act"><button class="btn" id="go"><svg viewBox="0 0 24 24" id="gi"></svg><span id="gl"></span></button><div class="lnks"><button class="lnk" id="go2" hidden></button><button class="lnk" id="sn" hidden>بعداً یادآوری کن</button></div></div></section>
 </div>
 <script>
+/* گزارش خطاهای زمانِ اجرای اسکریپت هیرو به میزبان (Hero.JSError در لاگ) —
+   اگر کاراکتر «لود نشود/هنگ کند»، علتِ واقعی همین‌جا ثبت می‌شود؛ سقف ۸ مورد */
+let __ec=0;const __rep=o=>{try{window.chrome&&window.chrome.webview&&window.chrome.webview.postMessage(o)}catch(e){}};
+window.onerror=function(m,s,l,c){if(__ec++<8)__rep({type:'js.error',data:{m:String(m),s:String(s||''),l:l||0,c:c||0}})};
+window.addEventListener('unhandledrejection',function(e){if(__ec++<8){var r=e&&e.reason;__rep({type:'js.error',data:{m:'REJ:'+String((r&&(r.message||r.stack))||r)}})}});
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,$=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d'),PI=Math.PI,K=3,U=.95*K;cv.width=290*K;cv.height=195*K;
 /* ناحیهٔ نزدیک کاراکتر: کلیک/لمس/کورسور فقط تا شعاع ~۱۰۰px از مرکز کاراکتر
    واکنش می‌گیرد؛ باقی سطح شفاف استیجِ ۲۹۰×۱۹۵ دیگر کلیک‌های نامرئی نمی‌گیرد
@@ -58,7 +63,7 @@ const SC=['#9fb2ff','#5fc8ff','#f2c14e','#6fd6ff','#7ff0a0','#ff9a5a','#ff8fc8',
 class S{constructor(v=0,k=140,d=16){this.v=v;this.t=v;this.w=0;this.k=k;this.d=d}u(dt){this.w+=(-this.k*(this.v-this.t)-this.d*this.w)*dt;this.v+=this.w*dt}}
 const sp={};['ef','lx','ly','b0','b1','b2','wk','dots','pk'].forEach(n=>sp[n]=new S());['ew','eh','lt','tl','hp'].forEach(n=>sp[n]=new S(0,170,19));sp.ew.v=sp.ew.t=18;sp.eh.v=sp.eh.t=30;sp.sq=new S(0,220,10);
 const hx=h=>[1,3,5].map(i=>parseInt(h.substr(i,2),16));
-let mi=1,col=hx('#7fd8ff'),scn=null,prog=0,celeb=0,bt=1,nb=2,ph=0,sw=0,now=0,t0=performance.now()/1e3,last=t0,lastDraw=t0,mx=0,my=0,lastSp=0,lastZ=0,jx=0,jy=0,nj=0,cpu=17,ramv=54,dsk=64;
+let mi=1,col=hx('#7fd8ff'),scn=null,prog=0,celeb=0,bt=1,nb=2,ph=0,sw=0,now=0,t0=performance.now()/1e3,last=t0,lastDraw=t0,mx=0,my=0,lastSp=0,lastZ=0,jx=0,jy=0,nj=0,cpu=17,ramv=54,dsk=64,rafDead=false;
 const Pt=[],add=o=>RM||ST.calm||Pt.push(Object.assign({l:1,vx:0,vy:0,g:0,r:3,c:[255,255,255],t:'d',d:1,a:0,vr:0},o));
 const rr=(a,b,w,h,r)=>{x.beginPath();x.roundRect(a,b,w,h,r)},lp=(a,b,t)=>a+(b-a)*t,RA=(c,a)=>`rgba(${c.map(Math.round)},${a})`;
 /* رنگ هاله دور کاراکتر = Accent ویندوز (از میزبان می‌آید). رنگ حالت (mood) برای چشم/صحنه/وضعیت جداگانه می‌ماند */
@@ -83,7 +88,7 @@ g.restore();x.save();x.globalAlpha=al;x.shadowColor=RA(c,.9);x.shadowBlur=22;x.d
 function star(s){x.beginPath();x.moveTo(0,-s);x.quadraticCurveTo(0,0,s,0);x.quadraticCurveTo(0,0,0,s);x.quadraticCurveTo(0,0,-s,0);x.quadraticCurveTo(0,0,0,-s);x.fill()}
 function chk(a,b,s){x.beginPath();x.moveTo(a-s,b);x.lineTo(a-s*.3,b+s*.7);x.lineTo(a+s,b-s*.6);x.stroke()}
 const pc=document.createElement('canvas');pc.width=pc.height=2;pc.getContext('2d').fillStyle='rgba(255,255,255,.07)';pc.getContext('2d').fillRect(0,0,1,1);const pat=x.createPattern(pc,'repeat');
-function frame(){requestAnimationFrame(frame);if(document.hidden)return;
+function frame(){(rafDead?setTimeout(frame,33):requestAnimationFrame(frame));if(document.hidden)return;
 /* ترمز اقتصادی: وقتی رم/CPU/busy سنگین است، نرخ رسم به ~۳۰fps می‌افتد (نصفِ بارِ رندر
    = سبک‌سازی واقعی WebView2). نرخِ ۱۱fps که اول گذاشتم روی سیستمِ «رم سنگین» همیشه
    فعال می‌ماند و کاراکتر را یخ‌نما می‌کند — پس حداقلِ این ترمز ۳۰fps است تا کاراکتر
@@ -91,8 +96,7 @@ function frame(){requestAnimationFrame(frame);if(document.hidden)return;
 const ntq=performance.now(),booting=(performance.now()/1e3-t0)<1.6,
 rq=booting?0:((ramHigh||ramv>=88||cpu>=88||window.CleanC.busy||run)?33:0);
 if(rq&&ntq-lastDraw<rq)return;lastDraw=ntq;
-now=performance.now()/1e3;const dt=Math.min(now-last,.05);last=now;
-const m=M[mi];let k=m[0],c=m[2],pose=m[3].slice(),bars=[cpu/100,ramv/100,dsk/100];
+now=performance.now()/1e3;const dt=Math.min(now-last,.05);last=now;const m=M[mi];let k=m[0],c=m[2],pose=m[3].slice(),bars=[cpu/100,ramv/100,dsk/100];
 if(celeb>now&&!MR()){k='celeb';pose=[22,30,0,0,1];c='#7dffbf';bars=[.1,.2,.2]}
 else if(scn!=null){k='work';const e2=sp.ef.t>.55;pose=e2?[22,22,.38,.12,0]:[20,26,.2,0,0];c=SC[scn];bars=[.3+.5*sp.ef.v,.4,.4]}
 FX(k,pose);if(rxO.col)c=rxO.col;const boot=Math.min(1,Math.max(0,(now-t0-.25)/1)),bz=1-Math.pow(1-boot,3);
@@ -151,7 +155,7 @@ else if(o.t=='ln'){x.beginPath();x.moveTo(0,0);x.lineTo(-Math.sign(o.vx)*16,0);x
 else if(o.t=='rg'){x.beginPath();x.arc(0,0,20+(1-o.l)*100,0,7);x.lineWidth=2;x.stroke()}
 else if(o.t=='h')heartP(o.r);else if(o.t=='nt'){x.font='700 11px Vazirmatn,sans-serif';x.textAlign='center';x.fillText('♪',0,0)}else if(o.t=='bb'){x.beginPath();x.arc(0,0,o.r,0,7);x.stroke()}else if(o.t=='dr'){x.beginPath();x.moveTo(0,-3);x.lineTo(0,3);x.stroke()}else if(o.t=='j')jicon(o.k,o.r);else if(o.t=='pz'){rr(-4,-4,8,8,1.5);x.stroke();x.beginPath();x.arc(0,-5.2,1.8,0,7);x.stroke()}else if(o.t=='z'){const q=5+(1-o.l)*3;x.beginPath();x.moveTo(-q,-q);x.lineTo(q,-q);x.lineTo(-q,q);x.lineTo(q,q);x.stroke()}
 x.restore()});
-x.restore();requestAnimationFrame(frame)}
+x.restore()}
 /* ===== Extra drawing helpers ===== */
 function jicon(i,s){x.scale(s,s);x.beginPath();switch(i){
 case 0:x.arc(0,0,2.6,0,7);for(let a=0;a<6;a++){const t=a*PI/3;x.moveTo(Math.cos(t)*3.8,Math.sin(t)*3.8);x.lineTo(Math.cos(t)*5.6,Math.sin(t)*5.6)}x.stroke();break;
@@ -212,6 +216,12 @@ case 15:{for(let i=0;i<5;i++){const cx=-32+i*16,id=34-i%3*5,pos=lp(34-((i*37)%17
 }
 x.restore()}
 requestAnimationFrame(frame);
+/* نگهبانِ حلقهٔ رسم: WinUI/WebView2 بعد از occlusion یا مینیمایز گاهی زنجیرهٔ rAF را
+   دیگر برنمی‌گرداند و کاراکتر روی آخرین فریم یخ می‌زند (همان «هنگِ کاراکتر» که کاربر
+   گزارش می‌کرد). اگر ۲.۵ ثانیه هیچ فریمی کشیده نشد ولی صفحه visible است، یک‌بار برای
+   همیشه به موتور setTimeout (۳۰fps) سوئیچ می‌کنیم — تأییدبانک‌انداز بیرون از OCclusion. */
+setInterval(function(){if(document.hidden||rafDead)return;const t=performance.now();
+ if(lastDraw&&t-lastDraw>2500){rafDead=true;__rep({type:'js.error',data:{m:'RAF_STALL: hero loop switched to setTimeout (30fps fallback)'}});frame()}},2000);
 
 /* ===== Card logic: state -> text + mood + scene ===== */
 const $$=s=>document.querySelectorAll(s),sleep=ms=>new Promise(r=>setTimeout(r,ms)),T=()=>performance.now()/1e3;

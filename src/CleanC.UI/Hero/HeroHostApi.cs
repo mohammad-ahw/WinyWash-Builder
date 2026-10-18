@@ -83,6 +83,13 @@ namespace CleanC.UI.Hero
                         _window.HandleHeroSnooze();
                         break;
 
+                    case "js.error":
+                        // خطای زمانِ اجرای اسکریپت هیرو → در لاگ ثبت می‌شود تا «کاراکتر لود
+                        // نمی‌شود/هنگ می‌کند» بدون حدس و گمان عیب‌یابی شود (فاز ۱۹)
+                        CcLog.Report("Hero.JSError", new InvalidOperationException(
+                            "خطای اسکریپت هیرو: " + (msg.Data.HasValue ? msg.Data.Value.ToString() : "بدون جزئیات")));
+                        break;
+
                     default:
                         var unknown = "پیام ناشناخته از هیرو: " + msg.Type;
                         CcLog.Report("Hero.HostApi", new InvalidOperationException(unknown));
