@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
+using CleanC.Core.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.Web.WebView2.Core;
@@ -132,8 +133,9 @@ namespace CleanC.UI.Hero
             {
                 if (FallbackPanel != null)
                 {
-                    FallbackSubtitle.Text = "نمایش گرافیکی داروگ روی این دستگاه در دسترس نیست"
-                        + " (راهنما: نصب «Microsoft WebView2 Runtime»)، ولی بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر کار می‌کنند.";
+                    if (FallbackTitle != null) FallbackTitle.Text = LocalizationService.Get("CleanC در حال مراقبت از سیستم شماست");
+                    FallbackSubtitle.Text = LocalizationService.Get("نمایش گرافیکی داروگ روی این دستگاه در دسترس نیست")
+                        + LocalizationService.Get(" (راهنما: نصب «Microsoft WebView2 Runtime»)، ولی بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر کار می‌کنند.");
                     FallbackPanel.Visibility = Visibility.Visible;
                 }
                 if (WebView != null) WebView.Visibility = Visibility.Collapsed;

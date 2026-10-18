@@ -42,7 +42,7 @@ namespace CleanC.UI
             Current = SettingsService.Load();
 
             var queue = DispatcherQueue.GetForCurrentThread()
-                ?? throw new InvalidOperationException("SettingsStore باید روی UI thread ساخته شود.");
+                ?? throw new InvalidOperationException(LocalizationService.Get("SettingsStore باید روی UI thread ساخته شود."));
 
             _debounce = queue.CreateTimer();
             _debounce.Interval = TimeSpan.FromMilliseconds(600);

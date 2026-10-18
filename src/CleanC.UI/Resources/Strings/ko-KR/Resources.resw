@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>관리자 권한으로 실행 중</value></data>
@@ -61,4 +61,54 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub 프로젝트 페이지</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>진단 정보 복사</value></data>
   <data name="BackToTools" xml:space="preserve"><value>도구 목록으로 돌아가기</value></data>
-<data name="BackButton" xml:space="preserve"><value>뒤로</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>시스템 건강 지수</value></data><data name="RamTitle" xml:space="preserve"><value>메모리 (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>프로세서 (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>실시간 네트워크 모니터링</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>최근 정리 기록</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>디스크 저장 공간 분석</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>상세 시스템 사양</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>배터리 수명 및 전원</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>앱 및 불필요한 소프트웨어 제거</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>인터넷 속도 및 품질 테스트</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows 개인 설정 및 시각 효과</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows 업데이트 관리자</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>시작 프로그램 관리</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>드라이버 관리</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>디스크 유지 관리 및 TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNS 관리자</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>컨텍스트 메뉴 관리</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>심층 저장 공간 정리</value></data></root>
+  <data name="BackButton" xml:space="preserve"><value>뒤로</value></data>
+  <data name="HealthScoreTitle" xml:space="preserve"><value>시스템 건강 지수</value></data>
+  <data name="RamTitle" xml:space="preserve"><value>메모리 (RAM)</value></data>
+  <data name="CpuTitle" xml:space="preserve"><value>프로세서 (CPU)</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>실시간 네트워크 모니터링</value></data>
+  <data name="CleanupHistoryTitle" xml:space="preserve"><value>최근 정리 기록</value></data>
+  <data name="DiskBreakdownTitle" xml:space="preserve"><value>디스크 저장 공간 분석</value></data>
+  <data name="ToolSpecsTitle" xml:space="preserve"><value>상세 시스템 사양</value></data>
+  <data name="ToolBatteryTitle" xml:space="preserve"><value>배터리 수명 및 전원</value></data>
+  <data name="ToolUninstallerTitle" xml:space="preserve"><value>앱 및 불필요한 소프트웨어 제거</value></data>
+  <data name="ToolSpeedTestTitle" xml:space="preserve"><value>인터넷 속도 및 품질 테스트</value></data>
+  <data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows 개인 설정 및 시각 효과</value></data>
+  <data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows 업데이트 관리자</value></data>
+  <data name="ToolStartupTitle" xml:space="preserve"><value>시작 프로그램 관리</value></data>
+  <data name="ToolDriversTitle" xml:space="preserve"><value>드라이버 관리</value></data>
+  <data name="ToolDiskTitle" xml:space="preserve"><value>디스크 유지 관리 및 TRIM</value></data>
+  <data name="ToolDnsTitle" xml:space="preserve"><value>DNS 관리자</value></data>
+  <data name="ToolContextMenuTitle" xml:space="preserve"><value>컨텍스트 메뉴 관리</value></data>
+  <data name="ToolDeepStorageTitle" xml:space="preserve"><value>심층 저장 공간 정리</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>네트워크</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>사용됨</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>정리 가능</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>여유</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>개 선택됨</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>총 감지됨</value></data>
+  <data name="Scanning" xml:space="preserve"><value>검사 중...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>정리 후 최적화됨</value></data>
+  <data name="CharacterTitle" xml:space="preserve"><value>히어로 캐릭터</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>대시보드 카드에 표시되는 캐릭터의 모습, 말투, 행동입니다. 변경 사항은 즉시 적용됩니다.</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>말투</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>장난스러움</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>차분함</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>진지함</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>캐릭터 이름</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>이름 (인사말용)</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>도시 (날씨 모듈)</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>애니메이션 강도</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>끔</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>낮음</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>보통</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>높음</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>캐릭터 크기</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>액세서리</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>기념일 액세서리 (이벤트)</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>말풍선</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>캐릭터 뒤의 장면 및 주변 효과</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>소리</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>빠른 반응 (짧은 애니메이션)</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>차분 모드 (모션 감소, 저사양 PC용)</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>기념일 음력 보정 (±1일)</value></data>
+</root>

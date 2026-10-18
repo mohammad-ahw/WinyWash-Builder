@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Запуск от имени администратора</value></data>
@@ -61,4 +61,54 @@
   <data name="ProjectPage" xml:space="preserve"><value>Страница проекта на GitHub</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>Скопировать диагностику</value></data>
   <data name="BackToTools" xml:space="preserve"><value>Назад к утилитам</value></data>
-<data name="BackButton" xml:space="preserve"><value>Назад</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>Индекс состояния системы</value></data><data name="RamTitle" xml:space="preserve"><value>Оперативная память (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>Процессор (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>Мониторинг сети</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>Недавние очистки</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>Структура дискового пространства</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>Полные характеристики системы</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>Состояние батареи и питание</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>Деинсталлятор приложений</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>Тест скорости и качества интернета</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Персонализация Windows и визуальные эффекты</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Управление обновлениями Windows</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>Диспетчер автозагрузки</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>Управление драйверами</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>Обслуживание дисков и TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>Диспетчер DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>Управление контекстным меню</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>Глубокая очистка диска</value></data></root>
+  <data name="BackButton" xml:space="preserve"><value>Назад</value></data>
+  <data name="HealthScoreTitle" xml:space="preserve"><value>Индекс состояния системы</value></data>
+  <data name="RamTitle" xml:space="preserve"><value>Оперативная память (RAM)</value></data>
+  <data name="CpuTitle" xml:space="preserve"><value>Процессор (CPU)</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>Мониторинг сети</value></data>
+  <data name="CleanupHistoryTitle" xml:space="preserve"><value>Недавние очистки</value></data>
+  <data name="DiskBreakdownTitle" xml:space="preserve"><value>Структура дискового пространства</value></data>
+  <data name="ToolSpecsTitle" xml:space="preserve"><value>Полные характеристики системы</value></data>
+  <data name="ToolBatteryTitle" xml:space="preserve"><value>Состояние батареи и питание</value></data>
+  <data name="ToolUninstallerTitle" xml:space="preserve"><value>Деинсталлятор приложений</value></data>
+  <data name="ToolSpeedTestTitle" xml:space="preserve"><value>Тест скорости и качества интернета</value></data>
+  <data name="ToolPersonalizationTitle" xml:space="preserve"><value>Персонализация Windows и визуальные эффекты</value></data>
+  <data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Управление обновлениями Windows</value></data>
+  <data name="ToolStartupTitle" xml:space="preserve"><value>Диспетчер автозагрузки</value></data>
+  <data name="ToolDriversTitle" xml:space="preserve"><value>Управление драйверами</value></data>
+  <data name="ToolDiskTitle" xml:space="preserve"><value>Обслуживание дисков и TRIM</value></data>
+  <data name="ToolDnsTitle" xml:space="preserve"><value>Диспетчер DNS</value></data>
+  <data name="ToolContextMenuTitle" xml:space="preserve"><value>Управление контекстным меню</value></data>
+  <data name="ToolDeepStorageTitle" xml:space="preserve"><value>Глубокая очистка диска</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>Сеть</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>Занято</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>Можно очистить</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>Свободно</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>выбрано элементов</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>Всего обнаружено</value></data>
+  <data name="Scanning" xml:space="preserve"><value>Сканирование...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>Оптимизировано после очистки</value></data>
+  <data name="CharacterTitle" xml:space="preserve"><value>Персонаж-герой</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>Внешний вид, тон и поведение персонажа на карточке панели. Изменения применяются мгновенно.</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>Тон речи</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>Шутливый</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>Спокойный</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>Серьёзный</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>Имя персонажа</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>Ваше имя (для приветствий)</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>Город (модуль погоды)</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>Интенсивность анимации</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>Выкл.</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>Низкая</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>Средняя</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>Высокая</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>Размер персонажа</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>Аксессуар</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>Аксессуар к событию (праздники)</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>Речевой пузырь</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>Сцена и фоновые эффекты за персонажем</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>Звуки</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>Быстрые реакции (короткие анимации)</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>Спокойный режим (меньше движения, для слабых ПК)</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>Коррекция лунного календаря для событий (±1 день)</value></data>
+</root>

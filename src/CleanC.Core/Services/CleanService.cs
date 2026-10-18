@@ -23,14 +23,14 @@ namespace CleanC.Core.Services
                 {
                     if (!item.IsChecked) continue;
 
-                    progress?.Invoke($"در حال پاک سازی: {item.Title}...");
+                    progress?.Invoke(string.Format(LocalizationService.Get("در حال پاک سازی: {0}..."), item.Title));
                     long freed = CleanCategory(item);
                     totalFreed += freed;
                     result.CleanedItems.Add(item.Title);
                 }
 
                 // Automatic RAM boost + DNS flush as part of clean
-                progress?.Invoke("بهینه سازی حافظه و رفرش شبکه...");
+                progress?.Invoke(LocalizationService.Get("بهینه سازی حافظه و رفرش شبکه..."));
                 var boost = await OptimizerService.BoostRamAsync();
                 totalFreed += boost.FreedBytes;
                 OptimizerService.FlushDns();

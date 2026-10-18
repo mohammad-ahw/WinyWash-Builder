@@ -17,7 +17,7 @@ namespace CleanC.Core.Services
     public class GpuItemInfo
     {
         public string Name { get; set; } = string.Empty;
-        public string VramFormatted { get; set; } = "اشتراکی (Shared)";
+        public string VramFormatted { get; set; } = LocalizationService.Get("اشتراکی (Shared)");
         public string DriverVersion { get; set; } = string.Empty;
     }
 
@@ -27,10 +27,10 @@ namespace CleanC.Core.Services
         public string DiskType { get; set; } = "SSD";
         public string BusType { get; set; } = "NVMe / SATA";
         public string SizeFormatted { get; set; } = string.Empty;
-        public string HealthStatus { get; set; } = "سالم (Healthy)";
-        public string TemperatureFormatted { get; set; } = "در دسترس نیست";
-        public string WearFormatted { get; set; } = "در دسترس نیست";
-        public string PowerOnHoursFormatted { get; set; } = "در دسترس نیست";
+        public string HealthStatus { get; set; } = LocalizationService.Get("سالم (Healthy)");
+        public string TemperatureFormatted { get; set; } = LocalizationService.Get("در دسترس نیست");
+        public string WearFormatted { get; set; } = LocalizationService.Get("در دسترس نیست");
+        public string PowerOnHoursFormatted { get; set; } = LocalizationService.Get("در دسترس نیست");
     }
 
     public class LogicalDriveItem
@@ -51,7 +51,7 @@ namespace CleanC.Core.Services
     public class WindowsActivationInfo
     {
         public bool IsActivated { get; set; }
-        public string StatusText { get; set; } = "نامشخص";
+        public string StatusText { get; set; } = LocalizationService.Get("نامشخص");
         public string Description { get; set; } = string.Empty;
         public int StatusCode { get; set; }
     }
@@ -274,8 +274,8 @@ namespace CleanC.Core.Services
             {
                 TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
                 DateTime bootTime = DateTime.Now - uptime;
-                string daysStr = uptime.Days > 0 ? $"{uptime.Days} روز و " : "";
-                specs.OsUptimeFormatted = $"{daysStr}{uptime.Hours} ساعت و {uptime.Minutes} دقیقه (روشن شده در {bootTime:HH:mm})";
+                string daysStr = uptime.Days > 0 ? string.Format(LocalizationService.Get("{0} روز و "), uptime.Days) : "";
+                specs.OsUptimeFormatted = string.Format(LocalizationService.Get("{0}{1} ساعت و {2} دقیقه (روشن شده در {3:HH:mm})"), daysStr, uptime.Hours, uptime.Minutes, bootTime);
             }
             catch (Exception __ex)
             {
@@ -365,7 +365,7 @@ namespace CleanC.Core.Services
                 if (string.IsNullOrEmpty(name)) continue;
 
                 string driverVer = adapterKey.GetValue("DriverVersion")?.ToString()?.Trim() ?? string.Empty;
-                string vramStr = "اشتراکی (Shared)";
+                string vramStr = LocalizationService.Get("اشتراکی (Shared)");
 
                 object? qwMem = adapterKey.GetValue("HardwareInformation.qwMemorySize");
                 if (qwMem != null && long.TryParse(qwMem.ToString(), out long vramBytes) && vramBytes > 0)
@@ -395,11 +395,11 @@ namespace CleanC.Core.Services
 
                 specs.Disks.Add(new DiskItemInfo
                 {
-                    Model = $"درایو محلی ({d.Name.TrimEnd('\\')})",
+                    Model = string.Format(LocalizationService.Get("درایو محلی ({0})"), d.Name.TrimEnd('\\')),
                     DiskType = "SSD / HDD",
                     BusType = d.DriveFormat,
-                    SizeFormatted = $"{Models.SystemStats.FormatBytes(d.TotalSize)} ({Models.SystemStats.FormatBytes(d.AvailableFreeSpace)} آزاد)",
-                    HealthStatus = "سالم و فعال"
+                    SizeFormatted = string.Format(LocalizationService.Get("{0} ({1} آزاد)"), Models.SystemStats.FormatBytes(d.TotalSize), Models.SystemStats.FormatBytes(d.AvailableFreeSpace)),
+                    HealthStatus = LocalizationService.Get("سالم و فعال")
                 });
             }
         }
@@ -433,31 +433,31 @@ namespace CleanC.Core.Services
                     {
                         case 1:
                             info.IsActivated = true;
-                            info.StatusText = "فعال شده با لایسنس معتبر (Licensed)";
+                            info.StatusText = LocalizationService.Get("فعال شده با لایسنس معتبر (Licensed)");
                             break;
                         case 2:
                             info.IsActivated = false;
-                            info.StatusText = "دوره آزمایشی اولیه (OOB Grace)";
+                            info.StatusText = LocalizationService.Get("دوره آزمایشی اولیه (OOB Grace)");
                             break;
                         case 3:
                             info.IsActivated = false;
-                            info.StatusText = "دوره مهلت تمدید (OOT Grace)";
+                            info.StatusText = LocalizationService.Get("دوره مهلت تمدید (OOT Grace)");
                             break;
                         case 4:
                             info.IsActivated = false;
-                            info.StatusText = "لایسنس غیرمعتبر یا جعلی (Non-Genuine)";
+                            info.StatusText = LocalizationService.Get("لایسنس غیرمعتبر یا جعلی (Non-Genuine)");
                             break;
                         case 5:
                             info.IsActivated = false;
-                            info.StatusText = "فعال نشده / نیازمند فعال سازی (Notification)";
+                            info.StatusText = LocalizationService.Get("فعال نشده / نیازمند فعال سازی (Notification)");
                             break;
                         case 6:
                             info.IsActivated = false;
-                            info.StatusText = "مهلت فعال سازی تمدید شده (Extended Grace)";
+                            info.StatusText = LocalizationService.Get("مهلت فعال سازی تمدید شده (Extended Grace)");
                             break;
                         default:
                             info.IsActivated = false;
-                            info.StatusText = "لایسنس نامعتبر یا غیرفعال";
+                            info.StatusText = LocalizationService.Get("لایسنس نامعتبر یا غیرفعال");
                             break;
                     }
                     return info;
@@ -465,7 +465,7 @@ namespace CleanC.Core.Services
             }
             catch
             {
-                info.StatusText = "اطلاعات لایسنس در دسترس نیست";
+                info.StatusText = LocalizationService.Get("اطلاعات لایسنس در دسترس نیست");
             }
             return info;
         }
@@ -794,15 +794,15 @@ namespace CleanC.Core.Services
                 foreach (var mo in diskSearcher.Get())
                 {
                     string id = mo["DeviceId"]?.ToString() ?? "";
-                    string name = mo["FriendlyName"]?.ToString()?.Trim() ?? "دیسک فیزیکی";
+                    string name = mo["FriendlyName"]?.ToString()?.Trim() ?? LocalizationService.Get("دیسک فیزیکی");
                     int mediaType = mo["MediaType"] != null ? Convert.ToInt32(mo["MediaType"]) : 0;
                     int busType = mo["BusType"] != null ? Convert.ToInt32(mo["BusType"]) : 0;
                     long size = mo["Size"] != null ? Convert.ToInt64(mo["Size"]) : 0;
                     int health = mo["HealthStatus"] != null ? Convert.ToInt32(mo["HealthStatus"]) : 0;
 
-                    string diskType = mediaType == 4 ? "SSD" : (mediaType == 3 ? "HDD" : "حافظه");
+                    string diskType = mediaType == 4 ? "SSD" : (mediaType == 3 ? "HDD" : LocalizationService.Get("حافظه"));
                     string busName = busType == 17 ? "NVMe" : (busType == 11 ? "SATA" : (busType == 7 ? "USB" : "Internal"));
-                    string healthLabel = health == 0 ? "سالم (Healthy)" : (health == 1 ? "هشدار (Warning)" : "نامطلوب");
+                    string healthLabel = health == 0 ? LocalizationService.Get("سالم (Healthy)") : (health == 1 ? LocalizationService.Get("هشدار (Warning)") : LocalizationService.Get("نامطلوب"));
 
                     var item = new DiskItemInfo
                     {
@@ -816,8 +816,8 @@ namespace CleanC.Core.Services
                     if (reliabilityDict.TryGetValue(id, out var r))
                     {
                         if (r.Temp > 0) item.TemperatureFormatted = $"{r.Temp}°C";
-                        if (r.Wear >= 0) item.WearFormatted = $"{100 - r.Wear}% سلامت";
-                        if (r.Hours > 0) item.PowerOnHoursFormatted = $"{r.Hours:N0} ساعت";
+                        if (r.Wear >= 0) item.WearFormatted = string.Format(LocalizationService.Get("{0}% سلامت"), 100 - r.Wear);
+                        if (r.Hours > 0) item.PowerOnHoursFormatted = string.Format(LocalizationService.Get("{0:N0} ساعت"), r.Hours);
 
                         if (!specs.HasSsdHealthData && mediaType == 4)
                         {
@@ -846,40 +846,40 @@ namespace CleanC.Core.Services
         {
             var sb = new StringBuilder();
             sb.AppendLine("==================================================");
-            sb.AppendLine("         گزارش مشخصات سیستم و سخت افزار (CleanC)     ");
+            sb.AppendLine(LocalizationService.Get("         گزارش مشخصات سیستم و سخت افزار (CleanC)     "));
             sb.AppendLine("==================================================");
-            sb.AppendLine($"تاریخ گزارش: {DateTime.Now:yyyy.MM.dd HH:mm:ss}");
+            sb.AppendLine(string.Format(LocalizationService.Get("تاریخ گزارش: {0:yyyy.MM.dd HH:mm:ss}"), DateTime.Now));
             sb.AppendLine();
 
-            sb.AppendLine("[پردازنده مرکزی - CPU]");
-            sb.AppendLine($"  مدل: {specs.CpuName}");
-            sb.AppendLine($"  مشخصات: {specs.CpuCores} هسته فیزیکی | {specs.CpuThreads} رشته منطقی");
-            sb.AppendLine($"  فرکانس: {specs.CpuClockMhz} MHz");
-            if (specs.CpuL3CacheKb > 0) sb.AppendLine($"  حافظه کش L3: {specs.CpuL3CacheKb} KB");
+            sb.AppendLine(LocalizationService.Get("[پردازنده مرکزی - CPU]"));
+            sb.AppendLine(string.Format(LocalizationService.Get("  مدل: {0}"), specs.CpuName));
+            sb.AppendLine(string.Format(LocalizationService.Get("  مشخصات: {0} هسته فیزیکی | {1} رشته منطقی"), specs.CpuCores, specs.CpuThreads));
+            sb.AppendLine(string.Format(LocalizationService.Get("  فرکانس: {0} MHz"), specs.CpuClockMhz));
+            if (specs.CpuL3CacheKb > 0) sb.AppendLine(string.Format(LocalizationService.Get("  حافظه کش L3: {0} KB"), specs.CpuL3CacheKb));
             sb.AppendLine();
 
-            sb.AppendLine("[حافظه رم - RAM]");
-            sb.AppendLine($"  ظرفیت کل: {specs.TotalRamFormatted} ({specs.RamType})");
-            sb.AppendLine($"  اسلات های فعال: {specs.RamSlotsUsed}");
-            sb.AppendLine($"  سرعت باس: {specs.RamSpeedMhz} MHz");
-            if (!string.IsNullOrEmpty(specs.RamManufacturer)) sb.AppendLine($"  سازنده: {specs.RamManufacturer}");
+            sb.AppendLine(LocalizationService.Get("[حافظه رم - RAM]"));
+            sb.AppendLine(string.Format(LocalizationService.Get("  ظرفیت کل: {0} ({1})"), specs.TotalRamFormatted, specs.RamType));
+            sb.AppendLine(string.Format(LocalizationService.Get("  اسلات های فعال: {0}"), specs.RamSlotsUsed));
+            sb.AppendLine(string.Format(LocalizationService.Get("  سرعت باس: {0} MHz"), specs.RamSpeedMhz));
+            if (!string.IsNullOrEmpty(specs.RamManufacturer)) sb.AppendLine(string.Format(LocalizationService.Get("  سازنده: {0}"), specs.RamManufacturer));
             sb.AppendLine();
 
-            sb.AppendLine("[مادربرد و بایوس]");
-            sb.AppendLine($"  سازنده مادربرد: {specs.MotherboardManufacturer}");
-            sb.AppendLine($"  مدل مادربرد: {specs.MotherboardModel}");
-            sb.AppendLine($"  نسخه بایوس: {specs.BiosVersion}");
-            sb.AppendLine($"  تاریخ بایوس: {specs.BiosReleaseDate}");
+            sb.AppendLine(LocalizationService.Get("[مادربرد و بایوس]"));
+            sb.AppendLine(string.Format(LocalizationService.Get("  سازنده مادربرد: {0}"), specs.MotherboardManufacturer));
+            sb.AppendLine(string.Format(LocalizationService.Get("  مدل مادربرد: {0}"), specs.MotherboardModel));
+            sb.AppendLine(string.Format(LocalizationService.Get("  نسخه بایوس: {0}"), specs.BiosVersion));
+            sb.AppendLine(string.Format(LocalizationService.Get("  تاریخ بایوس: {0}"), specs.BiosReleaseDate));
             sb.AppendLine();
 
-            sb.AppendLine("[کارت های گرافیک - GPU]");
+            sb.AppendLine(LocalizationService.Get("[کارت های گرافیک - GPU]"));
             if (specs.Gpus.Count > 0)
             {
                 foreach (var gpu in specs.Gpus)
                 {
                     sb.AppendLine($"  - {gpu.Name}");
-                    sb.AppendLine($"    حافظه اختصاصی VRAM: {gpu.VramFormatted}");
-                    sb.AppendLine($"    نسخه درایور: {gpu.DriverVersion}");
+                    sb.AppendLine(string.Format(LocalizationService.Get("    حافظه اختصاصی VRAM: {0}"), gpu.VramFormatted));
+                    sb.AppendLine(string.Format(LocalizationService.Get("    نسخه درایور: {0}"), gpu.DriverVersion));
                 }
             }
             else
@@ -888,29 +888,29 @@ namespace CleanC.Core.Services
             }
             sb.AppendLine();
 
-            sb.AppendLine("[حافظه های ذخیره سازی]");
+            sb.AppendLine(LocalizationService.Get("[حافظه های ذخیره سازی]"));
             foreach (var disk in specs.Disks)
             {
                 sb.AppendLine($"  - {disk.Model} ({disk.DiskType} {disk.BusType}) - {disk.SizeFormatted}");
-                sb.AppendLine($"    وضعیت: {disk.HealthStatus} | دما: {disk.TemperatureFormatted} | کارکرد: {disk.PowerOnHoursFormatted}");
+                sb.AppendLine(string.Format(LocalizationService.Get("    وضعیت: {0} | دما: {1} | کارکرد: {2}"), disk.HealthStatus, disk.TemperatureFormatted, disk.PowerOnHoursFormatted));
             }
             sb.AppendLine();
 
             if (specs.HasBattery)
             {
-                sb.AppendLine("[باتری لپ تاپ]");
-                sb.AppendLine($"  سلامت باتری: {specs.BatteryHealthPercent}%");
-                sb.AppendLine($"  ظرفیت اولیه کارخانه: {specs.BatteryDesignCapacityMWh} mWh");
-                sb.AppendLine($"  ظرفیت شارژ فعلی: {specs.BatteryFullChargeCapacityMWh} mWh");
-                sb.AppendLine($"  تعداد دفعات شارژ (سیکل): {specs.BatteryCycleCount}");
+                sb.AppendLine(LocalizationService.Get("[باتری لپ تاپ]"));
+                sb.AppendLine(string.Format(LocalizationService.Get("  سلامت باتری: {0}%"), specs.BatteryHealthPercent));
+                sb.AppendLine(string.Format(LocalizationService.Get("  ظرفیت اولیه کارخانه: {0} mWh"), specs.BatteryDesignCapacityMWh));
+                sb.AppendLine(string.Format(LocalizationService.Get("  ظرفیت شارژ فعلی: {0} mWh"), specs.BatteryFullChargeCapacityMWh));
+                sb.AppendLine(string.Format(LocalizationService.Get("  تعداد دفعات شارژ (سیکل): {0}"), specs.BatteryCycleCount));
                 sb.AppendLine();
             }
 
-            sb.AppendLine("[سیستم عامل و پایداری]");
-            sb.AppendLine($"  ویندوز: {specs.OsName} ({specs.OsArchitecture})");
-            sb.AppendLine($"  شماره ساخت: Build {specs.OsBuild}");
-            sb.AppendLine($"  تاریخ نصب: {specs.OsInstallDate}");
-            sb.AppendLine($"  مدت زمان روشن بودن سیستم: {specs.OsUptimeFormatted}");
+            sb.AppendLine(LocalizationService.Get("[سیستم عامل و پایداری]"));
+            sb.AppendLine(string.Format(LocalizationService.Get("  ویندوز: {0} ({1})"), specs.OsName, specs.OsArchitecture));
+            sb.AppendLine(string.Format(LocalizationService.Get("  شماره ساخت: Build {0}"), specs.OsBuild));
+            sb.AppendLine(string.Format(LocalizationService.Get("  تاریخ نصب: {0}"), specs.OsInstallDate));
+            sb.AppendLine(string.Format(LocalizationService.Get("  مدت زمان روشن بودن سیستم: {0}"), specs.OsUptimeFormatted));
             sb.AppendLine("==================================================");
 
             return sb.ToString();

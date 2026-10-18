@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Als Administrator ausgeführt</value></data>
@@ -61,4 +61,54 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub-Projektseite</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>Diagnosedaten kopieren</value></data>
   <data name="BackToTools" xml:space="preserve"><value>Zurück zur Werkzeugübersicht</value></data>
-<data name="BackButton" xml:space="preserve"><value>Zurück</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>Systemzustands-Index</value></data><data name="RamTitle" xml:space="preserve"><value>Arbeitsspeicher (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>Prozessor (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>Netzwerk-Überwachung</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>Kürzliche Bereinigungen</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>Speicherbelegung</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>Detaillierte Systemspezifikationen</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>Akkuzustand &amp; Energie</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>App- &amp; Bloatware-Deinstallationsprogramm</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>Internet-Geschwindigkeitstest</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows-Personalisierung &amp; Effekte</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update-Manager</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>Autostart-Manager</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>Treiber-Manager</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>Datenträgerwartung &amp; TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNS-Manager</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>Kontextmenü-Manager</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>Tiefenbereinigung</value></data></root>
+  <data name="BackButton" xml:space="preserve"><value>Zurück</value></data>
+  <data name="HealthScoreTitle" xml:space="preserve"><value>Systemzustands-Index</value></data>
+  <data name="RamTitle" xml:space="preserve"><value>Arbeitsspeicher (RAM)</value></data>
+  <data name="CpuTitle" xml:space="preserve"><value>Prozessor (CPU)</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>Netzwerk-Überwachung</value></data>
+  <data name="CleanupHistoryTitle" xml:space="preserve"><value>Kürzliche Bereinigungen</value></data>
+  <data name="DiskBreakdownTitle" xml:space="preserve"><value>Speicherbelegung</value></data>
+  <data name="ToolSpecsTitle" xml:space="preserve"><value>Detaillierte Systemspezifikationen</value></data>
+  <data name="ToolBatteryTitle" xml:space="preserve"><value>Akkuzustand &amp; Energie</value></data>
+  <data name="ToolUninstallerTitle" xml:space="preserve"><value>App- &amp; Bloatware-Deinstallationsprogramm</value></data>
+  <data name="ToolSpeedTestTitle" xml:space="preserve"><value>Internet-Geschwindigkeitstest</value></data>
+  <data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windows-Personalisierung &amp; Effekte</value></data>
+  <data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update-Manager</value></data>
+  <data name="ToolStartupTitle" xml:space="preserve"><value>Autostart-Manager</value></data>
+  <data name="ToolDriversTitle" xml:space="preserve"><value>Treiber-Manager</value></data>
+  <data name="ToolDiskTitle" xml:space="preserve"><value>Datenträgerwartung &amp; TRIM</value></data>
+  <data name="ToolDnsTitle" xml:space="preserve"><value>DNS-Manager</value></data>
+  <data name="ToolContextMenuTitle" xml:space="preserve"><value>Kontextmenü-Manager</value></data>
+  <data name="ToolDeepStorageTitle" xml:space="preserve"><value>Tiefenbereinigung</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>Netzwerk</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>Belegt</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>Bereinigbar</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>Frei</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>Elemente ausgewählt</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>Insgesamt erkannt</value></data>
+  <data name="Scanning" xml:space="preserve"><value>Wird gescannt...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>Nach der Bereinigung optimiert</value></data>
+  <data name="CharacterTitle" xml:space="preserve"><value>Heldenfigur</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>Aussehen, Ton und Verhalten der Figur auf der Dashboard-Karte. Änderungen wirken sofort.</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>Sprechton</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>Verspielt</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>Ruhig</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>Seriös</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>Name der Figur</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>Ihr Name (für Begrüßungen)</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>Stadt (Wettermodul)</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>Animationsintensität</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>Aus</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>Niedrig</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>Mittel</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>Hoch</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>Größe der Figur</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>Accessoire</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>Anlass-Accessoire (Events)</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>Sprechblase</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>Szene und Umgebungseffekte hinter der Figur</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>Töne</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>Schnelle Reaktionen (kürzere Animationen)</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>Ruhemodus (reduzierte Bewegung, für langsamere PCs)</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>Korrektur des Mondkalenders für Anlässe (±1 Tag)</value></data>
+</root>

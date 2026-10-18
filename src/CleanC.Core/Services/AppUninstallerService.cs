@@ -273,8 +273,8 @@ namespace CleanC.Core.Services
                 return true;
             }
 
-            if (displayName.Contains("نسخه آزمایشی", StringComparison.Ordinal) ||
-                displayName.Contains("نسخه تست", StringComparison.Ordinal))
+            if (displayName.Contains("نسخه آزمایشی", StringComparison.Ordinal) || // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
+                displayName.Contains("نسخه تست", StringComparison.Ordinal)) // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
             {
                 evidence = LocalizationService.Get("EvTrialInNameLocalized", "نام برنامه شامل «نسخه آزمایشی» است");
                 return true;
@@ -393,7 +393,7 @@ namespace CleanC.Core.Services
                 if (result.ExtendedErrorCode != null)
                 {
                     CcLog.Report("AppUninstaller.Appx", new InvalidOperationException(
-                        $"حذف {packageFullName} ناموفق بود: {result.ExtendedErrorCode.Message}"));
+                        string.Format(LocalizationService.Get("حذف {0} ناموفق بود: {1}"), packageFullName, result.ExtendedErrorCode.Message)));
                     return false;
                 }
                 return true;

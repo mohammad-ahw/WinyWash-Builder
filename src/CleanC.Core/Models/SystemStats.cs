@@ -1,3 +1,5 @@
+using CleanC.Core.Services;
+
 namespace CleanC.Core.Models
 {
     public class SystemStats
@@ -15,9 +17,9 @@ namespace CleanC.Core.Models
         public double DiskPercent { get; set; }
         public string DiskModel { get; set; } = string.Empty;
         public string DiskType { get; set; } = "NVMe SSD";
-        public string DiskHealth { get; set; } = "سالم (Healthy)";
+        public string DiskHealth { get; set; } = LocalizationService.Get("سالم (Healthy)");
         public string GpuSummary { get; set; } = string.Empty;
-        public string PowerSummary { get; set; } = "متصل به برق";
+        public string PowerSummary { get; set; } = LocalizationService.Get("متصل به برق");
 
         public string TotalRamFormatted => FormatBytes(TotalRamBytes);
         public string UsedRamFormatted => FormatBytes(UsedRamBytes);
@@ -30,14 +32,14 @@ namespace CleanC.Core.Models
         public static string FormatBytes(long bytes)
         {
             bool isFa = string.Equals(Services.LocalizationService.CurrentLanguage?.Code, "fa-IR", System.StringComparison.OrdinalIgnoreCase);
-            if (bytes <= 0) return isFa ? "0 بایت" : "0 B";
-            string[] unitsFa = { "بایت", "کیلوبایت", "مگابایت", "گیگابایت", "ترابایت" };
+            if (bytes <= 0) return isFa ? LocalizationService.Get("0 بایت") : "0 B";
+            string[] unitsFa = { LocalizationService.Get("بایت"), LocalizationService.Get("کیلوبایت"), LocalizationService.Get("مگابایت"), LocalizationService.Get("گیگابایت"), LocalizationService.Get("ترابایت") };
             string[] unitsEn = { "B", "KB", "MB", "GB", "TB" };
             string[] units = isFa ? unitsFa : unitsEn;
             int digitGroups = (int)(Math.Log(bytes) / Math.Log(1024));
             if (digitGroups >= units.Length) digitGroups = units.Length - 1;
             double num = bytes / Math.Pow(1024, digitGroups);
-            string formattedNum = num.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture).Replace('/', '.').Replace('٫', '.');
+            string formattedNum = num.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture).Replace('/', '.').Replace('٫', '.'); // i18n-logic: نرمال‌سازی جداکننده اعشارِ داده‌ی خارجی
             return $"{formattedNum} {units[digitGroups]}";
         }
     }

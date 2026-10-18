@@ -13,7 +13,7 @@ namespace CleanC.Core.Services
         public bool IsFastStartupEnabled { get; set; }
         public bool IsHibernationEnabled { get; set; }
         public long HiberfilSizeBytes { get; set; }
-        public string FormattedHiberfilSize => HiberfilSizeBytes > 0 ? SystemStats.FormatBytes(HiberfilSizeBytes) : "۰ بایت (حذف شده)";
+        public string FormattedHiberfilSize => HiberfilSizeBytes > 0 ? SystemStats.FormatBytes(HiberfilSizeBytes) : LocalizationService.Get("۰ بایت (حذف شده)");
     }
 
     public static class FastStartupService

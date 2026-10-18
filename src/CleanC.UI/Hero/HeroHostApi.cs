@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
+using CleanC.Core.Services;
 
 namespace CleanC.UI.Hero
 {
@@ -87,11 +88,11 @@ namespace CleanC.UI.Hero
                         // خطای زمانِ اجرای اسکریپت هیرو → در لاگ ثبت می‌شود تا «کاراکتر لود
                         // نمی‌شود/هنگ می‌کند» بدون حدس و گمان عیب‌یابی شود
                         CcLog.Report("Hero.JSError", new InvalidOperationException(
-                            "خطای اسکریپت هیرو: " + (msg.Data.HasValue ? msg.Data.Value.ToString() : "بدون جزئیات")));
+                            LocalizationService.Get("خطای اسکریپت هیرو: ") + (msg.Data.HasValue ? msg.Data.Value.ToString() : LocalizationService.Get("بدون جزئیات"))));
                         break;
 
                     default:
-                        var unknown = "پیام ناشناخته از هیرو: " + msg.Type;
+                        var unknown = LocalizationService.Get("پیام ناشناخته از هیرو: ") + msg.Type;
                         CcLog.Report("Hero.HostApi", new InvalidOperationException(unknown));
                         ReplyErr(id, unknown);
                         break;

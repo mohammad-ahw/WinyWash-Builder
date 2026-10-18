@@ -22,7 +22,7 @@ namespace CleanC.Core.Services
         public bool IsDuplicateOldVersion { get; set; }
         public bool HasError { get; set; }
         public int ErrorCode { get; set; }
-        public string StatusDescription { get; set; } = "آماده و سالم";
+        public string StatusDescription { get; set; } = LocalizationService.Get("آماده و سالم");
         public bool IsSelected { get; set; }
 
         // D14 — بسته ی یتیم: هیچ دستگاه فعالی از این بسته در DriverStore استفاده نمی کند
@@ -104,7 +104,7 @@ namespace CleanC.Core.Services
                     for (int i = 1; i < sorted.Count; i++)
                     {
                         sorted[i].IsDuplicateOldVersion = true;
-                        sorted[i].StatusDescription = "نسخه قدیمی DriverStore (تکراری)";
+                        sorted[i].StatusDescription = LocalizationService.Get("نسخه قدیمی DriverStore (تکراری)");
                     }
                 }
 
@@ -180,13 +180,14 @@ namespace CleanC.Core.Services
 
                     foreach (var mo in searcher.Get())
                     {
-                        string devName = mo["Name"]?.ToString() ?? "دستگاه نامشخص";
+                        string devName = mo["Name"]?.ToString() ?? LocalizationService.Get("دستگاه نامشخص");
                         int errCode = mo["ConfigManagerErrorCode"] != null ? Convert.ToInt32(mo["ConfigManagerErrorCode"]) : 0;
                         string status = mo["Status"]?.ToString() ?? "Error";
 
                         // Add error device to the list
                         list.Insert(0, new DriverItem
                         {
+                            // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود (مقدار نگهبان در publishedName == "سخت افزار معیوب")
                             PublishedName = "سخت افزار معیوب",
                             OriginalName = devName,
                             ProviderName = "System Device",
@@ -223,6 +224,7 @@ namespace CleanC.Core.Services
                 try
                 {
                     // 1. Defective / Error device removal
+                    // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود (مقدار نگهبان سخت افزار معیوب)
                     if (isErrorDevice || publishedName == "سخت افزار معیوب" || !publishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase))
                     {
                         string target = !string.IsNullOrEmpty(deviceName) ? deviceName : publishedName;
@@ -237,9 +239,9 @@ namespace CleanC.Core.Services
                         if (pDev != null)
                         {
                             pDev.WaitForExit(8000);
-                            return (true, $"دستگاه معیوب '{target}' با موفقیت از سیستم حذف و جدا شد.");
+                            return (true, string.Format(LocalizationService.Get("دستگاه معیوب '{0}' با موفقیت از سیستم حذف و جدا شد."), target));
                         }
-                        return (false, "عدم توانایی در اجرای ابزار جداسازی سخت افزار.");
+                        return (false, LocalizationService.Get("عدم توانایی در اجرای ابزار جداسازی سخت افزار."));
                     }
 
                     string infName = publishedName.Trim();
@@ -254,21 +256,22 @@ namespace CleanC.Core.Services
                     };
 
                     using var p = Process.Start(psi);
-                    if (p == null) return (false, "عدم توانایی در اجرای ابزار pnputil.");
+                    if (p == null) return (false, LocalizationService.Get("عدم توانایی در اجرای ابزار pnputil."));
 
                     string stdout = p.StandardOutput.ReadToEnd();
                     string stderr = p.StandardError.ReadToEnd();
                     p.WaitForExit(10000);
 
+                    // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود (خروجی فرآیند pnputil ویندوز فارسی مقایسه میشود)
                     if (p.ExitCode == 0 || stdout.Contains("successfully", StringComparison.OrdinalIgnoreCase) || stdout.Contains("حذف شد", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (true, $"بسته درایور {infName} با موفقیت از مخزن درایورها حذف شد.");
+                        return (true, string.Format(LocalizationService.Get("بسته درایور {0} با موفقیت از مخزن درایورها حذف شد."), infName));
                     }
 
                     // If in use by an active device, safely preserve it rather than forcibly breaking hardware
                     if (stdout.Contains("in use", StringComparison.OrdinalIgnoreCase) || stderr.Contains("in use", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (false, $"بسته درایور {infName} در حال استفاده توسط سخت‌افزار فعال سیستم است و جهت حفظ پایداری حذف نشد.");
+                        return (false, string.Format(LocalizationService.Get("بسته درایور {0} در حال استفاده توسط سخت‌افزار فعال سیستم است و جهت حفظ پایداری حذف نشد."), infName));
                     }
 
                     // 4. Fallback to DISM /Online /Remove-Driver
@@ -288,7 +291,7 @@ namespace CleanC.Core.Services
                             pDism.WaitForExit(10000);
                             if (pDism.ExitCode == 0 || dismOut.Contains("100.0%", StringComparison.OrdinalIgnoreCase) || dismOut.Contains("The operation completed successfully", StringComparison.OrdinalIgnoreCase))
                             {
-                                return (true, $"بسته درایور {infName} از طریق سرویس DISM با موفقیت حذف شد.");
+                                return (true, string.Format(LocalizationService.Get("بسته درایور {0} از طریق سرویس DISM با موفقیت حذف شد."), infName));
                             }
                         }
                     }
@@ -299,14 +302,14 @@ namespace CleanC.Core.Services
 
                     if (stdout.Contains("in use", StringComparison.OrdinalIgnoreCase) || stderr.Contains("in use", StringComparison.OrdinalIgnoreCase))
                     {
-                        return (false, $"امکان حذف درایور {infName} وجود ندارد زیرا توسط هسته سیستم در حال استفاده فعال است.");
+                        return (false, string.Format(LocalizationService.Get("امکان حذف درایور {0} وجود ندارد زیرا توسط هسته سیستم در حال استفاده فعال است."), infName));
                     }
 
-                    return (false, $"عدم موفقیت در حذف درایور: {(string.IsNullOrEmpty(stderr) ? stdout : stderr)}".Trim());
+                    return (false, string.Format(LocalizationService.Get("عدم موفقیت در حذف درایور: {0}"), (string.IsNullOrEmpty(stderr) ? stdout : stderr)).Trim());
                 }
                 catch (Exception ex)
                 {
-                    return (false, $"خطا در فرآیند حذف: {ex.Message}");
+                    return (false, string.Format(LocalizationService.Get("خطا در فرآیند حذف: {0}"), ex.Message));
                 }
             });
         }
@@ -331,7 +334,7 @@ namespace CleanC.Core.Services
                     for (int i = 0; i < count; i++)
                     {
                         dynamic update = searchResult.Updates.Item(i);
-                        string title = update.Title?.ToString() ?? "آپدیت درایور";
+                        string title = update.Title?.ToString() ?? LocalizationService.Get("آپدیت درایور");
                         list.Add(title);
                     }
                 }
@@ -437,15 +440,15 @@ namespace CleanC.Core.Services
         {
             return code switch
             {
-                1 => "دستگاه به درستی پیکربندی نشده است (Code 1)",
-                10 => "دستگاه امکان راه اندازی ندارد (Code 10)",
-                14 => "سیستم برای استفاده نیازمند ریستارت است (Code 14)",
-                22 => "دستگاه توسط ویندوز غیرفعال شده است (Code 22)",
-                28 => "درایور این سخت افزار نصب نشده است (Code 28)",
-                31 => "ویندوز نمی تواند درایور را بارگذاری کند (Code 31)",
-                39 => "درایور آسیب دیده یا مفقود شده است (Code 39)",
-                43 => "سخت افزار به دلیل گزارش خطا متوقف شده است (Code 43)",
-                _ => $"کد خطای سخت افزاری ({code})"
+                1 => LocalizationService.Get("دستگاه به درستی پیکربندی نشده است (Code 1)"),
+                10 => LocalizationService.Get("دستگاه امکان راه اندازی ندارد (Code 10)"),
+                14 => LocalizationService.Get("سیستم برای استفاده نیازمند ریستارت است (Code 14)"),
+                22 => LocalizationService.Get("دستگاه توسط ویندوز غیرفعال شده است (Code 22)"),
+                28 => LocalizationService.Get("درایور این سخت افزار نصب نشده است (Code 28)"),
+                31 => LocalizationService.Get("ویندوز نمی تواند درایور را بارگذاری کند (Code 31)"),
+                39 => LocalizationService.Get("درایور آسیب دیده یا مفقود شده است (Code 39)"),
+                43 => LocalizationService.Get("سخت افزار به دلیل گزارش خطا متوقف شده است (Code 43)"),
+                _ => string.Format(LocalizationService.Get("کد خطای سخت افزاری ({0})"), code)
             };
         }
     }

@@ -40,10 +40,10 @@ namespace CleanC.Core.Services
         public string FlagEmoji => InternetSpeedTestService.GetCountryFlagEmoji(CountryCode);
 
         // Experience ratings (Speedtest.net style)
-        public string WebBrowsingRating => PingMs <= 90 && DownloadSpeedMbps >= 10 ? "عالی" : (PingMs <= 180 && DownloadSpeedMbps >= 5 ? "خوب" : "متوسط");
+        public string WebBrowsingRating => PingMs <= 90 && DownloadSpeedMbps >= 10 ? LocalizationService.Get("عالی") : (PingMs <= 180 && DownloadSpeedMbps >= 5 ? LocalizationService.Get("خوب") : LocalizationService.Get("متوسط"));
         public string VideoStreamingRating => DownloadSpeedMbps >= 25 ? "4K UHD" : (DownloadSpeedMbps >= 10 ? "Full HD 1080p" : (DownloadSpeedMbps >= 3 ? "HD 720p" : "SD 480p"));
-        public string GamingRating => PingMs <= 40 ? "عالی (بدون لگ)" : (PingMs <= 70 ? "بسیار خوب" : (PingMs <= 120 ? "قابل قبول" : "دارای تاخیر"));
-        public string VideoCallingRating => PingMs <= 110 && UploadSpeedMbps >= 2.5 ? "کیفیت عالی (HD)" : (PingMs <= 180 && UploadSpeedMbps >= 1 ? "کیفیت مطلوب" : "کیفیت پایه");
+        public string GamingRating => PingMs <= 40 ? LocalizationService.Get("عالی (بدون لگ)") : (PingMs <= 70 ? LocalizationService.Get("بسیار خوب") : (PingMs <= 120 ? LocalizationService.Get("قابل قبول") : LocalizationService.Get("دارای تاخیر")));
+        public string VideoCallingRating => PingMs <= 110 && UploadSpeedMbps >= 2.5 ? LocalizationService.Get("کیفیت عالی (HD)") : (PingMs <= 180 && UploadSpeedMbps >= 1 ? LocalizationService.Get("کیفیت مطلوب") : LocalizationService.Get("کیفیت پایه"));
 
         public long BytesDownloaded { get; set; }
         public long BytesUploaded { get; set; }
@@ -172,13 +172,13 @@ namespace CleanC.Core.Services
                     {
                         using var ipifyCts = new CancellationTokenSource(TimeSpan.FromSeconds(1.5));
                         result.ClientIp = await _httpClient.GetStringAsync("https://api.ipify.org", ipifyCts.Token);
-                        result.IspName = "شبکه اینترنت";
-                        result.Country = "جهانی";
+                        result.IspName = LocalizationService.Get("شبکه اینترنت");
+                        result.Country = LocalizationService.Get("جهانی");
                     }
                     catch
                     {
-                        result.ClientIp = "اتصال فعال";
-                        result.IspName = "شبکه اینترنت";
+                        result.ClientIp = LocalizationService.Get("اتصال فعال");
+                        result.IspName = LocalizationService.Get("شبکه اینترنت");
                     }
                 }
             }
@@ -358,10 +358,10 @@ namespace CleanC.Core.Services
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    result.ErrorMessage = "تست توسط کاربر لغو گردید.";
+                    result.ErrorMessage = LocalizationService.Get("تست توسط کاربر لغو گردید.");
                     return result;
                 }
-                result.ErrorMessage = "خطا در اتصال به سرور دانلود اینترنت.";
+                result.ErrorMessage = LocalizationService.Get("خطا در اتصال به سرور دانلود اینترنت.");
                 return result;
             }
 

@@ -255,7 +255,7 @@ namespace CleanC.UI
                 TotalFreedGb = _cumulativeFreedBytes / (1024.0 * 1024.0 * 1024.0),
                 LastClean = _lastCleanDateTime == DateTime.MinValue || _lastCleanFreedBytes <= 0
                     ? null
-                    : $"{SystemStats.FormatBytes(_lastCleanFreedBytes)}، {_lastCleanDateTime:HH:mm}"
+                    : string.Format(LocalizationService.Get("{0}، {1:HH:mm}"), SystemStats.FormatBytes(_lastCleanFreedBytes), _lastCleanDateTime)
             };
 
             var json = HeroOutbound.State(state);
@@ -569,7 +569,7 @@ namespace CleanC.UI
                     Title = title,
                     IconGlyph = glyph,
                     IsFailed = true,
-                    StatusSummary = $"ناموفق ✗ — {why}"
+                    StatusSummary = string.Format(LocalizationService.Get("ناموفق ✗ — {0}"), why)
                 });
             }
         }
@@ -590,9 +590,9 @@ namespace CleanC.UI
         {
             var s = new HeroRunSession();
 
-            Live("در حال آماده سازی و ارزیابی سرفصل های سیستم...",
-                "بررسی متوالی فایل های موقت، کش ها و فضاهای ذخیره سازی", 5);
-            LiveFreedCounterText.Text = "+ 0 بایت آزاد شد";
+            Live(LocalizationService.Get("در حال آماده سازی و ارزیابی سرفصل های سیستم..."),
+                LocalizationService.Get("بررسی متوالی فایل های موقت، کش ها و فضاهای ذخیره سازی"), 5);
+            LiveFreedCounterText.Text = LocalizationService.Get("+ 0 بایت آزاد شد");
 
             _activeCleaningItems.Clear();
             _displayedFreedBytes = 0;
@@ -638,7 +638,7 @@ namespace CleanC.UI
         // ---------------------------------------------------------------- 1
         private async Task HeroStepScanAsync(HeroRunSession s)
         {
-            Live("در حال پویش سریع سرفصل های سیستم...", "شناسایی فایل های زائد و گزینه های قابل بهینه سازی", 8);
+            Live(LocalizationService.Get("در حال پویش سریع سرفصل های سیستم..."), LocalizationService.Get("شناسایی فایل های زائد و گزینه های قابل بهینه سازی"), 8);
             // اسکنِ مشترک: اگر اسکنِ پس‌زمینهٔ استارت‌آپ هنوز در جریان است همان را می‌گیریم
             // تا مرحلهٔ ۱ کلِ دیسک را دوباره نگردد.
             _cachedScanResult ??= await GetHeroScanAsync();
@@ -664,7 +664,7 @@ namespace CleanC.UI
             s.ReportGroups.Add(new CleanupReportGroup
             {
                 GroupId = "system_boost",
-                Title = "بهینه سازی زنده سیستم و پایداری",
+                Title = LocalizationService.Get("بهینه سازی زنده سیستم و پایداری"),
                 IconGlyph = "\uE9D2"
             });
         }
@@ -709,16 +709,16 @@ namespace CleanC.UI
                 if (vm == null) continue;
 
                 string detail = item.Bytes > 0
-                    ? $"پویش سکتورها و پاک‌سازی فضای شناسایی‌شده · حجم: {item.FormattedBytes}"
-                    : $"شناسایی و پاک‌سازی فایل‌های زائد و کش سرفصل {vm.Title}";
+                    ? string.Format(LocalizationService.Get("پویش سکتورها و پاک‌سازی فضای شناسایی‌شده · حجم: {0}"), item.FormattedBytes)
+                    : string.Format(LocalizationService.Get("شناسایی و پاک‌سازی فایل‌های زائد و کش سرفصل {0}"), vm.Title);
 
-                Live($"پاک‌سازی فعال: {vm.Title}",
-                    $"سرفصل {i + 1} از {total} · {detail}",
+                Live(string.Format(LocalizationService.Get("پاک‌سازی فعال: {0}"), vm.Title),
+                    string.Format(LocalizationService.Get("سرفصل {0} از {1} · {2}"), i + 1, total, detail),
                     10 + (i * 70.0 / total));
 
                 vm.IsLoading = true;
                 vm.IsSuccess = false;
-                vm.StatusText = "در حال پردازش سکتورها...";
+                vm.StatusText = LocalizationService.Get("در حال پردازش سکتورها...");
                 LiveCleanListView?.ScrollIntoView(vm);
                 await Task.Delay(60);
 
@@ -731,8 +731,8 @@ namespace CleanC.UI
                 vm.IsSuccess = true;
                 vm.WasEmpty = wasEmpty;
                 vm.StatusText = wasEmpty
-                    ? (item.Bytes > 0 ? "قبلاً پاک بود ✓" : "بدون فایل زائد (پاک)")
-                    : $"+ {SystemStats.FormatBytes(itemFreed)} آزاد شد ✓";
+                    ? (item.Bytes > 0 ? LocalizationService.Get("قبلاً پاک بود ✓") : LocalizationService.Get("بدون فایل زائد (پاک)"))
+                    : string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(itemFreed));
 
                 if (s.TotalFreed > _displayedFreedBytes) AnimateCountUp(s.TotalFreed);
                 await Task.Delay(90);
@@ -746,8 +746,8 @@ namespace CleanC.UI
                     FreedBytes = itemFreed,
                     WasEmpty = wasEmpty,
                     StatusSummary = wasEmpty
-                        ? (item.Bytes > 0 ? "قبلاً پاک بود" : "خالی بود (بدون تغییر)")
-                        : $"+ {SystemStats.FormatBytes(itemFreed)} آزاد شد"
+                        ? (item.Bytes > 0 ? LocalizationService.Get("قبلاً پاک بود") : LocalizationService.Get("خالی بود (بدون تغییر)"))
+                        : string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(itemFreed))
                 });
                 await Task.Delay(20);
             }
@@ -760,8 +760,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepRamAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("ramBoost")) return new { mb = 0L };
-            Live("بهینه‌سازی عمیق حافظه رم (RAM Working Set)",
-                "تخلیه Working Set پردازه‌ها و بازیابی بلوک‌های غیرفعال حافظه فیزیکی", 82);
+            Live(LocalizationService.Get("بهینه‌سازی عمیق حافظه رم (RAM Working Set)"),
+                LocalizationService.Get("تخلیه Working Set پردازه‌ها و بازیابی بلوک‌های غیرفعال حافظه فیزیکی"), 82);
             await Task.Delay(60);
 
             long freed = 0;
@@ -772,14 +772,14 @@ namespace CleanC.UI
                 s.RamFreed = freed;
                 if (!boost.Success && freed <= 0)
                 {
-                    s.Fail("ram_boost_fail", "آزادسازی حافظه رم (RAM Working Set)", "\uE9D2",
-                        new InvalidOperationException("BoostRamAsync نتیجه‌ای برنگرداند"),
-                        "دسترسی لازم برای تخلیه Working Set فراهم نشد");
+                    s.Fail("ram_boost_fail", LocalizationService.Get("آزادسازی حافظه رم (RAM Working Set)"), "\uE9D2",
+                        new InvalidOperationException(LocalizationService.Get("BoostRamAsync نتیجه‌ای برنگرداند")),
+                        LocalizationService.Get("دسترسی لازم برای تخلیه Working Set فراهم نشد"));
                 }
             }
             catch (Exception ex)
             {
-                s.Fail("ram_boost_fail", "آزادسازی حافظه رم (RAM Working Set)", "\uE9D2", ex, ex.Message);
+                s.Fail("ram_boost_fail", LocalizationService.Get("آزادسازی حافظه رم (RAM Working Set)"), "\uE9D2", ex, ex.Message);
             }
 
             s.TotalFreed += freed;
@@ -792,8 +792,8 @@ namespace CleanC.UI
         private async Task HeroStepDnsAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("dnsFlush") && !s.IsBoostEnabled("backgroundHelpers")) return;
-            Live("نوسازی کش DNS و سوکت‌های شبکه",
-                "تخلیه Resolve Cache، پاک‌سازی جدول ARP و ریست بافرهای Winsock", 90);
+            Live(LocalizationService.Get("نوسازی کش DNS و سوکت‌های شبکه"),
+                LocalizationService.Get("تخلیه Resolve Cache، پاک‌سازی جدول ARP و ریست بافرهای Winsock"), 90);
             await Task.Delay(50);
             try
             {
@@ -805,7 +805,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                s.Fail("dns_flush_fail", "تخلیه کش DNS و نوسازی کانکشن ها", "\uE774", ex, ex.Message);
+                s.Fail("dns_flush_fail", LocalizationService.Get("تخلیه کش DNS و نوسازی کانکشن ها"), "\uE774", ex, ex.Message);
             }
         }
 
@@ -813,8 +813,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepBrowserAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("browserBoost")) return new { mb = 0L };
-            Live("سبک‌سازی مرورگر و توقف پردازه‌های مخفی",
-                "بستن Background Tasks مرورگرهای Edge و Chrome و آزادسازی کش افزونه‌ها", 92);
+            Live(LocalizationService.Get("سبک‌سازی مرورگر و توقف پردازه‌های مخفی"),
+                LocalizationService.Get("بستن Background Tasks مرورگرهای Edge و Chrome و آزادسازی کش افزونه‌ها"), 92);
             long freed = 0;
             try
             {
@@ -830,7 +830,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                s.Fail("browser_opt_fail", "بهینه سازی مرورگر و پاکسازی افزونه ها", "\uE774", ex, ex.Message);
+                s.Fail("browser_opt_fail", LocalizationService.Get("بهینه سازی مرورگر و پاکسازی افزونه ها"), "\uE774", ex, ex.Message);
             }
             await Task.Delay(50);
             long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
@@ -841,8 +841,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepRegistryAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("orphanedRegistry") && !s.IsBoostEnabled("leftovers")) return new { mb = 0L };
-            Live("پویش عمیق رجیستری و بقایای نرم‌افزارها",
-                "شناسایی ارجاعات مفقود در AppData و حذف کلیدهای نامعتبر رجیستری", 94);
+            Live(LocalizationService.Get("پویش عمیق رجیستری و بقایای نرم‌افزارها"),
+                LocalizationService.Get("شناسایی ارجاعات مفقود در AppData و حذف کلیدهای نامعتبر رجیستری"), 94);
             await Task.Delay(50);
             long freed = 0;
             try
@@ -864,7 +864,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                s.Fail("deep_clean_leftovers_fail", "پاکسازی عمیق بقایای نرم افزارها", "\uE74D", ex, ex.Message);
+                s.Fail("deep_clean_leftovers_fail", LocalizationService.Get("پاکسازی عمیق بقایای نرم افزارها"), "\uE74D", ex, ex.Message);
             }
             long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
             return new { mb = mbFreed };
@@ -874,15 +874,15 @@ namespace CleanC.UI
         private async Task<object?> HeroStepStartupAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("startupOptimize")) return new { mb = 0L };
-            Live("ارزیابی و بهینه‌سازی استارتاپ ویندوز",
-                "بررسی اولویت بارگذاری و غیرفعال‌سازی سرویس‌ها و لانچرهای کندکننده بوت", 95);
+            Live(LocalizationService.Get("ارزیابی و بهینه‌سازی استارتاپ ویندوز"),
+                LocalizationService.Get("بررسی اولویت بارگذاری و غیرفعال‌سازی سرویس‌ها و لانچرهای کندکننده بوت"), 95);
             try
             {
                 s.DisabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
             }
             catch (Exception ex)
             {
-                s.Fail("startup_opt_fail", "بهینه سازی استارتاپ ویندوز", "\uE7B5", ex, ex.Message);
+                s.Fail("startup_opt_fail", LocalizationService.Get("بهینه سازی استارتاپ ویندوز"), "\uE7B5", ex, ex.Message);
             }
             await Task.Delay(50);
             return new { mb = 0L };
@@ -892,8 +892,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepTweaksAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("winTweaks")) return new { mb = 0L };
-            Live("توقف تله‌متری و روان‌سازی پردازشی ویندوز",
-                "غیرفعال‌سازی DiagTrack و اعمال تنظیمات افزایش پاسخ‌دهی سیستم‌عامل", 96);
+            Live(LocalizationService.Get("توقف تله‌متری و روان‌سازی پردازشی ویندوز"),
+                LocalizationService.Get("غیرفعال‌سازی DiagTrack و اعمال تنظیمات افزایش پاسخ‌دهی سیستم‌عامل"), 96);
             try
             {
                 s.WinTweaks = await WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync();
@@ -901,7 +901,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                s.Fail("win_tweaks_fail", "توقف تله متری و تنظیمات عملکرد ویندوز", "\uE770", ex, ex.Message);
+                s.Fail("win_tweaks_fail", LocalizationService.Get("توقف تله متری و تنظیمات عملکرد ویندوز"), "\uE770", ex, ex.Message);
             }
             await Task.Delay(50);
             return new { mb = 0L };
@@ -911,9 +911,9 @@ namespace CleanC.UI
         private async Task HeroStepFastStartupAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("fastStartup")) return;
-            Live("در حال بررسی و اعمال Fast Startup...",
-                "کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)", 97);
-            const string title = "Fast Startup (خاموش شدن سریع ویندوز)";
+            Live(LocalizationService.Get("در حال بررسی و اعمال Fast Startup..."),
+                LocalizationService.Get("کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)"), 97);
+            string title = LocalizationService.Get("Fast Startup (خاموش شدن سریع ویندوز)");
             const string glyph = "\uE7E8";
             try
             {
@@ -924,7 +924,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost", Id = "fast_startup",
                         Title = title, IconGlyph = glyph,
-                        WasEmpty = true, StatusSummary = "از قبل فعال بود ✓"
+                        WasEmpty = true, StatusSummary = LocalizationService.Get("از قبل فعال بود ✓")
                     };
                 }
                 else if (!fs.IsHibernationEnabled)
@@ -933,7 +933,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost", Id = "fast_startup",
                         Title = title, IconGlyph = glyph, IsFailed = true,
-                        StatusSummary = "انجام نشد ✗ — هایبرنیشن خاموش است (فعال سازی آن فایل hiberfil.sys می سازد)"
+                        StatusSummary = LocalizationService.Get("انجام نشد ✗ — هایبرنیشن خاموش است (فعال سازی آن فایل hiberfil.sys می سازد)")
                     };
                 }
                 else if (FastStartupService.SetFastStartup(true))
@@ -942,7 +942,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost", Id = "fast_startup",
                         Title = title, IconGlyph = glyph,
-                        WasEmpty = false, StatusSummary = "فعال شد ✓"
+                        WasEmpty = false, StatusSummary = LocalizationService.Get("فعال شد ✓")
                     };
                 }
                 else
@@ -951,7 +951,7 @@ namespace CleanC.UI
                     {
                         GroupId = "system_boost", Id = "fast_startup",
                         Title = title, IconGlyph = glyph, IsFailed = true,
-                        StatusSummary = "ناموفق ✗ — دسترسی Administrator لازم است"
+                        StatusSummary = LocalizationService.Get("ناموفق ✗ — دسترسی Administrator لازم است")
                     };
                 }
             }
@@ -966,8 +966,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepGpuAsync(HeroRunSession s)
         {
             if (!s.IsBoostEnabled("gpuOptimize")) return new { mb = 0L };
-            Live("در حال تخصیص هوشمند کارت گرافیک...",
-                "هدایت برنامه های سنگین و بازی ها به پردازنده گرافیکی قدرتمند", 98);
+            Live(LocalizationService.Get("در حال تخصیص هوشمند کارت گرافیک..."),
+                LocalizationService.Get("هدایت برنامه های سنگین و بازی ها به پردازنده گرافیکی قدرتمند"), 98);
             try
             {
                 var gpu = await GpuOptimizerService.OptimizeGpuPreferencesAsync();
@@ -976,7 +976,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                s.Fail("gpu_opt_fail", "تخصیص کارت گرافیک مجزا", "\uE790", ex, ex.Message);
+                s.Fail("gpu_opt_fail", LocalizationService.Get("تخصیص کارت گرافیک مجزا"), "\uE790", ex, ex.Message);
             }
             await Task.Delay(40);
             return new { mb = 0L };
@@ -986,8 +986,8 @@ namespace CleanC.UI
         private async Task<object?> HeroStepDebloatAsync(HeroRunSession s, int[] selected)
         {
             if (!s.IsBoostEnabled("bloatwareClean")) return new { mb = 0L };
-            Live("در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)...",
-                "پاکسازی Candy Crush و بازی های پیش فرض و بررسی برنامه های کم استفاده", 99);
+            Live(LocalizationService.Get("در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)..."),
+                LocalizationService.Get("پاکسازی Candy Crush و بازی های پیش فرض و بررسی برنامه های کم استفاده"), 99);
             long freed = 0;
             try
             {
@@ -1018,7 +1018,7 @@ namespace CleanC.UI
             }
             catch (Exception ex)
             {
-                s.Fail("bloatware_clean_fail", "حذف برنامه ها و بازی های تبلیغاتی", "\uE74C", ex, ex.Message);
+                s.Fail("bloatware_clean_fail", LocalizationService.Get("حذف برنامه ها و بازی های تبلیغاتی"), "\uE74C", ex, ex.Message);
             }
             await Task.Delay(40);
             long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
@@ -1028,8 +1028,8 @@ namespace CleanC.UI
         // ---------------------------------------------------------------- 12
         private async Task HeroStepHardwareAsync(HeroRunSession s)
         {
-            Live("در حال بررسی وضعیت مانیتور و توان سیستم...",
-                "سنجش نرخ نوسازی تصویر و پلن مصرف انرژی", 99.5);
+            Live(LocalizationService.Get("در حال بررسی وضعیت مانیتور و توان سیستم..."),
+                LocalizationService.Get("سنجش نرخ نوسازی تصویر و پلن مصرف انرژی"), 99.5);
             try
             {
                 s.Attention = await HardwareDiagnosticService.RunDiagnosticsAsync();
@@ -1049,10 +1049,10 @@ namespace CleanC.UI
             LiveCleanProgressBar.Value = 100;
             if (LiveCleanSpinner != null) LiveCleanSpinner.Visibility = Visibility.Collapsed;
             if (LiveCleanDoneIcon != null) LiveCleanDoneIcon.Visibility = Visibility.Visible;
-            LiveCleanStatusTitle.Text = "بهینه سازی خودکار سیستم با موفقیت به پایان رسید!";
-            LiveCleanPhaseSubtitle.Text = $"مجموعاً {SystemStats.FormatBytes(s.TotalFreed)} آزاد گردید.";
+            LiveCleanStatusTitle.Text = LocalizationService.Get("بهینه سازی خودکار سیستم با موفقیت به پایان رسید!");
+            LiveCleanPhaseSubtitle.Text = string.Format(LocalizationService.Get("مجموعاً {0} آزاد گردید."), SystemStats.FormatBytes(s.TotalFreed));
             _displayedFreedBytes = s.TotalFreed;
-            LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(s.TotalFreed)} آزاد شد";
+            LiveFreedCounterText.Text = string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(s.TotalFreed));
 
             await Task.Delay(500);
 
@@ -1106,68 +1106,68 @@ namespace CleanC.UI
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "ram_boost",
-                    Title = "آزادسازی حافظه رم (RAM Working Set)", IconGlyph = "\uE9D2",
+                    Title = LocalizationService.Get("آزادسازی حافظه رم (RAM Working Set)"), IconGlyph = "\uE9D2",
                     FreedBytes = s.RamFreed, WasEmpty = s.RamFreed == 0,
-                    StatusSummary = s.RamFreed > 0 ? $"+ {SystemStats.FormatBytes(s.RamFreed)} آزاد شد" : "بدون تغییر"
+                    StatusSummary = s.RamFreed > 0 ? string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(s.RamFreed)) : LocalizationService.Get("بدون تغییر")
                 });
 
             if (s.IsBoostEnabled("dnsFlush") && !HasFailure("dns_flush_fail"))
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "dns_flush",
-                    Title = "تخلیه کش DNS و نوسازی کانکشن ها", IconGlyph = "\uE774",
-                    StatusSummary = "با موفقیت نوسازی شد ✓"
+                    Title = LocalizationService.Get("تخلیه کش DNS و نوسازی کانکشن ها"), IconGlyph = "\uE774",
+                    StatusSummary = LocalizationService.Get("با موفقیت نوسازی شد ✓")
                 });
 
             if (s.ExtFreed > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "browser_opt",
-                    Title = "بهینه سازی مرورگرها و حذف افزونه های زائد", IconGlyph = "\uE774",
+                    Title = LocalizationService.Get("بهینه سازی مرورگرها و حذف افزونه های زائد"), IconGlyph = "\uE774",
                     FreedBytes = s.ExtFreed,
-                    StatusSummary = $"+ {SystemStats.FormatBytes(s.ExtFreed)} آزاد شد ✓"
+                    StatusSummary = string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(s.ExtFreed))
                 });
 
             if (s.DisabledStartups > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "startup_opt",
-                    Title = $"بهینه سازی استارتاپ ({s.DisabledStartups} برنامه غیرضروری)", IconGlyph = "\uE7B5",
-                    StatusSummary = "غیرفعال شد ✓"
+                    Title = string.Format(LocalizationService.Get("بهینه سازی استارتاپ ({0} برنامه غیرضروری)"), s.DisabledStartups), IconGlyph = "\uE7B5",
+                    StatusSummary = LocalizationService.Get("غیرفعال شد ✓")
                 });
 
             if (s.GpuCount > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "gpu_opt",
-                    Title = $"تخصیص کارت گرافیک مجزا ({s.GpuName})", IconGlyph = "\uE790",
-                    StatusSummary = $"{s.GpuCount} برنامه بهینه سازی شد ✓"
+                    Title = string.Format(LocalizationService.Get("تخصیص کارت گرافیک مجزا ({0})"), s.GpuName), IconGlyph = "\uE790",
+                    StatusSummary = string.Format(LocalizationService.Get("{0} برنامه بهینه سازی شد ✓"), s.GpuCount)
                 });
 
             if (s.BloatRemoved > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "bloat_clean",
-                    Title = $"حذف خودکار برنامه ها و بازی های تبلیغاتی ({s.BloatRemoved} برنامه)", IconGlyph = "\uE74C",
+                    Title = string.Format(LocalizationService.Get("حذف خودکار برنامه ها و بازی های تبلیغاتی ({0} برنامه)"), s.BloatRemoved), IconGlyph = "\uE74C",
                     FreedBytes = s.BloatFreed,
-                    StatusSummary = s.BloatFreed > 0 ? $"+ {SystemStats.FormatBytes(s.BloatFreed)} آزاد شد ✓" : "پاکسازی شد ✓"
+                    StatusSummary = s.BloatFreed > 0 ? string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(s.BloatFreed)) : LocalizationService.Get("پاکسازی شد ✓")
                 });
 
             if (s.BorderlineRemoved > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "borderline_clean",
-                    Title = $"پاکسازی برنامه های اختیاری تاییدشده ({s.BorderlineRemoved} برنامه)", IconGlyph = "\uE74C",
+                    Title = string.Format(LocalizationService.Get("پاکسازی برنامه های اختیاری تاییدشده ({0} برنامه)"), s.BorderlineRemoved), IconGlyph = "\uE74C",
                     FreedBytes = s.BorderlineFreed,
-                    StatusSummary = s.BorderlineFreed > 0 ? $"+ {SystemStats.FormatBytes(s.BorderlineFreed)} آزاد شد ✓" : "پاکسازی شد ✓"
+                    StatusSummary = s.BorderlineFreed > 0 ? string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(s.BorderlineFreed)) : LocalizationService.Get("پاکسازی شد ✓")
                 });
 
             if (s.WinTweaks > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "win_tweaks",
-                    Title = "توقف تله متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز", IconGlyph = "\uE770",
-                    StatusSummary = "اعمال شد ✓"
+                    Title = LocalizationService.Get("توقف تله‌متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز"), IconGlyph = "\uE770",
+                    StatusSummary = LocalizationService.Get("اعمال شد ✓")
                 });
 
             if (s.FastStartup != null) group.Items.Add(s.FastStartup);
@@ -1176,13 +1176,13 @@ namespace CleanC.UI
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "deep_clean_leftovers",
-                    Title = $"پاکسازی عمیق ({s.RegCleaned} کلید نامعتبر رجیستری + {s.LeftoverFolders} پوشه رهاشده)",
+                    Title = string.Format(LocalizationService.Get("پاکسازی عمیق ({0} کلید نامعتبر رجیستری + {1} پوشه رهاشده)"), s.RegCleaned, s.LeftoverFolders),
                     IconGlyph = "\uE74D",
                     FreedBytes = s.LeftoverFreed,
                     WasEmpty = s.RegCleaned == 0 && s.LeftoverFreed == 0,
                     StatusSummary = s.LeftoverFreed > 0
-                        ? $"+ {SystemStats.FormatBytes(s.LeftoverFreed)} آزاد شد ✓"
-                        : "کلیدهای نامعتبر پاکسازی شدند ✓"
+                        ? string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(s.LeftoverFreed))
+                        : LocalizationService.Get("کلیدهای نامعتبر پاکسازی شدند ✓")
                 });
 
             group.Items.AddRange(s.FailedSteps);
@@ -1291,7 +1291,7 @@ namespace CleanC.UI
                     var root = new StackPanel { Spacing = 6 };
                     root.Children.Add(new TextBlock
                     {
-                        Text = "این برنامه‌ها ممکن است به دردت بخورند؛ هر کدام را خواستی انتخاب کن.",
+                        Text = LocalizationService.Get("این برنامه‌ها ممکن است به دردت بخورند؛ هر کدام را خواستی انتخاب کن."),
                         TextWrapping = TextWrapping.Wrap
                     });
                     root.Children.Add(new ScrollViewer { MaxHeight = 340, Content = panel });
@@ -1299,10 +1299,10 @@ namespace CleanC.UI
                     var dialog = new ContentDialog
                     {
                         XamlRoot = Content.XamlRoot,
-                        Title = "برنامه‌های مرزی پیدا شد",
+                        Title = LocalizationService.Get("برنامه‌های مرزی پیدا شد"),
                         Content = root,
-                        PrimaryButtonText = "حذف انتخاب‌شده‌ها",
-                        CloseButtonText = "انصراف",
+                        PrimaryButtonText = LocalizationService.Get("حذف انتخاب‌شده‌ها"),
+                        CloseButtonText = LocalizationService.Get("انصراف"),
                         DefaultButton = ContentDialogButton.Close
                     };
 
@@ -1336,12 +1336,12 @@ namespace CleanC.UI
 
                 root.Children.Add(new TextBlock
                 {
-                    Text = $"خلق و خو: {Str(d, "mood")} · {Int(d, "days")} روز حضور",
+                    Text = string.Format(LocalizationService.Get("خلق و خو: {0} · {1} روز حضور"), Str(d, "mood"), Int(d, "days")),
                     TextWrapping = TextWrapping.Wrap
                 });
                 root.Children.Add(new TextBlock
                 {
-                    Text = $"{Int(d, "found")} از {Int(d, "total")} کشف شده · {Int(d, "weekRuns")} اجرا در هفته",
+                    Text = string.Format(LocalizationService.Get("{0} از {1} کشف شده · {2} اجرا در هفته"), Int(d, "found"), Int(d, "total"), Int(d, "weekRuns")),
                     Opacity = 0.75,
                     TextWrapping = TextWrapping.Wrap
                 });
@@ -1381,9 +1381,9 @@ namespace CleanC.UI
                 var dialog = new ContentDialog
                 {
                     XamlRoot = Content.XamlRoot,
-                    Title = "دفترچه کشفیات",
+                    Title = LocalizationService.Get("دفترچه کشفیات"),
                     Content = new ScrollViewer { MaxHeight = 420, Content = root },
-                    CloseButtonText = "بستن",
+                    CloseButtonText = LocalizationService.Get("بستن"),
                     DefaultButton = ContentDialogButton.Close
                 };
                 await dialog.ShowAsync();
@@ -1429,7 +1429,7 @@ namespace CleanC.UI
                         await Task.Run(NetworkProxyDiagnosticService.FixGhostProxy);
                         _heroProxyDead = false;
                         _heroProxyAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(10);
-                        ShowInfoBar("اصلاح اتصال اینترنت", "پراکسی نامعتبر ویندوز خاموش شد و تنظیمات شبکه نوسازی گردید.", InfoBarSeverity.Success);
+                        ShowInfoBar(LocalizationService.Get("اصلاح اتصال اینترنت"), LocalizationService.Get("پراکسی نامعتبر ویندوز خاموش شد و تنظیمات شبکه نوسازی گردید."), InfoBarSeverity.Success);
                         break;
                     case "ram":
                     {
@@ -1439,11 +1439,11 @@ namespace CleanC.UI
                         int ramHelpers = await Task.Run(ProcessManagerService.CleanBackgroundHelpers);
                         _heroRamAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(5);
                         string ramMsg = ramHelpers > 0
-                            ? $"حافظه رم بهینه شد ({SystemStats.FormatBytes(boost.FreedBytes)} آزاد شد) و {ramHelpers} روندهای پس‌زمینه بسته شدند."
+                            ? string.Format(LocalizationService.Get("حافظه رم بهینه شد ({0} آزاد شد) و {1} روندهای پس‌زمینه بسته شدند."), SystemStats.FormatBytes(boost.FreedBytes), ramHelpers)
                             : boost.FreedBytes > 0
-                                ? $"حافظه رم با موفقیت بهینه‌سازی شد ({SystemStats.FormatBytes(boost.FreedBytes)} آزاد شد)."
-                                : "حافظه رم بررسی و تمام کش‌های غیرضروری تخلیه شدند.";
-                        ShowInfoBar("آزادسازی رم", ramMsg, InfoBarSeverity.Success);
+                                ? string.Format(LocalizationService.Get("حافظه رم با موفقیت بهینه‌سازی شد ({0} آزاد شد)."), SystemStats.FormatBytes(boost.FreedBytes))
+                                : LocalizationService.Get("حافظه رم بررسی و تمام کش‌های غیرضروری تخلیه شدند.");
+                        ShowInfoBar(LocalizationService.Get("آزادسازی رم"), ramMsg, InfoBarSeverity.Success);
                         break;
                     }
                     case "browser":
@@ -1476,9 +1476,9 @@ namespace CleanC.UI
                         SaveCumulativeFreedStats();
                         long freedMb = Math.Max(0, (beforeBytes - afterBytes) / (1024 * 1024));
                         string bMsg = freedMb > 0
-                            ? $"پردازه‌ها و تب‌های پس‌زمینهٔ مرورگر با موفقیت سبک شدند ({freedMb} مگابایت رم آزاد شد)."
-                            : "پردازه‌ها و وظایف پس‌زمینهٔ مرورگر با موفقیت بهینه‌سازی شدند.";
-                        ShowInfoBar("سبک‌سازی مرورگر", bMsg, InfoBarSeverity.Success);
+                            ? string.Format(LocalizationService.Get("پردازه‌ها و تب‌های پس‌زمینهٔ مرورگر با موفقیت سبک شدند ({0} مگابایت رم آزاد شد)."), freedMb)
+                            : LocalizationService.Get("پردازه‌ها و وظایف پس‌زمینهٔ مرورگر با موفقیت بهینه‌سازی شدند.");
+                        ShowInfoBar(LocalizationService.Get("سبک‌سازی مرورگر"), bMsg, InfoBarSeverity.Success);
                         break;
                     }
                     case "cpu":
@@ -1489,13 +1489,13 @@ namespace CleanC.UI
                         var (lowered, topName) = await Task.Run(() => ProcessManagerService.EaseHighCpuProcesses());
                         _heroTopCpu = "";
                         _heroCpuAlertSuppressedUntil = DateTime.UtcNow.AddMinutes(5);
-                        string top = string.IsNullOrEmpty(topName) ? "" : $" پرمصرف‌ترین: {topName}.";
+                        string top = string.IsNullOrEmpty(topName) ? "" : string.Format(LocalizationService.Get(" پرمصرف‌ترین: {0}."), topName);
                         string cpuMsg = lowered > 0
-                            ? $"{lowered} پردازهٔ سنگین به اولویت پایین منتقل و {helpers} روندهای پس‌زمینه بسته شد.{top}"
+                            ? string.Format(LocalizationService.Get("{0} پردازهٔ سنگین به اولویت پایین منتقل و {1} روندهای پس‌زمینه بسته شد.{2}"), lowered, helpers, top)
                             : helpers > 0
-                                ? $"{helpers} روندهای پس‌زمینه بسته شد و پردازنده پایش شد.{top}"
-                                : $"پردازنده پایش شد؛ پردازهٔ قابل مداخله‌ای پیدا نشد.{top}";
-                        ShowInfoBar("مدیریت پردازش‌ها", cpuMsg, InfoBarSeverity.Success);
+                                ? string.Format(LocalizationService.Get("{0} روندهای پس‌زمینه بسته شد و پردازنده پایش شد.{1}"), helpers, top)
+                                : string.Format(LocalizationService.Get("پردازنده پایش شد؛ پردازهٔ قابل مداخله‌ای پیدا نشد.{0}"), top);
+                        ShowInfoBar(LocalizationService.Get("مدیریت پردازش‌ها"), cpuMsg, InfoBarSeverity.Success);
                         break;
                     }
                 }

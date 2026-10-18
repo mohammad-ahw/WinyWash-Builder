@@ -74,62 +74,62 @@ namespace CleanC.Core.Services
         // Borderline apps that should NEVER be deleted automatically without user prompt
         private static readonly Dictionary<string, (string Name, string Desc)> BorderlineSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "Microsoft.Paint", ("Microsoft Paint", "نرم افزار نقاشی پیش فرض ویندوز") },
-            { "Microsoft.XboxApp", ("Xbox App", "برنامه اصلی ایکس باکس و بازی های ویندوز") },
-            { "Microsoft.XboxGamingOverlay", ("Xbox Game Bar", "نوار ابزار و ضبط ویدیوی بازی") },
-            { "Microsoft.XboxGameOverlay", ("Xbox Game Overlay", "پوشش درون بازی ایکس باکس") },
-            { "Microsoft.XboxIdentityProvider", ("Xbox Identity Provider", "سرویس ورود به اکانت مایکروسافت در بازی ها") },
-            { "Microsoft.XboxSpeechToTextOverlay", ("Xbox Speech To Text", "ابزار تبدیل گفتار به نوشتار ایکس باکس") },
-            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام سازی گوشی با ویندوز") },
-            { "Microsoft.PowerAutomateDesktop", ("Power Automate Desktop", "ابزار اتوماسیون کارهای تکراری مایکروسافت (RPA) — اگر استفاده نمی کنید لازم نیست") }
+            { "Microsoft.Paint", ("Microsoft Paint", LocalizationService.Get("نرم افزار نقاشی پیش فرض ویندوز")) },
+            { "Microsoft.XboxApp", ("Xbox App", LocalizationService.Get("برنامه اصلی ایکس باکس و بازی های ویندوز")) },
+            { "Microsoft.XboxGamingOverlay", ("Xbox Game Bar", LocalizationService.Get("نوار ابزار و ضبط ویدیوی بازی")) },
+            { "Microsoft.XboxGameOverlay", ("Xbox Game Overlay", LocalizationService.Get("پوشش درون بازی ایکس باکس")) },
+            { "Microsoft.XboxIdentityProvider", ("Xbox Identity Provider", LocalizationService.Get("سرویس ورود به اکانت مایکروسافت در بازی ها")) },
+            { "Microsoft.XboxSpeechToTextOverlay", ("Xbox Speech To Text", LocalizationService.Get("ابزار تبدیل گفتار به نوشتار ایکس باکس")) },
+            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", LocalizationService.Get("برنامه اتصال و همگام سازی گوشی با ویندوز")) },
+            { "Microsoft.PowerAutomateDesktop", ("Power Automate Desktop", LocalizationService.Get("ابزار اتوماسیون کارهای تکراری مایکروسافت (RPA) — اگر استفاده نمی کنید لازم نیست")) }
         };
 
         // کلاسیک هایی که تقریباً همیشه بدون استفاده اند (اکوسیستم قدیمی Apple، VPN بی استفاده، JDK منسوخ).
         // فقط در «بازبینی دستی» نمایش داده می شوند — هرگز تیک پیش فرض نمی خورند.
         private static readonly Dictionary<string, (string Name, string Desc)> KnownUnusedSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "Apple Mobile Device Support", ("Apple Mobile Device Support", "برای همگام سازی آیفون با iTunes قدیمی — اگر آیفون وصل نمی کنید لازم نیست") },
-            { "Bonjour", ("Bonjour", "سرویس کشف شبکه ی اپل — فقط برای iTunes و چاپگرهای اپل لازم است") },
-            { "X-VPN", ("X-VPN", "کلاینت VPN بدون استفاده") },
-            { "Java SE Development Kit 8", ("Java SE Development Kit 8", "نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست") },
-            { "PC Health Check", ("Windows PC Health Check", "ابزار منسوخ بررسی سلامت ویندوز — مایکروسافت بازنشسته اش کرده؛ جایگزین: PC Manager") },
-            { "Universal Adb Driver", ("Universal Adb Driver", "درایور ADB قدیمی و عمومی — برای گوشی های جدید، درایور رسمی گوگل یا سازنده بهتر است") }
+            { "Apple Mobile Device Support", ("Apple Mobile Device Support", LocalizationService.Get("برای همگام سازی آیفون با iTunes قدیمی — اگر آیفون وصل نمی کنید لازم نیست")) },
+            { "Bonjour", ("Bonjour", LocalizationService.Get("سرویس کشف شبکه ی اپل — فقط برای iTunes و چاپگرهای اپل لازم است")) },
+            { "X-VPN", ("X-VPN", LocalizationService.Get("کلاینت VPN بدون استفاده")) },
+            { "Java SE Development Kit 8", ("Java SE Development Kit 8", LocalizationService.Get("نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست")) },
+            { "PC Health Check", ("Windows PC Health Check", LocalizationService.Get("ابزار منسوخ بررسی سلامت ویندوز — مایکروسافت بازنشسته اش کرده؛ جایگزین: PC Manager")) },
+            { "Universal Adb Driver", ("Universal Adb Driver", LocalizationService.Get("درایور ADB قدیمی و عمومی — برای گوشی های جدید، درایور رسمی گوگل یا سازنده بهتر است")) }
         };
 
         // Known promotional pre-installed packages
         private static readonly Dictionary<string, (string Name, string Desc)> PromoBloatwareSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "king.com.CandyCrushSaga", ("Candy Crush Saga", "بازی تبلیغاتی پیش فرض ویندوز") },
-            { "king.com.CandyCrushSodaSaga", ("Candy Crush Soda", "بازی تبلیغاتی پیش فرض ویندوز") },
-            { "ByteDance.TikTok", ("TikTok", "برنامه تبلیغاتی تیک تاک") },
-            { "Disney", ("Disney+", "برنامه اشتراک دیزنی پلاس") },
-            { "Facebook", ("Facebook", "برنامه فیس بوک") },
-            { "Instagram", ("Instagram", "برنامه اینستاگرام") },
-            { "AmazonVideo.PrimeVideo", ("Amazon Prime Video", "برنامه تبلیغاتی آمازون پرایم") },
-            { "Netflix", ("Netflix", "برنامه پخش فیلم نتفلیکس") },
-            { "SpotifyAB.SpotifyMusic", ("Spotify (پیش فرض)", "نسخه استور از پیش نصب شده اسپاتیفای") },
-            { "A949DE3C.MarchofEmpires", ("March of Empires", "بازی تبلیغاتی پیش فرض") },
-            { "A949DE3C.HiddenCityMysteryofShadows", ("Hidden City", "بازی تبلیغاتی پیش فرض") },
-            { "flaregamesGmbH.RoyalRevolt2", ("Royal Revolt 2", "بازی تبلیغاتی پیش فرض") },
-            { "9E2F88E3.TWITTER", ("Twitter (منسوخ)", "اپ قدیمی توییتر از پیش نصب شده — سرویس آن سال ها پیش تعطیل شده است") }
+            { "king.com.CandyCrushSaga", ("Candy Crush Saga", LocalizationService.Get("بازی تبلیغاتی پیش فرض ویندوز")) },
+            { "king.com.CandyCrushSodaSaga", ("Candy Crush Soda", LocalizationService.Get("بازی تبلیغاتی پیش فرض ویندوز")) },
+            { "ByteDance.TikTok", ("TikTok", LocalizationService.Get("برنامه تبلیغاتی تیک تاک")) },
+            { "Disney", ("Disney+", LocalizationService.Get("برنامه اشتراک دیزنی پلاس")) },
+            { "Facebook", ("Facebook", LocalizationService.Get("برنامه فیس بوک")) },
+            { "Instagram", ("Instagram", LocalizationService.Get("برنامه اینستاگرام")) },
+            { "AmazonVideo.PrimeVideo", ("Amazon Prime Video", LocalizationService.Get("برنامه تبلیغاتی آمازون پرایم")) },
+            { "Netflix", ("Netflix", LocalizationService.Get("برنامه پخش فیلم نتفلیکس")) },
+            { "SpotifyAB.SpotifyMusic", ("Spotify (پیش فرض)", LocalizationService.Get("نسخه استور از پیش نصب شده اسپاتیفای")) },
+            { "A949DE3C.MarchofEmpires", ("March of Empires", LocalizationService.Get("بازی تبلیغاتی پیش فرض")) },
+            { "A949DE3C.HiddenCityMysteryofShadows", ("Hidden City", LocalizationService.Get("بازی تبلیغاتی پیش فرض")) },
+            { "flaregamesGmbH.RoyalRevolt2", ("Royal Revolt 2", LocalizationService.Get("بازی تبلیغاتی پیش فرض")) },
+            { "9E2F88E3.TWITTER", ("Twitter (منسوخ)", LocalizationService.Get("اپ قدیمی توییتر از پیش نصب شده — سرویس آن سال ها پیش تعطیل شده است")) }
         };
 
         // Non-essential Windows components that can be safely removed
         private static readonly Dictionary<string, (string Name, string Desc)> WindowsBloatwareSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "Microsoft.549981C3F5F10", ("Cortana (کورتانا)", "دستیار صوتی قدیمی و غیرفعال مایکروسافت") },
-            { "Microsoft.BingNews", ("Microsoft News (اخبار)", "فید اخبار و مقالات مایکروسافت") },
-            { "Microsoft.BingWeather", ("Weather (آب و هوا)", "برنامه هواشناسی پیش فرض ویندوز") },
-            { "Microsoft.Getstarted", ("Tips (نکات ویندوز)", "برنامه راهنما و پیشنهادات ویندوز") },
-            { "Microsoft.GetHelp", ("Get Help (راهنمایی)", "ابزار پشتیبانی و راهنمایی مایکروسافت") },
-            { "Clipchamp.Clipchamp", ("Clipchamp (ویرایشگر ویدیو)", "ویرایشگر ویدیوی پیش فرض مایکروسافت") },
-            { "Microsoft.MicrosoftSolitaireCollection", ("Solitaire Collection", "بازی های ورق پیش فرض ویندوز") },
-            { "Microsoft.WindowsFeedbackHub", ("Feedback Hub", "مرکز ارسال بازخورد و باگ به مایکروسافت") },
-            { "Microsoft.MixedReality.Portal", ("Mixed Reality Portal", "پورتال واقعیت ترکیبی ویندوز") },
-            { "Microsoft.Microsoft3DViewer", ("3D Viewer", "نمایشگر فایل های سه بعدی ویندوز") },
-            { "Microsoft.People", ("People (مخاطبین)", "برنامه مخاطبین قدیمی ویندوز") },
-            { "Microsoft.BingSports", ("MSN Sports (ورزش)", "برنامه اخبار ورزشی مایکروسافت") },
-            { "Microsoft.BingFinance", ("MSN Money (اقتصاد)", "برنامه اخبار مالی مایکروسافت") }
+            { "Microsoft.549981C3F5F10", ("Cortana (کورتانا)", LocalizationService.Get("دستیار صوتی قدیمی و غیرفعال مایکروسافت")) },
+            { "Microsoft.BingNews", ("Microsoft News (اخبار)", LocalizationService.Get("فید اخبار و مقالات مایکروسافت")) },
+            { "Microsoft.BingWeather", ("Weather (آب و هوا)", LocalizationService.Get("برنامه هواشناسی پیش فرض ویندوز")) },
+            { "Microsoft.Getstarted", ("Tips (نکات ویندوز)", LocalizationService.Get("برنامه راهنما و پیشنهادات ویندوز")) },
+            { "Microsoft.GetHelp", ("Get Help (راهنمایی)", LocalizationService.Get("ابزار پشتیبانی و راهنمایی مایکروسافت")) },
+            { "Clipchamp.Clipchamp", ("Clipchamp (ویرایشگر ویدیو)", LocalizationService.Get("ویرایشگر ویدیوی پیش فرض مایکروسافت")) },
+            { "Microsoft.MicrosoftSolitaireCollection", ("Solitaire Collection", LocalizationService.Get("بازی های ورق پیش فرض ویندوز")) },
+            { "Microsoft.WindowsFeedbackHub", ("Feedback Hub", LocalizationService.Get("مرکز ارسال بازخورد و باگ به مایکروسافت")) },
+            { "Microsoft.MixedReality.Portal", ("Mixed Reality Portal", LocalizationService.Get("پورتال واقعیت ترکیبی ویندوز")) },
+            { "Microsoft.Microsoft3DViewer", ("3D Viewer", LocalizationService.Get("نمایشگر فایل های سه بعدی ویندوز")) },
+            { "Microsoft.People", ("People (مخاطبین)", LocalizationService.Get("برنامه مخاطبین قدیمی ویندوز")) },
+            { "Microsoft.BingSports", ("MSN Sports (ورزش)", LocalizationService.Get("برنامه اخبار ورزشی مایکروسافت")) },
+            { "Microsoft.BingFinance", ("MSN Money (اقتصاد)", LocalizationService.Get("برنامه اخبار مالی مایکروسافت")) }
         };
 
         // OEM Trials signatures
@@ -199,7 +199,7 @@ namespace CleanC.Core.Services
                             SizeBytes = size,
                             SizeIsEstimate = sizeIsEstimate,
                             CategoryType = AppCategoryType.Bloatware,
-                            CategoryLabel = "تبلیغاتی / پیش فرض",
+                            CategoryLabel = LocalizationService.Get("تبلیغاتی / پیش فرض"),
                             Description = kvp.Value.Desc,
                             IsPackagedApp = true,
                             IsSelected = true
@@ -222,7 +222,7 @@ namespace CleanC.Core.Services
                             SizeBytes = size,
                             SizeIsEstimate = sizeIsEstimate,
                             CategoryType = AppCategoryType.Bloatware,
-                            CategoryLabel = "ویندوز (غیرضروری)",
+                            CategoryLabel = LocalizationService.Get("ویندوز (غیرضروری)"),
                             Description = kvp.Value.Desc,
                             IsPackagedApp = true,
                             IsSelected = true
@@ -327,8 +327,8 @@ namespace CleanC.Core.Services
                                 SizeBytes = 250 * 1024 * 1024,
                                 SizeIsEstimate = true,
                                 CategoryType = AppCategoryType.OemTrial,
-                                CategoryLabel = "نرم افزار لپ تاپ / تریال",
-                                Description = "نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم",
+                                CategoryLabel = LocalizationService.Get("نرم افزار لپ تاپ / تریال"),
+                                Description = LocalizationService.Get("نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم"),
                                 IsPackagedApp = false,
                                 IsSelected = true
                             });
@@ -349,7 +349,7 @@ namespace CleanC.Core.Services
                         if (sizeBytes > 500 * 1024 * 1024) // > 500 MB
                         {
                             bool isUnused = false;
-                            string desc = "برنامه حجیم";
+                            string desc = LocalizationService.Get("برنامه حجیم");
 
                             // Match executables in userAssistMap
                             var matchingRuns = userAssistMap.Where(kvp => displayName.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase) ||
@@ -361,7 +361,7 @@ namespace CleanC.Core.Services
                                 if (lastRun < DateTime.Now.AddDays(-30))
                                 {
                                     isUnused = true;
-                                    desc = $"بیش از ۳۰ روز است اجرا نشده (آخرین اجرا: {lastRun:yyyy.MM.dd})";
+                                    desc = string.Format(LocalizationService.Get("بیش از ۳۰ روز است اجرا نشده (آخرین اجرا: {0:yyyy.MM.dd})"), lastRun);
                                 }
                             }
                             else
@@ -375,7 +375,7 @@ namespace CleanC.Core.Services
                                         if (iDate < DateTime.Now.AddDays(-30))
                                         {
                                             isUnused = true;
-                                            desc = $"نصب شده در تاریخ {iDate:yyyy.MM.dd} ولی ثبت استفاده ای از آن نشده است";
+                                            desc = string.Format(LocalizationService.Get("نصب شده در تاریخ {0:yyyy.MM.dd} ولی ثبت استفاده ای از آن نشده است"), iDate);
                                         }
                                     }
                                 }
@@ -390,7 +390,7 @@ namespace CleanC.Core.Services
                                     UninstallString = uninstallString ?? string.Empty,
                                     SizeBytes = sizeBytes,
                                     CategoryType = AppCategoryType.LargeUnused,
-                                    CategoryLabel = "حجیم و کم استفاده",
+                                    CategoryLabel = LocalizationService.Get("حجیم و کم استفاده"),
                                     Description = desc,
                                     IsPackagedApp = false,
                                     IsSelected = false // Unused apps are unchecked by default for extra safety!
@@ -454,7 +454,7 @@ namespace CleanC.Core.Services
                                             SizeBytes = size,
                                             SizeIsEstimate = sizeIsEstimate,
                                             CategoryType = AppCategoryType.BorderlineOptional,
-                                            CategoryLabel = "اختیاری / در صورت عدم نیاز",
+                                            CategoryLabel = LocalizationService.Get("اختیاری / در صورت عدم نیاز"),
                                             Description = kvp.Value.Desc,
                                             IsPackagedApp = true,
                                             IsSelected = false // Unchecked by default for safety
@@ -527,7 +527,7 @@ namespace CleanC.Core.Services
                                         SizeBytes = sizeBytes,
                                         SizeIsEstimate = false,
                                         CategoryType = AppCategoryType.BorderlineOptional,
-                                        CategoryLabel = "اختیاری / در صورت عدم نیاز",
+                                        CategoryLabel = LocalizationService.Get("اختیاری / در صورت عدم نیاز"),
                                         Description = kvp.Value.Desc,
                                         IsPackagedApp = false,
                                         IsSelected = false // فقط بازبینی دستی
@@ -593,7 +593,7 @@ namespace CleanC.Core.Services
                 if (result.ExtendedErrorCode != null)
                 {
                     CcLog.Report("Bloatware.Appx", new InvalidOperationException(
-                        $"حذف {packageFullName} ناموفق بود: {result.ExtendedErrorCode.Message}"));
+                        string.Format(LocalizationService.Get("حذف {0} ناموفق بود: {1}"), packageFullName, result.ExtendedErrorCode.Message)));
                     return false;
                 }
 

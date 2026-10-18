@@ -24,11 +24,11 @@ namespace CleanC.Core.Services
                     return "ultimate";
                 if (ActiveSchemeGuid.Equals("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", StringComparison.OrdinalIgnoreCase) ||
                     ActiveSchemeName.Contains("High", StringComparison.OrdinalIgnoreCase) ||
-                    ActiveSchemeName.Contains("حداکثر کارایی", StringComparison.OrdinalIgnoreCase))
+                    ActiveSchemeName.Contains("حداکثر کارایی", StringComparison.OrdinalIgnoreCase)) // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
                     return "high";
                 if (ActiveSchemeGuid.Equals("a1841308-3541-4fab-bc81-f71556f20b4a", StringComparison.OrdinalIgnoreCase) ||
                     ActiveSchemeName.Contains("Saver", StringComparison.OrdinalIgnoreCase) ||
-                    ActiveSchemeName.Contains("ذخیره انرژی", StringComparison.OrdinalIgnoreCase))
+                    ActiveSchemeName.Contains("ذخیره انرژی", StringComparison.OrdinalIgnoreCase)) // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
                     return "saver";
                 return "balanced";
             }
@@ -97,7 +97,7 @@ namespace CleanC.Core.Services
 
                 if (name.Contains("High performance", StringComparison.OrdinalIgnoreCase) ||
                     name.Contains("Ultimate Performance", StringComparison.OrdinalIgnoreCase) ||
-                    name.Contains("حداکثر کارایی", StringComparison.OrdinalIgnoreCase) ||
+                    name.Contains("حداکثر کارایی", StringComparison.OrdinalIgnoreCase) || // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
                     guid.Equals("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c", StringComparison.OrdinalIgnoreCase) ||
                     guid.Equals("e9a42b02-d5df-448d-aa00-03f14749eb61", StringComparison.OrdinalIgnoreCase))
                 {
@@ -178,15 +178,15 @@ namespace CleanC.Core.Services
                 // If currently connected to AC power and not already in High/Ultimate performance
                 if (status.IsOnAcPower && !status.IsHighPerformanceOrUltimate)
                 {
-                    string deviceType = status.IsLaptop ? "لپ تاپ شما به شارژر متصل است" : "سیستم دسکتاپ شما با برق مستقیم کار می کند";
+                    string deviceType = status.IsLaptop ? LocalizationService.Get("لپ تاپ شما به شارژر متصل است") : LocalizationService.Get("سیستم دسکتاپ شما با برق مستقیم کار می کند");
 
                     return new AttentionDecisionItem
                     {
                         Id = "power_plan",
-                        Title = "فعال سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)",
-                        Description = $"{deviceType}. برای حذف تأخیر کلاک پردازنده و پایدار ماندن حداکثر توان پردازشی، پلن High Performance فعال شود؟",
-                        Category = "انرژی و پردازنده",
-                        ActionText = "فعال سازی High Performance",
+                        Title = LocalizationService.Get("فعال سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)"),
+                        Description = string.Format(LocalizationService.Get("{0}. برای حذف تأخیر کلاک پردازنده و پایدار ماندن حداکثر توان پردازشی، پلن High Performance فعال شود؟"), deviceType),
+                        Category = LocalizationService.Get("انرژی و پردازنده"),
+                        ActionText = LocalizationService.Get("فعال سازی High Performance"),
                         IconGlyph = "\uE945"
                     };
                 }

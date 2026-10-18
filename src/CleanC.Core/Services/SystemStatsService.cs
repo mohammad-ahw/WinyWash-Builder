@@ -16,7 +16,7 @@ namespace CleanC.Core.Services
 
         private static string _cachedDiskModel = string.Empty;
         private static string _cachedDiskType = "SSD";
-        private static string _cachedDiskHealth = "سالم (Healthy)";
+        private static string _cachedDiskHealth = LocalizationService.Get("سالم (Healthy)");
         private static string _cachedGpuSummary = string.Empty;
         private static bool _hardwareInitialized = false;
 
@@ -78,7 +78,7 @@ namespace CleanC.Core.Services
             }
 
             // 4. Hardware Details (Non-blocking background cache)
-            stats.DiskModel = string.IsNullOrEmpty(_cachedDiskModel) ? "درایو محلی ویندوز" : _cachedDiskModel;
+            stats.DiskModel = string.IsNullOrEmpty(_cachedDiskModel) ? LocalizationService.Get("درایو محلی ویندوز") : _cachedDiskModel;
             stats.DiskType = _cachedDiskType;
             stats.DiskHealth = _cachedDiskHealth;
             stats.GpuSummary = _cachedGpuSummary;
@@ -88,8 +88,8 @@ namespace CleanC.Core.Services
             {
                 var pStatus = PowerPlanService.GetPowerStatus();
                 stats.PowerSummary = pStatus.IsOnAcPower
-                    ? (pStatus.IsLaptop ? "متصل به شارژر" : "متصل به برق")
-                    : $"{pStatus.BatteryPercent}% باتری";
+                    ? (pStatus.IsLaptop ? LocalizationService.Get("متصل به شارژر") : LocalizationService.Get("متصل به برق"))
+                    : string.Format(LocalizationService.Get("{0}% باتری"), pStatus.BatteryPercent);
             }
             catch (Exception __ex)
             {
@@ -123,14 +123,14 @@ namespace CleanC.Core.Services
                     string mType = mediaType == 4 ? "SSD" : (mediaType == 3 ? "HDD" : "Drive");
                     _cachedDiskType = $"{bType} {mType}".Trim();
 
-                    _cachedDiskHealth = health == 0 ? "سالم (Healthy)" : (health == 1 ? "هشدار (Warning)" : "نیازمند بررسی");
+                    _cachedDiskHealth = health == 0 ? LocalizationService.Get("سالم (Healthy)") : (health == 1 ? LocalizationService.Get("هشدار (Warning)") : LocalizationService.Get("نیازمند بررسی"));
                     break;
                 }
             }
             catch
             {
                 _cachedDiskType = "SSD";
-                _cachedDiskHealth = "سالم (Healthy)";
+                _cachedDiskHealth = LocalizationService.Get("سالم (Healthy)");
             }
 
             try

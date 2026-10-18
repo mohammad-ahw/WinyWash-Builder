@@ -194,9 +194,9 @@ namespace CleanC.Core.Services
             item.ImpactScore = Math.Clamp(score, 1, 100);
             item.ImpactLabel = item.ImpactScore switch
             {
-                >= 65 => "زیاد",
-                >= 35 => "متوسط",
-                _ => "کم"
+                >= 65 => LocalizationService.Get("زیاد"),
+                >= 35 => LocalizationService.Get("متوسط"),
+                _ => LocalizationService.Get("کم")
             };
         }
 
@@ -210,12 +210,12 @@ namespace CleanC.Core.Services
             if (string.IsNullOrWhiteSpace(category)) return 40;
 
             string c = category;
-            if (c.Contains("ضروری", StringComparison.Ordinal)) return 85;           // سخت افزار و سیستم
-            if (c.Contains("گیمینگ", StringComparison.Ordinal)) return 75;          // لانچر بازی
-            if (c.Contains("پیام رسان", StringComparison.Ordinal)) return 60;
-            if (c.Contains("دانلود", StringComparison.Ordinal) || c.Contains("ابری", StringComparison.Ordinal)) return 50;
+            if (c.Contains("ضروری", StringComparison.Ordinal)) return 85;           // سخت افزار و سیستم // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
+            if (c.Contains("گیمینگ", StringComparison.Ordinal)) return 75;          // لانچر بازی // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
+            if (c.Contains("پیام رسان", StringComparison.Ordinal)) return 60; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
+            if (c.Contains("دانلود", StringComparison.Ordinal) || c.Contains("ابری", StringComparison.Ordinal)) return 50; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
             if (c.Contains("VPN", StringComparison.OrdinalIgnoreCase)) return 15;
-            if (c.Contains("آپدیتر", StringComparison.Ordinal)) return 25;
+            if (c.Contains("آپدیتر", StringComparison.Ordinal)) return 25; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
             if (c.Contains("MSIX", StringComparison.OrdinalIgnoreCase)) return 30;
             return 40; // برنامه کاربردی (اختیاری)
         }

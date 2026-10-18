@@ -4,6 +4,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Media;
 using Windows.UI;
 using CleanC.Core.Models;
+using CleanC.Core.Services;
 
 namespace CleanC.UI.ViewModels
 {
@@ -15,7 +16,7 @@ namespace CleanC.UI.ViewModels
         {
             Category = category;
             _isChecked = category.IsChecked;
-            _statusText = "در صف بهینه سازی";
+            _statusText = LocalizationService.Get("در صف بهینه سازی");
         }
 
         public string Id => Category.Id;

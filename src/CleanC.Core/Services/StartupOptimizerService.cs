@@ -27,7 +27,7 @@ namespace CleanC.Core.Services
         public bool IsNonEssential { get; set; }
         public bool IsDisabled { get; set; }
         public bool IsVpnOrProxy { get; set; }
-        public string Category { get; set; } = "برنامه کاربردی (اختیاری)";
+        public string Category { get; set; } = LocalizationService.Get("برنامه کاربردی (اختیاری)");
 
         // ====================================================================
         // منابعی که قبلاً اصلاً دیده نمی شدند
@@ -248,7 +248,7 @@ namespace CleanC.Core.Services
                 foreach (var item in items)
                 {
                     // Never silently disable VPNs or Chat apps during Quick Boost!
-                    if (item.IsVpnOrProxy || item.Category.Contains("پیام رسان")) continue;
+                    if (item.IsVpnOrProxy || item.Category.Contains("پیام رسان")) continue; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
                     // RunOnce / تسک های زمان بندی شده / StartupTaskهای MSIX عمداً
                     // وارد بهینه سازی خودکار نمی شوند؛ غیرفعال کردنشان باید دستی و آگاهانه باشد
@@ -828,7 +828,7 @@ namespace CleanC.Core.Services
                                 IsNonEssential = true,
                                 IsDisabled = (startType != 2),
                                 IsVpnOrProxy = true,
-                                Category = "فیلترشکن و پروکسی (VPN)"
+                                Category = "فیلترشکن و پروکسی (VPN)" // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
                             });
                         }
                     }
@@ -846,30 +846,30 @@ namespace CleanC.Core.Services
 
         public static string ResolveStartupCategory(string name, string cmd, bool isProtected)
         {
-            if (isProtected) return "سخت افزار و سیستم (ضروری)";
+            if (isProtected) return "سخت افزار و سیستم (ضروری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
             string lower = $"{name} {cmd}".ToLowerInvariant();
 
             if (IsVpnApp(name, cmd))
-                return "فیلترشکن و پروکسی (VPN)";
+                return "فیلترشکن و پروکسی (VPN)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
             if (lower.Contains("telegram") || lower.Contains("discord") || lower.Contains("whatsapp") ||
                 lower.Contains("skype") || lower.Contains("slack") || lower.Contains("teams") || lower.Contains("viber"))
-                return "پیام رسان و چت (اختیاری)";
+                return "پیام رسان و چت (اختیاری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
             if (lower.Contains("idm") || lower.Contains("idman") || lower.Contains("download") ||
                 lower.Contains("torrent") || lower.Contains("utorrent") || lower.Contains("qbittorrent") ||
                 lower.Contains("onedrive") || lower.Contains("dropbox") || lower.Contains("mega"))
-                return "دانلود و ابزار ابری (اختیاری)";
+                return "دانلود و ابزار ابری (اختیاری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
             if (lower.Contains("steam") || lower.Contains("epic") || lower.Contains("riot") ||
                 lower.Contains("origin") || lower.Contains("battle.net") || lower.Contains("uplay") || lower.Contains("galaxy"))
-                return "لانچر بازی و گیمینگ (اختیاری)";
+                return "لانچر بازی و گیمینگ (اختیاری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
             if (lower.Contains("update") || lower.Contains("updater") || lower.Contains("helper") || lower.Contains("jusched"))
-                return "آپدیتر پس زمینه (غیرضروری)";
+                return "آپدیتر پس زمینه (غیرضروری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
-            return "برنامه کاربردی (اختیاری)";
+            return LocalizationService.Get("برنامه کاربردی (اختیاری)");
         }
 
         public static bool IsVpnApp(string name, string cmd)

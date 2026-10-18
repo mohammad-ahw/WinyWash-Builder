@@ -25,12 +25,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 1: Recommended items (موارد پیشنهادی)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی فایل های موقت و موارد توصیه شده...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال ارزیابی فایل های موقت و موارد توصیه شده..."));
                 var grpRec = new JunkGroup
                 {
                     Id = "recommended",
-                    Title = "موارد پیشنهادی (Recommended items)",
-                    Description = "فایل های زائد و موقتی که پاکسازی آنها ۱۰۰٪ ایمن است",
+                    Title = LocalizationService.Get("موارد پیشنهادی (Recommended items)"),
+                    Description = LocalizationService.Get("فایل های زائد و موقتی که پاکسازی آنها ۱۰۰٪ ایمن است"),
                     IconGlyph = "\uE8B7"
                 };
 
@@ -41,8 +41,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "tempFiles",
                     GroupId = "recommended",
-                    Title = "فایل های موقت سیستم و کاربر",
-                    Description = "فایل های موقت، کش برنامه ها و پردازه ها در مسیرهای Temp",
+                    Title = LocalizationService.Get("فایل های موقت سیستم و کاربر"),
+                    Description = LocalizationService.Get("فایل های موقت، کش برنامه ها و پردازه ها در مسیرهای Temp"),
                     Path = tempDir,
                     TargetPaths = tempPaths,
                     Bytes = tempBytes,
@@ -55,8 +55,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "recycleBin",
                     GroupId = "recommended",
-                    Title = "سطل بازیافت (Recycle Bin)",
-                    Description = "فایل های حذف شده موجود در سطل بازیافت تمام درایوها",
+                    Title = LocalizationService.Get("سطل بازیافت (Recycle Bin)"),
+                    Description = LocalizationService.Get("فایل های حذف شده موجود در سطل بازیافت تمام درایوها"),
                     Path = "RecycleBin",
                     TargetPaths = new List<string> { "RecycleBin" },
                     Bytes = binBytes,
@@ -78,7 +78,7 @@ namespace CleanC.Core.Services
                 {
                     Id = "crashLogs",
                     GroupId = "recommended",
-                    Title = "گزارش های خطا و کرش دامپ ها",
+                    Title = LocalizationService.Get("گزارش های خطا و کرش دامپ ها"),
                     Description = LocalizationService.Get("DescCrashLogs", "لاگ های گزارش خرابی، فایل های WER، دامپ های حافظه و گزارش های کرنل (LiveKernelReports)"),
                     Path = crashPaths[0],
                     TargetPaths = crashPaths,
@@ -96,8 +96,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "edgeCache",
                         GroupId = "recommended",
-                        Title = "حافظه کش مایکروسافت اج (Microsoft Edge)",
-                        Description = "کش صفحات وب، تصاویر و کدهای ذخیره شده مرورگر اج",
+                        Title = LocalizationService.Get("حافظه کش مایکروسافت اج (Microsoft Edge)"),
+                        Description = LocalizationService.Get("کش صفحات وب، تصاویر و کدهای ذخیره شده مرورگر اج"),
                         Path = edgePaths.FirstOrDefault() ?? Path.Combine(edgeUserData, @"Default\Cache"),
                         TargetPaths = edgePaths,
                         Bytes = edgeBytes,
@@ -115,8 +115,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "chromeCache",
                         GroupId = "recommended",
-                        Title = "حافظه کش گوگل کروم (Google Chrome)",
-                        Description = "کش صفحات وب، تصاویر و کدهای کامپایل شده مرورگر کروم",
+                        Title = LocalizationService.Get("حافظه کش گوگل کروم (Google Chrome)"),
+                        Description = LocalizationService.Get("کش صفحات وب، تصاویر و کدهای کامپایل شده مرورگر کروم"),
                         Path = chromePaths.FirstOrDefault() ?? Path.Combine(chromeUserData, @"Default\Cache"),
                         TargetPaths = chromePaths,
                         Bytes = chromeBytes,
@@ -135,8 +135,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "updateCache",
                             GroupId = "recommended",
-                            Title = "کش نصبی آپدیت های ویندوز",
-                            Description = "فایل های بسته های نصب شده Windows Update",
+                            Title = LocalizationService.Get("کش نصبی آپدیت های ویندوز"),
+                            Description = LocalizationService.Get("فایل های بسته های نصب شده Windows Update"),
                             Path = updateCachePath,
                             TargetPaths = new List<string> { updateCachePath },
                             Bytes = updateBytes,
@@ -159,8 +159,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "deliveryOpt",
                         GroupId = "recommended",
-                        Title = "کش توزیع دانلود ویندوز (Delivery Optimization)",
-                        Description = "فایل های موقت بسته های دانلود آپدیت ها و استور مایکروسافت",
+                        Title = LocalizationService.Get("کش توزیع دانلود ویندوز (Delivery Optimization)"),
+                        Description = LocalizationService.Get("فایل های موقت بسته های دانلود آپدیت ها و استور مایکروسافت"),
                         Path = doPaths[0],
                         TargetPaths = doPaths,
                         Bytes = doBytes,
@@ -221,8 +221,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "thumbnailCache",
                             GroupId = "recommended",
-                            Title = "حافظه کش بندانگشتی ها (Thumbnail Cache)",
-                            Description = "پیش نمایش ذخیره شده فایل ها و تصاویر در فایل اکسپلورر",
+                            Title = LocalizationService.Get("حافظه کش بندانگشتی ها (Thumbnail Cache)"),
+                            Description = LocalizationService.Get("پیش نمایش ذخیره شده فایل ها و تصاویر در فایل اکسپلورر"),
                             Path = explorerCacheDir,
                             TargetPaths = thumbFiles,
                             Bytes = thumbBytes,
@@ -259,10 +259,10 @@ namespace CleanC.Core.Services
                     {
                         Id = "emptyFolders",
                         GroupId = "recommended",
-                        Title = "پوشه‌های خالی رهاشده (Empty Folders)",
+                        Title = LocalizationService.Get("پوشه‌های خالی رهاشده (Empty Folders)"),
                         Description = emptyFolderPaths.Count > 0
-                            ? $"{emptyFolderPaths.Count} پوشه کاملاً خالی در Downloads و Desktop"
-                            : "پوشه خالی در پوشه‌های کاربری یافت نشد (سیستم مرتب است)",
+                            ? string.Format(LocalizationService.Get("{0} پوشه کاملاً خالی در Downloads و Desktop"), emptyFolderPaths.Count)
+                            : LocalizationService.Get("پوشه خالی در پوشه‌های کاربری یافت نشد (سیستم مرتب است)"),
                         Path = Path.Combine(userProfile, "Downloads"),
                         TargetPaths = emptyFolderPaths,
                         Bytes = 0,
@@ -280,12 +280,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 2: Other system items (سایر موارد سیستمی)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی شیدرهای گرافیکی و حافظه های سیستمی...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال ارزیابی شیدرهای گرافیکی و حافظه های سیستمی..."));
                 var grpSys = new JunkGroup
                 {
                     Id = "system",
-                    Title = "سایر موارد سیستمی (Other system items)",
-                    Description = "شیدرهای گرافیکی دایرکت ایکس و گزارش های سیستمی",
+                    Title = LocalizationService.Get("سایر موارد سیستمی (Other system items)"),
+                    Description = LocalizationService.Get("شیدرهای گرافیکی دایرکت ایکس و گزارش های سیستمی"),
                     IconGlyph = "\uE770"
                 };
 
@@ -303,8 +303,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "directxCache",
                     GroupId = "system",
-                    Title = "کش شیدرهای گرافیکی (DirectX Shader Cache)",
-                    Description = "شیدرهای رندر گرافیکی ذخیره شده بازی ها و کارت گرافیک",
+                    Title = LocalizationService.Get("کش شیدرهای گرافیکی (DirectX Shader Cache)"),
+                    Description = LocalizationService.Get("شیدرهای رندر گرافیکی ذخیره شده بازی ها و کارت گرافیک"),
                     Path = d3dPaths[0],
                     TargetPaths = d3dPaths,
                     Bytes = d3dBytes,
@@ -325,8 +325,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "windowsWidgets",
                         GroupId = "system",
-                        Title = "ویجت های ویندوز (Windows Widgets)",
-                        Description = "داده های آفلاین و کش ویجت های ویندوز ۱۱",
+                        Title = LocalizationService.Get("ویجت های ویندوز (Windows Widgets)"),
+                        Description = LocalizationService.Get("داده های آفلاین و کش ویجت های ویندوز ۱۱"),
                         Path = widgetPaths[0],
                         TargetPaths = widgetPaths,
                         Bytes = widgetsBytes,
@@ -345,8 +345,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "networkCerts",
                     GroupId = "system",
-                    Title = "کش گواهی ها و شبکه ویندوز",
-                    Description = "فایل های موقت ارتباطی شبکه و ابزارهای سیستم",
+                    Title = LocalizationService.Get("کش گواهی ها و شبکه ویندوز"),
+                    Description = LocalizationService.Get("فایل های موقت ارتباطی شبکه و ابزارهای سیستم"),
                     Path = inetPaths[0],
                     TargetPaths = inetPaths,
                     Bytes = inetBytes,
@@ -363,8 +363,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "orphanedRegistry",
                             GroupId = "system",
-                            Title = "مسیرها و کلیدهای نامعتبر رجیستری (Orphaned Registry)",
-                            Description = $"{deadMui} مسیر نامعتبر از برنامه های حذف شده در MuiCache رجیستری",
+                            Title = LocalizationService.Get("مسیرها و کلیدهای نامعتبر رجیستری (Orphaned Registry)"),
+                            Description = string.Format(LocalizationService.Get("{0} مسیر نامعتبر از برنامه های حذف شده در MuiCache رجیستری"), deadMui),
                             Path = "Registry",
                             TargetPaths = new List<string>(),
                             Bytes = deadMui * 1024,
@@ -382,12 +382,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 3: Other application items (Dynamic Probing)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال پویش نرم افزارهای نصب شده کاربر...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال پویش نرم افزارهای نصب شده کاربر..."));
                 var grpApps = new JunkGroup
                 {
                     Id = "apps",
-                    Title = "سایر موارد برنامه ها (Other application items)",
-                    Description = "کش و لاگ های نرم افزارهای کشف شده در سیستم",
+                    Title = LocalizationService.Get("سایر موارد برنامه ها (Other application items)"),
+                    Description = LocalizationService.Get("کش و لاگ های نرم افزارهای کشف شده در سیستم"),
                     IconGlyph = "\uE71D"
                 };
 
@@ -400,8 +400,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "nodejsCache",
                         GroupId = "apps",
-                        Title = "کش پکیج های Node.js (npm)",
-                        Description = "بسته های موقت دانلودشده npm در سیستم",
+                        Title = LocalizationService.Get("کش پکیج های Node.js (npm)"),
+                        Description = LocalizationService.Get("بسته های موقت دانلودشده npm در سیستم"),
                         Path = npmPath,
                         TargetPaths = new List<string> { npmPath },
                         Bytes = npmBytes,
@@ -424,8 +424,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "nvidiaCache",
                         GroupId = "apps",
-                        Title = "کش درایور و شیدرهای انویدیا (NVIDIA)",
-                        Description = "فایل های موقت و شیدرهای رندر کارت گرافیک انویدیا",
+                        Title = LocalizationService.Get("کش درایور و شیدرهای انویدیا (NVIDIA)"),
+                        Description = LocalizationService.Get("فایل های موقت و شیدرهای رندر کارت گرافیک انویدیا"),
                         Path = nvPaths[0],
                         TargetPaths = nvPaths,
                         Bytes = nvBytes,
@@ -442,8 +442,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "onedriveLogs",
                         GroupId = "apps",
-                        Title = "لاگ ها و گزارش های OneDrive",
-                        Description = "فایل های عیب یابی و لاگ های هماهنگ سازی وان درایو",
+                        Title = LocalizationService.Get("لاگ ها و گزارش های OneDrive"),
+                        Description = LocalizationService.Get("فایل های عیب یابی و لاگ های هماهنگ سازی وان درایو"),
                         Path = onedrivePath,
                         TargetPaths = new List<string> { onedrivePath },
                         Bytes = odBytes,
@@ -460,8 +460,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "pipCache",
                         GroupId = "apps",
-                        Title = "کش پکیج های پایتون (Pip)",
-                        Description = "بسته های دانلودشده مخزن پایتون",
+                        Title = LocalizationService.Get("کش پکیج های پایتون (Pip)"),
+                        Description = LocalizationService.Get("بسته های دانلودشده مخزن پایتون"),
                         Path = pipPath,
                         TargetPaths = new List<string> { pipPath },
                         Bytes = pipBytes,
@@ -484,8 +484,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "vscodeCache",
                         GroupId = "apps",
-                        Title = "کش محیط برنامه نویسی VS Code",
-                        Description = "فایل های کش و داده های موقت ویرایشگر کد",
+                        Title = LocalizationService.Get("کش محیط برنامه نویسی VS Code"),
+                        Description = LocalizationService.Get("فایل های کش و داده های موقت ویرایشگر کد"),
                         Path = vscPaths[0],
                         TargetPaths = vscPaths,
                         Bytes = vscBytes,
@@ -507,8 +507,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "discordCache",
                         GroupId = "apps",
-                        Title = "کش پیام رسان دیسکورد (Discord)",
-                        Description = "تصاویر و رسانه های موقت دانلودشده در دیسکورد",
+                        Title = LocalizationService.Get("کش پیام رسان دیسکورد (Discord)"),
+                        Description = LocalizationService.Get("تصاویر و رسانه های موقت دانلودشده در دیسکورد"),
                         Path = discordPaths[0],
                         TargetPaths = discordPaths,
                         Bytes = discBytes,
@@ -525,8 +525,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "telegramCache",
                         GroupId = "apps",
-                        Title = "دیتای پیام رسان تلگرام (Telegram Desktop)",
-                        Description = "پروفایل و رسانه های کش شده تلگرام؛ حاوی نشست ورود حساب شماست - پاکسازی خودکار عمداً غیرفعال است و فقط با تیک دستی انجام می شود",
+                        Title = LocalizationService.Get("دیتای پیام رسان تلگرام (Telegram Desktop)"),
+                        Description = LocalizationService.Get("پروفایل و رسانه های کش شده تلگرام؛ حاوی نشست ورود حساب شماست - پاکسازی خودکار عمداً غیرفعال است و فقط با تیک دستی انجام می شود"),
                         Path = tgPath,
                         TargetPaths = new List<string> { tgPath },
                         Bytes = tgBytes,
@@ -548,8 +548,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "spotifyCache",
                         GroupId = "apps",
-                        Title = "کش نرم افزار اسپاتیفای (Spotify)",
-                        Description = "فایل های موقت موسیقی و کاور آلبوم ها",
+                        Title = LocalizationService.Get("کش نرم افزار اسپاتیفای (Spotify)"),
+                        Description = LocalizationService.Get("فایل های موقت موسیقی و کاور آلبوم ها"),
                         Path = spotPaths[0],
                         TargetPaths = spotPaths,
                         Bytes = spotBytes,
@@ -573,8 +573,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "aiModelsCache",
                         GroupId = "apps",
-                        Title = "مدل ها و کش ابزارهای هوش مصنوعی (AI & LLMs)",
-                        Description = "مدل های دانلودشده Ollama و کش HuggingFace",
+                        Title = LocalizationService.Get("مدل ها و کش ابزارهای هوش مصنوعی (AI & LLMs)"),
+                        Description = LocalizationService.Get("مدل های دانلودشده Ollama و کش HuggingFace"),
                         Path = aiPaths[0],
                         TargetPaths = aiPaths,
                         Bytes = aiBytes,
@@ -599,10 +599,10 @@ namespace CleanC.Core.Services
                 {
                     Id = "phoneBackups",
                     GroupId = "apps",
-                    Title = "بکاپ‌های قدیمی گوشی و تبلت (Apple، سامسونگ، هواوی)",
+                    Title = LocalizationService.Get("بکاپ‌های قدیمی گوشی و تبلت (Apple، سامسونگ، هواوی)"),
                     Description = phoneBytes > 0
-                        ? "نسخه‌های پشتیبان حجیم دستگاه‌های موبایل؛ این تنها نسخه پشتیبان شماست - حذف خودکار عمداً غیرفعال است و فقط بعد از تیک دستی و مرور مسیر انجام می شود"
-                        : "هیچ بکاپ قدیمی از گوشی یا تبلت در کامپیوتر یافت نشد",
+                        ? LocalizationService.Get("نسخه‌های پشتیبان حجیم دستگاه‌های موبایل؛ این تنها نسخه پشتیبان شماست - حذف خودکار عمداً غیرفعال است و فقط بعد از تیک دستی و مرور مسیر انجام می شود")
+                        : LocalizationService.Get("هیچ بکاپ قدیمی از گوشی یا تبلت در کامپیوتر یافت نشد"),
                     Path = phoneBackupPaths.FirstOrDefault() ?? Path.Combine(userProfile, @"Apple\MobileSync\Backup"),
                     TargetPaths = phoneBackupPaths,
                     Bytes = phoneBytes,
@@ -621,10 +621,10 @@ namespace CleanC.Core.Services
                     {
                         Id = "browserDeadExtensions",
                         GroupId = "apps",
-                        Title = "افزونه‌های زائد و دیتابیس‌های منسوخ مرورگرها (Chrome / Edge)",
+                        Title = LocalizationService.Get("افزونه‌های زائد و دیتابیس‌های منسوخ مرورگرها (Chrome / Edge)"),
                         Description = deadExtList.Count > 0
-                            ? $"{deadExtList.Count} افزونه منسوخ یا دیتابیس رهاشده با حفظ ۱۰۰٪ اطلاعات سایت‌ها"
-                            : "افزونه منسوخ یا دیتابیس زائد مرورگر یافت نشد (مرورگرها مرتب هستند)",
+                            ? string.Format(LocalizationService.Get("{0} افزونه منسوخ یا دیتابیس رهاشده با حفظ ۱۰۰٪ اطلاعات سایت‌ها"), deadExtList.Count)
+                            : LocalizationService.Get("افزونه منسوخ یا دیتابیس زائد مرورگر یافت نشد (مرورگرها مرتب هستند)"),
                         Path = "Browsers",
                         TargetPaths = deadExtList.Select(e => e.InstallPath).Where(p => !string.IsNullOrEmpty(p)).ToList(),
                         Bytes = deadExtBytes,
@@ -642,12 +642,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 4: Computer Usage Traces (ردپای استفاده از کامپیوتر)
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال بررسی تاریخچه و ردپای استفاده از سیستم...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال بررسی تاریخچه و ردپای استفاده از سیستم..."));
                 var grpTraces = new JunkGroup
                 {
                     Id = "traces",
-                    Title = "ردپای استفاده از کامپیوتر (Usage Traces)",
-                    Description = "لیست فایل های اخیر، پرش سریع و تاریخچه های سیستم",
+                    Title = LocalizationService.Get("ردپای استفاده از کامپیوتر (Usage Traces)"),
+                    Description = LocalizationService.Get("لیست فایل های اخیر، پرش سریع و تاریخچه های سیستم"),
                     IconGlyph = "\uE81C"
                 };
 
@@ -658,8 +658,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "recentFiles",
                     GroupId = "traces",
-                    Title = "تاریخچه فایل های اخیر (Recent Items)",
-                    Description = "شورتکات های ثبت شده فایل های اخیراً باز شده در ویندوز",
+                    Title = LocalizationService.Get("تاریخچه فایل های اخیر (Recent Items)"),
+                    Description = LocalizationService.Get("شورتکات های ثبت شده فایل های اخیراً باز شده در ویندوز"),
                     Path = recentPath,
                     TargetPaths = new List<string> { recentPath },
                     Bytes = recentBytes,
@@ -677,8 +677,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "explorerJumpList",
                     GroupId = "traces",
-                    Title = "لیست های پرش اکسپلورر (Jump Lists)",
-                    Description = "میانبرهای برنامه های اخیر در تسک بار ویندوز",
+                    Title = LocalizationService.Get("لیست های پرش اکسپلورر (Jump Lists)"),
+                    Description = LocalizationService.Get("میانبرهای برنامه های اخیر در تسک بار ویندوز"),
                     Path = jumpPaths[0],
                     TargetPaths = jumpPaths,
                     Bytes = jumpBytes,
@@ -690,12 +690,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 5: Download Managers & Incomplete Files
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی دانلود منیجرها و فایل های ناقص...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال ارزیابی دانلود منیجرها و فایل های ناقص..."));
                 var grpDownloads = new JunkGroup
                 {
                     Id = "downloads",
-                    Title = "دانلود منیجرها و فایل های ناتمام (Download Managers)",
-                    Description = "چانک های موقت، تکه های دانلود ناقص و فایل های رهاشده",
+                    Title = LocalizationService.Get("دانلود منیجرها و فایل های ناتمام (Download Managers)"),
+                    Description = LocalizationService.Get("چانک های موقت، تکه های دانلود ناقص و فایل های رهاشده"),
                     IconGlyph = "\uE896"
                 };
 
@@ -710,8 +710,8 @@ namespace CleanC.Core.Services
                         {
                             Id = "idmChunks",
                             GroupId = "downloads",
-                            Title = "فایل های موقت و چانک های ناتمام IDM",
-                            Description = "قطعات موقت دانلودهای متوقف شده، لغوشده و رهاشده در اینترنت دانلود منیجر",
+                            Title = LocalizationService.Get("فایل های موقت و چانک های ناتمام IDM"),
+                            Description = LocalizationService.Get("قطعات موقت دانلودهای متوقف شده، لغوشده و رهاشده در اینترنت دانلود منیجر"),
                             Path = idmDataDir,
                             TargetPaths = new List<string> { idmDataDir },
                             Bytes = idmBytes,
@@ -733,8 +733,8 @@ namespace CleanC.Core.Services
                     {
                         Id = "fdmTemp",
                         GroupId = "downloads",
-                        Title = "فایل های موقت Free Download Manager (FDM)",
-                        Description = "کش و قطعات موقت دانلودهای ناتمام FDM",
+                        Title = LocalizationService.Get("فایل های موقت Free Download Manager (FDM)"),
+                        Description = LocalizationService.Get("کش و قطعات موقت دانلودهای ناتمام FDM"),
                         Path = fdmPaths[0],
                         TargetPaths = fdmPaths,
                         Bytes = fdmBytes,
@@ -773,8 +773,8 @@ namespace CleanC.Core.Services
                             {
                                 Id = "abandonedDownloads",
                                 GroupId = "downloads",
-                                Title = "دانلودهای ناتمام و ناقص قدیمی مرورگرها",
-                                Description = $"{abandonedFiles.Count} فایل ناقص رهاشده در پوشه Downloads (.crdownload / .part)",
+                                Title = LocalizationService.Get("دانلودهای ناتمام و ناقص قدیمی مرورگرها"),
+                                Description = string.Format(LocalizationService.Get("{0} فایل ناقص رهاشده در پوشه Downloads (.crdownload / .part)"), abandonedFiles.Count),
                                 Path = userDownloads,
                                 TargetPaths = abandonedFiles,
                                 Bytes = abandonedBytes,
@@ -805,10 +805,10 @@ namespace CleanC.Core.Services
                         {
                             Id = "oldInstallers",
                             GroupId = "downloads",
-                            Title = "فایل‌های نصبی و اینستالرهای قدیمی (.exe / .iso)",
+                            Title = LocalizationService.Get("فایل‌های نصبی و اینستالرهای قدیمی (.exe / .iso)"),
                             Description = installerFiles.Count > 0
-                                ? $"{installerFiles.Count} فایل نصبی با بیش از ۱۴ روز عدم استفاده در Downloads"
-                                : "اینستالر یا ستاپ قدیمی با بیش از ۱۴ روز قدمت یافت نشد",
+                                ? string.Format(LocalizationService.Get("{0} فایل نصبی با بیش از ۱۴ روز عدم استفاده در Downloads"), installerFiles.Count)
+                                : LocalizationService.Get("اینستالر یا ستاپ قدیمی با بیش از ۱۴ روز قدمت یافت نشد"),
                             Path = userDownloads,
                             TargetPaths = installerFiles,
                             Bytes = installerBytes,
@@ -834,10 +834,10 @@ namespace CleanC.Core.Services
                         {
                             Id = "largeUserFiles",
                             GroupId = "downloads",
-                            Title = "فایل‌های بسیار حجیم قدیمی (بالای ۲۰۰ مگابایت)",
+                            Title = LocalizationService.Get("فایل‌های بسیار حجیم قدیمی (بالای ۲۰۰ مگابایت)"),
                             Description = largeFiles.Count > 0
-                                ? $"{largeFiles.Count} فایل حجیم با بیش از ۲۱ روز عدم تغییر در پوشه Downloads"
-                                : "فایل حجیم قدیمی بالای ۲۰۰ مگابایت در Downloads یافت نشد",
+                                ? string.Format(LocalizationService.Get("{0} فایل حجیم با بیش از ۲۱ روز عدم تغییر در پوشه Downloads"), largeFiles.Count)
+                                : LocalizationService.Get("فایل حجیم قدیمی بالای ۲۰۰ مگابایت در Downloads یافت نشد"),
                             Path = userDownloads,
                             TargetPaths = largeFiles,
                             Bytes = largeFilesBytes,
@@ -856,7 +856,7 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 6: Leftover Folders of Uninstalled Apps
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال پویش پوشه های باقیمانده نرم افزارهای حذف شده...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال پویش پوشه های باقیمانده نرم افزارهای حذف شده..."));
                 try
                 {
                     var leftovers = LeftoverCleanerService.ScanLeftoverFolders();
@@ -865,8 +865,8 @@ namespace CleanC.Core.Services
                         var grpLeftovers = new JunkGroup
                         {
                             Id = "leftovers",
-                            Title = "پوشه های باقیمانده نرم افزارهای حذف شده (Leftovers)",
-                            Description = "پوشه های حجیم برنامه هایی که از سیستم حذف شده اند ولی داده هایشان باقی مانده است",
+                            Title = LocalizationService.Get("پوشه های باقیمانده نرم افزارهای حذف شده (Leftovers)"),
+                            Description = LocalizationService.Get("پوشه های حجیم برنامه هایی که از سیستم حذف شده اند ولی داده هایشان باقی مانده است"),
                             IconGlyph = "\uE74D"
                         };
 
@@ -876,8 +876,8 @@ namespace CleanC.Core.Services
                             {
                                 Id = $"leftover_{lo.FolderName}",
                                 GroupId = "leftovers",
-                                Title = $"پوشه رهاشده: {lo.FolderName} ({lo.LocationType})",
-                                Description = $"مسیر: {lo.FullPath}",
+                                Title = string.Format(LocalizationService.Get("پوشه رهاشده: {0} ({1})"), lo.FolderName, lo.LocationType),
+                                Description = string.Format(LocalizationService.Get("مسیر: {0}"), lo.FullPath),
                                 Path = lo.FullPath,
                                 TargetPaths = new List<string> { lo.FullPath },
                                 Bytes = lo.SizeBytes,
@@ -896,12 +896,12 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // Group 7: Live System Optimization & Performance Boost
                 // -------------------------------------------------------------
-                progressCallback?.Invoke("در حال ارزیابی گزینه های بهینه سازی زنده و پایداری...");
+                progressCallback?.Invoke(LocalizationService.Get("در حال ارزیابی گزینه های بهینه سازی زنده و پایداری..."));
                 var grpBoost = new JunkGroup
                 {
                     Id = "system_boost",
-                    Title = "بهینه سازی زنده و پایداری سیستم (Performance & Boost)",
-                    Description = "آزادسازی رم، کش شبکه، پروسس های اضافی، استارتاپ، Debloat و پلن انرژی",
+                    Title = LocalizationService.Get("بهینه سازی زنده و پایداری سیستم (Performance & Boost)"),
+                    Description = LocalizationService.Get("آزادسازی رم، کش شبکه، پروسس های اضافی، استارتاپ، Debloat و پلن انرژی"),
                     IconGlyph = "\uE9D2"
                 };
 
@@ -909,8 +909,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "ramBoost",
                     GroupId = "system_boost",
-                    Title = "آزادسازی حافظه فعال رم (RAM Working Set)",
-                    Description = "تخلیه Working Set پردازه ها و آزادسازی فوری حافظه اشغال شده بدون بستن برنامه ها",
+                    Title = LocalizationService.Get("آزادسازی حافظه فعال رم (RAM Working Set)"),
+                    Description = LocalizationService.Get("تخلیه Working Set پردازه ها و آزادسازی فوری حافظه اشغال شده بدون بستن برنامه ها"),
                     Path = "Memory",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -922,8 +922,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "dnsFlush",
                     GroupId = "system_boost",
-                    Title = "تخلیه کش DNS و نوسازی ارتباطات شبکه",
-                    Description = "پاکسازی رکوردهای نامعتبر دامنه از کش ویندوز و رفع کندی ارتباطات اینترنتی",
+                    Title = LocalizationService.Get("تخلیه کش DNS و نوسازی ارتباطات شبکه"),
+                    Description = LocalizationService.Get("پاکسازی رکوردهای نامعتبر دامنه از کش ویندوز و رفع کندی ارتباطات اینترنتی"),
                     Path = "Network",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -935,8 +935,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "backgroundHelpers",
                     GroupId = "system_boost",
-                    Title = "بستن پردازه ها و کمک کننده های اضافی در پس زمینه",
-                    Description = "توقف سرویس های جانبی، پروسه های گزارش گیری و آپدیترهای مقیم در پس زمینه",
+                    Title = LocalizationService.Get("بستن پردازه ها و کمک کننده های اضافی در پس زمینه"),
+                    Description = LocalizationService.Get("توقف سرویس های جانبی، پروسه های گزارش گیری و آپدیترهای مقیم در پس زمینه"),
                     Path = "Processes",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -948,8 +948,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "browserBoost",
                     GroupId = "system_boost",
-                    Title = "خاموش سازی تسک های پس زمینه مرورگرها (Edge / Chrome)",
-                    Description = "غیرفعال سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته شدن",
+                    Title = LocalizationService.Get("خاموش سازی تسک های پس زمینه مرورگرها (Edge / Chrome)"),
+                    Description = LocalizationService.Get("غیرفعال سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته شدن"),
                     Path = "Browsers",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -961,8 +961,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "startupOptimize",
                     GroupId = "system_boost",
-                    Title = "بهینه سازی استارتاپ ویندوز",
-                    Description = "غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم",
+                    Title = LocalizationService.Get("بهینه سازی استارتاپ ویندوز"),
+                    Description = LocalizationService.Get("غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم"),
                     Path = "Startup",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -974,8 +974,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "bloatwareClean",
                     GroupId = "system_boost",
-                    Title = "حذف برنامه ها و بازی های تبلیغاتی پیش فرض (Debloat)",
-                    Description = "حذف نرم افزارها و بازی های تبلیغاتی پیش فرض و بررسی برنامه های کم استفاده",
+                    Title = LocalizationService.Get("حذف برنامه ها و بازی های تبلیغاتی پیش فرض (Debloat)"),
+                    Description = LocalizationService.Get("حذف نرم افزارها و بازی های تبلیغاتی پیش فرض و بررسی برنامه های کم استفاده"),
                     Path = "Bloatware",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -987,8 +987,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "fastStartup",
                     GroupId = "system_boost",
-                    Title = "کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)",
-                    Description = "فعال سازی خاموش سازی و راه اندازی فوق سریع ویندوز",
+                    Title = LocalizationService.Get("کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)"),
+                    Description = LocalizationService.Get("فعال سازی خاموش سازی و راه اندازی فوق سریع ویندوز"),
                     Path = "FastStartup",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -1000,8 +1000,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "gpuOptimize",
                     GroupId = "system_boost",
-                    Title = "تخصیص هوشمند کارت گرافیک مجزا",
-                    Description = "هدایت بازی ها و برنامه های سنگین به پردازنده گرافیکی قدرتمند اصلی",
+                    Title = LocalizationService.Get("تخصیص هوشمند کارت گرافیک مجزا"),
+                    Description = LocalizationService.Get("هدایت بازی ها و برنامه های سنگین به پردازنده گرافیکی قدرتمند اصلی"),
                     Path = "GPU",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -1013,8 +1013,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "winTweaks",
                     GroupId = "system_boost",
-                    Title = "بهینه سازی تنظیمات عملکرد و حریم خصوصی ویندوز",
-                    Description = "غیرفعال سازی تله متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز",
+                    Title = LocalizationService.Get("بهینه سازی تنظیمات عملکرد و حریم خصوصی ویندوز"),
+                    Description = LocalizationService.Get("غیرفعال سازی تله متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز"),
                     Path = "Tweaks",
                     TargetPaths = new List<string>(),
                     Bytes = 0,
@@ -1026,8 +1026,8 @@ namespace CleanC.Core.Services
                 {
                     Id = "inactiveHeavyApps",
                     GroupId = "system_boost",
-                    Title = "بازبینی نرم‌افزارهای حجیم و کم‌استفاده (> 500MB با بیش از ۳۰ روز عدم اجرا)",
-                    Description = "مکث تعاملی جهت نمایش لیست برنامه‌های سنگین بلااستفاده و تایید اختیاری کاربر برای حذف",
+                    Title = LocalizationService.Get("بازبینی نرم‌افزارهای حجیم و کم‌استفاده (> 500MB با بیش از ۳۰ روز عدم اجرا)"),
+                    Description = LocalizationService.Get("مکث تعاملی جهت نمایش لیست برنامه‌های سنگین بلااستفاده و تایید اختیاری کاربر برای حذف"),
                     Path = "AppsReview",
                     TargetPaths = new List<string>(),
                     Bytes = 0,

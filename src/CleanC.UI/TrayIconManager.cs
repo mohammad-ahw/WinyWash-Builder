@@ -167,7 +167,7 @@ namespace CleanC.UI
                     uFlags = NIF_MESSAGE | NIF_TIP | (_hIcon != IntPtr.Zero ? NIF_ICON : 0),
                     uCallbackMessage = WM_TRAYICON,
                     hIcon = _hIcon,
-                    szTip = "CleanC - بهینه ساز هوشمند ویندوز"
+                    szTip = LocalizationService.Get("CleanC - بهینه ساز هوشمند ویندوز")
                 };
 
                 Shell_NotifyIcon(NIM_ADD, ref nid);
@@ -230,7 +230,7 @@ namespace CleanC.UI
                     try
                     {
                         var stats = SystemStatsService.GetCurrentStats();
-                        _statusHeader = $"CleanC (پردازنده: {stats.CpuPercent}% • رم: {stats.RamPercent}%)";
+                        _statusHeader = string.Format(LocalizationService.Get("CleanC (پردازنده: {0}% • رم: {1}%)"), stats.CpuPercent, stats.RamPercent);
                     }
                     catch (Exception __ex)
                     {
@@ -240,12 +240,12 @@ namespace CleanC.UI
 
                 AppendMenu(hMenu, MF_STRING, 0, _statusHeader);
                 AppendMenu(hMenu, MF_SEPARATOR, 0, "");
-                AppendMenu(hMenu, MF_STRING, IDM_RESTORE, "🪟 نمایش پنجره اصلی CleanC");
-                AppendMenu(hMenu, MF_STRING, IDM_BOOST_RAM, "🚀 آزادسازی آنی حافظه رم (RAM Boost)");
-                AppendMenu(hMenu, MF_STRING, IDM_QUICK_BOOST, "🧹 بهینه سازی کامل سیستم (Quick Boost)");
-                AppendMenu(hMenu, MF_STRING, IDM_DNS, "🌐 تغییر سریع DNS و تحریم شکن");
+                AppendMenu(hMenu, MF_STRING, IDM_RESTORE, LocalizationService.Get("🪟 نمایش پنجره اصلی CleanC"));
+                AppendMenu(hMenu, MF_STRING, IDM_BOOST_RAM, LocalizationService.Get("🚀 آزادسازی آنی حافظه رم (RAM Boost)"));
+                AppendMenu(hMenu, MF_STRING, IDM_QUICK_BOOST, LocalizationService.Get("🧹 بهینه سازی کامل سیستم (Quick Boost)"));
+                AppendMenu(hMenu, MF_STRING, IDM_DNS, LocalizationService.Get("🌐 تغییر سریع DNS و تحریم شکن"));
                 AppendMenu(hMenu, MF_SEPARATOR, 0, "");
-                AppendMenu(hMenu, MF_STRING, IDM_EXIT, "❌ خروج از CleanC");
+                AppendMenu(hMenu, MF_STRING, IDM_EXIT, LocalizationService.Get("❌ خروج از CleanC"));
 
                 GetCursorPos(out POINT pt);
                 SetForegroundWindow(_hwnd);
@@ -278,12 +278,12 @@ namespace CleanC.UI
                         try
                         {
                             var res = await OptimizerService.BoostRamAsync();
-                            ShowBalloonNotification("آزادسازی حافظه رم", $"مقدار {SystemStats.FormatBytes(res.FreedBytes)} حافظه رم با موفقیت آزاد شد.", WinNotifySeverity.Info);
+                            ShowBalloonNotification(LocalizationService.Get("آزادسازی حافظه رم"), string.Format(LocalizationService.Get("مقدار {0} حافظه رم با موفقیت آزاد شد."), SystemStats.FormatBytes(res.FreedBytes)), WinNotifySeverity.Info);
                         }
                         catch (Exception boostEx)
                         {
                             CcLog.Ignore(boostEx, "Tray.BoostRam");
-                            ShowBalloonNotification("آزادسازی حافظه رم", "اجرای آزادسازی رم با خطا مواجه شد — جزئیات در crash.log ثبت شد.", WinNotifySeverity.Warning);
+                            ShowBalloonNotification(LocalizationService.Get("آزادسازی حافظه رم"), LocalizationService.Get("اجرای آزادسازی رم با خطا مواجه شد — جزئیات در crash.log ثبت شد."), WinNotifySeverity.Warning);
                         }
                     });
                     break;

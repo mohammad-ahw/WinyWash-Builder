@@ -47,7 +47,7 @@ namespace CleanC.Core.Services
                 {
                     try
                     {
-                        progress?.Invoke($"در حال اسکن پوشه: {Path.GetFileName(folder)}...");
+                        progress?.Invoke(string.Format(LocalizationService.Get("در حال اسکن پوشه: {0}..."), Path.GetFileName(folder)));
                         var dirInfo = new DirectoryInfo(folder);
                         foreach (var file in dirInfo.EnumerateFiles("*", enumOptions))
                         {

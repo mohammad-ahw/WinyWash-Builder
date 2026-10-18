@@ -16,11 +16,11 @@ namespace CleanC.Core.Services
         public string Title { get; set; } = string.Empty;
         public string KbArticleId { get; set; } = string.Empty;
         public long SizeBytes { get; set; }
-        public string FormattedSize => SizeBytes > 0 ? Models.SystemStats.FormatBytes(SizeBytes) : "حجم متغیر / آنلاین";
+        public string FormattedSize => SizeBytes > 0 ? Models.SystemStats.FormatBytes(SizeBytes) : LocalizationService.Get("حجم متغیر / آنلاین");
         public string Description { get; set; } = string.Empty;
         public bool IsOptional { get; set; }
         public bool IsNextGenFeatureUpdate { get; set; }
-        public string CategoryName { get; set; } = "آپدیت کیفی و امنیتی";
+        public string CategoryName { get; set; } = LocalizationService.Get("آپدیت کیفی و امنیتی");
         public string BuildFlightVersion { get; set; } = string.Empty;
         public string SupportUrl { get; set; } = string.Empty;
     }
@@ -30,7 +30,7 @@ namespace CleanC.Core.Services
         public bool IsPaused { get; set; }
         public string PauseExpiryDate { get; set; } = string.Empty;
         public bool IsServiceDisabled { get; set; }
-        public string ServiceStatus { get; set; } = "درحال اجرا";
+        public string ServiceStatus { get; set; } = LocalizationService.Get("درحال اجرا");
     }
 
     public static class WindowsUpdateService
@@ -71,12 +71,12 @@ namespace CleanC.Core.Services
                 {
                     int startType = Convert.ToInt32(sKey.GetValue("Start", 3));
                     info.IsServiceDisabled = (startType == 4); // 4 = Disabled
-                    info.ServiceStatus = (startType == 4) ? "غیرفعال (Disabled)" : "آماده به کار (فعال)";
+                    info.ServiceStatus = (startType == 4) ? LocalizationService.Get("غیرفعال (Disabled)") : LocalizationService.Get("آماده به کار (فعال)");
                 }
             }
             catch
             {
-                info.ServiceStatus = "نامشخص";
+                info.ServiceStatus = LocalizationService.Get("نامشخص");
             }
 
             return info;
@@ -135,7 +135,7 @@ namespace CleanC.Core.Services
                                         for (int i = 0; i < count; i++)
                                         {
                                             dynamic update = searchResult.Updates.Item(i);
-                                            string title = update.Title?.ToString() ?? "آپدیت ویندوز";
+                                            string title = update.Title?.ToString() ?? LocalizationService.Get("آپدیت ویندوز");
                                             string desc = update.Description?.ToString() ?? "";
                                             long size = 0;
                                             try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex) { CcLog.Ignore(__ex); }
@@ -157,7 +157,7 @@ namespace CleanC.Core.Services
                                                 Description = desc,
                                                 IsOptional = false,
                                                 IsNextGenFeatureUpdate = isNextGen,
-                                                CategoryName = isNextGen ? "ارتقای نسل سیستم عامل" : "آپدیت کیفی و امنیتی"
+                                                CategoryName = isNextGen ? LocalizationService.Get("ارتقای نسل سیستم عامل") : LocalizationService.Get("آپدیت کیفی و امنیتی")
                                             });
                                         }
                                     }
@@ -171,7 +171,7 @@ namespace CleanC.Core.Services
                                         for (int i = 0; i < countOpt; i++)
                                         {
                                             dynamic update = optResult.Updates.Item(i);
-                                            string title = update.Title?.ToString() ?? "آپدیت اختیاری ویندوز";
+                                            string title = update.Title?.ToString() ?? LocalizationService.Get("آپدیت اختیاری ویندوز");
                                             string desc = update.Description?.ToString() ?? "";
                                             long size = 0;
                                             try { size = Convert.ToInt64(update.MaxDownloadSize); } catch (Exception __ex) { CcLog.Ignore(__ex); }
@@ -195,7 +195,7 @@ namespace CleanC.Core.Services
                                                 Description = desc,
                                                 IsOptional = true,
                                                 IsNextGenFeatureUpdate = isNextGen,
-                                                CategoryName = isNextGen ? "ارتقای نسل جدید (اختیاری)" : (isDriver ? "درایور سخت افزار (اختیاری)" : "آپدیت اختیاری ویندوز")
+                                                CategoryName = isNextGen ? LocalizationService.Get("ارتقای نسل جدید (اختیاری)") : (isDriver ? LocalizationService.Get("درایور سخت افزار (اختیاری)") : LocalizationService.Get("آپدیت اختیاری ویندوز"))
                                             });
                                         }
                                     }
@@ -363,7 +363,7 @@ namespace CleanC.Core.Services
                 {
                     if (!string.IsNullOrEmpty(buildFlightVer))
                     {
-                        title = $"بروزرسانی نسل جدید ویندوز ۱۱ (بیلد {buildFlightVer})";
+                        title = string.Format(LocalizationService.Get("بروزرسانی نسل جدید ویندوز ۱۱ (بیلد {0})"), buildFlightVer);
                     }
                     else
                     {
@@ -374,11 +374,11 @@ namespace CleanC.Core.Services
                 if (string.IsNullOrEmpty(desc))
                 {
                     desc = !string.IsNullOrEmpty(buildFlightVer)
-                        ? $"ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {title} - بیلد {buildFlightVer}) شامل قابلیت های هوش مصنوعی و بهینه سازی های عمیق هسته سیستم عامل"
-                        : $"ارتقای رسمی به نسخه جدید ویندوز ۱۱ ({title})";
+                        ? string.Format(LocalizationService.Get("ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {0} - بیلد {1}) شامل قابلیت های هوش مصنوعی و بهینه سازی های عمیق هسته سیستم عامل"), title, buildFlightVer)
+                        : string.Format(LocalizationService.Get("ارتقای رسمی به نسخه جدید ویندوز ۱۱ ({0})"), title);
                 }
 
-                string kbId = !string.IsNullOrEmpty(buildFlightId) ? $"نسل بعد ({buildFlightId})" : "نسل جدید اختیاری";
+                string kbId = !string.IsNullOrEmpty(buildFlightId) ? string.Format(LocalizationService.Get("نسل بعد ({0})"), buildFlightId) : LocalizationService.Get("نسل جدید اختیاری");
 
                 return new PendingUpdateItem
                 {
@@ -387,7 +387,7 @@ namespace CleanC.Core.Services
                     Description = desc,
                     IsOptional = true,
                     IsNextGenFeatureUpdate = true,
-                    CategoryName = "ارتقای نسل سیستم عامل (Next-Gen OS Upgrade)",
+                    CategoryName = LocalizationService.Get("ارتقای نسل سیستم عامل (Next-Gen OS Upgrade)"),
                     BuildFlightVersion = buildFlightVer,
                     SupportUrl = "https://go.microsoft.com/fwlink/?linkid=2132062#windowsupdate=26100"
                 };
@@ -521,13 +521,13 @@ namespace CleanC.Core.Services
                     StartService("bits");
                     StartService("wuauserv");
 
-                    return (true, freed, $"کش آپدیت با موفقیت تخلیه گردید و سرویس ها نوسازی شدند. ({Models.SystemStats.FormatBytes(freed)} آزاد شد)");
+                    return (true, freed, string.Format(LocalizationService.Get("کش آپدیت با موفقیت تخلیه گردید و سرویس ها نوسازی شدند. ({0} آزاد شد)"), Models.SystemStats.FormatBytes(freed)));
                 }
                 catch (Exception ex)
                 {
                     // Ensure services restarted
                     StartService("wuauserv");
-                    return (false, freed, $"خطا در پاکسازی: {ex.Message}");
+                    return (false, freed, string.Format(LocalizationService.Get("خطا در پاکسازی: {0}"), ex.Message));
                 }
             });
         }

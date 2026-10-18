@@ -7,9 +7,7 @@
   <data name="NotificationHistory" xml:space="preserve"><value>تاریخچه عملیات و اعلان ها</value></data>
   <data name="ToggleTheme" xml:space="preserve"><value>تغییر تم (تاریک / روشن)</value></data>
   <data name="Settings" xml:space="preserve"><value>تنظیمات برنامه</value></data>
-  <data name="NavDashboardShort" xml:space="preserve"><value>داشبورد</value></data>
-    <data name="NavToolsShort" xml:space="preserve"><value>ابزارها</value></data>
-    <data name="NavDashboard" xml:space="preserve"><value>داشبورد بهینه سازی</value></data>
+  <data name="NavDashboard" xml:space="preserve"><value>داشبورد بهینه سازی</value></data>
   <data name="NavTools" xml:space="preserve"><value>ابزارهای سیستمی ویندوز</value></data>
 
   

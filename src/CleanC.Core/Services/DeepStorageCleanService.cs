@@ -57,7 +57,7 @@ namespace CleanC.Core.Services
 
                 foreach (var dir in targetDirectories)
                 {
-                    progress?.Invoke($"در حال بررسی پوشه: {Path.GetFileName(dir)}...");
+                    progress?.Invoke(string.Format(LocalizationService.Get("در حال بررسی پوشه: {0}..."), Path.GetFileName(dir)));
 
                     try
                     {
@@ -254,6 +254,7 @@ namespace CleanC.Core.Services
                                     }
                                     // Smart Scenario 3: Copied duplicates like "name - Copy.ext" or "name (1).ext"
                                     // عکس های شخصی عمداً کنار گذاشته می شوند (بدون پیشنهاد حذف)
+                                    // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
                                     else if (!IsPersonalImage(name)
                                         && (lowerName.Contains(" - copy") || lowerName.Contains(" (1)") || lowerName.Contains(" (2)") || lowerName.Contains("نسخه کپی")))
                                     {
@@ -289,6 +290,7 @@ namespace CleanC.Core.Services
                                         });
                                     }
                                     // Old screenshots > 21 days old
+                                    // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
                                     else if ((lowerName.StartsWith("screenshot") || lowerName.StartsWith("اسکرین شات") || lowerName.StartsWith("capture")) && (now - file.LastWriteTime).TotalDays > 21)
                                     {
                                         messItems.Add(new StorageMessItem
@@ -351,31 +353,31 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // 1.5 Scan Developer Caches & Container Junk (If Present)
                 // -------------------------------------------------------------
-                progress?.Invoke("در حال بررسی حافظه های موقت توسعه دهندگان و کانتینرها...");
+                progress?.Invoke(LocalizationService.Get("در حال بررسی حافظه های موقت توسعه دهندگان و کانتینرها..."));
                 string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
                 string appDataRoaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
 
                 var devCaches = new (string Path, string Name)[]
                 {
-                    (Path.Combine(localAppData, "npm-cache"), "کش پکیج های npm"),
-                    (Path.Combine(appDataRoaming, "npm-cache"), "کش پکیج های npm (Roaming)"),
-                    (Path.Combine(userProfile, ".nuget", "packages"), "کش پکیج های NuGet"),
-                    (Path.Combine(localAppData, "NuGet", "v3-cache"), "کش HTTP پکیج های NuGet"),
-                    (Path.Combine(localAppData, "pip", "cache"), "کش پکیج های Python pip"),
-                    (Path.Combine(userProfile, ".bun", "install", "cache"), "کش پکیج های Bun"),
-                    (Path.Combine(userProfile, ".gradle", "caches"), "کش بیلد و ابزارهای Gradle"),
-                    (Path.Combine(userProfile, ".cargo", "registry", "cache"), "کش پکیج های Rust Cargo"),
-                    (Path.Combine(userProfile, ".android", "build-cache"), "کش کامپایل Android Studio"),
-                    (Path.Combine(appDataRoaming, "Code", "Cache"), "کش ادیتور VS Code"),
-                    (Path.Combine(appDataRoaming, "Code", "CachedData"), "داده های کش شده VS Code"),
-                    (Path.Combine(userProfile, ".docker"), "کش و لاگ های Docker"),
-                    (Path.Combine(userProfile, ".ollama", "models"), "مدل های هوش مصنوعی Ollama (.gguf)"),
+                    (Path.Combine(localAppData, "npm-cache"), LocalizationService.Get("کش پکیج های npm")),
+                    (Path.Combine(appDataRoaming, "npm-cache"), LocalizationService.Get("کش پکیج های npm (Roaming)")),
+                    (Path.Combine(userProfile, ".nuget", "packages"), LocalizationService.Get("کش پکیج های NuGet")),
+                    (Path.Combine(localAppData, "NuGet", "v3-cache"), LocalizationService.Get("کش HTTP پکیج های NuGet")),
+                    (Path.Combine(localAppData, "pip", "cache"), LocalizationService.Get("کش پکیج های Python pip")),
+                    (Path.Combine(userProfile, ".bun", "install", "cache"), LocalizationService.Get("کش پکیج های Bun")),
+                    (Path.Combine(userProfile, ".gradle", "caches"), LocalizationService.Get("کش بیلد و ابزارهای Gradle")),
+                    (Path.Combine(userProfile, ".cargo", "registry", "cache"), LocalizationService.Get("کش پکیج های Rust Cargo")),
+                    (Path.Combine(userProfile, ".android", "build-cache"), LocalizationService.Get("کش کامپایل Android Studio")),
+                    (Path.Combine(appDataRoaming, "Code", "Cache"), LocalizationService.Get("کش ادیتور VS Code")),
+                    (Path.Combine(appDataRoaming, "Code", "CachedData"), LocalizationService.Get("داده های کش شده VS Code")),
+                    (Path.Combine(userProfile, ".docker"), LocalizationService.Get("کش و لاگ های Docker")),
+                    (Path.Combine(userProfile, ".ollama", "models"), LocalizationService.Get("مدل های هوش مصنوعی Ollama (.gguf)")),
                     // توجه: مسیرهای .lmstudio و lm-studio عمداً اینجا نیستند — LM Studio
                     // (برنامه و مدل ها) در لیست «قفل/دست نزن» کاربر است. فقط آپدیترِ آن
                     // (lm-studio-updater) توسط دیتکتور D04 قابل حذف است.
-                    (Path.Combine(userProfile, ".cache", "huggingface", "hub"), "کش مدل های HuggingFace"),
-                    (Path.Combine(userProfile, "Apple", "MobileSync", "Backup"), "بکاپ های آیفون (Apple MobileSync)"),
-                    (Path.Combine(appDataRoaming, "Apple Computer", "MobileSync", "Backup"), "بکاپ های آیفون (iTunes)")
+                    (Path.Combine(userProfile, ".cache", "huggingface", "hub"), LocalizationService.Get("کش مدل های HuggingFace")),
+                    (Path.Combine(userProfile, "Apple", "MobileSync", "Backup"), LocalizationService.Get("بکاپ های آیفون (Apple MobileSync)")),
+                    (Path.Combine(appDataRoaming, "Apple Computer", "MobileSync", "Backup"), LocalizationService.Get("بکاپ های آیفون (iTunes)"))
                 };
 
                 foreach (var (cPath, cName) in devCaches)
@@ -458,7 +460,7 @@ namespace CleanC.Core.Services
                 // -------------------------------------------------------------
                 // 2. Compute Fast Hashes for Potential Duplicates
                 // -------------------------------------------------------------
-                progress?.Invoke("در حال تحلیل و مقایسه فایل های یکسان...");
+                progress?.Invoke(LocalizationService.Get("در حال تحلیل و مقایسه فایل های یکسان..."));
 
                 var duplicateCandidates = filesBySize.Where(kvp => kvp.Value.Count > 1).ToList();
                 var duplicateGroups = new List<DuplicateFileGroup>();
@@ -1087,6 +1089,7 @@ namespace CleanC.Core.Services
         // یا پسوندش جزو پسوندهای امنیتی باشد، فقط «گزارش» می شود.
         // برچسب ها به صورت کلید کاتالوگ ذخیره می شوند تا در زمان تطبیق
         // (نه در زمان بارگذاری کلاس) به زبان جاری ترجمه شوند.
+        // i18n-logic: برچسب ها در زمان تطبیق (نه بارگذاری کلاس) با Get(key, faFallback) به زبان جاری حل می شوند
         private static readonly (string Token, string LabelKey, string LabelFa)[] SensitiveNamePatterns =
         {
             ("license", "SensitiveLicense", "فایل لایسنس نرم‌افزار"),
@@ -1253,17 +1256,17 @@ namespace CleanC.Core.Services
                         CreateNoWindow = true
                     };
                     using var p = Process.Start(psi);
-                    if (p == null) return (false, "سرویس Docker روی سیستم نصب یا فعال نیست.");
+                    if (p == null) return (false, LocalizationService.Get("سرویس Docker روی سیستم نصب یا فعال نیست."));
                     // پراِن داکر روی کش های حجیم می تواند طولانی باشد؛ تایم اوت قبلی
                     // سرانجام فریم های خروجی را نصفه می گرداند و خطای ناشناخته می داد
                     bool ok = CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 300000, out int dockerCode);
                     return ok && dockerCode == 0
-                        ? (true, "کش داکر، ایمیج های بی استفاده و کانتینرهای متوقف شده با موفقیت پاکسازی شدند.")
-                        : (false, "خطا در پاکسازی کش Docker.");
+                        ? (true, LocalizationService.Get("کش داکر، ایمیج های بی استفاده و کانتینرهای متوقف شده با موفقیت پاکسازی شدند."))
+                        : (false, LocalizationService.Get("خطا در پاکسازی کش Docker."));
                 }
                 catch
                 {
-                    return (false, "سرویس Docker در دسترس نیست.");
+                    return (false, LocalizationService.Get("سرویس Docker در دسترس نیست."));
                 }
             });
         }
@@ -1314,7 +1317,7 @@ namespace CleanC.Core.Services
                     }
                 }
 
-                return (true, freed, $"کش های محیط های برنامه نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({SystemStats.FormatBytes(freed)} آزاد شد)");
+                return (true, freed, string.Format(LocalizationService.Get("کش های محیط های برنامه نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({0} آزاد شد)"), SystemStats.FormatBytes(freed)));
             });
         }
 
@@ -1357,7 +1360,7 @@ namespace CleanC.Core.Services
 
                     if (vhdxFiles.Count == 0)
                     {
-                        return (true, "سرویس WSL2 خاموش و حافظه رم آزاد شد. فایل دیسک مجازی vhdx مجزا یافت نشد.");
+                        return (true, LocalizationService.Get("سرویس WSL2 خاموش و حافظه رم آزاد شد. فایل دیسک مجازی vhdx مجزا یافت نشد."));
                     }
 
                     int compacted = 0;
@@ -1393,14 +1396,14 @@ namespace CleanC.Core.Services
                     }
 
                     string finalMsg = compactionFailures > 0
-                        ? $"تعداد {compacted} دیسک مجازی WSL2 متراکم شد؛ {compactionFailures} مورد کامل نشد (دیسک حجم غالب می تواند کامل نشود)."
-                        : $"تعداد {compacted} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد.";
+                        ? string.Format(LocalizationService.Get("تعداد {0} دیسک مجازی WSL2 متراکم شد؛ {1} مورد کامل نشد (دیسک حجم غالب می تواند کامل نشود)."), compacted, compactionFailures)
+                        : string.Format(LocalizationService.Get("تعداد {0} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد."), compacted);
                     return (true, finalMsg);
                 }
                 catch (Exception ex)
                 {
                     CcLog.Ignore(ex);
-                    return (false, "خطا در متراکم سازی دیسک WSL2.");
+                    return (false, LocalizationService.Get("خطا در متراکم سازی دیسک WSL2."));
                 }
             });
         }
@@ -1417,18 +1420,18 @@ namespace CleanC.Core.Services
                         CreateNoWindow = true
                     };
                     using var p = Process.Start(psi);
-                    if (p == null) return (false, "امکان اجرای ابزار DISM وجود ندارد.");
+                    if (p == null) return (false, LocalizationService.Get("امکان اجرای ابزار DISM وجود ندارد."));
                     // پاکسازی WinSxS معمولاً چند دقیقه طول می کشد؛ ۹۰ ثانیه ی قبلی
                     // Escaped زمان خروج را نصفه می کشید و بی سر و صدا «خطا» می گذاشت.
                     bool ok = CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 900000, out int code);
                     return ok && code == 0
-                        ? (true, "فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته های قدیمی حذف شدند.")
-                        : (false, "عملیات DISM با خطا، تایم اوت یا نیاز به دسترسی Administrator پایان یافت.");
+                        ? (true, LocalizationService.Get("فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته های قدیمی حذف شدند."))
+                        : (false, LocalizationService.Get("عملیات DISM با خطا، تایم اوت یا نیاز به دسترسی Administrator پایان یافت."));
                 }
                 catch (Exception ex)
                 {
                     CcLog.Ignore(ex);
-                    return (false, "خطا در اجرای ابزار پاکسازی DISM.");
+                    return (false, LocalizationService.Get("خطا در اجرای ابزار پاکسازی DISM."));
                 }
             });
         }

@@ -109,7 +109,7 @@ namespace CleanC.Core.Services
                     if (!isPortListening)
                     {
                         info.HasConflict = true;
-                        info.Details = $"پراکسی سیستم روی پورت {port} فعال مانده در حالی که کلاینت VPN بسته شده است و اینترنت ترمینال و ویندوز قطع می باشد.";
+                        info.Details = string.Format(LocalizationService.Get("پراکسی سیستم روی پورت {0} فعال مانده در حالی که کلاینت VPN بسته شده است و اینترنت ترمینال و ویندوز قطع می باشد."), port);
                     }
                 }
             }

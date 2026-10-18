@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>تشغيل كمسؤول</value></data>
@@ -61,4 +61,54 @@
   <data name="ProjectPage" xml:space="preserve"><value>صفحة المشروع على GitHub</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>نسخ معلومات التشخيص</value></data>
   <data name="BackToTools" xml:space="preserve"><value>العودة إلى قائمة الأدوات</value></data>
-<data name="BackButton" xml:space="preserve"><value>رجوع</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>مؤشر صحة النظام</value></data><data name="RamTitle" xml:space="preserve"><value>ذاكرة الوصول العشوائي (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>المعالج (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>مراقبة حركة الإنترنت</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>عمليات التنظيف الأخيرة</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>تفصيل مساحة القرص</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>مواصفات النظام الشاملة</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>صحة البطارية والطاقة</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>إلغاء تثبيت التطبيقات</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>اختبار سرعة وجودة الإنترنت</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>تخصيص ويندوز والمؤثرات</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>إدارة تحديثات ويندوز</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>إدارة بدء التشغيل</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>إدارة برامج التشغيل</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>صيانة القرص و TRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>إدارة DNS</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>إدارة قائمة النقر الأيمن</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>التنظيف العميق للقرص</value></data></root>
+  <data name="BackButton" xml:space="preserve"><value>رجوع</value></data>
+  <data name="HealthScoreTitle" xml:space="preserve"><value>مؤشر صحة النظام</value></data>
+  <data name="RamTitle" xml:space="preserve"><value>ذاكرة الوصول العشوائي (RAM)</value></data>
+  <data name="CpuTitle" xml:space="preserve"><value>المعالج (CPU)</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>مراقبة حركة الإنترنت</value></data>
+  <data name="CleanupHistoryTitle" xml:space="preserve"><value>عمليات التنظيف الأخيرة</value></data>
+  <data name="DiskBreakdownTitle" xml:space="preserve"><value>تفصيل مساحة القرص</value></data>
+  <data name="ToolSpecsTitle" xml:space="preserve"><value>مواصفات النظام الشاملة</value></data>
+  <data name="ToolBatteryTitle" xml:space="preserve"><value>صحة البطارية والطاقة</value></data>
+  <data name="ToolUninstallerTitle" xml:space="preserve"><value>إلغاء تثبيت التطبيقات</value></data>
+  <data name="ToolSpeedTestTitle" xml:space="preserve"><value>اختبار سرعة وجودة الإنترنت</value></data>
+  <data name="ToolPersonalizationTitle" xml:space="preserve"><value>تخصيص ويندوز والمؤثرات</value></data>
+  <data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>إدارة تحديثات ويندوز</value></data>
+  <data name="ToolStartupTitle" xml:space="preserve"><value>إدارة بدء التشغيل</value></data>
+  <data name="ToolDriversTitle" xml:space="preserve"><value>إدارة برامج التشغيل</value></data>
+  <data name="ToolDiskTitle" xml:space="preserve"><value>صيانة القرص و TRIM</value></data>
+  <data name="ToolDnsTitle" xml:space="preserve"><value>إدارة DNS</value></data>
+  <data name="ToolContextMenuTitle" xml:space="preserve"><value>إدارة قائمة النقر الأيمن</value></data>
+  <data name="ToolDeepStorageTitle" xml:space="preserve"><value>التنظيف العميق للقرص</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>حركة الشبكة</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>مستخدَم</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>قابل للتنظيف</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>متاح</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>عنصر محدد</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>إجمالي المكتشف</value></data>
+  <data name="Scanning" xml:space="preserve"><value>جارٍ الفحص...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>تم التحسين بعد التنظيف</value></data>
+  <data name="CharacterTitle" xml:space="preserve"><value>شخصية البطل</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>مظهر الشخصية ونبرتها وسلوكها في بطاقة لوحة التحكم. تُطبَّق التغييرات فوراً.</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>نبرة الحديث</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>مرِح</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>هادئ</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>جادّ</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>اسم الشخصية</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>اسمك (للتحية)</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>المدينة (وحدة الطقس)</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>كثافة الحركة</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>إيقاف</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>منخفض</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>متوسط</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>مرتفع</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>حجم الشخصية</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>إكسسوار</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>إكسسوار المناسبات (الأحداث)</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>فقاعة الحوار</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>مشهد وتأثيرات محيطة خلف الشخصية</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>الأصوات</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>تفاعلات سريعة (حركات أقصر)</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>الوضع الهادئ (حركة أقل للأجهزة الأبطأ)</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>تصحيح التقويم القمري للمناسبات (±يوم واحد)</value></data>
+</root>

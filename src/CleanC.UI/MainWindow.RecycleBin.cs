@@ -35,7 +35,7 @@ namespace CleanC.UI
                 _recycleBinRows.Clear();
                 RecycleBinEmptyHint.Visibility = Visibility.Collapsed;
                 RecycleBinLoadingPanel.Visibility = Visibility.Visible;
-                RecycleBinLoadingText.Text = "در حال خواندن فهرست سطل بازیافت...";
+                RecycleBinLoadingText.Text = LocalizationService.Get("در حال خواندن فهرست سطل بازیافت...");
                 RecycleBinCountText.Text = "…";
                 RecycleBinSizeText.Text = "…";
                 RecycleBinSelectAllCheck.IsChecked = false;
@@ -53,7 +53,7 @@ namespace CleanC.UI
                         VerticalAlignment = VerticalAlignment.Center,
                         Margin = new Thickness(0, 0, 12, 0)
                     };
-                    AutomationProperties.SetName(box, $"انتخاب {item.FileName}");
+                    AutomationProperties.SetName(box, string.Format(LocalizationService.Get("انتخاب {0}"), item.FileName));
                     box.Checked += (_, _) => UpdateRecycleBinSelectedCount();
                     box.Unchecked += (_, _) => UpdateRecycleBinSelectedCount();
 
@@ -61,7 +61,7 @@ namespace CleanC.UI
                     _recycleBinRows.Add((box, item));
                 }
 
-                RecycleBinCountText.Text = $"{items.Count} شیء";
+                RecycleBinCountText.Text = string.Format(LocalizationService.Get("{0} شیء"), items.Count);
                 RecycleBinSizeText.Text = SystemStats.FormatBytes(items.Sum(i => i.SizeBytes));
                 RecycleBinEmptyHint.Visibility = items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
             }
@@ -69,7 +69,7 @@ namespace CleanC.UI
             {
                 CcLog.Ignore(ex, "LoadRecycleBinPageAsync");
                 RecycleBinLoadingPanel.Visibility = Visibility.Collapsed;
-                ShowInfoBar("سطل بازیافت", "فهرست سطل بازیافت قابل خواندن نیست.", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), LocalizationService.Get("فهرست سطل بازیافت قابل خواندن نیست."), InfoBarSeverity.Error);
             }
             finally
             {
@@ -124,14 +124,14 @@ namespace CleanC.UI
 
             // ردیف اطلاعات تکمیلی: نوع + زمان حذف + حجم
             var meta = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-            meta.Children.Add(MetaChip(item.IsDirectory ? "پوشه" : "فایل", "\uE8B7"));
+            meta.Children.Add(MetaChip(item.IsDirectory ? LocalizationService.Get("پوشه") : LocalizationService.Get("فایل"), "\uE8B7"));
             meta.Children.Add(MetaChip(
-                item.DeletedAt == DateTime.MinValue ? "زمان حذف نامشخص" : item.DeletedAt.ToString("yyyy.MM.dd HH:mm", System.Globalization.CultureInfo.InvariantCulture),
+                item.DeletedAt == DateTime.MinValue ? LocalizationService.Get("زمان حذف نامشخص") : item.DeletedAt.ToString("yyyy.MM.dd HH:mm", System.Globalization.CultureInfo.InvariantCulture),
                 "\uE81C"));
             meta.Children.Add(MetaChip(item.FormattedSize, "\uE964"));
 
             if (!item.PayloadExists)
-                meta.Children.Add(MetaChip("داده موجود نیست", "\uE711"));
+                meta.Children.Add(MetaChip(LocalizationService.Get("داده موجود نیست"), "\uE711"));
 
             info.Children.Add(meta);
 
@@ -150,10 +150,10 @@ namespace CleanC.UI
                 Background = GetThemeBrush("AppCardSecondaryBrush"),
                 BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                 FontSize = 11,
-                Content = "بازگردانی",
+                Content = LocalizationService.Get("بازگردانی"),
                 IsEnabled = item.PayloadExists
             };
-            AutomationProperties.SetName(restoreBtn, $"بازگردانی {item.FileName}");
+            AutomationProperties.SetName(restoreBtn, string.Format(LocalizationService.Get("بازگردانی {0}"), item.FileName));
             restoreBtn.Click += RecycleBinItemRestoreBtn_Click;
 
             var deleteBtn = new Button
@@ -166,9 +166,9 @@ namespace CleanC.UI
                 BorderBrush = GetThemeBrush("AppCardBorderBrush"),
                 FontSize = 11,
                 Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 239, 68, 68)),
-                Content = "حذف قطعی"
+                Content = LocalizationService.Get("حذف قطعی")
             };
-            AutomationProperties.SetName(deleteBtn, $"حذف قطعی {item.FileName}");
+            AutomationProperties.SetName(deleteBtn, string.Format(LocalizationService.Get("حذف قطعی {0}"), item.FileName));
             deleteBtn.Click += RecycleBinItemDeleteBtn_Click;
 
             actions.Children.Add(restoreBtn);
@@ -233,7 +233,7 @@ namespace CleanC.UI
             var selected = GetSelectedRecycleBinItems();
             if (selected.Count == 0)
             {
-                ShowInfoBar("سطل بازیافت", "ابتدا دست کم یک شیء را انتخاب کنید.", InfoBarSeverity.Informational);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), LocalizationService.Get("ابتدا دست کم یک شیء را انتخاب کنید."), InfoBarSeverity.Informational);
                 return;
             }
 
@@ -250,9 +250,9 @@ namespace CleanC.UI
             });
 
             if (errors.Count == 0)
-                ShowInfoBar("سطل بازیافت", $"{restored} شیء به مسیر اصلی بازگردانده شد.", InfoBarSeverity.Success);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("{0} شیء به مسیر اصلی بازگردانده شد."), restored), InfoBarSeverity.Success);
             else
-                ShowInfoBar("سطل بازیافت", $"{restored} شیء بازگردانده شد؛ {errors.Count} مورد ناموفق ({errors[0]})", InfoBarSeverity.Warning);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("{0} شیء بازگردانده شد؛ {1} مورد ناموفق ({2})"), restored, errors.Count, errors[0]), InfoBarSeverity.Warning);
 
             await LoadRecycleBinPageAsync();
         }
@@ -265,15 +265,15 @@ namespace CleanC.UI
             var selected = GetSelectedRecycleBinItems();
             if (selected.Count == 0)
             {
-                ShowInfoBar("سطل بازیافت", "ابتدا دست کم یک شیء را انتخاب کنید.", InfoBarSeverity.Informational);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), LocalizationService.Get("ابتدا دست کم یک شیء را انتخاب کنید."), InfoBarSeverity.Informational);
                 return;
             }
 
             long total = selected.Sum(i => i.SizeBytes);
             bool confirmed = await ConfirmRecycleBinAsync(
-                "حذف قطعی اشیاء انتخاب شده",
-                $"{selected.Count} شیء با حجم {SystemStats.FormatBytes(total)} برای همیشه حذف می شود.\nاین عملیات قابل بازگشت نیست.",
-                "حذف قطعی");
+                LocalizationService.Get("حذف قطعی اشیاء انتخاب شده"),
+                string.Format(LocalizationService.Get("{0} شیء با حجم {1} برای همیشه حذف می شود.\nاین عملیات قابل بازگشت نیست."), selected.Count, SystemStats.FormatBytes(total)),
+                LocalizationService.Get("حذف قطعی"));
 
             if (!confirmed) return;
 
@@ -290,9 +290,9 @@ namespace CleanC.UI
             });
 
             if (errors.Count == 0)
-                ShowInfoBar("سطل بازیافت", $"{deleted} شیء برای همیشه حذف شد.", InfoBarSeverity.Success);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("{0} شیء برای همیشه حذف شد."), deleted), InfoBarSeverity.Success);
             else
-                ShowInfoBar("سطل بازیافت", $"{deleted} شیء حذف شد؛ {errors.Count} مورد ناموفق ({errors[0]})", InfoBarSeverity.Warning);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("{0} شیء حذف شد؛ {1} مورد ناموفق ({2})"), deleted, errors.Count, errors[0]), InfoBarSeverity.Warning);
 
             await LoadRecycleBinPageAsync();
         }
@@ -307,9 +307,9 @@ namespace CleanC.UI
 
             long total = items.Sum(i => i.SizeBytes);
             bool confirmed = await ConfirmRecycleBinAsync(
-                "خالی کردن کل سطل بازیافت",
-                $"{items.Count} شیء با حجم {SystemStats.FormatBytes(total)} برای همیشه حذف می شود.\nپس از خالی کردن، هیچ شیء قابل بازگردانی نخواهد بود.",
-                "خالی کردن");
+                LocalizationService.Get("خالی کردن کل سطل بازیافت"),
+                string.Format(LocalizationService.Get("{0} شیء با حجم {1} برای همیشه حذف می شود.\nپس از خالی کردن، هیچ شیء قابل بازگردانی نخواهد بود."), items.Count, SystemStats.FormatBytes(total)),
+                LocalizationService.Get("خالی کردن"));
 
             if (!confirmed) return;
 
@@ -318,11 +318,11 @@ namespace CleanC.UI
             await Task.Run(() => removed = RecycleBinService.EmptyAll(out error));
 
             if (removed > 0)
-                ShowInfoBar("سطل بازیافت", $"سطل خالی شد؛ {removed} شیء حذف قطعی گردید.", InfoBarSeverity.Success);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("سطل خالی شد؛ {0} شیء حذف قطعی گردید."), removed), InfoBarSeverity.Success);
             else if (!string.IsNullOrEmpty(error))
-                ShowInfoBar("سطل بازیافت", $"خالی کردن سطل کامل نشد: {error}", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("خالی کردن سطل کامل نشد: {0}"), error), InfoBarSeverity.Error);
             else
-                ShowInfoBar("سطل بازیافت", "چیزی برای حذف وجود نداشت.", InfoBarSeverity.Informational);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), LocalizationService.Get("چیزی برای حذف وجود نداشت."), InfoBarSeverity.Informational);
 
             await LoadRecycleBinPageAsync();
         }
@@ -344,19 +344,19 @@ namespace CleanC.UI
 
                 if (ok)
                 {
-                    ShowInfoBar("سطل بازیافت", $"«{item.FileName}» به مسیر اصلی بازگردانده شد.", InfoBarSeverity.Success);
+                    ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("«{0}» به مسیر اصلی بازگردانده شد."), item.FileName), InfoBarSeverity.Success);
                     await LoadRecycleBinPageAsync();
                 }
                 else
                 {
-                    ShowInfoBar("سطل بازیافت", string.IsNullOrEmpty(error) ? "بازگردانی انجام نشد." : error, InfoBarSeverity.Error);
+                    ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.IsNullOrEmpty(error) ? LocalizationService.Get("بازگردانی انجام نشد.") : error, InfoBarSeverity.Error);
                     btn.IsEnabled = true;
                 }
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "RecycleBinItemRestoreBtn_Click");
-                ShowInfoBar("سطل بازیافت", "بازگردانی شیء با خطای غیرمنتظره مواجه شد.", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), LocalizationService.Get("بازگردانی شیء با خطای غیرمنتظره مواجه شد."), InfoBarSeverity.Error);
                 btn.IsEnabled = true;
             }
         }
@@ -369,9 +369,9 @@ namespace CleanC.UI
             if (sender is not Button btn || btn.Tag is not RecycleBinItem item) return;
 
             bool confirmed = await ConfirmRecycleBinAsync(
-                "حذف قطعی شیء",
-                $"«{item.FileName}» ({item.FormattedSize}) برای همیشه حذف می شود.\nاین عملیات قابل بازگشت نیست.",
-                "حذف قطعی");
+                LocalizationService.Get("حذف قطعی شیء"),
+                string.Format(LocalizationService.Get("«{0}» ({1}) برای همیشه حذف می شود.\nاین عملیات قابل بازگشت نیست."), item.FileName, item.FormattedSize),
+                LocalizationService.Get("حذف قطعی"));
 
             if (!confirmed) return;
 
@@ -383,19 +383,19 @@ namespace CleanC.UI
 
                 if (ok)
                 {
-                    ShowInfoBar("سطل بازیافت", $"«{item.FileName}» برای همیشه حذف شد.", InfoBarSeverity.Success);
+                    ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.Format(LocalizationService.Get("«{0}» برای همیشه حذف شد."), item.FileName), InfoBarSeverity.Success);
                     await LoadRecycleBinPageAsync();
                 }
                 else
                 {
-                    ShowInfoBar("سطل بازیافت", string.IsNullOrEmpty(error) ? "حذف انجام نشد." : error, InfoBarSeverity.Error);
+                    ShowInfoBar(LocalizationService.Get("سطل بازیافت"), string.IsNullOrEmpty(error) ? LocalizationService.Get("حذف انجام نشد.") : error, InfoBarSeverity.Error);
                     btn.IsEnabled = true;
                 }
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "RecycleBinItemDeleteBtn_Click");
-                ShowInfoBar("سطل بازیافت", "حذف شیء با خطای غیرمنتظره مواجه شد.", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("سطل بازیافت"), LocalizationService.Get("حذف شیء با خطای غیرمنتظره مواجه شد."), InfoBarSeverity.Error);
                 btn.IsEnabled = true;
             }
         }
@@ -414,7 +414,7 @@ namespace CleanC.UI
                     Title = title,
                     Content = message,
                     PrimaryButtonText = primaryText,
-                    CloseButtonText = "انصراف",
+                    CloseButtonText = LocalizationService.Get("انصراف"),
                     DefaultButton = ContentDialogButton.Close,
                     XamlRoot = this.Content.XamlRoot
                 };

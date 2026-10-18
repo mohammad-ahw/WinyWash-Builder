@@ -135,9 +135,9 @@ namespace CleanC.Core.Services
         /// <summary>توصیف فارسیِ رفتار حذف برای نمایش در دیالوگ تأیید (صادقانه، نه وعده ی قطعی).</summary>
         public static string DescribeMode(SafeDeleteMode mode) => mode switch
         {
-            SafeDeleteMode.Quarantine => "در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)",
-            SafeDeleteMode.Permanent => "برای همیشه حذف خواهد شد (قابل بازگردانی نیست)",
-            _ => "به سطل بازیافت منتقل خواهد شد"
+            SafeDeleteMode.Quarantine => LocalizationService.Get("در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)"),
+            SafeDeleteMode.Permanent => LocalizationService.Get("برای همیشه حذف خواهد شد (قابل بازگردانی نیست)"),
+            _ => LocalizationService.Get("به سطل بازیافت منتقل خواهد شد")
         };
 
         /// <summary>
@@ -172,22 +172,22 @@ namespace CleanC.Core.Services
         /// </summary>
         public static string DescribeBatch(SafeDeleteBatchResult batch)
         {
-            if (batch == null) return "هیچ موردی حذف نشد.";
+            if (batch == null) return LocalizationService.Get("هیچ موردی حذف نشد.");
 
             var parts = new List<string>();
-            if (batch.RecycledCount > 0) parts.Add($"{batch.RecycledCount} مورد به سطل بازیافت منتقل شد");
-            if (batch.QuarantinedCount > 0) parts.Add($"{batch.QuarantinedCount} مورد در قرنطینه ذخیره شد");
-            if (batch.PermanentCount > 0) parts.Add($"{batch.PermanentCount} مورد حذف قطعی شد");
+            if (batch.RecycledCount > 0) parts.Add(string.Format(LocalizationService.Get("{0} مورد به سطل بازیافت منتقل شد"), batch.RecycledCount));
+            if (batch.QuarantinedCount > 0) parts.Add(string.Format(LocalizationService.Get("{0} مورد در قرنطینه ذخیره شد"), batch.QuarantinedCount));
+            if (batch.PermanentCount > 0) parts.Add(string.Format(LocalizationService.Get("{0} مورد حذف قطعی شد"), batch.PermanentCount));
 
-            string message = parts.Count > 0 ? string.Join("، ", parts) : "هیچ موردی حذف نشد";
+            string message = parts.Count > 0 ? string.Join(LocalizationService.Get("، "), parts) : LocalizationService.Get("هیچ موردی حذف نشد");
 
-            if (batch.NotFoundCount > 0) message += $"؛ {batch.NotFoundCount} مورد از قبل وجود نداشت";
-            if (batch.FailedCount > 0) message += $"؛ {batch.FailedCount} مورد ناموفق";
+            if (batch.NotFoundCount > 0) message += string.Format(LocalizationService.Get("؛ {0} مورد از قبل وجود نداشت"), batch.NotFoundCount);
+            if (batch.FailedCount > 0) message += string.Format(LocalizationService.Get("؛ {0} مورد ناموفق"), batch.FailedCount);
 
             if (batch.FreedBytes > 0)
-                message += $" — {Models.SystemStats.FormatBytes(batch.FreedBytes)} فضا آزاد گردید";
+                message += string.Format(LocalizationService.Get(" — {0} فضا آزاد گردید"), Models.SystemStats.FormatBytes(batch.FreedBytes));
             else if (batch.MovedBytes > 0)
-                message += $" — {Models.SystemStats.FormatBytes(batch.MovedBytes)} جابه جا شد (تا خالی کردن سطل آزاد نمی شود)";
+                message += string.Format(LocalizationService.Get(" — {0} جابه جا شد (تا خالی کردن سطل آزاد نمی شود)"), Models.SystemStats.FormatBytes(batch.MovedBytes));
 
             return message;
         }
@@ -403,11 +403,11 @@ namespace CleanC.Core.Services
 
         private static string FriendlyError(Exception ex) => ex switch
         {
-            UnauthorizedAccessException => "دسترسی کافی نیست",
-            DirectoryNotFoundException => "مسیر پیدا نشد",
-            FileNotFoundException => "فایل پیدا نشد",
-            IOException io when io.Message.Contains("recycle", StringComparison.OrdinalIgnoreCase) => "سطل بازیافت در دسترس نیست",
-            IOException => "فایل توسط برنامه ی دیگری قفل است",
+            UnauthorizedAccessException => LocalizationService.Get("دسترسی کافی نیست"),
+            DirectoryNotFoundException => LocalizationService.Get("مسیر پیدا نشد"),
+            FileNotFoundException => LocalizationService.Get("فایل پیدا نشد"),
+            IOException io when io.Message.Contains("recycle", StringComparison.OrdinalIgnoreCase) => LocalizationService.Get("سطل بازیافت در دسترس نیست"),
+            IOException => LocalizationService.Get("فایل توسط برنامه ی دیگری قفل است"),
             _ => ex.Message
         };
 
@@ -577,7 +577,7 @@ namespace CleanC.Core.Services
             var manifest = ListQuarantineSessions()
                 .FirstOrDefault(s => string.Equals(s.SessionId, sessionId, StringComparison.OrdinalIgnoreCase));
 
-            if (manifest == null) return (0, 0, "نشست قرنطینه پیدا نشد.");
+            if (manifest == null) return (0, 0, LocalizationService.Get("نشست قرنطینه پیدا نشد."));
 
             foreach (var entry in manifest.Entries)
             {
@@ -587,7 +587,7 @@ namespace CleanC.Core.Services
 
                     string dest = entry.OriginalPath;
                     string? destDir = Path.GetDirectoryName(dest);
-                    if (string.IsNullOrWhiteSpace(destDir)) { failed++; lastError = "مسیر مقصد نامعتبر است."; continue; }
+                    if (string.IsNullOrWhiteSpace(destDir)) { failed++; lastError = LocalizationService.Get("مسیر مقصد نامعتبر است."); continue; }
 
                     Directory.CreateDirectory(destDir);
                     if (Exists(dest, entry.IsDirectory)) dest = MakeUniquePath(dest);

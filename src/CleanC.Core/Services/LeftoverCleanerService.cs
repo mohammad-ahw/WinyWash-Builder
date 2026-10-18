@@ -190,7 +190,7 @@ namespace CleanC.Core.Services
                                     FolderName = dirName,
                                     FullPath = dir,
                                     SizeBytes = size,
-                                    LocationType = "C:\\Users (پروفایل کاربر)"
+                                    LocationType = LocalizationService.Get("C:\\Users (پروفایل کاربر)")
                                 });
                             }
                         }

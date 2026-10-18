@@ -13,8 +13,8 @@ namespace CleanC.Core.Services
         public string Id { get; set; } = string.Empty;
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string Category { get; set; } = "سخت افزار";
-        public string ActionText { get; set; } = "اعمال تغییر";
+        public string Category { get; set; } = LocalizationService.Get("سخت افزار");
+        public string ActionText { get; set; } = LocalizationService.Get("اعمال تغییر");
         public string IconGlyph { get; set; } = "\uE7F4";
         public bool IsApplied { get; set; }
         public int IntParameter { get; set; }
@@ -60,10 +60,10 @@ namespace CleanC.Core.Services
                         list.Add(new AttentionDecisionItem
                         {
                             Id = "bloatware_apps",
-                            Title = $"{bloatCandidates.Count} برنامه غیرضروری، تبلیغاتی یا کم استفاده شناسایی شد",
-                            Description = $"برنامه های تبلیغاتی و بلااستفاده پیش فرض که حدود {SystemStats.FormatBytes(totalBloatBytes)} از فضای دیسک و منابع سیستم را درگیر کرده اند.",
-                            Category = "مدیریت نرم افزارها",
-                            ActionText = "بررسی و حذف",
+                            Title = string.Format(LocalizationService.Get("{0} برنامه غیرضروری، تبلیغاتی یا کم استفاده شناسایی شد"), bloatCandidates.Count),
+                            Description = string.Format(LocalizationService.Get("برنامه های تبلیغاتی و بلااستفاده پیش فرض که حدود {0} از فضای دیسک و منابع سیستم را درگیر کرده اند."), SystemStats.FormatBytes(totalBloatBytes)),
+                            Category = LocalizationService.Get("مدیریت نرم افزارها"),
+                            ActionText = LocalizationService.Get("بررسی و حذف"),
                             IconGlyph = "\uE74D",
                             IntParameter = bloatCandidates.Count
                         });
@@ -98,10 +98,10 @@ namespace CleanC.Core.Services
                             list.Add(new AttentionDecisionItem
                             {
                                 Id = "ssd_critical_space",
-                                Title = $"کاهش بحرانی فضای درایو ویندوز ({freeGb} GB معادل {freePercent:0}% آزاد)",
-                                Description = "پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول های فلش می شود. توصیه می شود پاکسازی و دستور TRIM انجام شود.",
-                                Category = "حافظه و دیسک",
-                                ActionText = "بهینه سازی TRIM دیسک",
+                                Title = string.Format(LocalizationService.Get("کاهش بحرانی فضای درایو ویندوز ({0} GB معادل {1:0}% آزاد)"), freeGb, freePercent),
+                                Description = LocalizationService.Get("پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول های فلش می شود. توصیه می شود پاکسازی و دستور TRIM انجام شود."),
+                                Category = LocalizationService.Get("حافظه و دیسک"),
+                                ActionText = LocalizationService.Get("بهینه سازی TRIM دیسک"),
                                 IconGlyph = "\uEDA2"
                             });
                         }
@@ -120,10 +120,10 @@ namespace CleanC.Core.Services
                         list.Add(new AttentionDecisionItem
                         {
                             Id = "gpu_hags",
-                            Title = "شتاب دهنده سخت افزاری گرافیک (HAGS) فعال نیست",
-                            Description = "با فعال سازی Hardware Accelerated GPU Scheduling، پردازش زمان بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم ها کاهش می یابد.",
-                            Category = "کارت گرافیک و گیمینگ",
-                            ActionText = "فعال سازی HAGS",
+                            Title = LocalizationService.Get("شتاب دهنده سخت افزاری گرافیک (HAGS) فعال نیست"),
+                            Description = LocalizationService.Get("با فعال سازی Hardware Accelerated GPU Scheduling، پردازش زمان بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم ها کاهش می یابد."),
+                            Category = LocalizationService.Get("کارت گرافیک و گیمینگ"),
+                            ActionText = LocalizationService.Get("فعال سازی HAGS"),
                             IconGlyph = "\uE790"
                         });
                     }
@@ -142,10 +142,10 @@ namespace CleanC.Core.Services
                         list.Insert(0, new AttentionDecisionItem
                         {
                             Id = "proxy_vpn_conflict",
-                            Title = $"تداخل پراکسی سیستم و قطعی اینترنت ({proxyConflict.ProxyServer})",
+                            Title = string.Format(LocalizationService.Get("تداخل پراکسی سیستم و قطعی اینترنت ({0})"), proxyConflict.ProxyServer),
                             Description = proxyConflict.Details,
-                            Category = "شبکه و ارتباطات",
-                            ActionText = "رفع قطعی و حذف پراکسی",
+                            Category = LocalizationService.Get("شبکه و ارتباطات"),
+                            ActionText = LocalizationService.Get("رفع قطعی و حذف پراکسی"),
                             IconGlyph = "\uE774"
                         });
                     }
@@ -164,10 +164,10 @@ namespace CleanC.Core.Services
                         list.Add(new AttentionDecisionItem
                         {
                             Id = "orphaned_services",
-                            Title = $"{orphanedServices.Count} سرویس یتیم در ویندوز شناسایی شد",
-                            Description = "سرویس‌هایی که فایل اجرایی آن‌ها از روی دیسک پاک شده اما ورودی آن‌ها در ویندوز مانده و باعث کندی استارتاپ سیستم می‌شوند.",
-                            Category = "سرویس‌ها و بوت",
-                            ActionText = "غیرفعال‌سازی سرویس‌ها",
+                            Title = string.Format(LocalizationService.Get("{0} سرویس یتیم در ویندوز شناسایی شد"), orphanedServices.Count),
+                            Description = LocalizationService.Get("سرویس‌هایی که فایل اجرایی آن‌ها از روی دیسک پاک شده اما ورودی آن‌ها در ویندوز مانده و باعث کندی استارتاپ سیستم می‌شوند."),
+                            Category = LocalizationService.Get("سرویس‌ها و بوت"),
+                            ActionText = LocalizationService.Get("غیرفعال‌سازی سرویس‌ها"),
                             IconGlyph = "\uE7B5",
                             IntParameter = orphanedServices.Count
                         });
@@ -188,10 +188,10 @@ namespace CleanC.Core.Services
                         list.Add(new AttentionDecisionItem
                         {
                             Id = "wsl_docker_compact",
-                            Title = $"فشرده‌سازی دیسک‌های مجازی WSL و داکر ({SystemStats.FormatBytes(totalVhdx)})",
-                            Description = "دیسک‌های مجازی پس از حذف فایل‌ها و کانتینرها حجم خود را پس نمی‌دهند. فشرده‌سازی VHDX می‌تواند گیگابایت‌ها فضا را آزاد کند.",
-                            Category = "مجازی‌سازی و دیسک",
-                            ActionText = "فشرده‌سازی دیسک‌ها",
+                            Title = string.Format(LocalizationService.Get("فشرده‌سازی دیسک‌های مجازی WSL و داکر ({0})"), SystemStats.FormatBytes(totalVhdx)),
+                            Description = LocalizationService.Get("دیسک‌های مجازی پس از حذف فایل‌ها و کانتینرها حجم خود را پس نمی‌دهند. فشرده‌سازی VHDX می‌تواند گیگابایت‌ها فضا را آزاد کند."),
+                            Category = LocalizationService.Get("مجازی‌سازی و دیسک"),
+                            ActionText = LocalizationService.Get("فشرده‌سازی دیسک‌ها"),
                             IconGlyph = "\uEDA2"
                         });
                     }
@@ -242,10 +242,10 @@ namespace CleanC.Core.Services
                 return new AttentionDecisionItem
                 {
                     Id = "refresh_rate",
-                    Title = $"ارتقای نرخ نوسازی مانیتور از {currentHz}Hz به {maxHz}Hz",
-                    Description = $"مانیتور شما با رزولوشن {width}×{height} از فرکانس بالاتر {maxHz}Hz پشتیبانی می کند که روانی و سرعت تصویر را ۲ برابر خواهد کرد.",
-                    Category = "نمایشگر و مانیتور",
-                    ActionText = $"ارتقا به {maxHz}Hz",
+                    Title = string.Format(LocalizationService.Get("ارتقای نرخ نوسازی مانیتور از {0}Hz به {1}Hz"), currentHz, maxHz),
+                    Description = string.Format(LocalizationService.Get("مانیتور شما با رزولوشن {0}×{1} از فرکانس بالاتر {2}Hz پشتیبانی می کند که روانی و سرعت تصویر را ۲ برابر خواهد کرد."), width, height, maxHz),
+                    Category = LocalizationService.Get("نمایشگر و مانیتور"),
+                    ActionText = string.Format(LocalizationService.Get("ارتقا به {0}Hz"), maxHz),
                     IconGlyph = "\uE7F4",
                     IntParameter = maxHz
                 };

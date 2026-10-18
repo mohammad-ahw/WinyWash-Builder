@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>管理者として実行中</value></data>
@@ -61,4 +61,54 @@
   <data name="ProjectPage" xml:space="preserve"><value>GitHub プロジェクトページ</value></data>
   <data name="CopyDiagnostics" xml:space="preserve"><value>診断情報をコピー</value></data>
   <data name="BackToTools" xml:space="preserve"><value>ツール一覧に戻る</value></data>
-<data name="BackButton" xml:space="preserve"><value>戻る</value></data><data name="HealthScoreTitle" xml:space="preserve"><value>システムヘルススコア</value></data><data name="RamTitle" xml:space="preserve"><value>メモリ (RAM)</value></data><data name="CpuTitle" xml:space="preserve"><value>プロセッサ (CPU)</value></data><data name="NetworkTitle" xml:space="preserve"><value>ネットワークトラフィック監視</value></data><data name="CleanupHistoryTitle" xml:space="preserve"><value>最近のクリーンアップ履歴</value></data><data name="DiskBreakdownTitle" xml:space="preserve"><value>ストレージ内訳</value></data><data name="ToolSpecsTitle" xml:space="preserve"><value>詳細なシステム仕様</value></data><data name="ToolBatteryTitle" xml:space="preserve"><value>バッテリー状態と電源</value></data><data name="ToolUninstallerTitle" xml:space="preserve"><value>アプリ＆ブロートウェアアンインストーラー</value></data><data name="ToolSpeedTestTitle" xml:space="preserve"><value>インターネット速度・品質テスト</value></data><data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windowsの個人用設定と視覚効果</value></data><data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update 管理</value></data><data name="ToolStartupTitle" xml:space="preserve"><value>スタートアップ管理</value></data><data name="ToolDriversTitle" xml:space="preserve"><value>ドライバ管理</value></data><data name="ToolDiskTitle" xml:space="preserve"><value>ディスクのメンテナンスとTRIM</value></data><data name="ToolDnsTitle" xml:space="preserve"><value>DNSマネージャー</value></data><data name="ToolContextMenuTitle" xml:space="preserve"><value>コンテキストメニュー管理</value></data><data name="ToolDeepStorageTitle" xml:space="preserve"><value>ディープストレージクリーナー</value></data></root>
+  <data name="BackButton" xml:space="preserve"><value>戻る</value></data>
+  <data name="HealthScoreTitle" xml:space="preserve"><value>システムヘルススコア</value></data>
+  <data name="RamTitle" xml:space="preserve"><value>メモリ (RAM)</value></data>
+  <data name="CpuTitle" xml:space="preserve"><value>プロセッサ (CPU)</value></data>
+  <data name="NetworkTitle" xml:space="preserve"><value>ネットワークトラフィック監視</value></data>
+  <data name="CleanupHistoryTitle" xml:space="preserve"><value>最近のクリーンアップ履歴</value></data>
+  <data name="DiskBreakdownTitle" xml:space="preserve"><value>ストレージ内訳</value></data>
+  <data name="ToolSpecsTitle" xml:space="preserve"><value>詳細なシステム仕様</value></data>
+  <data name="ToolBatteryTitle" xml:space="preserve"><value>バッテリー状態と電源</value></data>
+  <data name="ToolUninstallerTitle" xml:space="preserve"><value>アプリ＆ブロートウェアアンインストーラー</value></data>
+  <data name="ToolSpeedTestTitle" xml:space="preserve"><value>インターネット速度・品質テスト</value></data>
+  <data name="ToolPersonalizationTitle" xml:space="preserve"><value>Windowsの個人用設定と視覚効果</value></data>
+  <data name="ToolWindowsUpdateTitle" xml:space="preserve"><value>Windows Update 管理</value></data>
+  <data name="ToolStartupTitle" xml:space="preserve"><value>スタートアップ管理</value></data>
+  <data name="ToolDriversTitle" xml:space="preserve"><value>ドライバ管理</value></data>
+  <data name="ToolDiskTitle" xml:space="preserve"><value>ディスクのメンテナンスとTRIM</value></data>
+  <data name="ToolDnsTitle" xml:space="preserve"><value>DNSマネージャー</value></data>
+  <data name="ToolContextMenuTitle" xml:space="preserve"><value>コンテキストメニュー管理</value></data>
+  <data name="ToolDeepStorageTitle" xml:space="preserve"><value>ディープストレージクリーナー</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>ネットワーク</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>使用済み</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>クリーン可能</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>空き</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>個選択中</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>検出合計</value></data>
+  <data name="Scanning" xml:space="preserve"><value>スキャン中...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>クリーンアップ後に最適化済み</value></data>
+  <data name="CharacterTitle" xml:space="preserve"><value>ヒーローキャラクター</value></data>
+  <data name="CharacterSub" xml:space="preserve"><value>ダッシュボードカード上のキャラクターの見た目・口調・動作。変更はすぐに反映されます。</value></data>
+  <data name="CharacterTone" xml:space="preserve"><value>話し方のトーン</value></data>
+  <data name="CharacterToneJoke" xml:space="preserve"><value>おちゃめ</value></data>
+  <data name="CharacterToneCalm" xml:space="preserve"><value>おだやか</value></data>
+  <data name="CharacterToneSerious" xml:space="preserve"><value>まじめ</value></data>
+  <data name="CharacterNameLabel" xml:space="preserve"><value>キャラクター名</value></data>
+  <data name="CharacterUserName" xml:space="preserve"><value>あなたの名前（あいさつ用）</value></data>
+  <data name="CharacterCity" xml:space="preserve"><value>都市（天気モジュール用）</value></data>
+  <data name="CharacterIntensity" xml:space="preserve"><value>アニメーションの強さ</value></data>
+  <data name="CharacterIntOff" xml:space="preserve"><value>オフ</value></data>
+  <data name="CharacterIntLow" xml:space="preserve"><value>弱</value></data>
+  <data name="CharacterIntMid" xml:space="preserve"><value>中</value></data>
+  <data name="CharacterIntHigh" xml:space="preserve"><value>強</value></data>
+  <data name="CharacterSize" xml:space="preserve"><value>キャラクターの大きさ</value></data>
+  <data name="CharacterLook" xml:space="preserve"><value>アクセサリー</value></data>
+  <data name="CharacterOccLook" xml:space="preserve"><value>イベント用アクセサリー</value></data>
+  <data name="CharacterBubble" xml:space="preserve"><value>吹き出し</value></data>
+  <data name="CharacterEnv" xml:space="preserve"><value>キャラクター背後のシーンと環境エフェクト</value></data>
+  <data name="CharacterSound" xml:space="preserve"><value>サウンド</value></data>
+  <data name="CharacterFast" xml:space="preserve"><value>すばやい反応（短いアニメーション）</value></data>
+  <data name="CharacterCalm" xml:space="preserve"><value>おだやかモード（動作を軽減、低速PC向け）</value></data>
+  <data name="CharacterLun" xml:space="preserve"><value>イベント用の旧暦補正（±1日）</value></data>
+</root>

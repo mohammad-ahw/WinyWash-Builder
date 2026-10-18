@@ -231,14 +231,14 @@ namespace CleanC.Core.Services
         public static bool Restore(RecycleBinItem item, out string error)
         {
             error = string.Empty;
-            if (item == null) { error = "شیء انتخاب نشده است."; return false; }
-            if (!item.PayloadExists) { error = "داده ی شیء دیگر در سطل موجود نیست."; return false; }
+            if (item == null) { error = LocalizationService.Get("شیء انتخاب نشده است."); return false; }
+            if (!item.PayloadExists) { error = LocalizationService.Get("داده ی شیء دیگر در سطل موجود نیست."); return false; }
 
             try
             {
                 string dest = item.OriginalPath;
                 string? destDir = Path.GetDirectoryName(dest);
-                if (string.IsNullOrWhiteSpace(destDir)) { error = "مسیر مقصد نامعتبر است."; return false; }
+                if (string.IsNullOrWhiteSpace(destDir)) { error = LocalizationService.Get("مسیر مقصد نامعتبر است."); return false; }
 
                 Directory.CreateDirectory(destDir);
 
@@ -278,7 +278,7 @@ namespace CleanC.Core.Services
         public static bool Delete(RecycleBinItem item, out string error)
         {
             error = string.Empty;
-            if (item == null) { error = "شیء انتخاب نشده است."; return false; }
+            if (item == null) { error = LocalizationService.Get("شیء انتخاب نشده است."); return false; }
 
             try
             {

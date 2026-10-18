@@ -12,7 +12,7 @@ namespace CleanC.Core.Services
 {
     public class BrowserDetails
     {
-        public string Name { get; set; } = "نامشخص";
+        public string Name { get; set; } = LocalizationService.Get("نامشخص");
         public string ProgId { get; set; } = string.Empty;
         public string ExecutablePath { get; set; } = string.Empty;
         public bool IsHardwareAccelerationActive { get; set; }
@@ -343,13 +343,13 @@ namespace CleanC.Core.Services
                                 results.Add(new BrowserExtensionInfo
                                 {
                                     Id = orphanId,
-                                    Name = $"پسماند تنظیمات افزونه ({orphanId})",
+                                    Name = string.Format(LocalizationService.Get("پسماند تنظیمات افزونه ({0})"), orphanId),
                                     BrowserName = bName,
                                     ProfileName = profName,
                                     SizeBytes = size,
                                     IsEnabled = false,
                                     Category = ExtensionRiskCategory.SafeToClean,
-                                    Reason = "دایرکتوری باقیمانده از افزونه حذف‌شده (Orphaned Remnant)",
+                                    Reason = LocalizationService.Get("دایرکتوری باقیمانده از افزونه حذف‌شده (Orphaned Remnant)"),
                                     InstallPath = orphanDir
                                 });
                             }
@@ -434,7 +434,7 @@ namespace CleanC.Core.Services
                     if (prefData.DisableReasons.Any(r => r > 1))
                     {
                         info.Category = ExtensionRiskCategory.SafeToClean;
-                        info.Reason = "افزونه دارای خطای داخلی یا مسدود شده توسط استور (Corrupted/Policy)";
+                        info.Reason = LocalizationService.Get("افزونه دارای خطای داخلی یا مسدود شده توسط استور (Corrupted/Policy)");
                         return info;
                     }
                 }
@@ -444,32 +444,32 @@ namespace CleanC.Core.Services
             if (ProtectedExtensionIds.Contains(extId))
             {
                 info.Category = ExtensionRiskCategory.ProtectedWhitelist;
-                info.Reason = "افزونه کلیدی و حفاظت‌شده (دانلود منیجر، مترجم، AI RTL)";
+                info.Reason = LocalizationService.Get("افزونه کلیدی و حفاظت‌شده (دانلود منیجر، مترجم، AI RTL)");
             }
             else if (KnownDeadExtensionIds.Contains(extId))
             {
                 info.Category = ExtensionRiskCategory.SafeToClean;
-                info.Reason = "افزونه منسوخ‌شده، غیرفعال یا جایگزین‌شده (Safe to Clean)";
+                info.Reason = LocalizationService.Get("افزونه منسوخ‌شده، غیرفعال یا جایگزین‌شده (Safe to Clean)");
             }
             else if (info.SizeBytes > 50 * 1024 * 1024)
             {
                 info.Category = ExtensionRiskCategory.ReviewWarning;
-                info.Reason = "حجم بسیار بالا (> 50MB) با احتمال مصرف سنگین رم";
+                info.Reason = LocalizationService.Get("حجم بسیار بالا (> 50MB) با احتمال مصرف سنگین رم");
             }
             else if (info.HasGlobalUrlAccess)
             {
                 info.Category = ExtensionRiskCategory.ReviewWarning;
-                info.Reason = "تزریق اسکریپت به تمام صفحات (<all_urls>) - پایش دائمی DOM";
+                info.Reason = LocalizationService.Get("تزریق اسکریپت به تمام صفحات (<all_urls>) - پایش دائمی DOM");
             }
             else if (!info.IsEnabled)
             {
                 info.Category = ExtensionRiskCategory.ReviewWarning;
-                info.Reason = "افزونه غیرفعال توسط کاربر";
+                info.Reason = LocalizationService.Get("افزونه غیرفعال توسط کاربر");
             }
             else
             {
                 info.Category = ExtensionRiskCategory.ReviewWarning;
-                info.Reason = "افزونه فعال استاندارد";
+                info.Reason = LocalizationService.Get("افزونه فعال استاندارد");
             }
 
             return info;

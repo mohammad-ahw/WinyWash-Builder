@@ -95,10 +95,10 @@ namespace CleanC.Core.Services
                     return new AttentionDecisionItem
                     {
                         Id = "advanced_tweaks",
-                        Title = "بهینه سازی پیشرفته شبکه و پاسخ دهی سیستم (Advanced Tweaks)",
-                        Description = "حذف محدودیت عمدی ویندوز برای پکت های شبکه، غیرفعال سازی GameDVR و افزایش اولویت پردازشی برنامه ها.",
-                        Category = "شبکه و کارایی",
-                        ActionText = "اعمال بهینه سازی ها",
+                        Title = LocalizationService.Get("بهینه سازی پیشرفته شبکه و پاسخ دهی سیستم (Advanced Tweaks)"),
+                        Description = LocalizationService.Get("حذف محدودیت عمدی ویندوز برای پکت های شبکه، غیرفعال سازی GameDVR و افزایش اولویت پردازشی برنامه ها."),
+                        Category = LocalizationService.Get("شبکه و کارایی"),
+                        ActionText = LocalizationService.Get("اعمال بهینه سازی ها"),
                         IconGlyph = "\uE9D2"
                     };
                 }

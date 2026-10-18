@@ -125,7 +125,7 @@ namespace CleanC.Core.Services
                 {
                     Path = dir,
                     LockType = LockTypes.Folder,
-                    Reason = "ریشه ی سیستمی ویندوز — هرگز حذف نمی شود",
+                    Reason = LocalizationService.Get("ریشه ی سیستمی ویندوز — هرگز حذف نمی شود"),
                     IsDefault = true,
                     CreatedAt = DateTime.MinValue
                 };
@@ -137,7 +137,7 @@ namespace CleanC.Core.Services
                 {
                     Path = name,
                     LockType = LockTypes.Name,
-                    Reason = "لیست حفاظت پیش فرض CleanC",
+                    Reason = LocalizationService.Get("لیست حفاظت پیش فرض CleanC"),
                     IsDefault = true,
                     CreatedAt = DateTime.MinValue
                 };

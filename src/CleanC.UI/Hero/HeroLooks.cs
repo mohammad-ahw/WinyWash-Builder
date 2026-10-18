@@ -4,6 +4,7 @@
 // هر وقت HTML اکسسوری اضافه/حذف کرد، اینجا هم باید به روز شود.
 
 using System.Collections.Generic;
+using CleanC.Core.Services;
 
 namespace CleanC.UI.Hero
 {
@@ -12,49 +13,49 @@ namespace CleanC.UI.Hero
         /// <summary>(کد، برچسب) — ترتیب باید با آرایهٔ ACC در HTML یکی بماند.</summary>
         internal static readonly (string Id, string Name)[] All =
         {
-            ("none",    "بدون اکسسوری"),
-            ("tech",    "تکنسین"),
-            ("gamer",   "گیمر"),
-            ("student", "دانشجو"),
-            ("formal",  "رسمی"),
-            ("detective","کارآگاه"),
-            ("wizard",  "جادوگر"),
-            ("astro",   "فضانورد"),
-            ("ninja",   "نینجا"),
-            ("scientist","دانشمند"),
-            ("explorer","ماجراجو"),
-            ("artist",  "هنرمند"),
-            ("photo",   "عکاس"),
-            ("music",   "موسیقی‌دان"),
-            ("pirate",  "دزد دریایی"),
-            ("nature",  "طبیعت‌گرا"),
-            ("ice",     "یخی"),
-            ("fire",    "آتشین"),
-            ("disco",   "دیسکو"),
-            ("crystal", "کریستالی")
+            ("none",    LocalizationService.Get("بدون اکسسوری")),
+            ("tech",    LocalizationService.Get("تکنسین")),
+            ("gamer",   LocalizationService.Get("گیمر")),
+            ("student", LocalizationService.Get("دانشجو")),
+            ("formal",  LocalizationService.Get("رسمی")),
+            ("detective", LocalizationService.Get("کارآگاه")),
+            ("wizard",  LocalizationService.Get("جادوگر")),
+            ("astro",   LocalizationService.Get("فضانورد")),
+            ("ninja",   LocalizationService.Get("نینجا")),
+            ("scientist", LocalizationService.Get("دانشمند")),
+            ("explorer", LocalizationService.Get("ماجراجو")),
+            ("artist",  LocalizationService.Get("هنرمند")),
+            ("photo",   LocalizationService.Get("عکاس")),
+            ("music",   LocalizationService.Get("موسیقی‌دان")),
+            ("pirate",  LocalizationService.Get("دزد دریایی")),
+            ("nature",  LocalizationService.Get("طبیعت‌گرا")),
+            ("ice",     LocalizationService.Get("یخی")),
+            ("fire",    LocalizationService.Get("آتشین")),
+            ("disco",   LocalizationService.Get("دیسکو")),
+            ("crystal", LocalizationService.Get("کریستالی"))
         };
 
         /// <summary>گزینه های لحن گفتار: همان سه مقداری که HTML می خواند.</summary>
         internal static readonly (string Id, string Name)[] Tones =
         {
-            ("joke",    "شوخ‌طبع"),
-            ("calm",    "آرام"),
-            ("serious", "جدی")
+            ("joke",    LocalizationService.Get("شوخ‌طبع")),
+            ("calm",    LocalizationService.Get("آرام")),
+            ("serious", LocalizationService.Get("جدی"))
         };
 
         /// <summary>گزینه های شدت — BUD داخل HTML: off/low/mid/high.</summary>
         internal static readonly (string Id, string Name)[] Intensities =
         {
-            ("off", "خاموش"),
-            ("low", "کم"),
-            ("mid", "متوسط"),
-            ("high","زیاد")
+            ("off", LocalizationService.Get("خاموش")),
+            ("low", LocalizationService.Get("کم")),
+            ("mid", LocalizationService.Get("متوسط")),
+            ("high",LocalizationService.Get("زیاد"))
         };
 
         /// <summary>لیست ظاهر مناسبتی: اول «بدون» (یعنی غیرفعال)، بعد همهٔ اکسسوری ها.</summary>
         internal static (string Id, string Name)[] Occasion()
         {
-            var list = new List<(string Id, string Name)> { ("", "بدون") };
+            var list = new List<(string Id, string Name)> { ("", LocalizationService.Get("بدون")) };
             list.AddRange(All);
             return list.ToArray();
         }

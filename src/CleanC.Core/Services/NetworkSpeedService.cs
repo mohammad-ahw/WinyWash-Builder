@@ -18,7 +18,7 @@ namespace CleanC.Core.Services
         private static DateTime _interfacesRefreshedUtc = DateTime.MinValue;
 
         // کش نتیجه — جلوگیری از نمونه گیری های پشت سرهم در همان تیک تایمر
-        private static (double Mbps, string TypeName) _cached = (0.0, "پایدار");
+        private static (double Mbps, string TypeName) _cached = (0.0, LocalizationService.Get("پایدار"));
         private static DateTime _cachedAtUtc = DateTime.MinValue;
 
         private static long _prevBytes = 0;
@@ -50,7 +50,7 @@ namespace CleanC.Core.Services
                 }
 
                 long totalBytes = 0;
-                string detectedType = "پایدار";
+                string detectedType = LocalizationService.Get("پایدار");
 
                 foreach (var ni in _interfaces)
                 {
@@ -101,7 +101,7 @@ namespace CleanC.Core.Services
             }
             catch
             {
-                return (0.0, "پایدار");
+                return (0.0, LocalizationService.Get("پایدار"));
             }
         }
     }

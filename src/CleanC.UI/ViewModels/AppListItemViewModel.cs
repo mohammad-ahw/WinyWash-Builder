@@ -35,7 +35,7 @@ namespace CleanC.UI.ViewModels
             }
 
             string pubStr = !string.IsNullOrEmpty(app.Publisher) ? $"{app.Publisher} · " : "";
-            string dateStr = !string.IsNullOrEmpty(app.InstalledDateFormatted) ? $"نصب: {app.InstalledDateFormatted}" : "";
+            string dateStr = !string.IsNullOrEmpty(app.InstalledDateFormatted) ? string.Format(LocalizationService.Get("نصب: {0}"), app.InstalledDateFormatted) : "";
             SubLine = $"{pubStr}{dateStr}".TrimEnd(' ', '·');
         }
 
@@ -57,6 +57,12 @@ namespace CleanC.UI.ViewModels
 
         public string SizeText => App.FormattedSize;
         public Visibility SizeVisibility => App.EstimatedSizeBytes > 0 && !string.IsNullOrEmpty(App.FormattedSize) ? Visibility.Visible : Visibility.Collapsed;
+
+        /// <summary>
+        /// برچسب دکمه «حذف» هر ردیف لیست — از کاتالوگ مرکزی خوانده می شود.
+        /// مقدار در زمان ساخت آیتم resolve می شود (لیست با هر بار ورود به بخش از نو ساخته می شود).
+        /// </summary>
+        public string DeleteLabel => LocalizationService.Get("حذف");
 
         // انتخاب از UI بلافاصله در مدل اصلی هم نوشته می شود تا منطق حذف گروهی همان را بخواند
         public bool IsSelected

@@ -70,15 +70,15 @@ namespace CleanC.Core.Services
                         if (returnCode == 0)
                         {
                             PruneOldRestorePoints(2);
-                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند).");
+                            return (true, LocalizationService.Get("نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند)."));
                         }
 
-                        return (false, $"ویندوز ساخت نقطه بازگردانی را رد کرد (کد {returnCode}) — محافظت از سیستم (System Protection) را فعال کنید.");
+                        return (false, string.Format(LocalizationService.Get("ویندوز ساخت نقطه بازگردانی را رد کرد (کد {0}) — محافظت از سیستم (System Protection) را فعال کنید."), returnCode));
                     }
                     catch (Exception wmiEx)
                     {
                         CcLog.Ignore(wmiEx, "RestorePoint.WMI");
-                        return (false, "ساخت نقطه بازگردانی ناموفق بود: " + wmiEx.Message);
+                        return (false, LocalizationService.Get("ساخت نقطه بازگردانی ناموفق بود: ") + wmiEx.Message);
                     }
                 }
                 catch (Exception ex)

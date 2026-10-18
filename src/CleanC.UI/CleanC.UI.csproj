@@ -23,6 +23,13 @@
     <PublishSingleFile>false</PublishSingleFile>
     <ErrorOnDuplicatePublishOutputFiles>false</ErrorOnDuplicatePublishOutputFiles>
     <NoWarn>$(NoWarn);PRI249</NoWarn>
+    <!--
+      فایل‌های .resw زیر Resources\Strings توسط LocalizationService خودمان (پارس XML مستقیم)
+      خوانده می‌شوند؛ XAML/MRT هیچ‌جا از آن‌ها استفاده نمی‌کند (هیچ x:Uid یا ms-appx در پروژه نیست).
+      MakePri با نام‌های فارسی بلند/چندخطی این طرح gettext-line خطای PRI222 می‌دهد،
+      پس glob پیش‌فرض PRIResource غیرفعال می‌شود. کپی فایل‌ها کنار exe از طریق Content انجام می‌شود.
+    -->
+    <EnableDefaultPriItems>false</EnableDefaultPriItems>
   </PropertyGroup>
 
   <ItemGroup>

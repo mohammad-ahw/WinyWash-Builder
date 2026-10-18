@@ -38,7 +38,7 @@ namespace CleanC.UI
                 {
                     content.Children.Add(new TextBlock
                     {
-                        Text = "قرنطینه خالی است؛ چیزی برای بازگردانی وجود ندارد.",
+                        Text = LocalizationService.Get("قرنطینه خالی است؛ چیزی برای بازگردانی وجود ندارد."),
                         FontSize = 11.5,
                         TextWrapping = TextWrapping.Wrap,
                         Foreground = (Brush)Application.Current.Resources["TextFillColorTertiaryBrush"]
@@ -55,14 +55,14 @@ namespace CleanC.UI
             var header = new StackPanel { Spacing = 4 };
             header.Children.Add(new TextBlock
             {
-                Text = "فایل های قرنطینه شده CleanC",
+                Text = LocalizationService.Get("فایل های قرنطینه شده CleanC"),
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 FontSize = 13,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"]
             });
             header.Children.Add(new TextBlock
             {
-                Text = "حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند.",
+                Text = LocalizationService.Get("حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند."),
                 FontSize = 11,
                 TextWrapping = TextWrapping.Wrap,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
@@ -89,19 +89,19 @@ namespace CleanC.UI
             long totalBytes = session.Entries.Sum(e => e.SizeBytes);
             string firstPath = session.Entries.FirstOrDefault()?.OriginalPath ?? string.Empty;
             string folder = string.IsNullOrWhiteSpace(firstPath)
-                ? "مسیر نامشخص"
-                : Path.GetDirectoryName(firstPath) ?? "مسیر نامشخص";
+                ? LocalizationService.Get("مسیر نامشخص")
+                : Path.GetDirectoryName(firstPath) ?? LocalizationService.Get("مسیر نامشخص");
 
             var summary = new StackPanel { Spacing = 2 };
             summary.Children.Add(new TextBlock
             {
-                Text = $"{session.Entries.Count} مورد · {SystemStats.FormatBytes(totalBytes)} · {session.CreatedAt:yyyy.MM.dd HH:mm}",
+                Text = string.Format(LocalizationService.Get("{0} مورد · {1} · {2}"), session.Entries.Count, SystemStats.FormatBytes(totalBytes), session.CreatedAt.ToString("yyyy.MM.dd HH:mm", System.Globalization.CultureInfo.InvariantCulture)),
                 FontSize = 12,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorPrimaryBrush"]
             });
             summary.Children.Add(new TextBlock
             {
-                Text = $"از: {folder}",
+                Text = string.Format(LocalizationService.Get("از: {0}"), folder),
                 FontSize = 10.5,
                 TextTrimming = TextTrimming.CharacterEllipsis,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorTertiaryBrush"]
@@ -109,19 +109,19 @@ namespace CleanC.UI
 
             var restoreBtn = new Button
             {
-                Content = "بازگردانی همه",
+                Content = LocalizationService.Get("بازگردانی همه"),
                 MinWidth = 96,
                 Padding = new Thickness(10, 4, 10, 4)
             };
-            AutomationProperties.SetName(restoreBtn, $"بازگردانی نشست {session.SessionId}");
+            AutomationProperties.SetName(restoreBtn, string.Format(LocalizationService.Get("بازگردانی نشست {0}"), session.SessionId));
 
             var deleteBtn = new Button
             {
-                Content = "حذف قطعی",
+                Content = LocalizationService.Get("حذف قطعی"),
                 MinWidth = 96,
                 Padding = new Thickness(10, 4, 10, 4)
             };
-            AutomationProperties.SetName(deleteBtn, $"حذف قطعی نشست {session.SessionId}");
+            AutomationProperties.SetName(deleteBtn, string.Format(LocalizationService.Get("حذف قطعی نشست {0}"), session.SessionId));
 
             restoreBtn.Click += (_, _) =>
                 SafeInvoker.Run(RestoreQuarantineSessionAsync(session, restoreBtn, deleteBtn, rebuild));
@@ -133,7 +133,7 @@ namespace CleanC.UI
                 if (!armed)
                 {
                     armed = true;
-                    deleteBtn.Content = "حذف شود؟";
+                    deleteBtn.Content = LocalizationService.Get("حذف شود؟");
                     return;
                 }
 
@@ -172,7 +172,7 @@ namespace CleanC.UI
             {
                 restoreBtn.IsEnabled = false;
                 deleteBtn.IsEnabled = false;
-                restoreBtn.Content = "در حال بازگردانی...";
+                restoreBtn.Content = LocalizationService.Get("در حال بازگردانی...");
 
                 var (restored, failed, error) = await Task.Run(() =>
                     SafeDeleteService.RestoreSession(session.SessionId));
@@ -180,16 +180,16 @@ namespace CleanC.UI
                 if (failed == 0 && restored > 0)
                 {
                     ShowInfoBar(
-                        "قرنطینه",
-                        $"{restored} مورد به مسیر اصلی خود بازگردانده شد.",
+                        LocalizationService.Get("قرنطینه"),
+                        string.Format(LocalizationService.Get("{0} مورد به مسیر اصلی خود بازگردانده شد."), restored),
                         InfoBarSeverity.Success);
                 }
                 else
                 {
                     string detail = string.IsNullOrWhiteSpace(error) ? string.Empty : $" ({error})";
                     ShowInfoBar(
-                        "قرنطینه",
-                        $"{restored} مورد بازگردانده شد؛ {failed} مورد ناموفق{detail}.",
+                        LocalizationService.Get("قرنطینه"),
+                        string.Format(LocalizationService.Get("{0} مورد بازگردانده شد؛ {1} مورد ناموفق{2}."), restored, failed, detail),
                         restored > 0 ? InfoBarSeverity.Warning : InfoBarSeverity.Error);
                 }
 
@@ -198,10 +198,10 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "MainWindow.Quarantine.Restore");
-                ShowInfoBar("قرنطینه", "بازگردانی انجام نشد: " + ex.Message, InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("قرنطینه"), LocalizationService.Get("بازگردانی انجام نشد: ") + ex.Message, InfoBarSeverity.Error);
                 restoreBtn.IsEnabled = true;
                 deleteBtn.IsEnabled = true;
-                restoreBtn.Content = "بازگردانی همه";
+                restoreBtn.Content = LocalizationService.Get("بازگردانی همه");
             }
         }
 
@@ -217,8 +217,8 @@ namespace CleanC.UI
                 bool ok = await Task.Run(() => SafeDeleteService.DeleteSession(session.SessionId));
 
                 ShowInfoBar(
-                    "قرنطینه",
-                    ok ? "نشست قرنطینه و فایل های آن برای همیشه حذف شد." : "حذف نشست قرنطینه انجام نشد.",
+                    LocalizationService.Get("قرنطینه"),
+                    ok ? LocalizationService.Get("نشست قرنطینه و فایل های آن برای همیشه حذف شد.") : LocalizationService.Get("حذف نشست قرنطینه انجام نشد."),
                     ok ? InfoBarSeverity.Success : InfoBarSeverity.Error);
 
                 rebuild();
@@ -226,7 +226,7 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "MainWindow.Quarantine.Delete");
-                ShowInfoBar("قرنطینه", "حذف انجام نشد: " + ex.Message, InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("قرنطینه"), LocalizationService.Get("حذف انجام نشد: ") + ex.Message, InfoBarSeverity.Error);
                 deleteBtn.IsEnabled = true;
                 restoreBtn.IsEnabled = true;
             }

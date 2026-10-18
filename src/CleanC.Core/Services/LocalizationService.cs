@@ -1086,6 +1086,13 @@ namespace CleanC.Core.Services
             if (!string.Equals(_current.Code, "en-US", StringComparison.OrdinalIgnoreCase) &&
                 _catalogs.TryGetValue("en-US", out var enDict) && enDict.TryGetValue(key, out var enVal))
             {
+                // الگوی gettext: وقتی خودِ key متن فارسی است (Get("متن فارسی")), برای کاربر فارسی
+                // همان متن منبع ترجمه ی درست است و نباید به انگلیسی fallback کند.
+                if (string.Equals(_current.Code, "fa-IR", StringComparison.OrdinalIgnoreCase) && ContainsPersian(key))
+                {
+                    return key;
+                }
+
                 return enVal;
             }
 
@@ -1097,6 +1104,20 @@ namespace CleanC.Core.Services
             }
 
             return defaultVal ?? key;
+        }
+
+        /// <summary>
+        /// بررسی اینکه رشته حاوی حداقل یک کاراکتر فارسی/عربی است — برای تشخیص کلیدهای gettext-style
+        /// (کلیدهایی که خودشان متن منبع فارسی هستند).
+        /// </summary>
+        public static bool ContainsPersian(string? text)
+        {
+            if (string.IsNullOrEmpty(text)) return false;
+            foreach (char c in text)
+            {
+                if (c >= '\u0600' && c <= '\u06FF') return true;
+            }
+            return false;
         }
 
         public static string GetFontFamilyName()

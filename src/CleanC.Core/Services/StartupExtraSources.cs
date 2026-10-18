@@ -145,7 +145,7 @@ namespace CleanC.Core.Services
                                 IsNonEssential = true,
                                 IsDisabled = !enabled,
                                 IsVpnOrProxy = false,
-                                Category = "برنامه MSIX/UWP (اختیاری)"
+                                Category = "برنامه MSIX/UWP (اختیاری)" // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
                             });
                         }
                     }
@@ -257,8 +257,8 @@ namespace CleanC.Core.Services
 
             // نسخه های محلی سازی شده ی خروجی schtasks؛ هر دو حالت «فاصله ساده» و
             // «نیم فاصله (ZWNJ)» ممکن است در خروجی محلی ظاهر شوند
-            if (s.Contains("ورود", StringComparison.Ordinal)) return true;
-            if (s.Contains("راه اندازی", StringComparison.Ordinal) || s.Contains("راه\u200Cاندازی", StringComparison.Ordinal)) return true;
+            if (s.Contains("ورود", StringComparison.Ordinal)) return true; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
+            if (s.Contains("راه اندازی", StringComparison.Ordinal) || s.Contains("راه\u200Cاندازی", StringComparison.Ordinal)) return true; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
             return false;
         }

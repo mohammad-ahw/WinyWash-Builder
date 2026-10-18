@@ -1,4 +1,5 @@
 using System;
+using CleanC.Core.Services;
 
 namespace CleanC.Core.Models
 {
@@ -11,7 +12,7 @@ namespace CleanC.Core.Models
         public DateTime? ParsedInstallDate { get; set; }
         public string InstalledDateFormatted => ParsedInstallDate.HasValue 
             ? ParsedInstallDate.Value.ToString("yyyy.MM.dd") 
-            : (!string.IsNullOrEmpty(InstallDate) ? InstallDate.Replace('/', '.') : "نامشخص");
+            : (!string.IsNullOrEmpty(InstallDate) ? InstallDate.Replace('/', '.') : LocalizationService.Get("نامشخص"));
 
         public long EstimatedSizeBytes { get; set; }
         public string FormattedSize => EstimatedSizeBytes > 0 ? SystemStats.FormatBytes(EstimatedSizeBytes) : string.Empty;

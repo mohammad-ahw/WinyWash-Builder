@@ -35,18 +35,18 @@ namespace CleanC.Core.Services
 
             if (oldLetter == "C" || newLetter == "C")
             {
-                return (false, "تغییر حرف درایو سیستم عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست.");
+                return (false, LocalizationService.Get("تغییر حرف درایو سیستم عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست."));
             }
 
             if (oldLetter == newLetter)
             {
-                return (false, "حرف انتخابی با حرف فعلی درایو یکسان است.");
+                return (false, LocalizationService.Get("حرف انتخابی با حرف فعلی درایو یکسان است."));
             }
 
             var existingDrives = DriveInfo.GetDrives();
             if (existingDrives.Any(d => d.Name.StartsWith(newLetter, StringComparison.OrdinalIgnoreCase)))
             {
-                return (false, $"حرف درایو {newLetter}: در حال حاضر توسط درایو دیگری در سیستم در حال استفاده است.");
+                return (false, string.Format(LocalizationService.Get("حرف درایو {0}: در حال حاضر توسط درایو دیگری در سیستم در حال استفاده است."), newLetter));
             }
 
             return await Task.Run(() =>
@@ -69,7 +69,7 @@ namespace CleanC.Core.Services
                     };
 
                     using var p = Process.Start(psi);
-                    if (p == null) return (false, "عدم توانایی در فراخوانی ابزار مدیریت پارتیشن.");
+                    if (p == null) return (false, LocalizationService.Get("عدم توانایی در فراخوانی ابزار مدیریت پارتیشن."));
 
                     p.WaitForExit(15000);
 
@@ -80,14 +80,14 @@ namespace CleanC.Core.Services
 
                     if (newLetterExists)
                     {
-                        return (true, $"حرف درایو با موفقیت از {oldLetter}: به {newLetter}: تغییر یافت.");
+                        return (true, string.Format(LocalizationService.Get("حرف درایو با موفقیت از {0}: به {1}: تغییر یافت."), oldLetter, newLetter));
                     }
 
-                    return (false, "تغییر حرف درایو انجام نشد — احتمالاً پارتیشن در حال استفاده یا رزرو شده است.");
+                    return (false, LocalizationService.Get("تغییر حرف درایو انجام نشد — احتمالاً پارتیشن در حال استفاده یا رزرو شده است."));
                 }
                 catch (Exception ex)
                 {
-                    return (false, $"خطای سیستمی: {ex.Message}");
+                    return (false, string.Format(LocalizationService.Get("خطای سیستمی: {0}"), ex.Message));
                 }
                 finally
                 {
@@ -108,7 +108,7 @@ namespace CleanC.Core.Services
                     result.Add(new LogicalDriveItem
                     {
                         Letter = d.Name.TrimEnd('\\'),
-                        VolumeLabel = string.IsNullOrWhiteSpace(d.VolumeLabel) ? "درایو محلی" : d.VolumeLabel,
+                        VolumeLabel = string.IsNullOrWhiteSpace(d.VolumeLabel) ? LocalizationService.Get("درایو محلی") : d.VolumeLabel,
                         FileSystem = d.DriveFormat,
                         TotalSizeBytes = d.TotalSize,
                         FreeSizeBytes = d.AvailableFreeSpace

@@ -75,28 +75,28 @@ namespace CleanC.UI
                 });
 
                 if (DeepStorageDuplicatesCountText != null)
-                    DeepStorageDuplicatesCountText.Text = $"{_deepScanResult.Duplicates.Count} گروه تکراری";
+                    DeepStorageDuplicatesCountText.Text = string.Format(LocalizationService.Get("{0} گروه تکراری"), _deepScanResult.Duplicates.Count);
                 if (DeepStorageDuplicatesSizeText != null)
-                    DeepStorageDuplicatesSizeText.Text = $"{SystemStats.FormatBytes(_deepScanResult.TotalDuplicatesWastedBytes)} فضا";
+                    DeepStorageDuplicatesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalDuplicatesWastedBytes));
 
                 if (DeepStorageEmptyFoldersCountText != null)
-                    DeepStorageEmptyFoldersCountText.Text = $"{_deepScanResult.EmptyFolders.Count} پوشه خالی";
+                    DeepStorageEmptyFoldersCountText.Text = string.Format(LocalizationService.Get("{0} پوشه خالی"), _deepScanResult.EmptyFolders.Count);
 
                 if (DeepStorageMessCountText != null)
-                    DeepStorageMessCountText.Text = $"{_deepScanResult.MessItems.Count} فایل زائد و نامرتب";
+                    DeepStorageMessCountText.Text = string.Format(LocalizationService.Get("{0} فایل زائد و نامرتب"), _deepScanResult.MessItems.Count);
                 if (DeepStorageMessSizeText != null)
-                    DeepStorageMessSizeText.Text = $"{SystemStats.FormatBytes(_deepScanResult.TotalMessBytes)} فضا";
+                    DeepStorageMessSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalMessBytes));
 
                 if (DeepStorageLargeFilesCountText != null)
-                    DeepStorageLargeFilesCountText.Text = $"{_deepScanResult.LargeFiles.Count} فایل حجیم";
+                    DeepStorageLargeFilesCountText.Text = string.Format(LocalizationService.Get("{0} فایل حجیم"), _deepScanResult.LargeFiles.Count);
                 if (DeepStorageLargeFilesSizeText != null)
-                    DeepStorageLargeFilesSizeText.Text = $"{SystemStats.FormatBytes(_deepScanResult.TotalLargeFilesBytes)} فضا";
+                    DeepStorageLargeFilesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalLargeFilesBytes));
 
                 RenderDeepStorageItems();
             }
             catch (Exception ex)
             {
-                ShowInfoBar("خطا در پویش عمیق", ex.Message, InfoBarSeverity.Warning);
+                ShowInfoBar(LocalizationService.Get("خطا در پویش عمیق"), ex.Message, InfoBarSeverity.Warning);
             }
             finally
             {
@@ -186,7 +186,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.Duplicates.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ فایل تکراری با محتوا و سایز یکسان در سیستم یافت نشد. دیسک بهینه است!"));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage(LocalizationService.Get("هیچ فایل تکراری با محتوا و سایز یکسان در سیستم یافت نشد. دیسک بهینه است!")));
                 return;
             }
 
@@ -231,8 +231,8 @@ namespace CleanC.UI
                 headerGrid.Children.Add(iconBorder);
 
                 var titleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
-                titleStack.Children.Add(new TextBlock { Text = $"{group.Files.Count} نسخه یکسان · {group.Files.FirstOrDefault()?.FileName}", FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
-                titleStack.Children.Add(new TextBlock { Text = $"حجم هر فایل: {group.FormattedSize} · هش محتوا: {group.HashPreview}", FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush") });
+                titleStack.Children.Add(new TextBlock { Text = string.Format(LocalizationService.Get("{0} نسخه یکسان · {1}"), group.Files.Count, group.Files.FirstOrDefault()?.FileName), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5 });
+                titleStack.Children.Add(new TextBlock { Text = string.Format(LocalizationService.Get("حجم هر فایل: {0} · هش محتوا: {1}"), group.FormattedSize, group.HashPreview), FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush") });
                 Grid.SetColumn(titleStack, 1);
                 headerGrid.Children.Add(titleStack);
 
@@ -242,7 +242,7 @@ namespace CleanC.UI
                     CornerRadius = new CornerRadius(5),
                     Padding = new Thickness(8, 3, 8, 3),
                     VerticalAlignment = VerticalAlignment.Center,
-                    Child = new TextBlock { Text = $"+ {group.FormattedWastedSize} قابل آزادسازی", FontSize = 10.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] }
+                    Child = new TextBlock { Text = string.Format(LocalizationService.Get("+ {0} قابل آزادسازی"), group.FormattedWastedSize), FontSize = 10.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] }
                 };
                 Grid.SetColumn(wastedBadge, 2);
                 headerGrid.Children.Add(wastedBadge);
@@ -294,7 +294,7 @@ namespace CleanC.UI
                         VerticalAlignment = VerticalAlignment.Center,
                         Child = new TextBlock
                         {
-                            Text = file.IsOriginal ? "نسخه اصلی (نگه داری)" : "نسخه کپی (اضافی)",
+                            Text = file.IsOriginal ? LocalizationService.Get("نسخه اصلی (نگه داری)") : LocalizationService.Get("نسخه کپی (اضافی)"),
                             FontSize = 10,
                             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                             Foreground = file.IsOriginal ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("TextFillColorTertiaryBrush")
@@ -315,7 +315,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.EmptyFolders.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ پوشه خالی بلااستفاده ای در دایرکتوری های انتخابی یافت نشد."));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage(LocalizationService.Get("هیچ پوشه خالی بلااستفاده ای در دایرکتوری های انتخابی یافت نشد.")));
                 return;
             }
 
@@ -343,7 +343,7 @@ namespace CleanC.UI
                     fileName: folder.FolderName,
                     directoryPath: folder.FolderPath,
                     evidenceText: evidenceText,
-                    pillText: "پوشه خالی",
+                    pillText: LocalizationService.Get("پوشه خالی"),
                     sizeText: string.Empty,
                     filePath: folder.FolderPath,
                     hasLock: true,
@@ -357,7 +357,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.MessItems.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ فایل زائد، موقت یا نصاب رها شده ای یافت نشد. دیسک کاملاً پاکیزه است."));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage(LocalizationService.Get("هیچ فایل زائد، موقت یا نصاب رها شده ای یافت نشد. دیسک کاملاً پاکیزه است.")));
                 RenderSensitiveFilesSection();
                 return;
             }
@@ -533,7 +533,7 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null || _deepScanResult.LargeFiles.Count == 0)
             {
-                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("فایل حجیم تر از ۵۰۰ مگابایت در پوشه های شخصی کاربر یافت نشد."));
+                DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage(LocalizationService.Get("فایل حجیم تر از ۵۰۰ مگابایت در پوشه های شخصی کاربر یافت نشد.")));
                 return;
             }
 
@@ -659,35 +659,35 @@ namespace CleanC.UI
 
             string title = _deepStorageActiveTab switch
             {
-                "duplicates" => "پاکسازی فایل های تکراری",
-                "empty_folders" => "پاکسازی پوشه های خالی",
-                "mess" => "سازماندهی دانلودها و دسکتاپ",
-                "large_files" => "پاکسازی فایل های حجیم",
+                "duplicates" => LocalizationService.Get("پاکسازی فایل های تکراری"),
+                "empty_folders" => LocalizationService.Get("پاکسازی پوشه های خالی"),
+                "mess" => LocalizationService.Get("سازماندهی دانلودها و دسکتاپ"),
+                "large_files" => LocalizationService.Get("پاکسازی فایل های حجیم"),
                 _ => ""
             };
 
             if (count == 0)
             {
                 if (title.Length > 0)
-                    ShowInfoBar(title, "هیچ موردی انتخاب نشده است.", InfoBarSeverity.Informational);
+                    ShowInfoBar(title, LocalizationService.Get("هیچ موردی انتخاب نشده است."), InfoBarSeverity.Informational);
                 return false;
             }
 
-            string sizeInfo = bytes > 0 ? $" مجموع حجم: {SystemStats.FormatBytes(bytes)}،" : "";
+            string sizeInfo = bytes > 0 ? string.Format(LocalizationService.Get(" مجموع حجم: {0}،"), SystemStats.FormatBytes(bytes)) : "";
             // دیالوگ دقیقاً همان رفتاری را وعده می دهد که واقعاً رخ می دهد
             string modeNote = SafeDeleteService.DescribeMode(SafeDeleteService.DefaultMode);
             var dialog = new ContentDialog
             {
-                Title = "تأیید حذف گروهی",
+                Title = LocalizationService.Get("تأیید حذف گروهی"),
                 Content = new TextBlock
                 {
-                    Text = $"{count} مورد انتخاب شده{sizeInfo} {modeNote}. ادامه می دهید؟",
+                    Text = string.Format(LocalizationService.Get("{0} مورد انتخاب شده{1} {2}. ادامه می دهید؟"), count, sizeInfo, modeNote),
                     FontSize = 13,
                     TextWrapping = TextWrapping.Wrap,
                     LineHeight = 20
                 },
-                PrimaryButtonText = "بله، حذف شود",
-                CloseButtonText = "انصراف",
+                PrimaryButtonText = LocalizationService.Get("بله، حذف شود"),
+                CloseButtonText = LocalizationService.Get("انصراف"),
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.Content.XamlRoot,
                 FlowDirection = FlowDirection.RightToLeft
@@ -717,7 +717,7 @@ namespace CleanC.UI
                     DeepStorageBatchDeleteSpinner.IsActive = true;
                 }
                 if (DeepStorageBatchDeleteIcon != null) DeepStorageBatchDeleteIcon.Visibility = Visibility.Collapsed;
-                if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = "در حال حذف ایمن...";
+                if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("در حال حذف ایمن...");
 
                 switch (_deepStorageActiveTab)
                 {
@@ -777,10 +777,10 @@ namespace CleanC.UI
 
                     string detail = SafeDeleteService.DescribeBatch(batch);
                     bool canUndo = batch.RecycledCount + batch.QuarantinedCount > 0;
-                    if (canUndo) detail += " — از «مرکز بازیابی» قابل بازگردانی است.";
+                    if (canUndo) detail += LocalizationService.Get(" — از «مرکز بازیابی» قابل بازگردانی است.");
 
                     var severity = batch.FailedCount > 0 ? InfoBarSeverity.Warning : InfoBarSeverity.Success;
-                    ShowInfoBar("پاکسازی عمیق دیسک", detail + ".", severity);
+                    ShowInfoBar(LocalizationService.Get("پاکسازی عمیق دیسک"), detail + ".", severity);
 
                     // فیدبک بصری موفقیت با رنگ سبز زمردی
                     if (DeepStorageBatchDeleteSpinner != null)
@@ -795,7 +795,7 @@ namespace CleanC.UI
                     }
                     if (DeepStorageBatchDeleteBtnText != null)
                     {
-                        DeepStorageBatchDeleteBtnText.Text = $"✓ {deletedCount} مورد با موفقیت پاکسازی شد";
+                        DeepStorageBatchDeleteBtnText.Text = string.Format(LocalizationService.Get("✓ {0} مورد با موفقیت پاکسازی شد"), deletedCount);
                     }
                     if (DeepStorageBatchDeleteBtn != null)
                     {
@@ -809,12 +809,12 @@ namespace CleanC.UI
                 }
                 else if (batch.FailedCount > 0)
                 {
-                    ShowInfoBar("پاکسازی عمیق دیسک", SafeDeleteService.DescribeBatch(batch) + ".", InfoBarSeverity.Error);
+                    ShowInfoBar(LocalizationService.Get("پاکسازی عمیق دیسک"), SafeDeleteService.DescribeBatch(batch) + ".", InfoBarSeverity.Error);
                 }
             }
             catch (Exception ex)
             {
-                ShowInfoBar("خطا در پاکسازی", ex.Message, InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("خطا در پاکسازی"), ex.Message, InfoBarSeverity.Error);
             }
             finally
             {
@@ -836,7 +836,7 @@ namespace CleanC.UI
                 }
                 if (DeepStorageBatchDeleteBtnText != null)
                 {
-                    DeepStorageBatchDeleteBtnText.Text = "حذف ایمن موارد انتخاب شده";
+                    DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("حذف ایمن موارد انتخاب شده");
                 }
             }
         }

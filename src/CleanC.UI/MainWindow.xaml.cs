@@ -16,6 +16,7 @@ using Microsoft.UI.Composition;
 using Microsoft.UI.Composition.SystemBackdrops;
 using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
+using Microsoft.UI.Xaml.Automation;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Hosting;
 using Microsoft.UI.Xaml.Media;
@@ -645,7 +646,7 @@ namespace CleanC.UI
                 // (که زیر همین تایمر صدا می‌شود) به WebView2 هیرو می‌روند — تلهمتری جداگانه نداریم.
 
                 // Bento RAM Card - Format: "14.9 of 16 GB" or "14.9 از 16 GB"
-                string ramOf = LocalizationService.IsRtl ? "از" : "of";
+                string ramOf = LocalizationService.IsRtl ? LocalizationService.Get("از") : "of";
                 CardRamText.Text = $"{usedRamGb.ToString("0.0", CultureInfo.InvariantCulture)} {ramOf} {Math.Round(totalRamGb).ToString("0", CultureInfo.InvariantCulture)} GB";
                 CardRamProgress.Value = ramPercent;
                 if (CardRamAvailableText != null) CardRamAvailableText.Text = LocalizationService.Get("RamCurrentlyUsed", "فضای مصرفی در حال حاضر");
@@ -671,9 +672,9 @@ namespace CleanC.UI
                 }
                 if (CardDiskText != null)
                 {
-                    string approx = LocalizationService.IsRtl ? "حدود" : "~";
-                    string mbpsUnit = LocalizationService.IsRtl ? "مگابیت" : "Mbps";
-                    string kbpsUnit = LocalizationService.IsRtl ? "کیلوبیت" : "Kbps";
+                    string approx = LocalizationService.IsRtl ? LocalizationService.Get("حدود") : "~";
+                    string mbpsUnit = LocalizationService.IsRtl ? LocalizationService.Get("مگابیت") : "Mbps";
+                    string kbpsUnit = LocalizationService.IsRtl ? LocalizationService.Get("کیلوبیت") : "Kbps";
                     if (netMbps >= 10.0)
                     {
                         CardDiskText.Text = $"{netMbps.ToString("0.0", CultureInfo.InvariantCulture)} Mbps";
@@ -701,19 +702,19 @@ namespace CleanC.UI
                 {
                     if (LocalizationService.IsRtl)
                     {
-                        CardPowerText.Text = !string.IsNullOrEmpty(stats.PowerSummary) ? stats.PowerSummary : "متصل به برق";
+                        CardPowerText.Text = !string.IsNullOrEmpty(stats.PowerSummary) ? stats.PowerSummary : LocalizationService.Get("متصل به برق");
                     }
                     else
                     {
-                        if (string.IsNullOrEmpty(stats.PowerSummary) || stats.PowerSummary.Contains("برق"))
+                        if (string.IsNullOrEmpty(stats.PowerSummary) || stats.PowerSummary.Contains("برق")) // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
                         {
                             CardPowerText.Text = LocalizationService.Get("PowerPlugged", "Plugged In");
                         }
-                        else if (stats.PowerSummary.Contains("شارژ"))
+                        else if (stats.PowerSummary.Contains("شارژ")) // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
                         {
                             CardPowerText.Text = LocalizationService.Get("PowerCharging", "Charging");
                         }
-                        else if (stats.PowerSummary.Contains("باتری"))
+                        else if (stats.PowerSummary.Contains("باتری")) // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
                         {
                             CardPowerText.Text = stats.PowerSummary.Replace("باتری", LocalizationService.Get("PowerBattery", "Battery")).Trim();
                         }
@@ -799,7 +800,7 @@ namespace CleanC.UI
             var stack = new StackPanel { Spacing = 10, Margin = new Thickness(0, 10, 0, 0) };
             stack.Children.Add(new TextBlock
             {
-                Text = "برنامه های زیر در ویندوز شناسایی شدند که ممکن است به آن ها نیاز داشته باشید (مانند Paint، سرویس های بازی Xbox یا نرم افزارهای حجیم با بیش از ۳۰ روز عدم استفاده). مواردی که مایل به حذف آن ها هستید را علامت بزنید:",
+                Text = LocalizationService.Get("برنامه های زیر در ویندوز شناسایی شدند که ممکن است به آن ها نیاز داشته باشید (مانند Paint، سرویس های بازی Xbox یا نرم افزارهای حجیم با بیش از ۳۰ روز عدم استفاده). مواردی که مایل به حذف آن ها هستید را علامت بزنید:"),
                 TextWrapping = TextWrapping.Wrap,
                 FontSize = 12.5,
                 LineHeight = 19
@@ -864,7 +865,7 @@ namespace CleanC.UI
                         Child = new TextBlock
                         {
                             // وقتی اندازه هاردکد تخمینی است، صادقانه به کاربر گفته می شود
-                            Text = app.FormattedSize + (app.SizeIsEstimate ? " (تخمینی)" : ""),
+                            Text = app.FormattedSize + (app.SizeIsEstimate ? LocalizationService.Get(" (تخمینی)") : ""),
                             FontSize = 10.5,
                             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                             FlowDirection = FlowDirection.LeftToRight
@@ -884,10 +885,10 @@ namespace CleanC.UI
 
             var dialog = new ContentDialog
             {
-                Title = "بررسی و بازبینی نرم افزارهای کم استفاده و پیش فرض",
+                Title = LocalizationService.Get("بررسی و بازبینی نرم افزارهای کم استفاده و پیش فرض"),
                 Content = stack,
-                PrimaryButtonText = "پاکسازی موارد انتخاب شده",
-                CloseButtonText = "صرف نظر و ادامه بهینه سازی",
+                PrimaryButtonText = LocalizationService.Get("پاکسازی موارد انتخاب شده"),
+                CloseButtonText = LocalizationService.Get("صرف نظر و ادامه بهینه سازی"),
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.Content.XamlRoot,
                 FlowDirection = FlowDirection.RightToLeft
@@ -928,7 +929,7 @@ namespace CleanC.UI
             _currentReportTotalFreed = totalFreed;
             _lastCleanupItems = groups.SelectMany(g => g.Items).ToList();
             _lastFreedBytes = totalFreed;
-            ReportTotalFreedText.Text = $"+ {SystemStats.FormatBytes(totalFreed)} آزاد شد";
+            ReportTotalFreedText.Text = string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(totalFreed));
             ReportGroupsContainer.Children.Clear();
 
             var successBg = new SolidColorBrush(Windows.UI.Color.FromArgb(28, 16, 185, 129));
@@ -976,8 +977,8 @@ namespace CleanC.UI
             achHeader.Children.Add(achIcon);
 
             var achTitleStack = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 3 };
-            achTitleStack.Children.Add(new TextBlock { Text = "دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم", FontSize = 14, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
-            achTitleStack.Children.Add(new TextBlock { Text = "خلاصهٔ اقدامات کلیدی و آزادسازی حافظه، دیسک، استارتاپ و اتصالات شبکه", FontSize = 11.5, Foreground = neutralFg });
+            achTitleStack.Children.Add(new TextBlock { Text = LocalizationService.Get("دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم"), FontSize = 14, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold });
+            achTitleStack.Children.Add(new TextBlock { Text = LocalizationService.Get("خلاصهٔ اقدامات کلیدی و آزادسازی حافظه، دیسک، استارتاپ و اتصالات شبکه"), FontSize = 11.5, Foreground = neutralFg });
             Grid.SetColumn(achTitleStack, 1);
             achHeader.Children.Add(achTitleStack);
             achStack.Children.Add(achHeader);
@@ -1020,32 +1021,32 @@ namespace CleanC.UI
 
             if (ramFreed > 0)
             {
-                AddAchievementChip("\uE9D2", $"+ {SystemStats.FormatBytes(ramFreed)} آزادسازی رم", Windows.UI.Color.FromArgb(255, 16, 185, 129));
+                AddAchievementChip("\uE9D2", string.Format(LocalizationService.Get("+ {0} آزادسازی رم"), SystemStats.FormatBytes(ramFreed)), Windows.UI.Color.FromArgb(255, 16, 185, 129));
             }
 
             if (junkDiskFreed > 0)
             {
-                AddAchievementChip("\uEDA2", $"+ {SystemStats.FormatBytes(junkDiskFreed)} پاکسازی دیسک", Windows.UI.Color.FromArgb(255, 59, 130, 246));
+                AddAchievementChip("\uEDA2", string.Format(LocalizationService.Get("+ {0} پاکسازی دیسک"), SystemStats.FormatBytes(junkDiskFreed)), Windows.UI.Color.FromArgb(255, 59, 130, 246));
             }
 
             if (startupItem != null)
             {
-                AddAchievementChip("\uE7B5", "بهینه‌سازی استارتاپ و سرعت بوت", Windows.UI.Color.FromArgb(255, 245, 158, 11));
+                AddAchievementChip("\uE7B5", LocalizationService.Get("بهینه‌سازی استارتاپ و سرعت بوت"), Windows.UI.Color.FromArgb(255, 245, 158, 11));
             }
 
             if (boostGroup?.Items.Any(i => i.Id == "dns_flush") == true)
             {
-                AddAchievementChip("\uE774", "نوسازی کش DNS و سوکت‌های شبکه", Windows.UI.Color.FromArgb(255, 6, 182, 212));
+                AddAchievementChip("\uE774", LocalizationService.Get("نوسازی کش DNS و سوکت‌های شبکه"), Windows.UI.Color.FromArgb(255, 6, 182, 212));
             }
 
             if (browserItem != null)
             {
-                AddAchievementChip("\uE774", "توقف تسک‌های پس‌زمینهٔ مرورگرها", Windows.UI.Color.FromArgb(255, 139, 92, 246));
+                AddAchievementChip("\uE774", LocalizationService.Get("توقف تسک‌های پس‌زمینهٔ مرورگرها"), Windows.UI.Color.FromArgb(255, 139, 92, 246));
             }
 
             if (winTweaksItem != null)
             {
-                AddAchievementChip("\uE770", "توقف تله‌متری و روان‌سازی ویندوز", Windows.UI.Color.FromArgb(255, 236, 72, 153));
+                AddAchievementChip("\uE770", LocalizationService.Get("توقف تله‌متری و روان‌سازی ویندوز"), Windows.UI.Color.FromArgb(255, 236, 72, 153));
             }
 
             if (gpuItem != null)
@@ -1116,12 +1117,12 @@ namespace CleanC.UI
                             bool success = HardwareDiagnosticService.ApplyRefreshRate(capturedAtt.IntParameter);
                             if (success)
                             {
-                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "ارتقا یافت ✓");
-                                ShowInfoBar("تنظیمات مانیتور", $"نرخ نوسازی با موفقیت به {capturedAtt.IntParameter}Hz ارتقا یافت.", InfoBarSeverity.Success);
+                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("ارتقا یافت ✓"));
+                                ShowInfoBar(LocalizationService.Get("تنظیمات مانیتور"), string.Format(LocalizationService.Get("نرخ نوسازی با موفقیت به {0}Hz ارتقا یافت."), capturedAtt.IntParameter), InfoBarSeverity.Success);
                             }
                             else
                             {
-                                ShowInfoBar("خطا", "امکان تغییر نرخ نوسازی مانیتور در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
+                                ShowInfoBar(LocalizationService.Get("خطا"), LocalizationService.Get("امکان تغییر نرخ نوسازی مانیتور در این لحظه وجود ندارد."), InfoBarSeverity.Warning);
                             }
                         }
                         else if (capturedAtt.Id == "power_plan")
@@ -1129,12 +1130,12 @@ namespace CleanC.UI
                             bool success = PowerPlanService.ApplyHighPerformancePlan();
                             if (success)
                             {
-                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فعال شد ✓");
-                                ShowInfoBar("مدیریت مصرف انرژی", "پلن High Performance با حداکثر توان پردازشی فعال گردید.", InfoBarSeverity.Success);
+                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("فعال شد ✓"));
+                                ShowInfoBar(LocalizationService.Get("مدیریت مصرف انرژی"), LocalizationService.Get("پلن High Performance با حداکثر توان پردازشی فعال گردید."), InfoBarSeverity.Success);
                             }
                             else
                             {
-                                ShowInfoBar("خطا", "امکان تغییر پلن برق در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
+                                ShowInfoBar(LocalizationService.Get("خطا"), LocalizationService.Get("امکان تغییر پلن برق در این لحظه وجود ندارد."), InfoBarSeverity.Warning);
                             }
                         }
                         else if (capturedAtt.Id == "bloatware_apps")
@@ -1145,50 +1146,50 @@ namespace CleanC.UI
                         {
                             int applied = await AdvancedTweakService.ApplyAdvancedTweaksAsync();
                             RegistryBackupService.MarkTweaksApplied();
-                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "اعمال شد ✓");
-                            ShowInfoBar("بهینه سازی پیشرفته", "محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت.", InfoBarSeverity.Success);
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("اعمال شد ✓"));
+                            ShowInfoBar(LocalizationService.Get("بهینه سازی پیشرفته"), LocalizationService.Get("محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت."), InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "ssd_critical_space")
                         {
-                            actionBtn.Content = "در حال بهینه سازی...";
+                            actionBtn.Content = LocalizationService.Get("در حال بهینه سازی...");
                             actionBtn.IsEnabled = false;
                             bool ok = await DiskMaintenanceService.OptimizeDriveTrimAsync("C");
-                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "انجام شد ✓");
-                            ShowInfoBar("بهینه سازی SSD", "دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه سازی گردیدند.", InfoBarSeverity.Success);
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("انجام شد ✓"));
+                            ShowInfoBar(LocalizationService.Get("بهینه سازی SSD"), LocalizationService.Get("دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه سازی گردیدند."), InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "gpu_hags")
                         {
                             bool ok = GpuOptimizerService.EnableHags();
-                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فعال شد ✓");
-                            ShowInfoBar("شتاب دهنده گرافیک", "قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)", InfoBarSeverity.Success);
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("فعال شد ✓"));
+                            ShowInfoBar(LocalizationService.Get("شتاب دهنده گرافیک"), LocalizationService.Get("قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)"), InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "proxy_vpn_conflict")
                         {
                             bool ok = NetworkProxyDiagnosticService.FixGhostProxy();
                             if (ok)
                             {
-                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "برطرف شد ✓");
-                                ShowInfoBar("رفع تداخل پراکسی", "پراکسی معلق غیرفعال شد و اتصال مستقیم اینترنت به ترمینال و ویندوز بازگشت.", InfoBarSeverity.Success);
+                                MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("برطرف شد ✓"));
+                                ShowInfoBar(LocalizationService.Get("رفع تداخل پراکسی"), LocalizationService.Get("پراکسی معلق غیرفعال شد و اتصال مستقیم اینترنت به ترمینال و ویندوز بازگشت."), InfoBarSeverity.Success);
                             }
                             else
                             {
-                                ShowInfoBar("خطا", "امکان تغییر تنظیمات پراکسی در این لحظه وجود ندارد.", InfoBarSeverity.Warning);
+                                ShowInfoBar(LocalizationService.Get("خطا"), LocalizationService.Get("امکان تغییر تنظیمات پراکسی در این لحظه وجود ندارد."), InfoBarSeverity.Warning);
                             }
                         }
                         else if (capturedAtt.Id == "orphaned_services")
                         {
                             int count = RegistryCleanerService.DisableOrphanedServices();
-                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "غیرفعال شد ✓");
-                            ShowInfoBar("سرویس های یتیم", $"{count} سرویس با فایل اجرایی ناموجود غیرفعال شدند تا بوت سیستم روان تر شود.", InfoBarSeverity.Success);
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("غیرفعال شد ✓"));
+                            ShowInfoBar(LocalizationService.Get("سرویس های یتیم"), string.Format(LocalizationService.Get("{0} سرویس با فایل اجرایی ناموجود غیرفعال شدند تا بوت سیستم روان تر شود."), count), InfoBarSeverity.Success);
                         }
                         else if (capturedAtt.Id == "wsl_docker_compact")
                         {
-                            actionBtn.Content = "در حال فشرده سازی...";
+                            actionBtn.Content = LocalizationService.Get("در حال فشرده سازی...");
                             actionBtn.IsEnabled = false;
                             var (ok, freed) = await DiskMaintenanceService.CompactAllWslDockerVhdxAsync();
-                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, "فشرده شد ✓");
-                            string freedMsg = freed > 0 ? $"+ {SystemStats.FormatBytes(freed)} فضا آزاد شد." : "دیسک های مجازی با موفقیت فشرده سازی شدند.";
-                            ShowInfoBar("فشرده سازی VHDX", freedMsg, InfoBarSeverity.Success);
+                            MarkAttentionCardSuccess(capturedCardBorder, capturedCardIcon, actionBtn, LocalizationService.Get("فشرده شد ✓"));
+                            string freedMsg = freed > 0 ? string.Format(LocalizationService.Get("+ {0} فضا آزاد شد."), SystemStats.FormatBytes(freed)) : LocalizationService.Get("دیسک های مجازی با موفقیت فشرده سازی شدند.");
+                            ShowInfoBar(LocalizationService.Get("فشرده سازی VHDX"), freedMsg, InfoBarSeverity.Success);
                         }
                     };
                     Grid.SetColumn(actionBtn, 2);
@@ -1259,7 +1260,7 @@ namespace CleanC.UI
                 };
                 var groupTotalText = new TextBlock
                 {
-                    Text = group.TotalFreedBytes > 0 ? $"+ {group.FormattedTotal} آزاد شد" : "بدون تغییر",
+                    Text = group.TotalFreedBytes > 0 ? string.Format(LocalizationService.Get("+ {0} آزاد شد"), group.FormattedTotal) : LocalizationService.Get("بدون تغییر"),
                     FontSize = 11.5,
                     FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                     Foreground = group.TotalFreedBytes > 0 ? successFg : neutralFg
@@ -1329,7 +1330,7 @@ namespace CleanC.UI
                         Text = isFailed
                             ? item.StatusSummary
                             : (hasFreed
-                                ? $"+ {item.FormattedFreed} آزاد شد ✓"
+                                ? string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), item.FormattedFreed)
                                 : item.StatusSummary),
                         FontSize = 11,
                         FontWeight = Microsoft.UI.Text.FontWeights.Normal,
@@ -1363,7 +1364,7 @@ namespace CleanC.UI
                 cbStack.Children.Add(new FontIcon { Glyph = "\uE73E", FontSize = 14, Foreground = successFg, VerticalAlignment = VerticalAlignment.Center });
                 cbStack.Children.Add(new TextBlock
                 {
-                    Text = $"{cleanPriorCount} سرفصل دیگر سیستم بررسی شدند و از قبل کاملاً پاکیزه و بهینه بودند.",
+                    Text = string.Format(LocalizationService.Get("{0} سرفصل دیگر سیستم بررسی شدند و از قبل کاملاً پاکیزه و بهینه بودند."), cleanPriorCount),
                     FontSize = 12,
                     Foreground = neutralFg,
                     VerticalAlignment = VerticalAlignment.Center
@@ -1373,13 +1374,13 @@ namespace CleanC.UI
             }
         }
 
-        private void MarkAttentionCardSuccess(Border cardBorder, FontIcon cardIcon, Button btn, string successText = "اعمال شد ✓")
+        private void MarkAttentionCardSuccess(Border cardBorder, FontIcon cardIcon, Button btn, string? successText = null)
         {
             cardBorder.Background = new SolidColorBrush(Windows.UI.Color.FromArgb(28, 16, 185, 129));
             cardBorder.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(120, 16, 185, 129));
             cardIcon.Glyph = "\uE73E";
             cardIcon.Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129));
-            btn.Content = successText;
+            btn.Content = successText ?? LocalizationService.Get("اعمال شد ✓");
             btn.IsEnabled = false;
             btn.Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent);
             btn.BorderBrush = new SolidColorBrush(Windows.UI.Color.FromArgb(160, 16, 185, 129));
@@ -1393,16 +1394,16 @@ namespace CleanC.UI
                 var candidates = await BloatwareService.ScanCandidateAppsAsync();
                 if (candidates.Count == 0)
                 {
-                    ShowInfoBar("برنامه ها", "هیچ برنامه غیرضروری یا کم استفاده ای یافت نشد.", InfoBarSeverity.Informational);
-                    MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, "بررسی شد ✓");
+                    ShowInfoBar(LocalizationService.Get("برنامه ها"), LocalizationService.Get("هیچ برنامه غیرضروری یا کم استفاده ای یافت نشد."), InfoBarSeverity.Informational);
+                    MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, LocalizationService.Get("بررسی شد ✓"));
                     return;
                 }
 
                 var dialog = new ContentDialog
                 {
-                    Title = "مدیریت و حذف برنامه های غیرضروری و کم استفاده",
-                    PrimaryButtonText = "حذف موارد انتخاب شده",
-                    CloseButtonText = "نگه داشتن همه",
+                    Title = LocalizationService.Get("مدیریت و حذف برنامه های غیرضروری و کم استفاده"),
+                    PrimaryButtonText = LocalizationService.Get("حذف موارد انتخاب شده"),
+                    CloseButtonText = LocalizationService.Get("نگه داشتن همه"),
                     DefaultButton = ContentDialogButton.Primary,
                     XamlRoot = this.Content.XamlRoot
                 };
@@ -1412,7 +1413,7 @@ namespace CleanC.UI
 
                 var headerText = new TextBlock
                 {
-                    Text = "برنامه های زیر می توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:",
+                    Text = LocalizationService.Get("برنامه های زیر می توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:"),
                     FontSize = 12,
                     Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"],
                     TextWrapping = TextWrapping.Wrap,
@@ -1424,7 +1425,7 @@ namespace CleanC.UI
 
                 var selectAllCheck = new CheckBox
                 {
-                    Content = "انتخاب همه برنامه ها",
+                    Content = LocalizationService.Get("انتخاب همه برنامه ها"),
                     IsChecked = true,
                     FontSize = 12,
                     FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
@@ -1522,10 +1523,10 @@ namespace CleanC.UI
                         {
                             _currentReportTotalFreed += freedBytes;
                             _displayedFreedBytes = _currentReportTotalFreed;
-                            ReportTotalFreedText.Text = $"+ {SystemStats.FormatBytes(_currentReportTotalFreed)} آزاد شد";
-                            LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(_currentReportTotalFreed)} آزاد شد";
+                            ReportTotalFreedText.Text = string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(_currentReportTotalFreed));
+                            LiveFreedCounterText.Text = string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(_currentReportTotalFreed));
 
-                            MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, $"{removed} برنامه حذف شد ✓");
+                            MarkAttentionCardSuccess(attBorder, attIcon, actionBtn, string.Format(LocalizationService.Get("{0} برنامه حذف شد ✓"), removed));
 
                             var removedCard = new Border
                             {
@@ -1541,9 +1542,9 @@ namespace CleanC.UI
                             rmGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                             rmGrid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                             var rmIcon = new FontIcon { Glyph = "\uE73E", FontSize = 16, Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129)), Margin = new Thickness(0, 0, 10, 0), VerticalAlignment = VerticalAlignment.Center };
-                            var rmTitle = new TextBlock { Text = $"حذف {removed} برنامه غیرضروری و بلااستفاده", FontSize = 12.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center };
+                            var rmTitle = new TextBlock { Text = string.Format(LocalizationService.Get("حذف {0} برنامه غیرضروری و بلااستفاده"), removed), FontSize = 12.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center };
                             var rmBadge = new Border { Background = new SolidColorBrush(Windows.UI.Color.FromArgb(30, 16, 185, 129)), CornerRadius = new CornerRadius(5), Padding = new Thickness(8, 3, 8, 3), VerticalAlignment = VerticalAlignment.Center };
-                            rmBadge.Child = new TextBlock { Text = $"+ {SystemStats.FormatBytes(freedBytes)} آزاد شد ✓", FontSize = 11, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129)) };
+                            rmBadge.Child = new TextBlock { Text = string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(freedBytes)), FontSize = 11, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, Foreground = new SolidColorBrush(Windows.UI.Color.FromArgb(255, 16, 185, 129)) };
                             Grid.SetColumn(rmIcon, 0); rmGrid.Children.Add(rmIcon);
                             Grid.SetColumn(rmTitle, 1); rmGrid.Children.Add(rmTitle);
                             Grid.SetColumn(rmBadge, 2); rmGrid.Children.Add(rmBadge);
@@ -1551,14 +1552,14 @@ namespace CleanC.UI
                             ReportGroupsContainer.Children.Insert(1, removedCard);
 
                             RefreshSystemStats();
-                            ShowInfoBar("پاکسازی نرم افزارها", $"{removed} برنامه با موفقیت حذف گردید ({SystemStats.FormatBytes(freedBytes)} فضا آزاد شد).", InfoBarSeverity.Success);
+                            ShowInfoBar(LocalizationService.Get("پاکسازی نرم افزارها"), string.Format(LocalizationService.Get("{0} برنامه با موفقیت حذف گردید ({1} فضا آزاد شد)."), removed, SystemStats.FormatBytes(freedBytes)), InfoBarSeverity.Success);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                ShowInfoBar("خطا", ex.Message, InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("خطا"), ex.Message, InfoBarSeverity.Error);
             }
         }
 
@@ -1590,7 +1591,7 @@ namespace CleanC.UI
                     _displayedFreedBytes = targetBytes;
                     countTimer.Stop();
                 }
-                LiveFreedCounterText.Text = $"+ {SystemStats.FormatBytes(_displayedFreedBytes)} آزاد شد";
+                LiveFreedCounterText.Text = string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(_displayedFreedBytes));
             };
             countTimer.Start();
         }
@@ -1599,14 +1600,14 @@ namespace CleanC.UI
         {
             var dialog = new ContentDialog
             {
-                Title = "یافتن و مدیریت فایل های بسیار حجیم (Large Files Finder)",
-                CloseButtonText = "بستن",
+                Title = LocalizationService.Get("یافتن و مدیریت فایل های بسیار حجیم (Large Files Finder)"),
+                CloseButtonText = LocalizationService.Get("بستن"),
                 XamlRoot = this.Content.XamlRoot,
                 FlowDirection = FlowDirection.RightToLeft
             };
 
             var rootPanel = new StackPanel { Spacing = 12, MinWidth = 480, MaxHeight = 440 };
-            var statusText = new TextBlock { Text = "در حال اسکن فایل های بالای ۵۰۰ مگابایت در مسیرهای کاربری...", FontSize = 12.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
+            var statusText = new TextBlock { Text = LocalizationService.Get("در حال اسکن فایل های بالای ۵۰۰ مگابایت در مسیرهای کاربری..."), FontSize = 12.5, Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"] };
             var spinner = new ProgressRing { IsActive = true, Width = 28, Height = 28, HorizontalAlignment = HorizontalAlignment.Center, Margin = new Thickness(0, 16, 0, 16) };
 
             rootPanel.Children.Add(statusText);
@@ -1622,11 +1623,11 @@ namespace CleanC.UI
 
             if (files.Count == 0)
             {
-                statusText.Text = "هیچ فایل حجیمی بالای ۵۰۰ مگابایت در مسیرهای کاربری یافت نشد.";
+                statusText.Text = LocalizationService.Get("هیچ فایل حجیمی بالای ۵۰۰ مگابایت در مسیرهای کاربری یافت نشد.");
                 return;
             }
 
-            statusText.Text = $"تعداد {files.Count} فایل حجیم شناسایی شد (مجموع حجم: {SystemStats.FormatBytes(totalBytes)}):";
+            statusText.Text = string.Format(LocalizationService.Get("تعداد {0} فایل حجیم شناسایی شد (مجموع حجم: {1}):"), files.Count, SystemStats.FormatBytes(totalBytes));
 
             var scroll = new ScrollViewer { MaxHeight = 340, VerticalScrollBarVisibility = ScrollBarVisibility.Auto };
             var filesStack = new StackPanel { Spacing = 6 };
@@ -1656,7 +1657,7 @@ namespace CleanC.UI
 
                 var actionsStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 6, VerticalAlignment = VerticalAlignment.Center, Margin = new Thickness(8, 0, 0, 0) };
 
-                var openBtn = new Button { Content = "پوشه", FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5) };
+                var openBtn = new Button { Content = LocalizationService.Get("پوشه"), FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5) };
                 openBtn.Click += (s, ev) =>
                 {
                     try
@@ -1675,7 +1676,7 @@ namespace CleanC.UI
                 };
                 actionsStack.Children.Add(openBtn);
 
-                var delBtn = new Button { Content = "حذف", FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5), Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) };
+                var delBtn = new Button { Content = LocalizationService.Get("حذف"), FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5), Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) };
 
                 // تأیید دومرحله ای حذف فایل حجیم.
                 // این دکمه داخل یک ContentDialog باز اجرا می شود و WinUI اجازه ی باز شدن
@@ -1688,7 +1689,7 @@ namespace CleanC.UI
                     if (!armed)
                     {
                         armed = true;
-                        delBtn.Content = "تأیید حذف؟";
+                        delBtn.Content = LocalizationService.Get("تأیید حذف؟");
 
                         if (armTimer == null)
                         {
@@ -1697,7 +1698,7 @@ namespace CleanC.UI
                             {
                                 armTimer.Stop();
                                 armed = false;
-                                delBtn.Content = "حذف";
+                                delBtn.Content = LocalizationService.Get("حذف");
                             };
                         }
 
@@ -1711,11 +1712,11 @@ namespace CleanC.UI
                     if (LargeFileScannerService.DeleteLargeFile(file.FilePath))
                     {
                         itemBorder.Visibility = Visibility.Collapsed;
-                        ShowInfoBar("حذف فایل", $"فایل {file.FileName} به سطل بازیافت منتقل شد.", InfoBarSeverity.Informational);
+                        ShowInfoBar(LocalizationService.Get("حذف فایل"), string.Format(LocalizationService.Get("فایل {0} به سطل بازیافت منتقل شد."), file.FileName), InfoBarSeverity.Informational);
                     }
                     else
                     {
-                        delBtn.Content = "حذف";
+                        delBtn.Content = LocalizationService.Get("حذف");
                     }
                 };
                 actionsStack.Children.Add(delBtn);
@@ -1743,8 +1744,8 @@ namespace CleanC.UI
         {
             var dialog = new ContentDialog
             {
-                Title = "مرکز بازیابی و بازگشت تغییرات (Restore & Undo Center)",
-                CloseButtonText = "بستن",
+                Title = LocalizationService.Get("مرکز بازیابی و بازگشت تغییرات (Restore & Undo Center)"),
+                CloseButtonText = LocalizationService.Get("بستن"),
                 XamlRoot = this.Content.XamlRoot,
                 FlowDirection = FlowDirection.RightToLeft
             };
@@ -1753,37 +1754,37 @@ namespace CleanC.UI
 
             var desc = new TextBlock
             {
-                Text = "مدیریت نقاط بازگردانی سیستم عامل و بازگرداندن تغییرات رجیستری و بهینه سازی ها با یک کلیک:",
+                Text = LocalizationService.Get("مدیریت نقاط بازگردانی سیستم عامل و بازگرداندن تغییرات رجیستری و بهینه سازی ها با یک کلیک:"),
                 FontSize = 12,
                 Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
             };
             stack.Children.Add(desc);
 
             // Section 1: Create Restore Point
-            var rpCard = CreateUndoSectionCard("\uE777", "ساخت نقطه بازگردانی ویندوز (Restore Point)", "ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه سازی ها یا تغییرات عمده.", "ایجاد Restore Point", async (btn) =>
+            var rpCard = CreateUndoSectionCard("\uE777", LocalizationService.Get("ساخت نقطه بازگردانی ویندوز (Restore Point)"), LocalizationService.Get("ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه سازی ها یا تغییرات عمده."), LocalizationService.Get("ایجاد Restore Point"), async (btn) =>
             {
-                btn.Content = "در حال ایجاد...";
+                btn.Content = LocalizationService.Get("در حال ایجاد...");
                 btn.IsEnabled = false;
                 var (ok, msg) = await RestorePointService.CreateRestorePointAsync($"CleanC Backup - {DateTime.Now:yyyy.MM.dd HH:mm}");
-                btn.Content = ok ? "ایجاد شد ✓" : "تلاش مجدد";
+                btn.Content = ok ? LocalizationService.Get("ایجاد شد ✓") : LocalizationService.Get("تلاش مجدد");
                 btn.IsEnabled = !ok;
-                ShowInfoBar("نقطه بازگردانی", msg, ok ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
+                ShowInfoBar(LocalizationService.Get("نقطه بازگردانی"), msg, ok ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
             });
             stack.Children.Add(rpCard);
 
             // Section 2: Undo Tweaks
-            var undoCard = CreateUndoSectionCard("\uE7A7", "بازگردانی تنظیمات بهینه شده به حالت اولیه (Undo)", "بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز.", "بازگردانی تنظیمات", async (btn) =>
+            var undoCard = CreateUndoSectionCard("\uE7A7", LocalizationService.Get("بازگردانی تنظیمات بهینه شده به حالت اولیه (Undo)"), LocalizationService.Get("بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز."), LocalizationService.Get("بازگردانی تنظیمات"), async (btn) =>
             {
-                btn.Content = "در حال بازگردانی...";
+                btn.Content = LocalizationService.Get("در حال بازگردانی...");
                 btn.IsEnabled = false;
                 int reverted = await RegistryBackupService.RollbackAllTweaksAsync();
-                btn.Content = "بازگردانده شد ✓";
-                ShowInfoBar("بازگردانی تغییرات", $"تعداد {reverted} مورد از تنظیمات و توئیک ها به حالت اولیه ویندوز بازگردانده شدند.", InfoBarSeverity.Success);
+                btn.Content = LocalizationService.Get("بازگردانده شد ✓");
+                ShowInfoBar(LocalizationService.Get("بازگردانی تغییرات"), string.Format(LocalizationService.Get("تعداد {0} مورد از تنظیمات و توئیک ها به حالت اولیه ویندوز بازگردانده شدند."), reverted), InfoBarSeverity.Success);
             });
             stack.Children.Add(undoCard);
 
             // Section 3: Open Windows System Restore
-            var sysRestoreCard = CreateUndoSectionCard("\uE895", "ابزار بازیابی سیستم ویندوز (System Restore)", "اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی.", "باز کردن System Restore", (btn) =>
+            var sysRestoreCard = CreateUndoSectionCard("\uE895", LocalizationService.Get("ابزار بازیابی سیستم ویندوز (System Restore)"), LocalizationService.Get("اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی."), LocalizationService.Get("باز کردن System Restore"), (btn) =>
             {
                 RestorePointService.LaunchSystemRestoreWizard();
                 dialog.Hide();
@@ -2000,7 +2001,7 @@ namespace CleanC.UI
                 {
                     itemsStack.Children.Add(new TextBlock
                     {
-                        Text = "هیچ موردی در این بخش شناسایی نشد (کاملاً تمیز است).",
+                        Text = LocalizationService.Get("هیچ موردی در این بخش شناسایی نشد (کاملاً تمیز است)."),
                         FontSize = 12,
                         Foreground = itemSecondary,
                         Margin = new Thickness(4)
@@ -2045,7 +2046,7 @@ namespace CleanC.UI
                         if (item.RequiresElevation)
                         {
                             var shield = new FontIcon { Glyph = "\uE7EF", FontSize = 12, Foreground = (Brush)Application.Current.Resources["SystemFillColorAttentionBrush"] };
-                            ToolTipService.SetToolTip(shield, "این مورد نیازمند دسترسی مدیر (Administrator) است.");
+                            ToolTipService.SetToolTip(shield, LocalizationService.Get("این مورد نیازمند دسترسی مدیر (Administrator) است."));
                             titleRow.Children.Add(shield);
                         }
 
@@ -2056,7 +2057,7 @@ namespace CleanC.UI
 
                         var sizeText = new TextBlock
                         {
-                            Text = grp.Id == "system_boost" ? (item.IsChecked ? "فعال ✓" : "غیرفعال") : item.FormattedBytes,
+                            Text = grp.Id == "system_boost" ? (item.IsChecked ? LocalizationService.Get("فعال ✓") : LocalizationService.Get("غیرفعال")) : item.FormattedBytes,
                             FontSize = 12,
                             FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                             VerticalAlignment = VerticalAlignment.Center,
@@ -2064,8 +2065,8 @@ namespace CleanC.UI
                         };
                         if (grp.Id == "system_boost")
                         {
-                            chk.Checked += (s, e) => { sizeText.Text = "فعال ✓"; };
-                            chk.Unchecked += (s, e) => { sizeText.Text = "غیرفعال"; };
+                            chk.Checked += (s, e) => { sizeText.Text = LocalizationService.Get("فعال ✓"); };
+                            chk.Unchecked += (s, e) => { sizeText.Text = LocalizationService.Get("غیرفعال"); };
                         }
                         Grid.SetColumn(sizeText, 2);
                         itemGrid.Children.Add(sizeText);
@@ -2083,7 +2084,7 @@ namespace CleanC.UI
         private void RefreshStatsBtn_Click(object sender, RoutedEventArgs e)
         {
             RefreshSystemStats();
-            ShowInfoBar("به‌روزرسانی شد", "اطلاعات مصرف رم، پردازنده و دیسک به‌روزرسانی شدند.", InfoBarSeverity.Informational);
+            ShowInfoBar(LocalizationService.Get("به‌روزرسانی شد"), LocalizationService.Get("اطلاعات مصرف رم، پردازنده و دیسک به‌روزرسانی شدند."), InfoBarSeverity.Informational);
         }
 
         /// <summary>
@@ -2708,8 +2709,8 @@ namespace CleanC.UI
                 {
                     _trayHintShown = true;
                     _trayManager?.ShowBalloonNotification(
-                        "CleanC در تری آیکون",
-                        "برای بازگرداندن پنجره روی آیکون کنار ساعت کلیک کنید.");
+                        LocalizationService.Get("CleanC در تری آیکون"),
+                        LocalizationService.Get("برای بازگرداندن پنجره روی آیکون کنار ساعت کلیک کنید."));
                 }
             }
             catch (Exception ex)
@@ -2767,17 +2768,17 @@ namespace CleanC.UI
                     finally { _isLoadingSettings = false; }
 
                     ShowInfoBar(
-                        "شروع همراه با ویندوز",
-                        "ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست.",
+                        LocalizationService.Get("شروع همراه با ویندوز"),
+                        LocalizationService.Get("ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست."),
                         InfoBarSeverity.Error);
                     return;
                 }
 
                 ShowInfoBar(
-                    "شروع همراه با ویندوز",
+                    LocalizationService.Get("شروع همراه با ویندوز"),
                     enabled
-                        ? "CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود."
-                        : "اجرای خودکار CleanC غیرفعال شد.",
+                        ? LocalizationService.Get("CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود.")
+                        : LocalizationService.Get("اجرای خودکار CleanC غیرفعال شد."),
                     InfoBarSeverity.Success);
             }
             catch (Exception ex)
@@ -2796,8 +2797,8 @@ namespace CleanC.UI
             if (string.Equals(mode, "Permanent", StringComparison.OrdinalIgnoreCase))
             {
                 ShowInfoBar(
-                    "حذف قطعی فعال شد",
-                    "فایل های شخصی دیگر به سطل بازیافت نمی روند و قابل بازگردانی نخواهند بود. کش و زباله ها همچنان قطعی حذف می شوند.",
+                    LocalizationService.Get("حذف قطعی فعال شد"),
+                    LocalizationService.Get("فایل های شخصی دیگر به سطل بازیافت نمی روند و قابل بازگردانی نخواهند بود. کش و زباله ها همچنان قطعی حذف می شوند."),
                     InfoBarSeverity.Warning);
             }
         }
@@ -2820,7 +2821,7 @@ namespace CleanC.UI
             _appWindow.Resize(new SizeInt32(1080, 800));
             CenterWindowOnScreen();
             SaveSettingsNow();
-            ShowInfoBar("اندازه ی پنجره بازنشانی شد", "پنجره با ابعاد پیش فرض ۱۰۸۰×۸۰۰ در مرکز صفحه قرار گرفت.", InfoBarSeverity.Informational);
+            ShowInfoBar(LocalizationService.Get("اندازه ی پنجره بازنشانی شد"), LocalizationService.Get("پنجره با ابعاد پیش فرض ۱۰۸۰×۸۰۰ در مرکز صفحه قرار گرفت."), InfoBarSeverity.Informational);
         }
 
         private void ResetAllSettingsBtn_Click(object sender, RoutedEventArgs e)
@@ -2833,7 +2834,7 @@ namespace CleanC.UI
             LocalizationService.SetLanguage(_settings.Language);
             ApplyLanguage();
             SwitchToView(AppView.Dashboard, persist: false);
-            ShowInfoBar("تنظیمات بازنشانی شد", "همه ی تنظیمات به حالت پیش فرض برگشت.", InfoBarSeverity.Success);
+            ShowInfoBar(LocalizationService.Get("تنظیمات بازنشانی شد"), LocalizationService.Get("همه ی تنظیمات به حالت پیش فرض برگشت."), InfoBarSeverity.Success);
         }
 
         private void LanguageComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -3048,12 +3049,69 @@ namespace CleanC.UI
                 if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "به‌روزرسانی وضعیت سیستم"));
                 if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها"));
 
-                if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? "از 100" : "of 100";
+                if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? LocalizationService.Get("از 100") : "of 100";
 
                 // Notification Flyout
                 if (NotificationHistoryTitleText != null) NotificationHistoryTitleText.Text = LocalizationService.Get("NotificationHistoryTitle", "تاریخچه اعلان ها و اقدامات");
                 if (NotificationHistoryClearText != null) NotificationHistoryClearText.Text = LocalizationService.Get("NotificationClear", "پاکسازی");
                 if (EmptyHistoryText != null) EmptyHistoryText.Text = LocalizationService.Get("NotificationEmpty", "هنوز هیچ اعلانی ثبت نشده است.");
+
+                // --- i18n فاز C: هدف های آدیت XAML (a11y و عناصر ثابت بدون پوشش) ---
+                // کارت های تحلیل — نام دسترسی پذیری برای screen reader
+                if (HealthScoreCard != null) AutomationProperties.SetName(HealthScoreCard, LocalizationService.Get("HealthScoreTitle", "امتیاز سلامت سیستم"));
+                if (BentoRamCard != null) AutomationProperties.SetName(BentoRamCard, LocalizationService.Get("RamTitle", "حافظه رم"));
+                if (BentoCpuCard != null) AutomationProperties.SetName(BentoCpuCard, LocalizationService.Get("CpuTitle", "پردازنده"));
+                if (BentoDiskCard != null) AutomationProperties.SetName(BentoDiskCard, LocalizationService.Get("NetworkTrafficTitle", "سرعت اینترنت"));
+                if (DiskBreakdownCard != null) AutomationProperties.SetName(DiskBreakdownCard, LocalizationService.Get("DiskBreakdownTitle", "تحلیل فضای دیسک C:"));
+                if (CleanupsHistoryCard != null) AutomationProperties.SetName(CleanupsHistoryCard, LocalizationService.Get("CleanupHistoryTitle", "فضای آزادشده در ۷ روز اخیر"));
+
+                // نوار ناوبری کناری — نام دسترسی پذیری دکمه های داشبورد و ابزارها
+                if (NavDashboardBtn != null) AutomationProperties.SetName(NavDashboardBtn, LocalizationService.Get("NavDashboard", "داشبورد بهینه سازی"));
+                if (NavToolsBtn != null) AutomationProperties.SetName(NavToolsBtn, LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز"));
+
+                // کارت تاریخچه اعلان ها — دکمه پاکسازی (قبلاً فقط ToolTip ثابت فارسی داشت)
+                if (ClearHistoryBtn != null) ToolTipService.SetToolTip(ClearHistoryBtn, LocalizationService.Get("پاکسازی تاریخچه"));
+
+                // لجند تحلیل فضای دیسک — سه نوار رنگی زیر نمودار
+                if (DiskLegendUsedBar != null) ToolTipService.SetToolTip(DiskLegendUsedBar, LocalizationService.Get("DiskUsed", "فضای استفاده شده"));
+                if (DiskLegendCleanableBar != null) ToolTipService.SetToolTip(DiskLegendCleanableBar, LocalizationService.Get("DiskCleanable", "قابل پاکسازی"));
+                if (DiskLegendFreeBar != null) ToolTipService.SetToolTip(DiskLegendFreeBar, LocalizationService.Get("DiskFree", "آزاد"));
+
+                // دکمه های «بازگشت» بالای همه ابزارها — ۱۱ نمونه یکسان در XAML، همه با یک شناسه
+                foreach (var backBtn in new[] { BackFromSpecsBtn, BackFromUninstallerBtn, BackFromSpeedTestBtn, BackFromPersonalizationBtn, BackFromStartupBtn, BackFromWindowsUpdateBtn, BackFromDriversBtn, BackFromDnsBtn, BackFromPrivacyBtn, BackFromDeepStorageBtn, BackFromRecycleBinBtn })
+                {
+                    if (backBtn == null) continue;
+                    AutomationProperties.SetName(backBtn, LocalizationService.Get("BackButton", "بازگشت"));
+                    ToolTipService.SetToolTip(backBtn, LocalizationService.Get("BackToTools", "بازگشت به فهرست ابزارها"));
+                }
+
+                // ابزار درایورها — دکمه بروزرسانی فهرست (a11y و tooltip یک متن دارند)
+                if (RefreshDriversListBtn != null)
+                {
+                    string refreshDriversText = LocalizationService.Get("بروزرسانی فهرست درایورها");
+                    AutomationProperties.SetName(RefreshDriversListBtn, refreshDriversText);
+                    ToolTipService.SetToolTip(RefreshDriversListBtn, refreshDriversText);
+                }
+
+                // کارت گزارش پایان پاکسازی — متن های ثابت (گروه XAML جدا)
+                if (ReportCardTitleText != null) ReportCardTitleText.Text = LocalizationService.Get("گزارش دستاوردهای بهینه‌سازی سیستم");
+                if (ReportCardSubtitleText != null) ReportCardSubtitleText.Text = LocalizationService.Get("عملیات با موفقیت پایان یافت؛ خلاصهٔ فضای آزادشده و اقدامات انجام‌شده در زیر آمده است:");
+                if (ReportCardFooterText != null) ReportCardFooterText.Text = LocalizationService.Get("فایل های موقت با موفقیت پاکسازی شدند و به اطلاعات شخصی آسیبی نرسید.");
+                if (CloseReportBtnText != null) CloseReportBtnText.Text = LocalizationService.Get("تأیید و بازگشت به داشبورد");
+
+                // حذف نرم افزار — چک باکس «انتخاب همه» + placeholder جعبه اسم کاراکتر
+                if (UninstallerSelectAllCheck != null) UninstallerSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
+                if (CharNameBox != null) CharNameBox.PlaceholderText = LocalizationService.Get("مثلاً سی‌سی");
+
+                // تنظیمات ظاهر — توضیح اسلایدر اندازه کاراکتر
+                if (CharSizeSlider != null) ToolTipService.SetToolTip(CharSizeSlider, LocalizationService.Get("حجم بالای ۱.۲۵× از درون کارت بیرون می زند"));
+
+                // کمبوباکس زبان — تنها آیتم غیرنیتیو «خودکار» است (نام بقیه زبان ها عمداً نیتیو می مانند)
+                if (LanguageComboBox != null && LanguageComboBox.Items.Count > 0 && LanguageComboBox.Items[0] is ComboBoxItem autoLangItem)
+                {
+                    autoLangItem.Content = LocalizationService.Get("خودکار (بر اساس ساعت و منطقه)");
+                }
+
 
                 // System Specs
                 if (SpecsHeaderTitle != null) SpecsHeaderTitle.Text = LocalizationService.Get("SpecsHeaderTitle", "مشخصات جامع سخت افزار");
@@ -3268,7 +3326,7 @@ namespace CleanC.UI
 
         private async Task ExportAiReportBtn_ClickAsync()
         {
-            string? path = await PickSavePathAsync("گزارش هوش مصنوعی (Markdown)", ".md", $"CleanC-AI-Report-{Stamp()}");
+            string? path = await PickSavePathAsync(LocalizationService.Get("گزارش هوش مصنوعی (Markdown)"), ".md", $"CleanC-AI-Report-{Stamp()}");
             if (string.IsNullOrEmpty(path)) return;
 
             try
@@ -3278,12 +3336,12 @@ namespace CleanC.UI
 
                 string md = ReportExportService.BuildAiReportMarkdown(specs, _lastCleanupItems, _lastFreedBytes);
                 ReportExportService.WriteUtf8Bom(path, md);
-                ShowInfoBar("خروجی گزارش", $"گزارش هوش مصنوعی در «{path}» ذخیره شد.", InfoBarSeverity.Success);
+                ShowInfoBar(LocalizationService.Get("خروجی گزارش"), string.Format(LocalizationService.Get("گزارش هوش مصنوعی در «{0}» ذخیره شد."), path), InfoBarSeverity.Success);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "ExportAiReport");
-                ShowInfoBar("خروجی گزارش", "ذخیره ی گزارش هوش مصنوعی انجام نشد.", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("خروجی گزارش"), LocalizationService.Get("ذخیره ی گزارش هوش مصنوعی انجام نشد."), InfoBarSeverity.Error);
             }
         }
 
@@ -3292,7 +3350,7 @@ namespace CleanC.UI
 
         private async Task ExportSpecsTxtBtn_ClickAsync()
         {
-            string? path = await PickSavePathAsync("مشخصات سیستم (TXT)", ".txt", $"CleanC-Specs-{Stamp()}");
+            string? path = await PickSavePathAsync(LocalizationService.Get("مشخصات سیستم (TXT)"), ".txt", $"CleanC-Specs-{Stamp()}");
             if (string.IsNullOrEmpty(path)) return; // کاربر انصراف داد
 
             try
@@ -3303,12 +3361,12 @@ namespace CleanC.UI
 
                 string text = ReportExportService.BuildSystemSpecsTxt(specs);
                 ReportExportService.WriteUtf8Bom(path, text);
-                ShowInfoBar("خروجی گزارش", $"گزارش مشخصات سیستم در «{path}» ذخیره شد.", InfoBarSeverity.Success);
+                ShowInfoBar(LocalizationService.Get("خروجی گزارش"), string.Format(LocalizationService.Get("گزارش مشخصات سیستم در «{0}» ذخیره شد."), path), InfoBarSeverity.Success);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "ExportSpecsTxt");
-                ShowInfoBar("خروجی گزارش", "ذخیره ی گزارش مشخصات انجام نشد (مسیر در دسترس نیست).", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("خروجی گزارش"), LocalizationService.Get("ذخیره ی گزارش مشخصات انجام نشد (مسیر در دسترس نیست)."), InfoBarSeverity.Error);
             }
         }
 
@@ -3329,7 +3387,7 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "OpenProjectPage");
-                ShowInfoBar("درباره CleanC", "باز کردن صفحه ی پروژه ممکن نشد.", InfoBarSeverity.Warning);
+                ShowInfoBar(LocalizationService.Get("درباره CleanC"), LocalizationService.Get("باز کردن صفحه ی پروژه ممکن نشد."), InfoBarSeverity.Warning);
             }
         }
 
@@ -3341,12 +3399,12 @@ namespace CleanC.UI
                 var dp = new Windows.ApplicationModel.DataTransfer.DataPackage();
                 dp.SetText(text);
                 Windows.ApplicationModel.DataTransfer.Clipboard.SetContent(dp);
-                ShowInfoBar("اطلاعات عیب یابی کپی شد", "حالا می توانی آن را در گزارش باگ جای گذاری کنی.", InfoBarSeverity.Success);
+                ShowInfoBar(LocalizationService.Get("اطلاعات عیب یابی کپی شد"), LocalizationService.Get("حالا می توانی آن را در گزارش باگ جای گذاری کنی."), InfoBarSeverity.Success);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "CopyDiagnostics");
-                ShowInfoBar("اطلاعات عیب یابی", "کپی کردن ممکن نشد.", InfoBarSeverity.Error);
+                ShowInfoBar(LocalizationService.Get("اطلاعات عیب یابی"), LocalizationService.Get("کپی کردن ممکن نشد."), InfoBarSeverity.Error);
             }
         }
 
@@ -3358,7 +3416,7 @@ namespace CleanC.UI
         private async Task CheckAppUpdatesBtn_ClickAsync()
         {
             string local = ReportExportService.GetVersion(typeof(MainWindow).Assembly);
-            ShowInfoBar("بررسی به‌روزرسانی", "در حال بررسی...", InfoBarSeverity.Informational);
+            ShowInfoBar(LocalizationService.Get("بررسی به‌روزرسانی"), LocalizationService.Get("در حال بررسی..."), InfoBarSeverity.Informational);
 
             try
             {
@@ -3371,16 +3429,16 @@ namespace CleanC.UI
 
                 if (resp.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
-                    ShowInfoBar("بررسی به‌روزرسانی",
-                        $"هنوز نسخه‌ای منتشر نشده (یا مخزن خصوصی است). نسخهٔ فعلی: {local}",
+                    ShowInfoBar(LocalizationService.Get("بررسی به‌روزرسانی"),
+                        string.Format(LocalizationService.Get("هنوز نسخه‌ای منتشر نشده (یا مخزن خصوصی است). نسخهٔ فعلی: {0}"), local),
                         InfoBarSeverity.Informational);
                     return;
                 }
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    ShowInfoBar("بررسی به‌روزرسانی",
-                        $"نتوانستم منبع نسخه‌ها را بخوانم (کد {(int)resp.StatusCode}). نسخهٔ فعلی: {local}",
+                    ShowInfoBar(LocalizationService.Get("بررسی به‌روزرسانی"),
+                        string.Format(LocalizationService.Get("نتوانستم منبع نسخه‌ها را بخوانم (کد {0}). نسخهٔ فعلی: {1}"), (int)resp.StatusCode, local),
                         InfoBarSeverity.Warning);
                     return;
                 }
@@ -3389,22 +3447,22 @@ namespace CleanC.UI
                 string? tag = ExtractJsonString(json, "tag_name");
                 if (string.IsNullOrWhiteSpace(tag))
                 {
-                    ShowInfoBar("بررسی به‌روزرسانی", $"پاسخ منبع نامعتبر بود. نسخهٔ فعلی: {local}", InfoBarSeverity.Warning);
+                    ShowInfoBar(LocalizationService.Get("بررسی به‌روزرسانی"), string.Format(LocalizationService.Get("پاسخ منبع نامعتبر بود. نسخهٔ فعلی: {0}"), local), InfoBarSeverity.Warning);
                     return;
                 }
 
                 string remote = tag.TrimStart('v', 'V');
-                ShowInfoBar("بررسی به‌روزرسانی",
+                ShowInfoBar(LocalizationService.Get("بررسی به‌روزرسانی"),
                     IsNewer(remote, local)
-                        ? $"نسخهٔ جدیدتری منتشر شده: {remote} (نسخهٔ فعلی: {local})"
-                        : $"به‌روز هستی؛ آخرین نسخهٔ منتشرشده {remote} است.",
+                        ? string.Format(LocalizationService.Get("نسخهٔ جدیدتری منتشر شده: {0} (نسخهٔ فعلی: {1})"), remote, local)
+                        : string.Format(LocalizationService.Get("به‌روز هستی؛ آخرین نسخهٔ منتشرشده {0} است."), remote),
                     IsNewer(remote, local) ? InfoBarSeverity.Success : InfoBarSeverity.Informational);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "CheckUpdates");
-                ShowInfoBar("بررسی به‌روزرسانی",
-                    $"بررسی به‌روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخهٔ فعلی: {local}",
+                ShowInfoBar(LocalizationService.Get("بررسی به‌روزرسانی"),
+                    string.Format(LocalizationService.Get("بررسی به‌روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخهٔ فعلی: {0}"), local),
                     InfoBarSeverity.Warning);
             }
         }
@@ -3599,22 +3657,22 @@ namespace CleanC.UI
         private static string GetActiveNetworkConsumer(double netMbps)
         {
             bool isRtl = LocalizationService.IsRtl;
-            if (netMbps < 0.2) return isRtl ? "شبکه آزاد و پایدار" : "Network Idle";
+            if (netMbps < 0.2) return isRtl ? LocalizationService.Get("شبکه آزاد و پایدار") : "Network Idle";
 
             try
             {
                 var running = GetRunningProcessNames();
 
-                if (running.Contains("IDMan")) return isRtl ? "دانلود فعال (IDM)" : "Internet Download Manager (IDM)";
-                if (running.Contains("steam") || running.Contains("steamwebhelper")) return isRtl ? "کلاینت استیم (Steam)" : "Steam Client";
-                if (running.Contains("qbittorrent") || running.Contains("utorrent")) return isRtl ? "کلاینت تورنت (Torrent)" : "Torrent Client";
-                if (running.Contains("msedge")) return isRtl ? "مرورگر مایکروسافت اج" : "Microsoft Edge";
-                if (running.Contains("chrome")) return isRtl ? "مرورگر گوگل کروم" : "Google Chrome";
-                if (running.Contains("firefox")) return isRtl ? "مرورگر فایرفاکس" : "Mozilla Firefox";
+                if (running.Contains("IDMan")) return isRtl ? LocalizationService.Get("دانلود فعال (IDM)") : "Internet Download Manager (IDM)";
+                if (running.Contains("steam") || running.Contains("steamwebhelper")) return isRtl ? LocalizationService.Get("کلاینت استیم (Steam)") : "Steam Client";
+                if (running.Contains("qbittorrent") || running.Contains("utorrent")) return isRtl ? LocalizationService.Get("کلاینت تورنت (Torrent)") : "Torrent Client";
+                if (running.Contains("msedge")) return isRtl ? LocalizationService.Get("مرورگر مایکروسافت اج") : "Microsoft Edge";
+                if (running.Contains("chrome")) return isRtl ? LocalizationService.Get("مرورگر گوگل کروم") : "Google Chrome";
+                if (running.Contains("firefox")) return isRtl ? LocalizationService.Get("مرورگر فایرفاکس") : "Mozilla Firefox";
                 if (running.Contains("Discord")) return "Discord";
-                if (running.Contains("Telegram")) return isRtl ? "پیام رسان تلگرام" : "Telegram";
-                if (running.Contains("Spotify")) return isRtl ? "استریم اسپاتیفای" : "Spotify";
-                if (running.Contains("DoSvc")) return isRtl ? "سرویس آپدیت ویندوز" : "Windows Update Service";
+                if (running.Contains("Telegram")) return isRtl ? LocalizationService.Get("پیام رسان تلگرام") : "Telegram";
+                if (running.Contains("Spotify")) return isRtl ? LocalizationService.Get("استریم اسپاتیفای") : "Spotify";
+                if (running.Contains("DoSvc")) return isRtl ? LocalizationService.Get("سرویس آپدیت ویندوز") : "Windows Update Service";
             }
             catch (Exception __ex)
             {
@@ -3781,7 +3839,7 @@ namespace CleanC.UI
             string usedTxt = $"{usedPct.ToString("0.#", CultureInfo.InvariantCulture)}%";
             string cleanTxt = cleanableGb > 0.01 ? $"{cleanPct.ToString("0.#", CultureInfo.InvariantCulture)}%" : "—";
             string freeTxt = $"{freePct.ToString("0.#", CultureInfo.InvariantCulture)}%";
-            string freeWord = LocalizationService.IsRtl ? "آزاد از" : "free of";
+            string freeWord = LocalizationService.IsRtl ? LocalizationService.Get("آزاد از") : "free of";
             string badgeTxt = $"{SystemStats.FormatBytes((long)(freeGb * 1024 * 1024 * 1024))} {freeWord} {SystemStats.FormatBytes((long)(totalGb * 1024 * 1024 * 1024))}";
 
             bool dirty = _lastDiskRenderSig != $"{usedTxt}|{cleanTxt}|{freeTxt}|{badgeTxt}";
@@ -3827,7 +3885,7 @@ namespace CleanC.UI
                 days[i] = byDate.TryGetValue(key, out var b) ? b : 0;
                 maxBytes = Math.Max(maxBytes, days[i]);
                 labels[i] = day.ToString("dd.MM", CultureInfo.InvariantCulture);
-                values[i] = days[i] > 0 ? SystemStats.FormatBytes(days[i]).Replace("گیگابایت", "گیگ") : "—";
+                values[i] = days[i] > 0 ? SystemStats.FormatBytes(days[i]).Replace("گیگابایت", "گیگ") : "—"; // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
             }
 
             // ستون ها به ترتیب در Children قرار دارند: TextBlock مقدار، Border نوار، TextBlock برچسب
@@ -3985,8 +4043,8 @@ namespace CleanC.UI
             if (string.IsNullOrWhiteSpace(title) && string.IsNullOrWhiteSpace(message)) return;
 
             string combined = (title + " " + message).ToLowerInvariant();
-            if (combined.Contains("در حال") || combined.Contains("checking") || combined.Contains("scanning") ||
-                combined.Contains("loading") || combined.Contains("لطفاً صبر کنید"))
+            if (combined.Contains("در حال") || combined.Contains("checking") || combined.Contains("scanning") || // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
+                combined.Contains("loading") || combined.Contains("لطفاً صبر کنید")) // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود
             {
                 return;
             }
@@ -4524,7 +4582,7 @@ namespace CleanC.UI
                 // badge ویندوز برای اپ unpackaged ممکن است در دسترس نباشد؛
                 // در آن صورت عدد سلامت روی tooltip تری آیکون نشان داده می شود.
                 if (!_windowsNotifications.TrySetBadge(roundedScore))
-                    _trayManager?.UpdateTooltip($"CleanC — سلامت سیستم: {roundedScore}%");
+                    _trayManager?.UpdateTooltip(string.Format(LocalizationService.Get("CleanC — سلامت سیستم: {0}%"), roundedScore));
             }
 
             if (HealthScoreValueText != null)
