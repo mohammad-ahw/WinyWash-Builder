@@ -22,5 +22,9 @@ namespace CleanC.Core.Models
         public bool IsStoreApp { get; set; }
         public string PackageFullName { get; set; } = string.Empty;
         public bool IsSelected { get; set; }
+
+        // D18 — نسخه ی آزمایشی: فقط badge نمایشی در تب Apps؛ هیچ حذف خودکاری انجام نمی شود
+        public bool IsTrialBadge { get; set; }
+        public string TrialEvidence { get; set; } = string.Empty;
     }
 }

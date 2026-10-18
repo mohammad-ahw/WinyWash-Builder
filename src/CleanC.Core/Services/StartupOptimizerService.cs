@@ -53,6 +53,18 @@ namespace CleanC.Core.Services
         public bool ImpactMeasured { get; set; }
         /// <summary>میلی ثانیه تأخیرِ واقعیِ ثبت شده در لاگ بوت (فقط وقتی <see cref="ImpactMeasured"/>).</summary>
         public long ImpactMs { get; set; }
+
+        // ====================================================================
+        // D12 — استارتاپ یتیم (فایل اجرایی هدف گم شده)
+        // ====================================================================
+        /// <summary>
+        /// آیا فایل اجراییِ این مورد روی دیسک وجود ندارد؟ (بازمانده ی برنامه ی حذف شده)
+        /// فقط وقتی true است که مسیر exe قابل استخراج بوده و واقعاً روی دیسک نباشد.
+        /// </summary>
+        public bool TargetMissing { get; set; }
+
+        /// <summary>شواهد تشخیص D12 — چرا این مورد یتیم شناسایی شد (مسیر گم‌شده).</summary>
+        public string Evidence { get; set; } = string.Empty;
     }
 
     public class StartupOptimizerService
@@ -143,6 +155,12 @@ namespace CleanC.Core.Services
             // 7. Items previously disabled and backed up by CleanC
             ScanCleanCDisabledItems(list);
 
+            // D12 — تشخیص هدف ناموجود (فایل اجرایی گم شده) برای همه ی موارد
+            foreach (var item in list)
+            {
+                DetectMissingTarget(item);
+            }
+
             // امتیاز تأثیر روی بوت را برای همه ی موارد محاسبه کن
             var impacts = BootImpactService.GetBootImpacts();
             foreach (var item in list)
@@ -151,6 +169,71 @@ namespace CleanC.Core.Services
             }
 
             return list;
+        }
+
+        // ====================================================================
+        // D12 — استارتاپ/تسک یتیم: فایل اجرایی هدف دیگر روی دیسک نیست
+        // ====================================================================
+        private static void DetectMissingTarget(StartupItem item)
+        {
+            try
+            {
+                // فقط منابعی که مفهوم «فایل اجرایی» در آنها معنا دارد
+                bool exeBearing = item.Location is "HKCU" or "HKLM" or "HKLM (32-bit)"
+                    or "HKCU RunOnce" or "HKLM RunOnce" or "UserStartupFolder" or "CommonStartupFolder"
+                    or "TaskScheduler";
+                if (!exeBearing) return;
+
+                // موارد غیرفعال (شامل غیرفعال شده های خودمان) را دوباره پرچم نمی زنیم
+                if (item.IsDisabled) return;
+
+                // در Startup Folder، Command خودِ مسیر فایل است
+                if (item.Location is "UserStartupFolder" or "CommonStartupFolder")
+                {
+                    if (!string.IsNullOrWhiteSpace(item.Command) && !File.Exists(item.Command))
+                    {
+                        item.TargetMissing = true;
+                        item.Evidence = $"فایل استارتاپ «{item.Command}» روی دیسک وجود ندارد";
+                    }
+                    return;
+                }
+
+                if (!TryResolveExecutablePath(item.Command, out string exePath)) return;
+
+                if (!File.Exists(exePath))
+                {
+                    item.TargetMissing = true;
+                    item.Evidence = $"فایل اجرایی «{exePath}» وجود ندارد — بازمانده ی برنامه ی حذف شده";
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+        }
+
+        // استخراج مسیر فایل اجرایی از رشته ی فرمان (با پشتیبانی از کوتیشن، آرگومان و متغیر محیطی).
+        // false یعنی قابل استخراج نبود (مثل rundll32/msiexec) و در آن صورت عمداً قضاوت نمی کنیم.
+        private static bool TryResolveExecutablePath(string command, out string exePath)
+        {
+            exePath = string.Empty;
+            if (string.IsNullOrWhiteSpace(command)) return false;
+
+            string expanded = Environment.ExpandEnvironmentVariables(command.Trim());
+
+            // متغیر حل نشده → قضاوت نکن (ممکن است روی حجم کاربر دیگری اشاره داشته باشد)
+            if (expanded.Contains('%')) return false;
+
+            int exeIndex = expanded.IndexOf(".exe", StringComparison.OrdinalIgnoreCase);
+            if (exeIndex < 0) return false;
+
+            string candidate = expanded[..(exeIndex + 4)].Trim().Trim('"');
+
+            // مسیر باید مطلق و دارای درایو باشد؛ در غیر این صورت نتیجه گیری نمی کنیم
+            if (candidate.Length < 4 || !candidate.Contains(':')) return false;
+
+            exePath = candidate;
+            return true;
         }
 
         public static async Task<int> OptimizeStartupAppsAsync(bool aggressive = false)

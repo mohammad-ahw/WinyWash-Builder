@@ -34,6 +34,10 @@ namespace CleanC.Core.Services
         public string Description { get; set; } = string.Empty;
         public bool IsSelected { get; set; } = true;
         public bool IsPackagedApp { get; set; } = true;
+
+        // D13 — بسته ی provisioned تصویر ویندوز: برای هر کاربر جدید دوباره نصب می شود.
+        // هنگام حذف، علاوه بر RemovePackageAsync باید Deprovision هم بشود وگرنه برمی گردد.
+        public bool IsProvisioned { get; set; }
     }
 
     public class BloatwareService
@@ -156,6 +160,9 @@ namespace CleanC.Core.Services
             using var packagesKey = Registry.CurrentUser.OpenSubKey(@"Software\Classes\Local Settings\Software\Microsoft\Windows\CurrentVersion\AppModel\Repository\Packages");
             if (packagesKey == null) return;
 
+            // D13 — لیست provisioned فقط اگر واقعاً کاندیدی پیدا شد لود می شود (lazy)
+            HashSet<string>? provisionedNames = null;
+
             foreach (var packageFullName in packagesKey.GetSubKeyNames())
             {
                 // Format: Name_Version_Arch_ResourceId_PublisherId
@@ -210,6 +217,49 @@ namespace CleanC.Core.Services
                     }
                 }
             }
+
+            // D13 — پرچم گذاری provisioned روی همه ی کاندیدهای پیدا شده (یک بار محاسبه)
+            if (result.Any(c => c.IsPackagedApp))
+            {
+                provisionedNames = GetProvisionedPackageNames();
+                if (provisionedNames.Count > 0)
+                {
+                    foreach (var item in result.Where(c => c.IsPackagedApp))
+                    {
+                        string name = item.PackageFullName.Split('_')[0];
+                        if (!provisionedNames.Contains(name)) continue;
+                        item.IsProvisioned = true;
+                        item.Description = item.Description +
+                            " — به صورت provisioned در تصویر ویندوز ثبت است و برای کاربران جدید خودکار نصب می شود";
+                    }
+                }
+            }
+        }
+
+        // D13 — نام پکیج های provisioned (تصویر ویندوز) از PackageManager
+        private static HashSet<string> GetProvisionedPackageNames()
+        {
+            var names = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            try
+            {
+                var packageManager = new Windows.Management.Deployment.PackageManager();
+                foreach (var pkg in packageManager.FindProvisionedPackages())
+                {
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(pkg.Id.Name)) names.Add(pkg.Id.Name);
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex, "Bloatware.Provisioned");
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex, "Bloatware.Provisioned");
+            }
+            return names;
         }
 
         private static void ScanWin32Apps(List<CandidateAppItem> result)
@@ -350,7 +400,7 @@ namespace CleanC.Core.Services
         {
             if (app.IsPackagedApp && !string.IsNullOrEmpty(app.PackageFullName))
             {
-                return await RemoveAppxPackageAsync(app.PackageFullName);
+                return await RemoveAppxPackageAsync(app.PackageFullName, app.IsProvisioned);
             }
             if (!string.IsNullOrEmpty(app.UninstallString))
             {
@@ -463,8 +513,11 @@ namespace CleanC.Core.Services
         /// که برای آنتی ویروس ها الگوی مشکوکی بود و نیاز به escape دستی کوتیشن داشت).
         /// خطای واقعی حذف در ExtendedErrorCode نتیجه برمی گردد؛ حذف سنگین ممکن است
         /// چند ده ثانیه طول بکشد و این متد تا پایان آن await می ماند.
+        ///
+        /// D13 — اگر پکیج provisioned باشد، بعد از حذف Deprovision هم می شود تا برای
+        /// کاربران جدید ویندوز دوباره نصب نشود (best-effort؛ شکست آن حذف را باطل نمی کند).
         /// </summary>
-        private static async Task<bool> RemoveAppxPackageAsync(string packageFullName)
+        private static async Task<bool> RemoveAppxPackageAsync(string packageFullName, bool deprovision = false)
         {
             try
             {
@@ -476,6 +529,26 @@ namespace CleanC.Core.Services
                         $"حذف {packageFullName} ناموفق بود: {result.ExtendedErrorCode.Message}"));
                     return false;
                 }
+
+                if (deprovision)
+                {
+                    string packageName = packageFullName.Split('_')[0];
+                    try
+                    {
+                        // Deprovision برای همه ی کاربران: بدون این کار پکیج برای کاربران
+                        // جدید ویندوز دوباره نصب می شود.
+                        var deprovResult = await packageManager.DeprovisionPackageForAllUsersAsync(packageName);
+                        if (deprovResult.ExtendedErrorCode != null)
+                        {
+                            CcLog.Ignore(new InvalidOperationException(deprovResult.ExtendedErrorCode.Message), "Bloatware.Deprovision");
+                        }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex, "Bloatware.Deprovision");
+                    }
+                }
+
                 return true;
             }
             catch (Exception __ex)
@@ -509,6 +582,18 @@ namespace CleanC.Core.Services
         private static bool IsEssentialPackage(string packageName, string packageFullName)
         {
             if (EssentialSystemPackages.Contains(packageName)) return true;
+
+            // D13 — بسته های زیرساختی بحرانی: حذفشان باعث از کار افتادن ده ها اپ می شود
+            // (VCLibs / UI.Xaml / WindowsAppRuntime / NET.Native موتور اجرای اپ های استور هستند
+            //  و Store خودش فروشگاه است)
+            if (packageName.StartsWith("Microsoft.VCLibs", StringComparison.OrdinalIgnoreCase) ||
+                packageName.StartsWith("Microsoft.UI.Xaml", StringComparison.OrdinalIgnoreCase) ||
+                packageName.StartsWith("Microsoft.WindowsAppRuntime", StringComparison.OrdinalIgnoreCase) ||
+                packageName.StartsWith("Microsoft.NET.Native", StringComparison.OrdinalIgnoreCase) ||
+                packageName.Equals("Microsoft.WindowsStore", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
 
             // Protect frameworks & language packs
             if (packageFullName.Contains("VCLibs", StringComparison.OrdinalIgnoreCase) ||

@@ -124,6 +124,8 @@ namespace CleanC.Core.Services
                                         catch { }
                                     }
 
+                                    bool isTrial = IsTrialProduct(displayName, out string trialEvidence);
+
                                     apps[displayName] = new InstalledAppInfo
                                     {
                                         DisplayName = displayName,
@@ -135,7 +137,9 @@ namespace CleanC.Core.Services
                                         UninstallString = uninstall ?? string.Empty,
                                         QuietUninstallString = quietUninstall ?? string.Empty,
                                         DisplayIcon = displayIcon,
-                                        IsStoreApp = false
+                                        IsStoreApp = false,
+                                        IsTrialBadge = isTrial,
+                                        TrialEvidence = trialEvidence
                                     };
                                 }
                             }
@@ -235,6 +239,30 @@ namespace CleanC.Core.Services
                     .ThenBy(a => a.DisplayName)
                     .ToList();
             });
+        }
+
+        // D18 — تشخیص برنامه ی trial از نام نمایشی (فقط badge نمایشی؛ حذف خودکار وجود ندارد).
+        // الگوی \btrial\b با مرز کلمه است تا چیزهایی مثل «Trials» یا «Triathlon» مثبت کاذب ندهند.
+        private static bool IsTrialProduct(string displayName, out string evidence)
+        {
+            evidence = string.Empty;
+            if (string.IsNullOrWhiteSpace(displayName)) return false;
+
+            if (System.Text.RegularExpressions.Regex.IsMatch(displayName, @"\btrial\b",
+                System.Text.RegularExpressions.RegexOptions.IgnoreCase))
+            {
+                evidence = "نام برنامه شامل «Trial» است";
+                return true;
+            }
+
+            if (displayName.Contains("نسخه آزمایشی", StringComparison.Ordinal) ||
+                displayName.Contains("نسخه تست", StringComparison.Ordinal))
+            {
+                evidence = "نام برنامه شامل «نسخه آزمایشی» است";
+                return true;
+            }
+
+            return false;
         }
 
         public static (string fileName, string arguments) ParseUninstallCommand(string commandLine)

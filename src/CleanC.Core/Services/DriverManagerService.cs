@@ -7,6 +7,7 @@ using System.Management;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
+using Microsoft.Win32;
 
 namespace CleanC.Core.Services
 {
@@ -23,6 +24,11 @@ namespace CleanC.Core.Services
         public int ErrorCode { get; set; }
         public string StatusDescription { get; set; } = "آماده و سالم";
         public bool IsSelected { get; set; }
+
+        // D14 — بسته ی یتیم: هیچ دستگاه فعالی از این بسته در DriverStore استفاده نمی کند
+        // (سخت افزار مربوطه دیگر روی سیستم حاضر نیست یا بسته تکراری/قدیمی است)
+        public bool IsOrphanNoHardware { get; set; }
+        public string Evidence { get; set; } = string.Empty;
     }
 
     public class DriverSummaryStats
@@ -30,6 +36,8 @@ namespace CleanC.Core.Services
         public int TotalDrivers { get; set; }
         public int ErrorCount { get; set; }
         public int DuplicateOldCount { get; set; }
+        // D14 — تعداد بسته هایی که سخت افزار حاضر از آنها استفاده نمی کند
+        public int OrphanNoHardwareCount { get; set; }
     }
 
     public static class DriverManagerService
@@ -83,6 +91,67 @@ namespace CleanC.Core.Services
                     }
                 }
 
+                // 2.5 D14 — کراس چک با نودهای دستگاه: هر بسته ی DriverStore که هیچ
+                //     دستگاه نصب شده ای (حتی جدا شده / phantom) به آن متصل نیست،
+                //     کاندید «یتیم» است. منبع حقیقت: HKLM\SYSTEM\...\Control\Class
+                //     که برای هر دستگاه مقدار InfPath (مثل oem14.inf) را نگه می دارد.
+                //     اگر شمارش رجیستری شکست بخورد، هیچ چیز پرچم نمی خورد تا
+                //     پیشنهاد نادرست ندهیم.
+                try
+                {
+                    var referencedInfPaths = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                    using (var classRoot = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Control\Class"))
+                    {
+                        if (classRoot != null)
+                        {
+                            foreach (var guidName in classRoot.GetSubKeyNames())
+                            {
+                                try
+                                {
+                                    using var classKey = classRoot.OpenSubKey(guidName);
+                                    if (classKey == null) continue;
+
+                                    foreach (var instanceName in classKey.GetSubKeyNames())
+                                    {
+                                        try
+                                        {
+                                            using var instanceKey = classKey.OpenSubKey(instanceName);
+                                            string? infPath = instanceKey?.GetValue("InfPath")?.ToString();
+                                            if (!string.IsNullOrEmpty(infPath)) referencedInfPaths.Add(infPath);
+                                        }
+                                        catch (Exception __ex)
+                                        {
+                                            CcLog.Ignore(__ex);
+                                        }
+                                    }
+                                }
+                                catch (Exception __ex)
+                                {
+                                    CcLog.Ignore(__ex);
+                                }
+                            }
+                        }
+                    }
+
+                    if (referencedInfPaths.Count > 0)
+                    {
+                        foreach (var d in list)
+                        {
+                            if (d.HasError || string.IsNullOrEmpty(d.PublishedName)) continue;
+                            if (!d.PublishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase)) continue;
+                            if (referencedInfPaths.Contains(d.PublishedName)) continue;
+
+                            d.IsOrphanNoHardware = true;
+                            d.Evidence = "هیچ دستگاهی (حتی جدا شده) به این بسته متصل نیست — سخت افزار مربوطه هرگز یا دیگر روی سیستم نیست";
+                        }
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+
                 // 3. Query Win32_PNPEntity for hardware error codes
                 try
                 {
@@ -120,7 +189,8 @@ namespace CleanC.Core.Services
                 {
                     TotalDrivers = list.Count,
                     ErrorCount = list.Count(d => d.HasError),
-                    DuplicateOldCount = list.Count(d => d.IsDuplicateOldVersion)
+                    DuplicateOldCount = list.Count(d => d.IsDuplicateOldVersion),
+                    OrphanNoHardwareCount = list.Count(d => d.IsOrphanNoHardware)
                 };
 
                 return (list, stats);
