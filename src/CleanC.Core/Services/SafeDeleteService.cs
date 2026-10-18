@@ -264,7 +264,7 @@ namespace CleanC.Core.Services
             if (LockRegistryService.IsUserLockedPath(path))
             {
                 result.Outcome = SafeDeleteOutcome.Failed;
-                result.Error = "این مسیر توسط کاربر قفل شده است";
+                result.Error = LocalizationService.Get("LockUserVetoError", "این مسیر توسط کاربر قفل شده است");
                 return result;
             }
 

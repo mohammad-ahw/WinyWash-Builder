@@ -937,7 +937,7 @@ namespace CleanC.UI
                     };
                     trialBadge.Child = new TextBlock
                     {
-                        Text = "نسخه آزمایشی",
+                        Text = LocalizationService.Get("BadgeTrial", "نسخه آزمایشی"),
                         FontSize = 10,
                         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                         Foreground = GetThemeBrush("SystemFillColorCautionBrush")
@@ -2068,7 +2068,7 @@ namespace CleanC.UI
                     };
                     orphanBadge.Child = new TextBlock
                     {
-                        Text = "هدف ناموجود",
+                        Text = LocalizationService.Get("BadgeTargetMissing", "هدف ناموجود"),
                         FontSize = 10,
                         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                         Foreground = GetThemeBrush("SystemFillColorCautionBrush")
@@ -2580,15 +2580,21 @@ namespace CleanC.UI
                 DriversDuplicateBanner.Visibility = (hasDuplicates || hasOrphans) ? Visibility.Visible : Visibility.Collapsed;
                 if (hasDuplicates && hasOrphans)
                 {
-                    DriversDuplicateBannerTitle.Text = $"شناسایی {stats.DuplicateOldCount} بسته تکراری و قدیمی + {stats.OrphanNoHardwareCount} بسته بدون سخت افزار در DriverStore ویندوز";
+                    DriversDuplicateBannerTitle.Text = string.Format(
+                        LocalizationService.Get("DriverBannerDupAndOrphan", "شناسایی {0} بسته تکراری و قدیمی + {1} بسته بدون سخت افزار در DriverStore ویندوز"),
+                        stats.DuplicateOldCount, stats.OrphanNoHardwareCount);
                 }
                 else if (hasOrphans)
                 {
-                    DriversDuplicateBannerTitle.Text = $"شناسایی {stats.OrphanNoHardwareCount} بسته بدون سخت افزار (بازمانده ی دستگاه های جدا شده) در DriverStore ویندوز";
+                    DriversDuplicateBannerTitle.Text = string.Format(
+                        LocalizationService.Get("DriverBannerOrphan", "شناسایی {0} بسته بدون سخت افزار (بازمانده ی دستگاه های جدا شده) در DriverStore ویندوز"),
+                        stats.OrphanNoHardwareCount);
                 }
                 else if (hasDuplicates)
                 {
-                    DriversDuplicateBannerTitle.Text = $"شناسایی {stats.DuplicateOldCount} بسته تکراری و قدیمی در DriverStore ویندوز";
+                    DriversDuplicateBannerTitle.Text = string.Format(
+                        LocalizationService.Get("DriverBannerDup", "شناسایی {0} بسته تکراری و قدیمی در DriverStore ویندوز"),
+                        stats.DuplicateOldCount);
                 }
 
                 RenderDrivers(drivers);
@@ -2756,7 +2762,7 @@ namespace CleanC.UI
                     };
                     orphanBadge.Child = new TextBlock
                     {
-                        Text = "بدون سخت افزار",
+                        Text = LocalizationService.Get("BadgeNoHardware", "بدون سخت افزار"),
                         FontSize = 10,
                         FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                         Foreground = GetThemeBrush("SystemFillColorCautionBrush")
@@ -2882,12 +2888,13 @@ namespace CleanC.UI
         private async Task DeleteSingleDriverAsync(DriverItem driver)
         {
             // متن تأیید بر اساس نوع تشخیص (تکراری/قدیمی در برابر بدون سخت افزار) تنظیم می شود
-            string dialogTitle = driver.IsOrphanNoHardware && !driver.IsDuplicateOldVersion
-                ? $"حذف بسته بدون سخت افزار {driver.PublishedName}"
-                : $"حذف درایور قدیمی {driver.PublishedName}";
-            string dialogContent = driver.IsOrphanNoHardware && !driver.IsDuplicateOldVersion
-                ? $"بسته '{driver.PublishedName}' متعلق به سخت افزاری است که دیگر به سیستم متصل نیست.\nآیا از حذف این بسته اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد."
-                : $"آیا از حذف بسته درایور قدیمی '{driver.OriginalName}' ({driver.PublishedName}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.";
+            bool isOrphanOnly = driver.IsOrphanNoHardware && !driver.IsDuplicateOldVersion;
+            string dialogTitle = isOrphanOnly
+                ? string.Format(LocalizationService.Get("DriverDeleteOrphanTitle", "حذف بسته بدون سخت افزار {0}"), driver.PublishedName)
+                : string.Format(LocalizationService.Get("DriverDeleteOldTitle", "حذف درایور قدیمی {0}"), driver.PublishedName);
+            string dialogContent = isOrphanOnly
+                ? string.Format(LocalizationService.Get("DriverDeleteOrphanBody", "بسته '{0}' متعلق به سخت افزاری است که دیگر به سیستم متصل نیست.\nآیا از حذف این بسته اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد."), driver.PublishedName)
+                : string.Format(LocalizationService.Get("DriverDeleteOldBody", "آیا از حذف بسته درایور قدیمی '{0}' ({1}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد."), driver.OriginalName, driver.PublishedName);
 
             var dialog = new ContentDialog
             {

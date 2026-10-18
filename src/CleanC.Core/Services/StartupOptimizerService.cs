@@ -193,7 +193,7 @@ namespace CleanC.Core.Services
                     if (!string.IsNullOrWhiteSpace(item.Command) && !File.Exists(item.Command))
                     {
                         item.TargetMissing = true;
-                        item.Evidence = $"فایل استارتاپ «{item.Command}» روی دیسک وجود ندارد";
+                        item.Evidence = string.Format(LocalizationService.Get("EvStartupFileMissing", "فایل استارتاپ «{0}» روی دیسک وجود ندارد"), item.Command);
                     }
                     return;
                 }
@@ -203,7 +203,7 @@ namespace CleanC.Core.Services
                 if (!File.Exists(exePath))
                 {
                     item.TargetMissing = true;
-                    item.Evidence = $"فایل اجرایی «{exePath}» وجود ندارد — بازمانده ی برنامه ی حذف شده";
+                    item.Evidence = string.Format(LocalizationService.Get("EvStartupExeMissing", "فایل اجرایی «{0}» وجود ندارد — بازمانده ی برنامه ی حذف شده"), exePath);
                 }
             }
             catch (Exception __ex)

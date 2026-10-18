@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using CleanC.Core.Services;
 
 namespace CleanC.Core.Models
 {
@@ -66,18 +67,18 @@ namespace CleanC.Core.Models
         public StorageMessCategory Category { get; set; }
         public string CategoryName => Category switch
         {
-            StorageMessCategory.OldInstaller => "فایل نصب قدیمی (Setup / Installer)",
-            StorageMessCategory.OldArchive => "فایل فشرده (Zip / Rar)",
-            StorageMessCategory.DuplicateCopy => "نسخه کپی شده (Copy / Duplicated)",
-            StorageMessCategory.OldScreenshot => "اسکرین شات قدیمی",
-            StorageMessCategory.TempJunk => "فایل موقت و زائد (Temp / Junk)",
-            StorageMessCategory.LargeFile => "فایل بسیار حجیم (>200MB)",
-            StorageMessCategory.ExtractedArchiveDuplicate => "فایل آرشیو آنزیپ‌شده (پوشه هم‌نام موجود است)",
-            StorageMessCategory.IncompleteDownload => "دانلود ناتمام و موقت (crdownload / part)",
-            StorageMessCategory.OemDriveRootLeftover => "بازمانده ی نصب سازنده در ریشه ی درایو",
-            StorageMessCategory.UpdaterLeftover => "بازمانده ی آپدیتر (Electron / Squirrel)",
-            StorageMessCategory.SyncDeviceLeftover => "بازمانده ی انتقال دستگاه / تمپ OneDrive",
-            _ => "سایر"
+            StorageMessCategory.OldInstaller => LocalizationService.Get("MessCatOldInstaller", "فایل نصب قدیمی (Setup / Installer)"),
+            StorageMessCategory.OldArchive => LocalizationService.Get("MessCatOldArchive", "فایل فشرده (Zip / Rar)"),
+            StorageMessCategory.DuplicateCopy => LocalizationService.Get("MessCatDuplicateCopy", "نسخه کپی شده (Copy / Duplicated)"),
+            StorageMessCategory.OldScreenshot => LocalizationService.Get("MessCatOldScreenshot", "اسکرین شات قدیمی"),
+            StorageMessCategory.TempJunk => LocalizationService.Get("MessCatTempJunk", "فایل موقت و زائد (Temp / Junk)"),
+            StorageMessCategory.LargeFile => LocalizationService.Get("MessCatLargeFile", "فایل بسیار حجیم (>200MB)"),
+            StorageMessCategory.ExtractedArchiveDuplicate => LocalizationService.Get("MessCatExtractedArchiveDup", "فایل آرشیو آنزیپ‌شده (پوشه هم‌نام موجود است)"),
+            StorageMessCategory.IncompleteDownload => LocalizationService.Get("MessCatIncompleteDownload", "دانلود ناتمام و موقت (crdownload / part)"),
+            StorageMessCategory.OemDriveRootLeftover => LocalizationService.Get("MessCatOemDriveRoot", "بازمانده ی نصب سازنده در ریشه ی درایو"),
+            StorageMessCategory.UpdaterLeftover => LocalizationService.Get("MessCatUpdater", "بازمانده ی آپدیتر (Electron / Squirrel)"),
+            StorageMessCategory.SyncDeviceLeftover => LocalizationService.Get("MessCatSyncDevice", "بازمانده ی انتقال دستگاه / تمپ OneDrive"),
+            _ => LocalizationService.Get("MessCatOther", "سایر")
         };
         public string CategoryTitle => CategoryName;
         public bool IsSelected { get; set; } = false;

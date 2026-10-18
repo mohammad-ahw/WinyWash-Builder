@@ -251,14 +251,14 @@ namespace CleanC.Core.Services
             if (System.Text.RegularExpressions.Regex.IsMatch(displayName, @"\btrial\b",
                 System.Text.RegularExpressions.RegexOptions.IgnoreCase))
             {
-                evidence = "نام برنامه شامل «Trial» است";
+                evidence = LocalizationService.Get("EvTrialInName", "نام برنامه شامل «Trial» است");
                 return true;
             }
 
             if (displayName.Contains("نسخه آزمایشی", StringComparison.Ordinal) ||
                 displayName.Contains("نسخه تست", StringComparison.Ordinal))
             {
-                evidence = "نام برنامه شامل «نسخه آزمایشی» است";
+                evidence = LocalizationService.Get("EvTrialInNameLocalized", "نام برنامه شامل «نسخه آزمایشی» است");
                 return true;
             }
 

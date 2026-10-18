@@ -109,7 +109,7 @@ namespace CleanC.Core.Services
                                                 FolderName = subDir.Name,
                                                 ParentPath = subDir.Parent?.FullName ?? string.Empty,
                                                 IsSelected = false,
-                                                Evidence = $"بیش از ۳۰ روز خالی مانده (آخرین تغییر: {subDir.LastWriteTime:yyyy/MM/dd})"
+                                                Evidence = string.Format(LocalizationService.Get("EvEmptyFolder30Days", "بیش از ۳۰ روز خالی مانده (آخرین تغییر: {0:yyyy/MM/dd})"), subDir.LastWriteTime)
                                             });
                                         }
                                     }
@@ -213,8 +213,8 @@ namespace CleanC.Core.Services
                                                 LastModified = file.LastWriteTime,
                                                 Category = StorageMessCategory.IncompleteDownload,
                                                 Evidence = completedExists
-                                                    ? $"فایل کامل «{Path.GetFileName(completedPath)}» موجود است — بازمانده ی دانلود تمام شده"
-                                                    : "بیش از ۲۴ ساعت بدون تغییر — دانلود رهاشده",
+                                                    ? string.Format(LocalizationService.Get("EvDownloadCompleted", "فایل کامل «{0}» موجود است — بازمانده ی دانلود تمام شده"), Path.GetFileName(completedPath))
+                                                    : LocalizationService.Get("EvDownloadAbandoned", "بیش از ۲۴ ساعت بدون تغییر — دانلود رهاشده"),
                                                 IsSelected = false
                                             });
                                         }
@@ -229,7 +229,7 @@ namespace CleanC.Core.Services
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
                                             Category = StorageMessCategory.IncompleteDownload,
-                                            Evidence = "فایل موقت .tmp قدیمی تر از ۷۲ ساعت در پوشه ی دانلود/دسکتاپ",
+                                            Evidence = LocalizationService.Get("EvTmpOld72h", "فایل موقت .tmp قدیمی تر از ۷۲ ساعت در پوشه ی دانلود/دسکتاپ"),
                                             IsSelected = false
                                         });
                                     }
@@ -262,8 +262,8 @@ namespace CleanC.Core.Services
                                             LastModified = file.LastWriteTime,
                                             Category = StorageMessCategory.OldInstaller,
                                             Evidence = matchedProduct != null
-                                                ? $"نصب کننده ی «{matchedProduct}» — برنامه نصب شده و این فایل دیگر لازم نیست"
-                                                : "نصب کننده ی قدیمی (بیش از ۱۴ روز) — برنامه ی هم نامی روی سیستم پیدا نشد",
+                                                ? string.Format(LocalizationService.Get("EvInstallerMatched", "نصب کننده ی «{0}» — برنامه نصب شده و این فایل دیگر لازم نیست"), matchedProduct)
+                                                : LocalizationService.Get("EvInstallerNoMatch", "نصب کننده ی قدیمی (بیش از ۱۴ روز) — برنامه ی هم نامی روی سیستم پیدا نشد"),
                                             IsSelected = false
                                         });
                                     }
@@ -397,11 +397,11 @@ namespace CleanC.Core.Services
                 var syncLeftovers = new (string Path, string Name, string EvidenceDesc)[]
                 {
                     (Path.Combine(userProfile, "CrossDevice"),
-                        "مبادله ی موقت دستگاه ها (CrossDevice)",
-                        "پوشه ی واسط Link to Windows / Phone Link برای انتقال فایل بین گوشی و کامپیوتر"),
+                        LocalizationService.Get("EvCrossDevice", "مبادله ی موقت دستگاه ها (CrossDevice)"),
+                        LocalizationService.Get("EvCrossDeviceSub", "پوشه ی واسط Link to Windows / Phone Link برای انتقال فایل بین گوشی و کامپیوتر")),
                     (Path.Combine(userProfile, "OneDrive", ".849C9593-D756-4E56-8D6E-42412F2A707B"),
-                        "پوشه ی موقت OneDrive",
-                        "انبار موقت فایل های در حال آپلود OneDrive که رها شده است")
+                        LocalizationService.Get("EvOneDriveTemp", "پوشه ی موقت OneDrive"),
+                        LocalizationService.Get("EvOneDriveTempSub", "انبار موقت فایل های در حال آپلود OneDrive که رها شده است"))
                 };
 
                 foreach (var (sPath, sName, sEvidence) in syncLeftovers)
@@ -506,7 +506,7 @@ namespace CleanC.Core.Services
                 // 2.5 Detectors فاز ۶ — D10 (ریشه ی درایو) / D04 (بازمانده ی آپدیتر) / D17 (فایل حساس)
                 //     (D03 یعنی LiveKernelReports در تب Clean و SystemScanService است، نه اینجا)
                 // -------------------------------------------------------------
-                progress?.Invoke("در حال بررسی ریشه ی درایوها و بازمانده ی آپدیترها...");
+                progress?.Invoke(LocalizationService.Get("ScanProgressDriveRoots", "در حال بررسی ریشه ی درایوها و بازمانده ی آپدیترها..."));
                 messItems.AddRange(ScanOemDriveRootLeftovers());
                 messItems.AddRange(ScanUpdaterLeftovers());
 
@@ -724,7 +724,7 @@ namespace CleanC.Core.Services
                                     SizeBytes = size,
                                     LastModified = Directory.GetLastWriteTime(dir),
                                     Category = StorageMessCategory.OemDriveRootLeftover,
-                                    Evidence = $"پوشه ی ریشه ی درایو با نام سازنده ی {vendor} — مدرک قطعی: {evidence}",
+                                    Evidence = string.Format(LocalizationService.Get("EvDriveRootLeftover", "پوشه ی ریشه ی درایو با نام سازنده ی {0} — مدرک قطعی: {1}"), vendor, evidence),
                                     RequiresAdmin = true,
                                     IsSelected = true
                                 });
@@ -794,8 +794,8 @@ namespace CleanC.Core.Services
                                    (hitLower.EndsWith(".exe", StringComparison.Ordinal) || hitLower.EndsWith(".msi", StringComparison.Ordinal));
 
                 return isInstaller
-                    ? $"فایل نصب باقی مانده «{hitName}»"
-                    : $"آرتیفکت اختصاصی سازنده «{hitName}» (تصویر بوت/بسته ی درایور)";
+                    ? string.Format(LocalizationService.Get("EvRemnantInstallerFile", "فایل نصب باقی مانده «{0}»"), hitName)
+                    : string.Format(LocalizationService.Get("EvVendorArtifact", "آرتیفکت اختصاصی سازنده «{0}» (تصویر بوت/بسته ی درایور)"), hitName);
             }
             catch (Exception __ex)
             {
@@ -845,8 +845,8 @@ namespace CleanC.Core.Services
                             LastModified = Directory.GetLastWriteTime(dir),
                             Category = StorageMessCategory.UpdaterLeftover,
                             Evidence = pendingInstaller != null
-                                ? $"پوشه ی آپدیتر شامل نصب کننده ی باقی مانده «{pendingInstaller}» — آپدیت نیمه تمام"
-                                : "پوشه ی آپدیتر با الگوی *-updater / SquirrelTemp (نصب در انتظاری پیدا نشد)",
+                                ? string.Format(LocalizationService.Get("EvUpdaterPendingInstaller", "پوشه ی آپدیتر شامل نصب کننده ی باقی مانده «{0}» — آپدیت نیمه تمام"), pendingInstaller)
+                                : LocalizationService.Get("EvUpdaterNoPending", "پوشه ی آپدیتر با الگوی *-updater / SquirrelTemp (نصب در انتظاری پیدا نشد)"),
                             RequiresAdmin = false,
                             IsSelected = false
                         });
@@ -874,7 +874,7 @@ namespace CleanC.Core.Services
                             SizeBytes = fi.Length,
                             LastModified = fi.LastWriteTime,
                             Category = StorageMessCategory.UpdaterLeftover,
-                            Evidence = "فایل .blockmap بازمانده ی آپدیتر الکترون (بیش از ۳۰ روز دست نخورده)",
+                            Evidence = LocalizationService.Get("EvBlockmapOld", "فایل .blockmap بازمانده ی آپدیتر الکترون (بیش از ۳۰ روز دست نخورده)"),
                             RequiresAdmin = false,
                             IsSelected = false
                         });
@@ -925,17 +925,19 @@ namespace CleanC.Core.Services
 
         // الگوهای نامِ فایل حساس (D17). اگر نام فایل یکی از این توکن ها را داشته باشد
         // یا پسوندش جزو پسوندهای امنیتی باشد، فقط «گزارش» می شود.
-        private static readonly (string Token, string Label)[] SensitiveNamePatterns =
+        // برچسب ها به صورت کلید کاتالوگ ذخیره می شوند تا در زمان تطبیق
+        // (نه در زمان بارگذاری کلاس) به زبان جاری ترجمه شوند.
+        private static readonly (string Token, string LabelKey, string LabelFa)[] SensitiveNamePatterns =
         {
-            ("license", "فایل لایسنس نرم‌افزار"),
-            ("serial", "شماره سریال نرم‌افزار"),
-            ("productkey", "کلید محصول (Product Key)"),
-            ("product key", "کلید محصول (Product Key)"),
-            ("activation", "کد فعال‌سازی"),
-            ("passwords", "فایل رمزهای عبور"),
-            ("id_rsa", "کلید خصوصی SSH"),
-            ("privatekey", "کلید خصوصی"),
-            ("private key", "کلید خصوصی")
+            ("license", "SensitiveLicense", "فایل لایسنس نرم‌افزار"),
+            ("serial", "SensitiveSerial", "شماره سریال نرم‌افزار"),
+            ("productkey", "SensitiveProductKey", "کلید محصول (Product Key)"),
+            ("product key", "SensitiveProductKey", "کلید محصول (Product Key)"),
+            ("activation", "SensitiveActivation", "کد فعال‌سازی"),
+            ("passwords", "SensitivePasswords", "فایل رمزهای عبور"),
+            ("id_rsa", "SensitiveSshKey", "کلید خصوصی SSH"),
+            ("privatekey", "SensitivePrivateKey", "کلید خصوصی"),
+            ("private key", "SensitivePrivateKey", "کلید خصوصی")
         };
 
         private static readonly string[] SensitiveExtensions = { ".kdbx", ".pem", ".pfx", ".key", ".pgp" };
@@ -995,15 +997,16 @@ namespace CleanC.Core.Services
         {
             string lower = fileName.ToLowerInvariant();
 
-            foreach (var (token, label) in SensitiveNamePatterns)
+            foreach (var (token, labelKey, labelFa) in SensitiveNamePatterns)
             {
-                if (lower.Contains(token, StringComparison.Ordinal)) return label;
+                if (lower.Contains(token, StringComparison.Ordinal)) return LocalizationService.Get(labelKey, labelFa);
             }
 
             string ext = Path.GetExtension(lower);
             foreach (var sensitiveExt in SensitiveExtensions)
             {
-                if (ext == sensitiveExt) return $"فایل کلید/امنیتی ({sensitiveExt})";
+                if (ext == sensitiveExt)
+                    return string.Format(LocalizationService.Get("SensitiveKeyFile", "فایل کلید/امنیتی ({0})"), sensitiveExt);
             }
 
             return null;

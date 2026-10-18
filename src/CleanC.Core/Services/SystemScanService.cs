@@ -79,7 +79,7 @@ namespace CleanC.Core.Services
                     Id = "crashLogs",
                     GroupId = "recommended",
                     Title = "گزارش های خطا و کرش دامپ ها",
-                    Description = "لاگ های گزارش خرابی، فایل های WER، دامپ های حافظه و گزارش های کرنل (LiveKernelReports)",
+                    Description = LocalizationService.Get("DescCrashLogs", "لاگ های گزارش خرابی، فایل های WER، دامپ های حافظه و گزارش های کرنل (LiveKernelReports)"),
                     Path = crashPaths[0],
                     TargetPaths = crashPaths,
                     Bytes = crashBytes,

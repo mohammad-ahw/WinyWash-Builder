@@ -466,7 +466,7 @@ namespace CleanC.UI
                 if (!string.IsNullOrEmpty(item.Evidence))
                 {
                     string evidenceText = item.RequiresAdmin
-                        ? $"نیازمند دسترسی ادمین · {item.Evidence}"
+                        ? $"{LocalizationService.Get("AdminRequired", "نیازمند دسترسی ادمین")} · {item.Evidence}"
                         : item.Evidence;
                     info.Children.Add(new TextBlock
                     {
@@ -545,15 +545,15 @@ namespace CleanC.UI
             };
 
             ToolTipService.SetToolTip(btn, isLocked
-                ? "رفع قفل — این مسیر دوباره قابل پیشنهاد می شود"
-                : "قفل کردن — این مسیر هرگز پیشنهاد یا حذف نمی شود");
+                ? LocalizationService.Get("LockTooltipUnlock", "رفع قفل — این مسیر دوباره قابل پیشنهاد می شود")
+                : LocalizationService.Get("LockTooltipLock", "قفل کردن — این مسیر هرگز پیشنهاد یا حذف نمی شود"));
 
             btn.Click += (s, e) =>
             {
                 bool currentlyLocked = LockRegistryService.IsUserLockedPath(path);
                 bool ok = currentlyLocked
                     ? LockRegistryService.RemoveLock(path)
-                    : LockRegistryService.AddLock(path, LockTypes.Folder, "قفل شده از صفحه ی پویش عمیق");
+                    : LockRegistryService.AddLock(path, LockTypes.Folder, LocalizationService.Get("LockReasonDeepScan", "قفل شده از صفحه ی پویش عمیق"));
 
                 if (ok)
                 {
@@ -561,7 +561,8 @@ namespace CleanC.UI
                 }
                 else
                 {
-                    ShowInfoBar("قفل مسیر", "ذخیره ی قفل ناموفق بود — دسترسی به locks.json بررسی شود.", InfoBarSeverity.Warning);
+                    ShowInfoBar(LocalizationService.Get("LockInfoBarTitle", "قفل مسیر"),
+                        LocalizationService.Get("LockSaveFailed", "ذخیره ی قفل ناموفق بود — دسترسی به locks.json بررسی شود."), InfoBarSeverity.Warning);
                 }
             };
 
@@ -591,7 +592,7 @@ namespace CleanC.UI
             });
             header.Children.Add(new TextBlock
             {
-                Text = $"فایل های حساس شناسایی شده ({_deepScanResult.SensitiveFiles.Count} مورد — فقط گزارش، بدون حذف)",
+                Text = string.Format(LocalizationService.Get("SensitiveSectionTitle", "فایل های حساس شناسایی شده ({0} مورد — فقط گزارش، بدون حذف)"), _deepScanResult.SensitiveFiles.Count),
                 FontSize = 12,
                 FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
                 VerticalAlignment = VerticalAlignment.Center

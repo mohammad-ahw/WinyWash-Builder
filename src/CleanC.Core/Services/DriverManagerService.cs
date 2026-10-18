@@ -143,7 +143,7 @@ namespace CleanC.Core.Services
                             if (referencedInfPaths.Contains(d.PublishedName)) continue;
 
                             d.IsOrphanNoHardware = true;
-                            d.Evidence = "هیچ دستگاهی (حتی جدا شده) به این بسته متصل نیست — سخت افزار مربوطه هرگز یا دیگر روی سیستم نیست";
+                            d.Evidence = LocalizationService.Get("EvDriverNoHardware", "هیچ دستگاهی (حتی جدا شده) به این بسته متصل نیست — سخت افزار مربوطه هرگز یا دیگر روی سیستم نیست");
                         }
                     }
                 }

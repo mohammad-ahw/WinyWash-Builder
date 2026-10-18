@@ -230,7 +230,7 @@ namespace CleanC.Core.Services
                         if (!provisionedNames.Contains(name)) continue;
                         item.IsProvisioned = true;
                         item.Description = item.Description +
-                            " — به صورت provisioned در تصویر ویندوز ثبت است و برای کاربران جدید خودکار نصب می شود";
+                            LocalizationService.Get("NoteProvisioned", " — به صورت provisioned در تصویر ویندوز ثبت است و برای کاربران جدید خودکار نصب می شود");
                     }
                 }
             }

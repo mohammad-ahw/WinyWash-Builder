@@ -354,7 +354,79 @@ namespace CleanC.Core.Services
                 ["JunkWindowsCaches"] = "کش های ساختار ویندوز",
                 ["JunkLogs"] = "لاگ ها و گزارش های خطا",
                 ["JunkDelivery"] = "فایل های بروزرسانی ویندوز",
-                ["JunkBoost"] = "بهینه سازی زنده سیستم"
+                ["JunkBoost"] = "بهینه سازی زنده سیستم",
+
+                // ── فاز ۶: دسته بندی های پویش عمیق ─────────────────────────────
+                ["MessCatOldInstaller"] = "فایل نصب قدیمی (Setup / Installer)",
+                ["MessCatOldArchive"] = "فایل فشرده (Zip / Rar)",
+                ["MessCatDuplicateCopy"] = "نسخه کپی شده (Copy / Duplicated)",
+                ["MessCatOldScreenshot"] = "اسکرین شات قدیمی",
+                ["MessCatTempJunk"] = "فایل موقت و زائد (Temp / Junk)",
+                ["MessCatLargeFile"] = "فایل بسیار حجیم (>200MB)",
+                ["MessCatExtractedArchiveDup"] = "فایل آرشیو آنزیپ‌شده (پوشه هم‌نام موجود است)",
+                ["MessCatIncompleteDownload"] = "دانلود ناتمام و موقت (crdownload / part)",
+                ["MessCatOemDriveRoot"] = "بازمانده ی نصب سازنده در ریشه ی درایو",
+                ["MessCatUpdater"] = "بازمانده ی آپدیتر (Electron / Squirrel)",
+                ["MessCatSyncDevice"] = "بازمانده ی انتقال دستگاه / تمپ OneDrive",
+                ["MessCatOther"] = "سایر",
+
+                // ── فاز ۶: شواهد دیتکتورها (Evidence) ───────────────────────────
+                ["EvEmptyFolder30Days"] = "بیش از ۳۰ روز خالی مانده (آخرین تغییر: {0:yyyy/MM/dd})",
+                ["EvDownloadCompleted"] = "فایل کامل «{0}» موجود است — بازمانده ی دانلود تمام شده",
+                ["EvDownloadAbandoned"] = "بیش از ۲۴ ساعت بدون تغییر — دانلود رهاشده",
+                ["EvTmpOld72h"] = "فایل موقت .tmp قدیمی تر از ۷۲ ساعت در پوشه ی دانلود/دسکتاپ",
+                ["EvInstallerMatched"] = "نصب کننده ی «{0}» — برنامه نصب شده و این فایل دیگر لازم نیست",
+                ["EvInstallerNoMatch"] = "نصب کننده ی قدیمی (بیش از ۱۴ روز) — برنامه ی هم نامی روی سیستم پیدا نشد",
+                ["EvCrossDevice"] = "مبادله ی موقت دستگاه ها (CrossDevice)",
+                ["EvCrossDeviceSub"] = "پوشه ی واسط Link to Windows / Phone Link برای انتقال فایل بین گوشی و کامپیوتر",
+                ["EvOneDriveTemp"] = "پوشه ی موقت OneDrive",
+                ["EvOneDriveTempSub"] = "انبار موقت فایل های در حال آپلود OneDrive که رها شده است",
+                ["EvDriveRootLeftover"] = "پوشه ی ریشه ی درایو با نام سازنده ی {0} — مدرک قطعی: {1}",
+                ["EvRemnantInstallerFile"] = "فایل نصب باقی مانده «{0}»",
+                ["EvVendorArtifact"] = "آرتیفکت اختصاصی سازنده «{0}» (تصویر بوت/بسته ی درایور)",
+                ["EvUpdaterPendingInstaller"] = "پوشه ی آپدیتر شامل نصب کننده ی باقی مانده «{0}» — آپدیت نیمه تمام",
+                ["EvUpdaterNoPending"] = "پوشه ی آپدیتر با الگوی *-updater / SquirrelTemp (نصب در انتظاری پیدا نشد)",
+                ["EvBlockmapOld"] = "فایل .blockmap بازمانده ی آپدیتر الکترون (بیش از ۳۰ روز دست نخورده)",
+                ["EvDriverNoHardware"] = "هیچ دستگاهی (حتی جدا شده) به این بسته متصل نیست — سخت افزار مربوطه هرگز یا دیگر روی سیستم نیست",
+                ["EvStartupFileMissing"] = "فایل استارتاپ «{0}» روی دیسک وجود ندارد",
+                ["EvStartupExeMissing"] = "فایل اجرایی «{0}» وجود ندارد — بازمانده ی برنامه ی حذف شده",
+                ["EvTrialInName"] = "نام برنامه شامل «Trial» است",
+                ["EvTrialInNameLocalized"] = "نام برنامه شامل «نسخه آزمایشی» است",
+                ["NoteProvisioned"] = " — به صورت provisioned در تصویر ویندوز ثبت است و برای کاربران جدید خودکار نصب می شود",
+
+                // ── فاز ۶: فایل های حساس (D17) ─────────────────────────────────
+                ["SensitiveLicense"] = "فایل لایسنس نرم‌افزار",
+                ["SensitiveSerial"] = "شماره سریال نرم‌افزار",
+                ["SensitiveProductKey"] = "کلید محصول (Product Key)",
+                ["SensitiveActivation"] = "کد فعال‌سازی",
+                ["SensitivePasswords"] = "فایل رمزهای عبور",
+                ["SensitiveSshKey"] = "کلید خصوصی SSH",
+                ["SensitivePrivateKey"] = "کلید خصوصی",
+                ["SensitiveKeyFile"] = "فایل کلید/امنیتی ({0})",
+
+                // ── فاز ۶: قفل مسیرها و برچسب های UI ───────────────────────────
+                ["LockUserVetoError"] = "این مسیر توسط کاربر قفل شده است",
+                ["LockTooltipLock"] = "قفل کردن — این مسیر هرگز پیشنهاد یا حذف نمی شود",
+                ["LockTooltipUnlock"] = "رفع قفل — این مسیر دوباره قابل پیشنهاد می شود",
+                ["LockInfoBarTitle"] = "قفل مسیر",
+                ["LockSaveFailed"] = "ذخیره ی قفل ناموفق بود — دسترسی به locks.json بررسی شود.",
+                ["LockReasonDeepScan"] = "قفل شده از صفحه ی پویش عمیق",
+                ["AdminRequired"] = "نیازمند دسترسی ادمین",
+                ["SensitiveSectionTitle"] = "فایل های حساس شناسایی شده ({0} مورد — فقط گزارش، بدون حذف)",
+                ["BadgeTargetMissing"] = "هدف ناموجود",
+                ["BadgeTrial"] = "نسخه آزمایشی",
+                ["BadgeNoHardware"] = "بدون سخت افزار",
+                ["ScanProgressDriveRoots"] = "در حال بررسی ریشه ی درایوها و بازمانده ی آپدیترها...",
+                ["DescCrashLogs"] = "لاگ های گزارش خرابی، فایل های WER، دامپ های حافظه و گزارش های کرنل (LiveKernelReports)",
+
+                // ── فاز ۶: درایورها (بنر + دیالوگ حذف) ─────────────────────────
+                ["DriverBannerDupAndOrphan"] = "شناسایی {0} بسته تکراری و قدیمی + {1} بسته بدون سخت افزار در DriverStore ویندوز",
+                ["DriverBannerOrphan"] = "شناسایی {0} بسته بدون سخت افزار (بازمانده ی دستگاه های جدا شده) در DriverStore ویندوز",
+                ["DriverBannerDup"] = "شناسایی {0} بسته تکراری و قدیمی در DriverStore ویندوز",
+                ["DriverDeleteOrphanTitle"] = "حذف بسته بدون سخت افزار {0}",
+                ["DriverDeleteOldTitle"] = "حذف درایور قدیمی {0}",
+                ["DriverDeleteOrphanBody"] = "بسته '{0}' متعلق به سخت افزاری است که دیگر به سیستم متصل نیست.\nآیا از حذف این بسته اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.",
+                ["DriverDeleteOldBody"] = "آیا از حذف بسته درایور قدیمی '{0}' ({1}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد."
             };
 
             var enFallback = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -648,7 +720,79 @@ namespace CleanC.Core.Services
                 ["JunkWindowsCaches"] = "Windows System Caches",
                 ["JunkLogs"] = "Event Logs & Crash Dumps",
                 ["JunkDelivery"] = "Delivery Optimization",
-                ["JunkBoost"] = "Live System Boost"
+                ["JunkBoost"] = "Live System Boost",
+
+                // ── Phase 6: Deep-scan mess categories ──────────────────────────
+                ["MessCatOldInstaller"] = "Old Installer (Setup / Installer)",
+                ["MessCatOldArchive"] = "Archive File (Zip / Rar)",
+                ["MessCatDuplicateCopy"] = "Duplicate Copy",
+                ["MessCatOldScreenshot"] = "Old Screenshot",
+                ["MessCatTempJunk"] = "Temp & Junk File",
+                ["MessCatLargeFile"] = "Very Large File (>200 MB)",
+                ["MessCatExtractedArchiveDup"] = "Extracted Archive (matching folder exists)",
+                ["MessCatIncompleteDownload"] = "Incomplete Download (crdownload / part)",
+                ["MessCatOemDriveRoot"] = "OEM Installer Leftover at Drive Root",
+                ["MessCatUpdater"] = "Updater Leftover (Electron / Squirrel)",
+                ["MessCatSyncDevice"] = "Device Transfer / OneDrive Temp Leftover",
+                ["MessCatOther"] = "Other",
+
+                // ── Phase 6: Detector evidence strings ──────────────────────────
+                ["EvEmptyFolder30Days"] = "Empty for over 30 days (last change: {0:yyyy/MM/dd})",
+                ["EvDownloadCompleted"] = "Complete file \"{0}\" exists — leftover of a finished download",
+                ["EvDownloadAbandoned"] = "No changes for over 24 hours — abandoned download",
+                ["EvTmpOld72h"] = "Temp .tmp file older than 72 hours in Downloads/Desktop",
+                ["EvInstallerMatched"] = "Installer for \"{0}\" — the app is installed; this file is no longer needed",
+                ["EvInstallerNoMatch"] = "Old installer (over 14 days) — no matching installed app was found",
+                ["EvCrossDevice"] = "Device swap staging (CrossDevice)",
+                ["EvCrossDeviceSub"] = "Link to Windows / Phone Link staging folder for phone-to-PC file transfers",
+                ["EvOneDriveTemp"] = "OneDrive temporary folder",
+                ["EvOneDriveTempSub"] = "Abandoned OneDrive staging area for in-progress uploads",
+                ["EvDriveRootLeftover"] = "Drive-root folder named after vendor {0} — hard evidence: {1}",
+                ["EvRemnantInstallerFile"] = "Remaining setup file \"{0}\"",
+                ["EvVendorArtifact"] = "Vendor-specific artifact \"{0}\" (boot image / driver package)",
+                ["EvUpdaterPendingInstaller"] = "Updater folder with leftover installer \"{0}\" — unfinished update",
+                ["EvUpdaterNoPending"] = "Updater folder matching *-updater / SquirrelTemp (no pending installer found)",
+                ["EvBlockmapOld"] = "Leftover .blockmap from an Electron updater (untouched for over 30 days)",
+                ["EvDriverNoHardware"] = "No device (not even a detached one) references this package — the hardware is no longer on this system",
+                ["EvStartupFileMissing"] = "Startup file \"{0}\" does not exist on disk",
+                ["EvStartupExeMissing"] = "Executable \"{0}\" is missing — leftover of an uninstalled app",
+                ["EvTrialInName"] = "App name contains \"Trial\"",
+                ["EvTrialInNameLocalized"] = "App name contains a trial marker",
+                ["NoteProvisioned"] = " — provisioned into the Windows image; it will auto-install for new users",
+
+                // ── Phase 6: Sensitive files (D17) ──────────────────────────────
+                ["SensitiveLicense"] = "Software license file",
+                ["SensitiveSerial"] = "Software serial number",
+                ["SensitiveProductKey"] = "Product key",
+                ["SensitiveActivation"] = "Activation code",
+                ["SensitivePasswords"] = "Passwords file",
+                ["SensitiveSshKey"] = "SSH private key",
+                ["SensitivePrivateKey"] = "Private key",
+                ["SensitiveKeyFile"] = "Key/security file ({0})",
+
+                // ── Phase 6: Path locks & UI badges ─────────────────────────────
+                ["LockUserVetoError"] = "This path is locked by the user",
+                ["LockTooltipLock"] = "Lock — this path will never be suggested or deleted",
+                ["LockTooltipUnlock"] = "Unlock — this path can be suggested again",
+                ["LockInfoBarTitle"] = "Path lock",
+                ["LockSaveFailed"] = "Saving the lock failed — check access to locks.json.",
+                ["LockReasonDeepScan"] = "Locked from the Deep Scan page",
+                ["AdminRequired"] = "Requires admin rights",
+                ["SensitiveSectionTitle"] = "Sensitive files detected ({0} items — report only, no deletion)",
+                ["BadgeTargetMissing"] = "Target missing",
+                ["BadgeTrial"] = "Trial",
+                ["BadgeNoHardware"] = "No hardware",
+                ["ScanProgressDriveRoots"] = "Scanning drive roots and updater leftovers...",
+                ["DescCrashLogs"] = "Crash logs, WER reports, memory dumps, and kernel reports (LiveKernelReports)",
+
+                // ── Phase 6: Drivers (banner + delete dialog) ───────────────────
+                ["DriverBannerDupAndOrphan"] = "Found {0} duplicate/outdated + {1} no-hardware driver packages in the Windows DriverStore",
+                ["DriverBannerOrphan"] = "Found {0} no-hardware driver packages (leftovers of detached devices) in the Windows DriverStore",
+                ["DriverBannerDup"] = "Found {0} duplicate/outdated driver packages in the Windows DriverStore",
+                ["DriverDeleteOrphanTitle"] = "Remove no-hardware package {0}",
+                ["DriverDeleteOldTitle"] = "Remove old driver {0}",
+                ["DriverDeleteOrphanBody"] = "Package '{0}' belongs to hardware that is no longer connected to this system.\nDelete this package?\nThe operation runs without a force switch and will stop if the package is in use.",
+                ["DriverDeleteOldBody"] = "Delete the old driver package '{0}' ({1})?\nThe operation runs without a force switch and will stop if the package is in use."
             };
 
             _catalogs["fa-IR"] = faFallback;
