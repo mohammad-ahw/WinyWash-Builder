@@ -51,6 +51,10 @@ namespace CleanC.UI.ViewModels
         public Visibility TrialVisibility => App.IsTrialBadge ? Visibility.Visible : Visibility.Collapsed;
         public Visibility EvidenceVisibility => App.IsTrialBadge && !string.IsNullOrEmpty(App.TrialEvidence) ? Visibility.Visible : Visibility.Collapsed;
 
+        // فیکس گپ بنچمارک: badge «کامپوننت / درایور» برای ورودی های SystemComponent=1
+        public string ComponentLabel => LocalizationService.Get("BadgeComponent", "کامپوننت / درایور");
+        public Visibility ComponentVisibility => App.IsSystemComponent ? Visibility.Visible : Visibility.Collapsed;
+
         public string SizeText => App.FormattedSize;
         public Visibility SizeVisibility => App.EstimatedSizeBytes > 0 && !string.IsNullOrEmpty(App.FormattedSize) ? Visibility.Visible : Visibility.Collapsed;
 

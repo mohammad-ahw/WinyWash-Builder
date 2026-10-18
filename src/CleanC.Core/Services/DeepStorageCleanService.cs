@@ -46,7 +46,7 @@ namespace CleanC.Core.Services
                 var messItems = new List<StorageMessItem>();
                 var emptyFolders = new List<EmptyFolderInfo>();
 
-                var installerExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".exe", ".msi", ".iso", ".bat", ".cmd" };
+                var installerExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".exe", ".msi", ".iso", ".bat", ".cmd", ".vsix" };
                 var archiveExtensions = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { ".zip", ".rar", ".7z", ".tar", ".gz" };
 
                 var now = DateTime.Now;
@@ -147,6 +147,25 @@ namespace CleanC.Core.Services
                                         filesBySize[size] = list;
                                     }
                                     list.Add(file);
+                                }
+
+                                // فایل قفل موقت آفیس (~$name.docx): Word/Excel هنگام باز بودن سند این فایل را
+                                // می سازد و هنگام بستن خودکار پاک می کند. ماندنش یعنی برنامه غیرعادی بسته
+                                // شده (کرش). حجم ناچیزی دارد ولی نشانه ی خرابی است — برای هر پوشه ی هدف.
+                                if (lowerName.StartsWith("~$") && (now - file.LastWriteTime).TotalHours >= 24)
+                                {
+                                    messItems.Add(new StorageMessItem
+                                    {
+                                        FilePath = file.FullName,
+                                        FileName = file.Name,
+                                        DirectoryPath = file.DirectoryName ?? string.Empty,
+                                        SizeBytes = size,
+                                        LastModified = file.LastWriteTime,
+                                        Category = StorageMessCategory.OfficeLockFile,
+                                        Evidence = LocalizationService.Get("EvOfficeLockFile", "فایل قفل موقت آفیس — سند بسته شده و این فایل رهاشده است"),
+                                        IsSelected = false
+                                    });
+                                    continue;
                                 }
 
                                 // Storage Organization items (Desktop / Downloads focused)
@@ -343,6 +362,7 @@ namespace CleanC.Core.Services
                     (Path.Combine(userProfile, ".nuget", "packages"), "کش پکیج های NuGet"),
                     (Path.Combine(localAppData, "NuGet", "v3-cache"), "کش HTTP پکیج های NuGet"),
                     (Path.Combine(localAppData, "pip", "cache"), "کش پکیج های Python pip"),
+                    (Path.Combine(userProfile, ".bun", "install", "cache"), "کش پکیج های Bun"),
                     (Path.Combine(userProfile, ".gradle", "caches"), "کش بیلد و ابزارهای Gradle"),
                     (Path.Combine(userProfile, ".cargo", "registry", "cache"), "کش پکیج های Rust Cargo"),
                     (Path.Combine(userProfile, ".android", "build-cache"), "کش کامپایل Android Studio"),
@@ -350,8 +370,9 @@ namespace CleanC.Core.Services
                     (Path.Combine(appDataRoaming, "Code", "CachedData"), "داده های کش شده VS Code"),
                     (Path.Combine(userProfile, ".docker"), "کش و لاگ های Docker"),
                     (Path.Combine(userProfile, ".ollama", "models"), "مدل های هوش مصنوعی Ollama (.gguf)"),
-                    (Path.Combine(userProfile, ".lmstudio", "models"), "مدل های هوش مصنوعی LM Studio"),
-                    (Path.Combine(localAppData, "lm-studio", "models"), "مدل های هوش مصنوعی LM Studio (Local)"),
+                    // توجه: مسیرهای .lmstudio و lm-studio عمداً اینجا نیستند — LM Studio
+                    // (برنامه و مدل ها) در لیست «قفل/دست نزن» کاربر است. فقط آپدیترِ آن
+                    // (lm-studio-updater) توسط دیتکتور D04 قابل حذف است.
                     (Path.Combine(userProfile, ".cache", "huggingface", "hub"), "کش مدل های HuggingFace"),
                     (Path.Combine(userProfile, "Apple", "MobileSync", "Backup"), "بکاپ های آیفون (Apple MobileSync)"),
                     (Path.Combine(appDataRoaming, "Apple Computer", "MobileSync", "Backup"), "بکاپ های آیفون (iTunes)")
@@ -511,6 +532,7 @@ namespace CleanC.Core.Services
                 progress?.Invoke(LocalizationService.Get("ScanProgressDriveRoots", "در حال بررسی ریشه ی درایوها و بازمانده ی آپدیترها..."));
                 messItems.AddRange(ScanOemDriveRootLeftovers());
                 messItems.AddRange(ScanUpdaterLeftovers());
+                emptyFolders.AddRange(ScanRootEmptyFolders());
 
                 // D17: فایل های حساس از دل همان فایل های اسکن شده ی قبلی جدا می شوند (بدون IO اضافه)
                 // و فقط در SensitiveFiles می نشینند — نه در MessItems، چون باید صرفاً گزارش باشند.
@@ -685,24 +707,30 @@ namespace CleanC.Core.Services
         // Detectors فاز ۶ (قدم ۲): D10 / D04 / D17
         // ====================================================================
 
+        // قاعده ی هر پوشه ی ریشه: نام سازنده + پیشوندهای مجاز آرتیفکت + پسوندهای مدرک اختصاصی.
+        // IsSelectedByDefault فقط برای بازمانده ی «نصاب» (NVIDIA/AOMEI/...) روشن است (تصمیم T2)؛
+        // اقلام مستندات/تصاویر محافظه کارانه خاموش می مانند تا خود کاربر تأیید کند.
+        internal sealed record OemRootRule(string Vendor, string[] ArtifactPrefixes, string[] EvidenceExtensions, bool IsSelectedByDefault = true);
+
         // نام پوشه های ریشه ی درایو که «بازمانده ی نصب سازنده» محسوب می شوند.
-        // عمداً فقط همین ۵ مورد (طبق SPEC) — لیست بسته، بدون الگوی باز، تا
-        // هیچ وقت سراغ پوشه های عادی کاربر در ریشه ی درایو نرویم.
-        private static readonly Dictionary<string, string> OemRootFolderAllowlist = new(StringComparer.OrdinalIgnoreCase)
+        // عمداً لیست بسته و دستی است — هیچ الگوی بازی وجود ندارد تا هرگز سراغ پوشه های
+        // عادی کاربر در ریشه ی درایو نرویم. هر ورودی فقط با «مدرک قطعی» فعال می شود.
+        private static readonly Dictionary<string, OemRootRule> OemRootFolderAllowlist = new(StringComparer.OrdinalIgnoreCase)
         {
-            ["NVIDIA"] = "NVIDIA",
-            ["Aomei"] = "AOMEI",
-            ["Intel"] = "Intel",
-            ["AMD"] = "AMD",
-            ["MSI"] = "MSI"
+            ["NVIDIA"] = new("NVIDIA", new[] { "nv", "nvidia" }, Array.Empty<string>()),
+            ["Aomei"] = new("AOMEI", new[] { "aomei", "amtag" }, Array.Empty<string>()),
+            ["Intel"] = new("Intel", new[] { "intel", "igfx", "gfx" }, Array.Empty<string>()),
+            ["AMD"] = new("AMD", new[] { "amd" }, Array.Empty<string>()),
+            ["MSI"] = new("MSI", new[] { "msi" }, Array.Empty<string>()),
+            // پیش نصب های MSI روی این دستگاه که فقط «سند/تصویر» دارند — مدرک: پسوند فایل
+            ["User Manual"] = new("MSI", Array.Empty<string>(), new[] { ".pdf" }, IsSelectedByDefault: false),
+            ["Lock Screen"] = new("Windows/MSI", Array.Empty<string>(), new[] { ".jpg", ".jpeg", ".png", ".webp", ".bmp" }, IsSelectedByDefault: false),
+            // ابزار پارتیشن AOMEI — از این پوشه فقط دو فایل لاگ ریشه اش مانده
+            ["AomeiPartAssistantPE"] = new("AOMEI", new[] { "aampa", "aomei", "amtag" }, new[] { ".log" }, IsSelectedByDefault: false)
         };
 
-        /// <summary>
-        /// D10 — بازمانده ی نصاب سازنده ها در «ریشه ی» درایوهای ثابت (C:\NVIDIA، C:\Aomei، ...).
-        /// فقط وقتی پیشنهاد می شود که مدرک قطعی وجود داشته باشد: یک فایل Setup/install/msi
-        /// در چند سطح اول پوشه پیدا شود. چون مدرک قطعی است، پیش فرض تیک خورده (تصمیم T2).
-        /// </summary>
-        private static List<StorageMessItem> ScanOemDriveRootLeftovers()
+        // ریشه ی درایوهای ثابت آماده ی سیستم — مشترک بین D10 و D09b
+        private static List<string> GetFixedDriveRoots()
         {
             var roots = new List<string>();
             try
@@ -724,9 +752,16 @@ namespace CleanC.Core.Services
             {
                 CcLog.Ignore(__ex);
             }
-
-            return ScanOemDriveRootLeftovers(roots);
+            return roots;
         }
+
+        /// <summary>
+        /// D10 — بازمانده ی نصاب سازنده ها در «ریشه ی» درایوهای ثابت (C:\NVIDIA، C:\Aomei، ...).
+        /// فقط وقتی پیشنهاد می شود که مدرک قطعی وجود داشته باشد: یک فایل Setup/install/msi
+        /// در چند سطح اول پوشه پیدا شود. چون مدرک قطعی است، پیش فرض تیک خورده (تصمیم T2).
+        /// </summary>
+        private static List<StorageMessItem> ScanOemDriveRootLeftovers()
+            => ScanOemDriveRootLeftovers(GetFixedDriveRoots());
 
         /// <summary>
         /// نسخه ی تست پذیر D10 — ریشه های درایو پارامتر می شوند تا تست ها
@@ -745,12 +780,12 @@ namespace CleanC.Core.Services
                         try
                         {
                             string name = Path.GetFileName(dir);
-                            if (!OemRootFolderAllowlist.TryGetValue(name, out string? vendor)) continue;
+                            if (!OemRootFolderAllowlist.TryGetValue(name, out OemRootRule? rule)) continue;
 
                             // قفل پیش فرض یا کاربر = اصلاً پیشنهاد نده
                             if (LockRegistryService.IsLockedPath(dir)) continue;
 
-                            string? evidence = FindDriveRootEvidence(dir, vendor, maxDepth: 3);
+                            string? evidence = FindDriveRootEvidence(dir, rule, maxDepth: 3);
                             if (evidence == null) continue; // بدون مدرک قطعی، سکوت می کنیم
 
                             long size = RecycleBinService.ComputeDirectorySize(dir);
@@ -764,9 +799,9 @@ namespace CleanC.Core.Services
                                 SizeBytes = size,
                                 LastModified = Directory.GetLastWriteTime(dir),
                                 Category = StorageMessCategory.OemDriveRootLeftover,
-                                Evidence = string.Format(LocalizationService.Get("EvDriveRootLeftover", "پوشه ی ریشه ی درایو با نام سازنده ی {0} — مدرک قطعی: {1}"), vendor, evidence),
+                                Evidence = string.Format(LocalizationService.Get("EvDriveRootLeftover", "پوشه ی ریشه ی درایو با نام سازنده ی {0} — مدرک قطعی: {1}"), rule.Vendor, evidence),
                                 RequiresAdmin = true,
-                                IsSelected = true
+                                IsSelected = rule.IsSelectedByDefault
                             });
                         }
                         catch (Exception __ex)
@@ -784,13 +819,14 @@ namespace CleanC.Core.Services
             return found;
         }
 
-        // جستجوی «مدرک قطعی» برای D10 در عمق محدود. دو نوع مدرک قابل قبول است:
+        // جستجوی «مدرک قطعی» برای D10 در عمق محدود. سه نوع مدرک قابل قبول است:
         //   1) فایل نصاب واقعی: نامش شامل setup/install باشد و پسوندش exe/msi باشد
-        //   2) آرتیفکت اختصاصی سازنده: نام فایل با نام سازنده شروع شود و تصویر/بسته باشد
-        //      (مثل AomeiBoot.wim برای AOMEI یا بسته های درایور)
+        //   2) آرتیفکت اختصاصی سازنده: نام با یکی از پیشوندهای مجاز شروع شود و تصویر/بسته
+        //      باشد (wim/sdi/esd/iso/img/exe/msi) — مثل AomeiBoot.wim برای AOMEI
+        //   3) مدرک پسوندی اختصاصی قاعده (مثل pdf در User Manual یا log در AomeiPartAssistantPE)
         // FirstOrDefault باعث می شود به محض پیدا شدن اولین مدرک، پیمایش فایل ها قطع شود
         // (پوشه های NVIDIA می توانند چند گیگابایت فایل داشته باشند).
-        internal static string? FindDriveRootEvidence(string dir, string vendor, int maxDepth)
+        internal static string? FindDriveRootEvidence(string dir, OemRootRule rule, int maxDepth)
         {
             try
             {
@@ -802,41 +838,124 @@ namespace CleanC.Core.Services
                     AttributesToSkip = FileAttributes.ReparsePoint | FileAttributes.System | FileAttributes.Hidden
                 };
 
+                string[] artifactExts = { ".wim", ".sdi", ".esd", ".iso", ".img", ".exe", ".msi" };
+
                 string? hit = Directory.EnumerateFiles(dir, "*", options).FirstOrDefault(file =>
                 {
                     string n = Path.GetFileName(file);
                     string lower = n.ToLowerInvariant();
+                    string ext = Path.GetExtension(n).ToLowerInvariant();
 
                     bool looksLikeInstaller =
                         (lower.Contains("setup", StringComparison.Ordinal) || lower.Contains("install", StringComparison.Ordinal)) &&
-                        (lower.EndsWith(".exe", StringComparison.Ordinal) || lower.EndsWith(".msi", StringComparison.Ordinal));
+                        (ext == ".exe" || ext == ".msi");
 
                     bool isVendorArtifact =
-                        lower.StartsWith(vendor.ToLowerInvariant(), StringComparison.Ordinal) &&
-                        (lower.EndsWith(".wim", StringComparison.Ordinal) || lower.EndsWith(".sdi", StringComparison.Ordinal) ||
-                         lower.EndsWith(".esd", StringComparison.Ordinal) || lower.EndsWith(".iso", StringComparison.Ordinal) ||
-                         lower.EndsWith(".img", StringComparison.Ordinal) || lower.EndsWith(".exe", StringComparison.Ordinal) ||
-                         lower.EndsWith(".msi", StringComparison.Ordinal));
+                        rule.ArtifactPrefixes.Any(p => lower.StartsWith(p, StringComparison.Ordinal)) &&
+                        artifactExts.Contains(ext, StringComparer.Ordinal);
 
-                    return looksLikeInstaller || isVendorArtifact;
+                    bool isRuleEvidenceExtension = rule.EvidenceExtensions.Contains(ext, StringComparer.OrdinalIgnoreCase);
+
+                    return looksLikeInstaller || isVendorArtifact || isRuleEvidenceExtension;
                 });
 
                 if (hit == null) return null;
 
                 string hitName = Path.GetFileName(hit);
                 string hitLower = hitName.ToLowerInvariant();
+                string hitExt = Path.GetExtension(hitName).ToLowerInvariant();
                 bool isInstaller = (hitLower.Contains("setup", StringComparison.Ordinal) || hitLower.Contains("install", StringComparison.Ordinal)) &&
-                                   (hitLower.EndsWith(".exe", StringComparison.Ordinal) || hitLower.EndsWith(".msi", StringComparison.Ordinal));
+                                   (hitExt == ".exe" || hitExt == ".msi");
 
-                return isInstaller
-                    ? string.Format(LocalizationService.Get("EvRemnantInstallerFile", "فایل نصب باقی مانده «{0}»"), hitName)
-                    : string.Format(LocalizationService.Get("EvVendorArtifact", "آرتیفکت اختصاصی سازنده «{0}» (تصویر بوت/بسته ی درایور)"), hitName);
+                if (isInstaller)
+                    return string.Format(LocalizationService.Get("EvRemnantInstallerFile", "فایل نصب باقی مانده «{0}»"), hitName);
+
+                return artifactExts.Contains(hitExt, StringComparer.Ordinal)
+                    ? string.Format(LocalizationService.Get("EvVendorArtifact", "آرتیفکت اختصاصی سازنده «{0}» (تصویر بوت/بسته ی درایور)"), hitName)
+                    : string.Format(LocalizationService.Get("EvPreloadFile", "فایل پیش نصب سازنده «{0}»"), hitName);
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
                 return null;
             }
+        }
+
+        // ====================================================================
+        // D09b — پوشه های خالی «ریشه ی درایو» (مثل C:\PerfLogs)
+        // ====================================================================
+
+        // پوشه هایی که هرگز در اسکن پوشه های خالی ریشه بررسی نمی شوند — سیستم،
+        // برنامه ها، پروفایل ها و پوشه های سرویس ویندوز. لیست بسته و محافظه کارانه.
+        private static readonly HashSet<string> RootEmptyFolderDenylist = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "Windows", "Program Files", "Program Files (x86)", "ProgramData", "Users",
+            "Recovery", "$Recycle.Bin", "System Volume Information", "Documents and Settings",
+            "XboxGames", "$WinREAgent", "OneDriveTemp", "Config.Msi"
+        };
+
+        /// <summary>
+        /// D09b — پوشه های خالی در «ریشه ی» درایوهای ثابت با denylist امن.
+        /// همیشه پیش فرض خاموش (IsSelected=false) و نیازمند ادمین — چون حذف پوشه
+        /// در ریشه ی درایو کار پرخطری است و فقط با تأیید آگاهانه ی کاربر انجام می شود.
+        /// </summary>
+        private static List<EmptyFolderInfo> ScanRootEmptyFolders()
+            => ScanRootEmptyFolders(GetFixedDriveRoots());
+
+        /// <summary>
+        /// نسخه ی تست پذیر D09b — ریشه های درایو پارامتر می شوند.
+        /// </summary>
+        internal static List<EmptyFolderInfo> ScanRootEmptyFolders(IEnumerable<string> driveRoots)
+        {
+            var found = new List<EmptyFolderInfo>();
+            var now = DateTime.Now;
+
+            foreach (var root in driveRoots)
+            {
+                try
+                {
+                    foreach (var dir in Directory.EnumerateDirectories(root))
+                    {
+                        try
+                        {
+                            string name = Path.GetFileName(dir);
+                            if (RootEmptyFolderDenylist.Contains(name)) continue;
+                            if (LockRegistryService.IsLockedPath(dir)) continue;
+
+                            var di = new DirectoryInfo(dir);
+
+                            // پوشه های مخفی/سیستمی/جانکشن هرگز پیشنهاد نمی شوند (سرویس های ویندوز)
+                            if ((di.Attributes & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.ReparsePoint)) != 0) continue;
+
+                            // فقط پوشه ی واقعاً خالی: نه فایل، نه زیرپوشه
+                            if (di.EnumerateFileSystemInfos().Any()) continue;
+
+                            // گیت زمانی ۳۰ روزه — مثل D09
+                            if ((now - di.LastWriteTime).TotalDays < 30) continue;
+
+                            found.Add(new EmptyFolderInfo
+                            {
+                                FolderPath = dir,
+                                FolderName = name,
+                                ParentPath = root,
+                                IsSelected = false,
+                                RequiresAdmin = true,
+                                Evidence = string.Format(LocalizationService.Get("EvRootEmptyFolder", "پوشه ی خالی در ریشه ی درایو — بیش از ۳۰ روز بدون محتوا (آخرین تغییر: {0:yyyy/MM/dd})"), di.LastWriteTime)
+                            });
+                        }
+                        catch (Exception __ex)
+                        {
+                            CcLog.Ignore(__ex);
+                        }
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                }
+            }
+
+            return found;
         }
 
         /// <summary>

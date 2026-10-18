@@ -330,11 +330,19 @@ namespace CleanC.UI
             foreach (var folder in sortedFolders)
             {
                 var capturedFolder = folder;
+
+                // D09b: پوشه های خالی ریشه ی درایو نیاز به ادمین دارند — مثل RenderStorageMess هشدار داده می شود
+                string evidenceText = string.IsNullOrEmpty(folder.Evidence)
+                    ? string.Empty
+                    : folder.RequiresAdmin
+                        ? $"{LocalizationService.Get("AdminRequired", "نیازمند دسترسی ادمین")} · {folder.Evidence}"
+                        : folder.Evidence;
+
                 vms.Add(new DeepStorageItemViewModel(
                     glyph: "\uE8B7",
                     fileName: folder.FolderName,
                     directoryPath: folder.FolderPath,
-                    evidenceText: folder.Evidence,
+                    evidenceText: evidenceText,
                     pillText: "پوشه خالی",
                     sizeText: string.Empty,
                     filePath: folder.FolderPath,

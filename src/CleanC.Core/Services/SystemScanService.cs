@@ -169,6 +169,42 @@ namespace CleanC.Core.Services
                     });
                 }
 
+                // Prefetch (Windows Performance Cache) — فایل های .pf که ویندوز برای تندتر
+                // کردن اجرای برنامه ها می سازد. حذفشان بی خطر است (خودکار بازسازی می شوند) ولی
+                // تا مدتی سرعت اجرای برنامه ها کمی کم می شود؛ برای همین پیش فرض خاموش است
+                // و فقط حجم و توضیح نمایش داده می شود تا کاربر خودش تصمیم بگیرد.
+                string prefetchPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Prefetch");
+                if (Directory.Exists(prefetchPath))
+                {
+                    long prefetchBytes = 0;
+                    try
+                    {
+                        foreach (var f in Directory.EnumerateFiles(prefetchPath, "*.pf"))
+                        {
+                            try { prefetchBytes += new FileInfo(f).Length; }
+                            catch (Exception __ex) { CcLog.Ignore(__ex); }
+                        }
+                    }
+                    catch (Exception __ex) { CcLog.Ignore(__ex); }
+
+                    if (prefetchBytes > 0)
+                    {
+                        grpRec.Items.Add(new JunkCategory
+                        {
+                            Id = "prefetch",
+                            GroupId = "recommended",
+                            Title = LocalizationService.Get("JunkPrefetchTitle", "کش Prefetch ویندوز (فایل های .pf)"),
+                            Description = LocalizationService.Get("JunkPrefetchDesc", "حافظه سرعت اجرای برنامه های ویندوز — خودکار بازسازی می شود و حذفش بی خطر است"),
+                            Path = prefetchPath,
+                            TargetPaths = new List<string> { prefetchPath },
+                            Bytes = prefetchBytes,
+                            RequiresElevation = true,
+                            IconGlyph = "\uE945",
+                            IsChecked = false
+                        });
+                    }
+                }
+
                 // Explorer Thumbnail Cache
                 string explorerCacheDir = Path.Combine(localApp, @"Microsoft\Windows\Explorer");
                 if (Directory.Exists(explorerCacheDir))
@@ -521,12 +557,12 @@ namespace CleanC.Core.Services
                     });
                 }
 
-                // AI & LLM Models & Caches (Ollama, LM Studio, HuggingFace)
+                // AI & LLM Models & Caches (Ollama, HuggingFace)
+                // توجه: مسیرهای .lmstudio و lm-studio عمداً اینجا نیستند — طبق لیست
+                // «قفل/دست نزن» کاربر، LM Studio و مدل هایش هرگز نباید پیشنهاد پاک شدن بگیرند.
                 var aiPaths = new List<string>
                 {
                     Path.Combine(userProfile, @".ollama\models"),
-                    Path.Combine(userProfile, @".lmstudio\models"),
-                    Path.Combine(localApp, @"lm-studio\models"),
                     Path.Combine(userProfile, @".cache\huggingface\hub")
                 }.Where(Directory.Exists).ToList();
 
@@ -538,7 +574,7 @@ namespace CleanC.Core.Services
                         Id = "aiModelsCache",
                         GroupId = "apps",
                         Title = "مدل ها و کش ابزارهای هوش مصنوعی (AI & LLMs)",
-                        Description = "مدل های دانلودشده Ollama، LM Studio و کش HuggingFace",
+                        Description = "مدل های دانلودشده Ollama و کش HuggingFace",
                         Path = aiPaths[0],
                         TargetPaths = aiPaths,
                         Bytes = aiBytes,

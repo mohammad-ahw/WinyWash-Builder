@@ -26,5 +26,11 @@ namespace CleanC.Core.Models
         // D18 — نسخه ی آزمایشی: فقط badge نمایشی در تب Apps؛ هیچ حذف خودکاری انجام نمی شود
         public bool IsTrialBadge { get; set; }
         public string TrialEvidence { get; set; } = string.Empty;
+
+        // فیکس گپ بنچمارک — کامپوننت سیستمی/درایور (SystemComponent=1): قبلاً کلاً از لیست
+        // مخفی می شد (ENE، WD_BLACK، TbtLegacyPlug). حالا نمایش داده می شود با badge
+        // «کامپوننت / درایور» ولی هیچ توصیه ی خودکاری نمی گیرد — فقط اقدام دستی آگاهانه.
+        public bool IsSystemComponent { get; set; }
+        public string ComponentEvidence { get; set; } = string.Empty;
     }
 }

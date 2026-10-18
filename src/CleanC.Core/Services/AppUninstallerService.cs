@@ -49,9 +49,23 @@ namespace CleanC.Core.Services
                                 // Filter out system drivers, VC++ redistributables, system components
                                 if (IsSystemOrDriverPackage(displayName, publisher)) continue;
 
-                                // Ignore system components and updates
+                                // فیکس گپ بنچمارک: ورودی های SystemComponent=1 (درایورها/ابزارهای سخت
+                                // افزاری مثل ENE، WD_BLACK، dch_setup و TbtLegacyPlug) قبلاً کلاً
+                                // مخفی می شدند و کاربر حتی نمی دانست نصب اند. حالا در لیست می آیند
+                                // ولی با badge «کامپوننت / درایور» — چون حذفشان ریسک دارد، هیچ
+                                // توصیه ی خودکاری نمی گیرند (فقط اقدام دستی آگاهانه ی کاربر).
+                                //
+                                // فیلتر نویز: کامپوننت های ناشر Microsoft (اجزای داخلی SDK/Visual
+                                // Studio/Office که در ویندوز هم مخفی اند) و Python Software Foundation
+                                // (زیربخش های خود پایتون) نمایش داده نمی شوند — وگرنه لیست با صد و
+                                // چند ردیف بی مصرف پر می شود. کامپوننت های سازنده های سخت افزار
+                                // (ENE، Intel، NVIDIA، MSI، ...) نمایش داده می شوند.
                                 var sysComp = appKey.GetValue("SystemComponent");
-                                if (sysComp != null && Convert.ToInt32(sysComp) == 1) continue;
+                                bool isSystemComponent = sysComp != null && Convert.ToInt32(sysComp) == 1;
+                                bool isComponentVendorPublisher = !string.IsNullOrWhiteSpace(publisher) &&
+                                    !publisher.StartsWith("Microsoft", StringComparison.OrdinalIgnoreCase) &&
+                                    !publisher.StartsWith("Python Software Foundation", StringComparison.OrdinalIgnoreCase);
+                                if (isSystemComponent && !isComponentVendorPublisher) continue;
 
                                 var parentKey = appKey.GetValue("ParentKeyName");
                                 if (parentKey != null && !string.IsNullOrWhiteSpace(parentKey.ToString())) continue;
@@ -139,7 +153,11 @@ namespace CleanC.Core.Services
                                         DisplayIcon = displayIcon,
                                         IsStoreApp = false,
                                         IsTrialBadge = isTrial,
-                                        TrialEvidence = trialEvidence
+                                        TrialEvidence = trialEvidence,
+                                        IsSystemComponent = isSystemComponent,
+                                        ComponentEvidence = isSystemComponent
+                                            ? LocalizationService.Get("EvSystemComponent", "ورودی کامپوننت سیستمی (SystemComponent) — معمولاً درایور یا ابزار سخت افزار؛ فقط با آگاهی کامل حذف کنید")
+                                            : string.Empty
                                     };
                                 }
                             }

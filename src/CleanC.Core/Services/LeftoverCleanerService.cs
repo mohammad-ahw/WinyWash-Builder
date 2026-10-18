@@ -411,38 +411,13 @@ namespace CleanC.Core.Services
                 }
             }
 
-            // Top-level Software registry keys
-            try
-            {
-                using var cuSoftware = Registry.CurrentUser.OpenSubKey("Software");
-                if (cuSoftware != null)
-                {
-                    foreach (var sub in cuSoftware.GetSubKeyNames())
-                    {
-                        if (sub.Length >= 3 && !GenericAppWords.Contains(sub)) signatures.Add(sub);
-                    }
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-
-            try
-            {
-                using var lmSoftware = Registry.LocalMachine.OpenSubKey("Software");
-                if (lmSoftware != null)
-                {
-                    foreach (var sub in lmSoftware.GetSubKeyNames())
-                    {
-                        if (sub.Length >= 3 && !GenericAppWords.Contains(sub)) signatures.Add(sub);
-                    }
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
+            // توجه (فیکس باگ ManyCam): عمداً کلیدهای مستقیم زیر HKCU\Software و HKLM\Software
+            // را «امضای نصب» حساب نمی کنیم. این کلیدها بعد از حذف برنامه هم می مانند —
+            // مثال واقعی: ManyCam حذف شده بود ولی HKCU\SOFTWARE\ManyCam مانده بود و باعث
+            // می شد پوشه های بازمانده اش (ProgramData و AppData) اشتباهاً «برنامه ی نصب شده»
+            // تلقی شوند و هرگز پیشنهاد پاک شدن نگیرند. تشخیص نصب فقط بر شواهد قابل اعتماد
+            // تکیه می کند: ورودی های Uninstall، پوشه های Program Files دارای فایل واقعی، و
+            // LocalAppData\Programs (پایین تر همین تابع).
 
             // Program Files and Program Files (x86) — فقط پوشه های دارای فایل واقعی؛
             // پوشه ی خالیِ باقی مانده ی یک برنامه ی حذف شده نباید «برنامه ی نصب شده» حساب شود

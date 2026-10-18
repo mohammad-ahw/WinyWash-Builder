@@ -36,6 +36,8 @@ namespace CleanC.Core.Models
         public string ParentPath { get; set; } = string.Empty;
         public bool IsSelected { get; set; } = false;
         public string Evidence { get; set; } = string.Empty;
+        // حذف این پوشه نیاز به دسترسی ادمین دارد (D09b — پوشه های خالی ریشه ی درایو)
+        public bool RequiresAdmin { get; set; } = false;
     }
 
     public enum StorageMessCategory
@@ -53,7 +55,9 @@ namespace CleanC.Core.Models
         // D04 — بازمانده ی آپدیترهای Electron/Squirrel در LocalAppData
         UpdaterLeftover,
         // D16 — بازمانده ی انتقال دستگاه ها (CrossDevice) و پوشه ی موقت OneDrive
-        SyncDeviceLeftover
+        SyncDeviceLeftover,
+        // فایل قفل موقت آفیس (~$name.docx) — بازمانده ی کرش Word/Excel
+        OfficeLockFile
     }
 
     public class StorageMessItem
@@ -78,6 +82,7 @@ namespace CleanC.Core.Models
             StorageMessCategory.OemDriveRootLeftover => LocalizationService.Get("MessCatOemDriveRoot", "بازمانده ی نصب سازنده در ریشه ی درایو"),
             StorageMessCategory.UpdaterLeftover => LocalizationService.Get("MessCatUpdater", "بازمانده ی آپدیتر (Electron / Squirrel)"),
             StorageMessCategory.SyncDeviceLeftover => LocalizationService.Get("MessCatSyncDevice", "بازمانده ی انتقال دستگاه / تمپ OneDrive"),
+            StorageMessCategory.OfficeLockFile => LocalizationService.Get("MessCatOfficeLock", "فایل قفل موقت آفیس (~$)"),
             _ => LocalizationService.Get("MessCatOther", "سایر")
         };
         public string CategoryTitle => CategoryName;

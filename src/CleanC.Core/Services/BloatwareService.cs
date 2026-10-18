@@ -80,7 +80,8 @@ namespace CleanC.Core.Services
             { "Microsoft.XboxGameOverlay", ("Xbox Game Overlay", "پوشش درون بازی ایکس باکس") },
             { "Microsoft.XboxIdentityProvider", ("Xbox Identity Provider", "سرویس ورود به اکانت مایکروسافت در بازی ها") },
             { "Microsoft.XboxSpeechToTextOverlay", ("Xbox Speech To Text", "ابزار تبدیل گفتار به نوشتار ایکس باکس") },
-            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام سازی گوشی با ویندوز") }
+            { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام سازی گوشی با ویندوز") },
+            { "Microsoft.PowerAutomateDesktop", ("Power Automate Desktop", "ابزار اتوماسیون کارهای تکراری مایکروسافت (RPA) — اگر استفاده نمی کنید لازم نیست") }
         };
 
         // کلاسیک هایی که تقریباً همیشه بدون استفاده اند (اکوسیستم قدیمی Apple، VPN بی استفاده، JDK منسوخ).
@@ -90,7 +91,9 @@ namespace CleanC.Core.Services
             { "Apple Mobile Device Support", ("Apple Mobile Device Support", "برای همگام سازی آیفون با iTunes قدیمی — اگر آیفون وصل نمی کنید لازم نیست") },
             { "Bonjour", ("Bonjour", "سرویس کشف شبکه ی اپل — فقط برای iTunes و چاپگرهای اپل لازم است") },
             { "X-VPN", ("X-VPN", "کلاینت VPN بدون استفاده") },
-            { "Java SE Development Kit 8", ("Java SE Development Kit 8", "نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست") }
+            { "Java SE Development Kit 8", ("Java SE Development Kit 8", "نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست") },
+            { "PC Health Check", ("Windows PC Health Check", "ابزار منسوخ بررسی سلامت ویندوز — مایکروسافت بازنشسته اش کرده؛ جایگزین: PC Manager") },
+            { "Universal Adb Driver", ("Universal Adb Driver", "درایور ADB قدیمی و عمومی — برای گوشی های جدید، درایور رسمی گوگل یا سازنده بهتر است") }
         };
 
         // Known promotional pre-installed packages

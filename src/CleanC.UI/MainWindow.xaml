@@ -969,6 +969,9 @@
                                                             <Border Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="5" Padding="8,2" VerticalAlignment="Center" Visibility="{Binding TrialVisibility}" ToolTipService.ToolTip="{Binding TrialEvidence}">
                                                                 <TextBlock Text="{Binding TrialLabel}" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCautionBrush}" />
                                                             </Border>
+                                                            <Border Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="5" Padding="8,2" VerticalAlignment="Center" Visibility="{Binding ComponentVisibility}" ToolTipService.ToolTip="{Binding App.ComponentEvidence}">
+                                                                <TextBlock Text="{Binding ComponentLabel}" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                                            </Border>
                                                         </StackPanel>
                                                         <TextBlock Text="{Binding SubLine}" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis" TextAlignment="Start" />
                                                         <TextBlock Text="{Binding TrialEvidence}" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis" Visibility="{Binding EvidenceVisibility}" TextAlignment="Start" />
