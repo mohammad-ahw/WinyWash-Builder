@@ -256,8 +256,76 @@ namespace CleanC.Core.Tests
             Assert.False(AppUninstallerService.IsTrialProduct("Notepad++", out _));
         }
 
-        // ── کاتالوگ ترجمه: همه ی کلیدهای فاز ۶ باید مقدار داشته باشند ────
+        // ── Acceptance hotfix: عکس شخصی، درایور اکوسیستم، پوشه خالی، سرویس ProgramData ──
 
+        [Fact]
+        public void PersonalImages_AreRecognized_ForPhotoSafetyRules()
+        {
+            // عکس شخصی: در D08 کنار گذاشته می شود و در D07 پیش انتخاب نمی شود
+            Assert.True(DeepStorageCleanService.IsPersonalImage("ChatGPT Image May 23.png"));
+            Assert.True(DeepStorageCleanService.IsPersonalImage("عکس (1).jpg"));
+            Assert.True(DeepStorageCleanService.IsPersonalImage("PHOTO.JPEG"));
+
+            // بقیه فایل ها آسیب نمی بینند
+            Assert.False(DeepStorageCleanService.IsPersonalImage("installer.exe"));
+            Assert.False(DeepStorageCleanService.IsPersonalImage("archive.zip"));
+            Assert.False(DeepStorageCleanService.IsPersonalImage("video.mp4"));
+        }
+
+        [Fact]
+        public void ProtectedDriverProviders_NeverFlaggedOrphan()
+        {
+            // Duet Display (در حال استفاده) و A-Volute (اکوسیستم MSI Sound Tune) هرگز یتیم نمی شوند
+            Assert.True(DriverManagerService.IsProtectedDriverProvider("Duet, Inc.", "duetdisplay.inf"));
+            Assert.True(DriverManagerService.IsProtectedDriverProvider("A-Volute", "NhAudiosvc.inf"));
+            Assert.True(DriverManagerService.IsProtectedDriverProvider("Micro-Star INT'L CO., LTD.", "MSI.inf"));
+
+            // Realtek/Intel حذف نمی شوند از اسکن‌پذیری — بسته های قدیمی شان باید پیدا شوند
+            Assert.False(DriverManagerService.IsProtectedDriverProvider("Realtek Semiconductor Corp.", "rt640x64.inf"));
+            Assert.False(DriverManagerService.IsProtectedDriverProvider("Intel Corporation", "iigd_dch.inf"));
+        }
+
+        [Fact]
+        public void EmptyLeftoverFolder_DoesNotCountAsInstalled()
+        {
+            string root = NewTempDir();
+            try
+            {
+                // سناریوی واقعی: C:\Program Files (x86)\Battle.net با زیرپوشه ی خالی
+                string emptyApp = Path.Combine(root, "Battle.net");
+                Directory.CreateDirectory(Path.Combine(emptyApp, "Battle.net.14542"));
+
+                Assert.False(LeftoverCleanerService.HasAnyFile(emptyApp));
+
+                // پوشه ی دارای فایل (حتی در عمق) باید «نصب شده» حساب شود
+                string realApp = Path.Combine(root, "RealApp");
+                WriteFile(Path.Combine(realApp, "bin", "app.exe"));
+
+                Assert.True(LeftoverCleanerService.HasAnyFile(realApp));
+            }
+            finally { Cleanup(root); }
+        }
+
+        [Fact]
+        public void ProgramDataService_OrphanRules_AreStrict()
+        {
+            string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+            string fakeExe = Path.Combine(programData, "Zylorp_components", "helper", "agent.exe");
+
+            // نام سرویس هم ریشه با پوشه + برنامه ی نصب نشده → یتیم
+            Assert.True(RegistryCleanerService.IsOrphanedProgramDataService("zylorp_helpersvc", fakeExe));
+
+            // نام سرویس بی ربط به پوشه → هرگز یتیم اعلام نمی شود
+            Assert.False(RegistryCleanerService.IsOrphanedProgramDataService("windows_audio_service", fakeExe));
+
+            // خارج از ProgramData → این قاعده اعمال نمی شود
+            Assert.False(RegistryCleanerService.IsOrphanedProgramDataService("zylorp_helpersvc", @"C:\Zylorp_components\agent.exe"));
+
+            // پوشه ی حفاظت شده ی پیش فرض → یتیم نیست
+            Assert.False(RegistryCleanerService.IsOrphanedProgramDataService("microsoft_helpersvc", Path.Combine(programData, "Microsoft", "agent.exe")));
+        }
+
+        // ── کاتالوگ ترجمه: همه ی کلیدهای فاز ۶ باید مقدار داشته باشند ────
         [Fact]
         public void Phase6_LocalizationKeys_AllExistInCatalog()
         {

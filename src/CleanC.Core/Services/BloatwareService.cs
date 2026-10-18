@@ -83,6 +83,16 @@ namespace CleanC.Core.Services
             { "Microsoft.YourPhone", ("Phone Link (پیوند با گوشی)", "برنامه اتصال و همگام سازی گوشی با ویندوز") }
         };
 
+        // کلاسیک هایی که تقریباً همیشه بدون استفاده اند (اکوسیستم قدیمی Apple، VPN بی استفاده، JDK منسوخ).
+        // فقط در «بازبینی دستی» نمایش داده می شوند — هرگز تیک پیش فرض نمی خورند.
+        private static readonly Dictionary<string, (string Name, string Desc)> KnownUnusedSignatures = new(StringComparer.OrdinalIgnoreCase)
+        {
+            { "Apple Mobile Device Support", ("Apple Mobile Device Support", "برای همگام سازی آیفون با iTunes قدیمی — اگر آیفون وصل نمی کنید لازم نیست") },
+            { "Bonjour", ("Bonjour", "سرویس کشف شبکه ی اپل — فقط برای iTunes و چاپگرهای اپل لازم است") },
+            { "X-VPN", ("X-VPN", "کلاینت VPN بدون استفاده") },
+            { "Java SE Development Kit 8", ("Java SE Development Kit 8", "نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست") }
+        };
+
         // Known promotional pre-installed packages
         private static readonly Dictionary<string, (string Name, string Desc)> PromoBloatwareSignatures = new(StringComparer.OrdinalIgnoreCase)
         {
@@ -97,7 +107,8 @@ namespace CleanC.Core.Services
             { "SpotifyAB.SpotifyMusic", ("Spotify (پیش فرض)", "نسخه استور از پیش نصب شده اسپاتیفای") },
             { "A949DE3C.MarchofEmpires", ("March of Empires", "بازی تبلیغاتی پیش فرض") },
             { "A949DE3C.HiddenCityMysteryofShadows", ("Hidden City", "بازی تبلیغاتی پیش فرض") },
-            { "flaregamesGmbH.RoyalRevolt2", ("Royal Revolt 2", "بازی تبلیغاتی پیش فرض") }
+            { "flaregamesGmbH.RoyalRevolt2", ("Royal Revolt 2", "بازی تبلیغاتی پیش فرض") },
+            { "9E2F88E3.TWITTER", ("Twitter (منسوخ)", "اپ قدیمی توییتر از پیش نصب شده — سرویس آن سال ها پیش تعطیل شده است") }
         };
 
         // Non-essential Windows components that can be safely removed
@@ -468,6 +479,59 @@ namespace CleanC.Core.Services
                         {
                             item.IsSelected = false; // Unchecked by default
                             list.Add(item);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                }
+
+                // 3. کلاسیک های بدون استفاده (Apple Mobile Device/Bonjour/X-VPN/JDK 8) — بدون تیک پیش فرض
+                try
+                {
+                    var roots = new List<(RegistryKey Root, string SubKeyPath)>
+                    {
+                        (Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
+                        (Registry.LocalMachine, @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+                        (Registry.CurrentUser, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
+                    };
+
+                    foreach (var (root, subPath) in roots)
+                    {
+                        using var uninstallKey = root.OpenSubKey(subPath, false);
+                        if (uninstallKey == null) continue;
+
+                        foreach (var sub in uninstallKey.GetSubKeyNames())
+                        {
+                            using var appKey = uninstallKey.OpenSubKey(sub, false);
+                            if (appKey == null) continue;
+
+                            string displayName = appKey.GetValue("DisplayName")?.ToString() ?? string.Empty;
+                            if (string.IsNullOrEmpty(displayName)) continue;
+
+                            foreach (var kvp in KnownUnusedSignatures)
+                            {
+                                if (displayName.Contains(kvp.Key, StringComparison.OrdinalIgnoreCase)
+                                    && !list.Any(x => x.DisplayName.Equals(kvp.Value.Name, StringComparison.OrdinalIgnoreCase)))
+                                {
+                                    long sizeBytes = appKey.GetValue("EstimatedSize") is int sizeKb ? (long)sizeKb * 1024 : 0;
+                                    list.Add(new CandidateAppItem
+                                    {
+                                        Id = sub,
+                                        DisplayName = kvp.Value.Name,
+                                        UninstallString = appKey.GetValue("UninstallString")?.ToString() ?? string.Empty,
+                                        SizeBytes = sizeBytes,
+                                        SizeIsEstimate = false,
+                                        CategoryType = AppCategoryType.BorderlineOptional,
+                                        CategoryLabel = "اختیاری / در صورت عدم نیاز",
+                                        Description = kvp.Value.Desc,
+                                        IsPackagedApp = false,
+                                        IsSelected = false // فقط بازبینی دستی
+                                    });
+                                    break;
+                                }
+                            }
                         }
                     }
                 }

@@ -42,6 +42,23 @@ namespace CleanC.Core.Services
 
     public static class DriverManagerService
     {
+        // وندورهایی که بسته ی درایورشان به اکوسیستم کنترل/صدا/نمایشگر لپ تاپ گره خورده و
+        // حذفشان می تواند قابلیت واقعی را بشکند (کنترل فن MSI، صدای Nahimic/A-Volute،
+        // نمایشگر مجازی Duet که فقط وقتی اپ در حال اجراست «متصل» به نظر می رسد و...).
+        // بسته ی این وندورها هرگز «یتیم بدون سخت افزار» علامت نمی خورد.
+        private static readonly string[] ProtectedDriverProviders = new[]
+        {
+            "Duet", "A-Volute", "Nahimic", "MSI", "Micro-Star", "Dragon", "Killer",
+            "SteelSeries", "Logitech", "Corsair", "Razer", "Dell", "Hewlett", "Lenovo", "ASUS",
+            "Apple", "Tonec", "IDM"
+        };
+
+        internal static bool IsProtectedDriverProvider(string? providerName, string? originalName)
+        {
+            string combined = (providerName ?? string.Empty) + " " + (originalName ?? string.Empty);
+            return ProtectedDriverProviders.Any(p => combined.Contains(p, StringComparison.OrdinalIgnoreCase));
+        }
+
         public static async Task<(List<DriverItem> drivers, DriverSummaryStats stats)> GetDriversAsync()
         {
             return await Task.Run(() =>
@@ -141,6 +158,8 @@ namespace CleanC.Core.Services
                             if (d.HasError || string.IsNullOrEmpty(d.PublishedName)) continue;
                             if (!d.PublishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase)) continue;
                             if (referencedInfPaths.Contains(d.PublishedName)) continue;
+                            // اکوسیستم سازنده (فن/صدا/نمایشگر مجازی) هرگز یتیم علامت نمی خورد
+                            if (IsProtectedDriverProvider(d.ProviderName, d.OriginalName)) continue;
 
                             d.IsOrphanNoHardware = true;
                             d.Evidence = LocalizationService.Get("EvDriverNoHardware", "هیچ دستگاهی (حتی جدا شده) به این بسته متصل نیست — سخت افزار مربوطه هرگز یا دیگر روی سیستم نیست");

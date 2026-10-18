@@ -285,12 +285,35 @@ namespace CleanC.Core.Services
             return false;
         }
 
+        // گارد «پوشه ی خالی»: پوشه ی باقی مانده ی یک برنامه ی حذف شده (مثل
+        // C:\Program Files (x86)\Battle.net که فقط زیرپوشه ی خالی دارد) نباید
+        // باعث شود بازمانده های واقعیِ ProgramData «متعلق به برنامه ی نصب شده» حساب شوند.
+        internal static bool HasAnyFile(string dir)
+        {
+            try
+            {
+                return Directory.EnumerateFiles(dir, "*", new EnumerationOptions
+                {
+                    RecurseSubdirectories = true,
+                    IgnoreInaccessible = true
+                }).Any();
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+                return false;
+            }
+        }
+
         private static bool ExistsInProgramFiles(string name)
         {
             string p1 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
             string p2 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
 
-            if (Directory.Exists(Path.Combine(p1, name)) || Directory.Exists(Path.Combine(p2, name))) return true;
+            string c1 = Path.Combine(p1, name);
+            string c2 = Path.Combine(p2, name);
+            if (Directory.Exists(c1) && HasAnyFile(c1)) return true;
+            if (Directory.Exists(c2) && HasAnyFile(c2)) return true;
 
             return false;
         }
@@ -303,7 +326,8 @@ namespace CleanC.Core.Services
                 string programsDir = Path.Combine(localApp, "Programs");
                 if (Directory.Exists(programsDir))
                 {
-                    if (Directory.Exists(Path.Combine(programsDir, name))) return true;
+                    string candidate = Path.Combine(programsDir, name);
+                    if (Directory.Exists(candidate) && HasAnyFile(candidate)) return true;
                 }
             }
             catch (Exception __ex)
@@ -312,6 +336,20 @@ namespace CleanC.Core.Services
             }
             return false;
         }
+
+        // کلماتی که در نام برنامه های نصب شده زیاد تکرار می شوند و به تنهایی
+        // مدرک «نصب بودن» نیستند. اگر این کلمات امضا شوند، پوشه هایی مثل
+        // «Battle.net_components» با substring-match اشتباهاً «متعلق به برنامه ی
+        // نصب شده» حساب می شوند و از لیست بازمانده ها حذف می شوند.
+        // نکته: «update/updates» عمداً اینجا نیست — همان سرکوب جلوی دوباره
+        // دیده شدن پوشه های *-updater (که دیتکتور اختصاصی D04 مدیریتشان می کند) را می گیرد.
+        private static readonly HashSet<string> GenericAppWords = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "components", "component", "runtime", "service", "services", "driver", "drivers",
+            "installer", "setup", "framework", "package", "packages", "toolchain", "templates",
+            "tools", "manifest", "sdk", "host", "extension", "extensions", "additional",
+            "toolset", "emscripten", "classes", "policies", "registeredapplications", "wow6432node"
+        };
 
         private static HashSet<string> GetInstalledSoftwareSignatures()
         {
@@ -337,7 +375,7 @@ namespace CleanC.Core.Services
                             {
                                 foreach (var word in name.Split(new[] { ' ', '-', '_', '.', '(', ')' }, StringSplitOptions.RemoveEmptyEntries))
                                 {
-                                    if (word.Length >= 3) signatures.Add(word);
+                                    if (word.Length >= 3 && !GenericAppWords.Contains(word)) signatures.Add(word);
                                 }
                             }
                         }
@@ -361,7 +399,7 @@ namespace CleanC.Core.Services
                             {
                                 foreach (var word in name.Split(new[] { ' ', '-', '_', '.', '(', ')' }, StringSplitOptions.RemoveEmptyEntries))
                                 {
-                                    if (word.Length >= 3) signatures.Add(word);
+                                    if (word.Length >= 3 && !GenericAppWords.Contains(word)) signatures.Add(word);
                                 }
                             }
                         }
@@ -381,7 +419,7 @@ namespace CleanC.Core.Services
                 {
                     foreach (var sub in cuSoftware.GetSubKeyNames())
                     {
-                        if (sub.Length >= 3) signatures.Add(sub);
+                        if (sub.Length >= 3 && !GenericAppWords.Contains(sub)) signatures.Add(sub);
                     }
                 }
             }
@@ -397,7 +435,7 @@ namespace CleanC.Core.Services
                 {
                     foreach (var sub in lmSoftware.GetSubKeyNames())
                     {
-                        if (sub.Length >= 3) signatures.Add(sub);
+                        if (sub.Length >= 3 && !GenericAppWords.Contains(sub)) signatures.Add(sub);
                     }
                 }
             }
@@ -406,18 +444,26 @@ namespace CleanC.Core.Services
                 CcLog.Ignore(__ex);
             }
 
-            // Program Files and Program Files (x86)
+            // Program Files and Program Files (x86) — فقط پوشه های دارای فایل واقعی؛
+            // پوشه ی خالیِ باقی مانده ی یک برنامه ی حذف شده نباید «برنامه ی نصب شده» حساب شود
+            // (وگرنه بازمانده های ProgramData آن برنامه هم اشتباهاً حذف از لیست می شوند).
             try
             {
                 string pf = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
                 if (Directory.Exists(pf))
                 {
-                    foreach (var d in Directory.GetDirectories(pf)) signatures.Add(Path.GetFileName(d));
+                    foreach (var d in Directory.GetDirectories(pf))
+                    {
+                        if (HasAnyFile(d)) signatures.Add(Path.GetFileName(d));
+                    }
                 }
                 string pfx = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
                 if (Directory.Exists(pfx))
                 {
-                    foreach (var d in Directory.GetDirectories(pfx)) signatures.Add(Path.GetFileName(d));
+                    foreach (var d in Directory.GetDirectories(pfx))
+                    {
+                        if (HasAnyFile(d)) signatures.Add(Path.GetFileName(d));
+                    }
                 }
             }
             catch (Exception __ex)
@@ -432,7 +478,10 @@ namespace CleanC.Core.Services
                 string programs = Path.Combine(localApp, "Programs");
                 if (Directory.Exists(programs))
                 {
-                    foreach (var d in Directory.GetDirectories(programs)) signatures.Add(Path.GetFileName(d));
+                    foreach (var d in Directory.GetDirectories(programs))
+                    {
+                        if (HasAnyFile(d)) signatures.Add(Path.GetFileName(d));
+                    }
                 }
             }
             catch (Exception __ex)

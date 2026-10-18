@@ -318,7 +318,8 @@ namespace CleanC.Core.Services
                         string? root = Path.GetPathRoot(exePath);
                         if (string.IsNullOrEmpty(root) || !Directory.Exists(root)) continue;
 
-                        if (IsExeReallyMissing(exePath))
+                        if (IsExeReallyMissing(exePath)
+                            || (start == 3 && IsOrphanedProgramDataService(subName, exePath)))
                         {
                             string disp = svcKey.GetValue("DisplayName")?.ToString() ?? subName;
                             list.Add(new OrphanedServiceItem
@@ -341,6 +342,73 @@ namespace CleanC.Core.Services
                 CcLog.Ignore(__ex);
             }
             return list;
+        }
+
+        // قانون دومِ یتیم بودنی سرویس: فایل اجرایی وجود دارد ولی زیر پوشه ی سطح اولِ
+        // ProgramData افتاده (مثل battlenet_helpersvc بازمانده از Battle.net حذف شده).
+        // این حکم فقط وقتی صادر می شود که: نوع راه اندازی Manual باشد، نام سرویس با نام
+        // پوشه هم ریشه باشد (battlenet ↔ Battle.net_components) و هیچ برنامه ی نصب شده ای
+        // با آن ریشه هم نام نباشد — در غیر این صورت هرگز چیزی یتیم اعلام نمی شود.
+        internal static bool IsOrphanedProgramDataService(string serviceName, string exePath)
+        {
+            try
+            {
+                string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                if (string.IsNullOrEmpty(programData)) return false;
+
+                string prefix = programData.TrimEnd('\\') + "\\";
+                if (!exePath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) return false;
+
+                string rel = exePath[prefix.Length..];
+                int sep = rel.IndexOfAny(new[] { '\\', '/' });
+                string segment = sep >= 0 ? rel[..sep] : rel;
+                if (segment.Length < 4) return false;
+                if (LockRegistryService.IsProtectedName(segment)) return false;
+
+                // توکن های >=۴ حرفیِ نام پوشه (battle / components / ...)
+                var tokens = segment.ToLowerInvariant()
+                    .Split(new[] { '.', '_', '-', ' ', '+', '(', ')' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Where(t => t.Length >= 4)
+                    .ToList();
+                if (tokens.Count == 0) return false;
+
+                // سرویس باید با پوشه هم ریشه باشد: battlenet_helpersvc ↔ Battle.net
+                string compactName = new(serviceName.ToLowerInvariant().Where(char.IsLetterOrDigit).ToArray());
+                var relatedTokens = tokens.Where(t => compactName.Contains(t)).ToList();
+                if (relatedTokens.Count == 0) return false;
+
+                // اگر برنامه ی نصب شده ای همان ریشه را داشته باشد → محصول حذف نشده → یتیم نیست
+                var roots = new List<(RegistryKey Root, string SubKeyPath)>
+                {
+                    (Registry.LocalMachine, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall"),
+                    (Registry.LocalMachine, @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"),
+                    (Registry.CurrentUser, @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall")
+                };
+
+                foreach (var (root, subPath) in roots)
+                {
+                    using var uninstallKey = root.OpenSubKey(subPath, false);
+                    if (uninstallKey == null) continue;
+
+                    foreach (var sub in uninstallKey.GetSubKeyNames())
+                    {
+                        using var appKey = uninstallKey.OpenSubKey(sub, false);
+                        string displayName = appKey?.GetValue("DisplayName")?.ToString() ?? string.Empty;
+                        if (displayName.Length > 0 &&
+                            relatedTokens.Any(t => displayName.Contains(t, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+                return false;
+            }
         }
 
         // تشخیص واقعی «فایل اجرایی ناموجود» برای صدور حکم «سرویس یتیم»:

@@ -234,7 +234,9 @@ namespace CleanC.Core.Services
                                         });
                                     }
                                     // Smart Scenario 3: Copied duplicates like "name - Copy.ext" or "name (1).ext"
-                                    else if (lowerName.Contains(" - copy") || lowerName.Contains(" (1)") || lowerName.Contains(" (2)") || lowerName.Contains("نسخه کپی"))
+                                    // عکس های شخصی عمداً کنار گذاشته می شوند (بدون پیشنهاد حذف)
+                                    else if (!IsPersonalImage(name)
+                                        && (lowerName.Contains(" - copy") || lowerName.Contains(" (1)") || lowerName.Contains(" (2)") || lowerName.Contains("نسخه کپی")))
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -575,6 +577,7 @@ namespace CleanC.Core.Services
             for (int i = 0; i < sortedFiles.Count; i++)
             {
                 var f = sortedFiles[i];
+                bool isImage = IsPersonalImage(f.Name);
                 group.Files.Add(new DuplicateFileInfo
                 {
                     FilePath = f.FullName,
@@ -583,7 +586,8 @@ namespace CleanC.Core.Services
                     SizeBytes = f.Length,
                     LastModified = f.LastWriteTime,
                     IsOriginal = (i == 0),
-                    IsSelectedForDeletion = (i > 0)
+                    // عکس شخصی: نمایش داده می شود ولی برای حذف پیش انتخاب نمی شود
+                    IsSelectedForDeletion = (i > 0) && !isImage
                 });
             }
             return group;
@@ -592,6 +596,17 @@ namespace CleanC.Core.Services
         // ====================================================================
         // D05 helpers — تطبیق فازی نصب کننده با برنامه های نصب شده
         // ====================================================================
+
+        // پسوندهای عکس شخصی — طبق قرارداد ایمنی، عکس های کاربر حتی با نام «(1)/(2)»
+        // هرگز پیشنهاد حذف نمی شوند: از D08 به کلی کنار گذاشته می شوند و در گروه های
+        // تکراری D07 هم به صورت پیش فرض تیک نمی خورند (فقط نمایش داده می شوند).
+        private static readonly HashSet<string> PersonalImageExtensions = new(StringComparer.OrdinalIgnoreCase)
+        {
+            ".png", ".jpg", ".jpeg", ".gif", ".bmp", ".webp", ".heic", ".heif", ".tif", ".tiff"
+        };
+
+        internal static bool IsPersonalImage(string fileName) =>
+            PersonalImageExtensions.Contains(Path.GetExtension(fileName));
 
         // توکن هایی که در نام نصب کننده ها عمومی هستند و به تنهایی مدرک تطبیق نیستند
         // (وگرنه «setup.exe» با هر محصولی که کلمه Setup دارد تطبیق داده می شد).
