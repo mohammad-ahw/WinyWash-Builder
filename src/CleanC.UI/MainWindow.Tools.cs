@@ -761,7 +761,12 @@ namespace CleanC.UI
             }
 
             UninstallerLoadingSpinner.Visibility = Visibility.Visible;
-            UninstallerAppsStack.Visibility = Visibility.Collapsed;
+            UninstallerAppsList.Visibility = Visibility.Collapsed;
+            if (UninstallerEmptyStack != null)
+            {
+                UninstallerEmptyStack.Children.Clear();
+                UninstallerEmptyStack.Visibility = Visibility.Collapsed;
+            }
 
             try
             {
@@ -773,7 +778,7 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
-                UninstallerAppsStack.Visibility = Visibility.Visible;
+                UninstallerAppsList.Visibility = Visibility.Visible;
                 UninstallerSummaryText.Text = $"خطا در بارگذاری برنامه ها: {ex.Message}";
             }
         }
@@ -783,12 +788,16 @@ namespace CleanC.UI
             // فیلد به local منتقل می شود تا null-analysis رزرو شود (بعد از هر فراخوانی
             // متد، حالت null فیلدها ریست می شود و کامپایلر هشدار CS8604 می دهد)
             var apps = _allInstalledApps;
-            if (UninstallerAppsStack == null || UninstallerSearchBox == null || UninstallerSortBox == null || apps == null)
+            if (UninstallerAppsList == null || UninstallerSearchBox == null || UninstallerSortBox == null || apps == null)
                 return;
 
             if (UninstallerLoadingSpinner != null) UninstallerLoadingSpinner.Visibility = Visibility.Collapsed;
-            UninstallerAppsStack.Visibility = Visibility.Visible;
-            UninstallerAppsStack.Children.Clear();
+
+            if (UninstallerEmptyStack != null)
+            {
+                UninstallerEmptyStack.Children.Clear();
+                UninstallerEmptyStack.Visibility = Visibility.Collapsed;
+            }
 
             if (LauncherUninstallerBadge != null)
             {
@@ -816,54 +825,13 @@ namespace CleanC.UI
                              .ToList()
             };
 
+            // B3: ساخت ViewModel به جای ساخت دستی کارت ها — ListView فقط کارت های داخل viewport را واقعی می کند
+            Brush normalCardBrush = GetThemeBrush("AppCardBorderBrush");
+            var selectedCardBrush = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"];
+
+            var itemVms = new List<AppListItemViewModel>(filtered.Count);
             foreach (var app in filtered)
             {
-                var itemBorder = new Border
-                {
-                    Background = GetThemeBrush("AppCardBackgroundBrush"),
-                    BorderBrush = app.IsSelected ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("AppCardBorderBrush"),
-                    BorderThickness = new Thickness(1),
-                    CornerRadius = new CornerRadius(10),
-                    Padding = new Thickness(14, 10, 14, 10)
-                };
-
-                var grid = new Grid { ColumnSpacing = 12 };
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // 0: Checkbox
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // 1: Avatar chip
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) }); // 2: Info
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // 3: Size Badge
-                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto }); // 4: Delete Button
-
-                // Col 0: CheckBox
-                var chk = new CheckBox
-                {
-                    IsChecked = app.IsSelected,
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-                var capturedApp = app;
-                var capturedBorder = itemBorder;
-                chk.Click += (s, e) =>
-                {
-                    capturedApp.IsSelected = chk.IsChecked == true;
-                    capturedBorder.BorderBrush = capturedApp.IsSelected ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"] : GetThemeBrush("AppCardBorderBrush");
-                    UpdateBatchUninstallerBar();
-                };
-                Grid.SetColumn(chk, 0);
-                grid.Children.Add(chk);
-
-                // Col 1: Real App Icon (with Fluent fallback)
-                var avatarBorder = new Border
-                {
-                    Width = 34,
-                    Height = 34,
-                    CornerRadius = new CornerRadius(8),
-                    Background = GetThemeBrush("AppCardSecondaryBrush"),
-                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
-                    BorderThickness = new Thickness(1),
-                    VerticalAlignment = VerticalAlignment.Center,
-                    HorizontalAlignment = HorizontalAlignment.Center
-                };
-
                 string? iconPath = null;
                 if (!string.IsNullOrEmpty(app.DisplayIcon))
                 {
@@ -873,156 +841,46 @@ namespace CleanC.UI
                 {
                     iconPath = GetOrExtractAppIconPath(app.UninstallString, app.DisplayName);
                 }
-
-                if (!string.IsNullOrEmpty(iconPath) && File.Exists(iconPath))
-                {
-                    avatarBorder.Child = new Image
-                    {
-                        Source = new BitmapImage(new Uri(iconPath)),
-                        Width = 22,
-                        Height = 22,
-                        VerticalAlignment = VerticalAlignment.Center,
-                        HorizontalAlignment = HorizontalAlignment.Center
-                    };
-                }
-                else
-                {
-                    avatarBorder.Child = new FontIcon
-                    {
-                        Glyph = "\uE71D",
-                        FontSize = 15,
-                        Foreground = (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"],
-                        HorizontalAlignment = HorizontalAlignment.Center,
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                }
-                Grid.SetColumn(avatarBorder, 1);
-                grid.Children.Add(avatarBorder);
-
-                // Col 2: App Info (Aligned to start, not centered!)
-                var infoStack = new StackPanel { Spacing = 2, VerticalAlignment = VerticalAlignment.Center, HorizontalAlignment = HorizontalAlignment.Stretch };
-                var nameText = new TextBlock
-                {
-                    Text = app.DisplayName,
-                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                    FontSize = 12.5,
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    TextAlignment = TextAlignment.Start
-                };
-                
-                string pubStr = !string.IsNullOrEmpty(app.Publisher) ? $"{app.Publisher} · " : "";
-                string dateStr = !string.IsNullOrEmpty(app.InstalledDateFormatted) ? $"نصب: {app.InstalledDateFormatted}" : "";
-                var subText = new TextBlock
-                {
-                    Text = $"{pubStr}{dateStr}".TrimEnd(' ', '·'),
-                    FontSize = 11,
-                    Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
-                    TextTrimming = TextTrimming.CharacterEllipsis,
-                    HorizontalAlignment = HorizontalAlignment.Stretch,
-                    TextAlignment = TextAlignment.Start
-                };
-
-                // ردیف نام + نشان «نسخه آزمایشی» (D18 — فقط نمایشی، بدون حذف خودکار)
-                var nameRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
-                nameRow.Children.Add(nameText);
-                if (app.IsTrialBadge)
-                {
-                    var trialBadge = new Border
-                    {
-                        Background = GetThemeBrush("AppCardSecondaryBrush"),
-                        CornerRadius = new CornerRadius(5),
-                        Padding = new Thickness(8, 2, 8, 2),
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    trialBadge.Child = new TextBlock
-                    {
-                        Text = LocalizationService.Get("BadgeTrial", "نسخه آزمایشی"),
-                        FontSize = 10,
-                        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                        Foreground = GetThemeBrush("SystemFillColorCautionBrush")
-                    };
-                    if (!string.IsNullOrEmpty(app.TrialEvidence))
-                    {
-                        ToolTipService.SetToolTip(trialBadge, app.TrialEvidence);
-                    }
-                    nameRow.Children.Add(trialBadge);
-                }
-
-                infoStack.Children.Add(nameRow);
-                infoStack.Children.Add(subText);
-
-                // شاهد D18 — برچسبی که باعث تشخیص trial شده
-                if (app.IsTrialBadge && !string.IsNullOrEmpty(app.TrialEvidence))
-                {
-                    infoStack.Children.Add(new TextBlock
-                    {
-                        Text = app.TrialEvidence,
-                        FontSize = 10.5,
-                        Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
-                        TextTrimming = TextTrimming.CharacterEllipsis,
-                        TextAlignment = TextAlignment.Start
-                    });
-                }
-                Grid.SetColumn(infoStack, 2);
-                grid.Children.Add(infoStack);
-
-                // Col 3: Size Badge
-                if (app.EstimatedSizeBytes > 0 && !string.IsNullOrEmpty(app.FormattedSize))
-                {
-                    var sizeBadge = new Border
-                    {
-                        Background = GetThemeBrush("AppCardSecondaryBrush"),
-                        CornerRadius = new CornerRadius(5),
-                        Padding = new Thickness(8, 2, 8, 2),
-                        VerticalAlignment = VerticalAlignment.Center
-                    };
-                    sizeBadge.Child = new TextBlock
-                    {
-                        Text = app.FormattedSize,
-                        FontSize = 10.5,
-                        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                        Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
-                        FlowDirection = FlowDirection.LeftToRight
-                    };
-                    Grid.SetColumn(sizeBadge, 3);
-                    grid.Children.Add(sizeBadge);
-                }
-
-                // Col 4: Single Uninstall Button
-                var uninstBtn = new Button
-                {
-                    Content = "حذف",
-                    FontSize = 11.5,
-                    FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
-                    Height = 30,
-                    Padding = new Thickness(14, 0, 14, 0),
-                    CornerRadius = new CornerRadius(6),
-                    Background = GetThemeBrush("AppCardSecondaryBrush"),
-                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
-                    Foreground = GetThemeBrush("SystemFillColorCriticalBrush"),
-                    VerticalAlignment = VerticalAlignment.Center
-                };
-
-                uninstBtn.Click += (s, e) => SafeInvoker.Run(UninstallSingleAppAsync(app));
-                Grid.SetColumn(uninstBtn, 4);
-                grid.Children.Add(uninstBtn);
-
-                itemBorder.Child = grid;
-                UninstallerAppsStack.Children.Add(itemBorder);
+                itemVms.Add(new AppListItemViewModel(app, iconPath, normalCardBrush, selectedCardBrush));
             }
+            UninstallerAppsList.ItemsSource = itemVms;
 
             // حالت خالی: یا جستجوی بی نتیجه، یا لیست نصب شده ها واقعاً خالی است
             if (filtered.Count == 0)
             {
-                UninstallerAppsStack.Children.Add(CreateEmptyStateMessage(
-                    string.IsNullOrEmpty(query)
-                        ? "هیچ نرم افزاری روی سیستم شناسایی نشد."
-                        : $"هیچ نرم افزاری مطابق با «{query}» پیدا نشد.",
-                    "\uE721"));
+                UninstallerAppsList.Visibility = Visibility.Collapsed;
+                var emptyStack = UninstallerEmptyStack;
+                if (emptyStack != null)
+                {
+                    emptyStack.Visibility = Visibility.Visible;
+                    emptyStack.Children.Add(CreateEmptyStateMessage(
+                        string.IsNullOrEmpty(query)
+                            ? "هیچ نرم افزاری روی سیستم شناسایی نشد."
+                            : $"هیچ نرم افزاری مطابق با «{query}» پیدا نشد.",
+                        "\uE721"));
+                }
+            }
+            else
+            {
+                UninstallerAppsList.Visibility = Visibility.Visible;
             }
 
             UpdateBatchUninstallerBar();
+        }
+
+        // B3: کلیک CheckBox — مقدار از طریق TwoWay binding در VM (و مدل اصلی) نوشته شده؛ فقط نوار گروهی را تازه می کنیم
+        private void AppListCheck_Click(object sender, RoutedEventArgs e)
+        {
+            UpdateBatchUninstallerBar();
+        }
+
+        // D5: دکمه حذف داخل DataTemplate — اپ متناظر از DataContext خوانده می شود
+        private void AppListUninstall_Click(object sender, RoutedEventArgs e)
+        {
+            if ((sender as FrameworkElement)?.DataContext is AppListItemViewModel vm)
+            {
+                SafeInvoker.Run(UninstallSingleAppAsync(vm.App));
+            }
         }
 
         private void UpdateBatchUninstallerBar()
@@ -1143,7 +1001,7 @@ namespace CleanC.UI
 
         private void UninstallerSearchBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
         {
-            if (UninstallerSearchBox == null || UninstallerAppsStack == null || UninstallerSortBox == null || _allInstalledApps == null)
+            if (UninstallerSearchBox == null || UninstallerAppsList == null || UninstallerSortBox == null || _allInstalledApps == null)
                 return;
             _uninstallerSearchDebounce.Stop();
             _uninstallerSearchDebounce.Start();
@@ -1151,7 +1009,7 @@ namespace CleanC.UI
 
         private void UninstallerSortBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (UninstallerSearchBox == null || UninstallerAppsStack == null || UninstallerSortBox == null || _allInstalledApps == null)
+            if (UninstallerSearchBox == null || UninstallerAppsList == null || UninstallerSortBox == null || _allInstalledApps == null)
                 return;
             FilterAndRenderApps();
         }

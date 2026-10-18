@@ -931,7 +931,61 @@
                                 </Border>
 
                                 <ProgressRing x:Name="UninstallerLoadingSpinner" IsActive="True" Width="32" Height="32" HorizontalAlignment="Center" Margin="0,24,0,0" />
-                                <StackPanel x:Name="UninstallerAppsStack" Spacing="6" Visibility="Collapsed" />
+
+                                <!-- B3: لیست اپ ها مجازی است — فقط کارت های داخل viewport ساخته می شوند (MaxHeight لازمه ی virtualization) -->
+                                <ListView x:Name="UninstallerAppsList" Visibility="Collapsed" SelectionMode="None" MaxHeight="560" HorizontalAlignment="Stretch" ScrollViewer.VerticalScrollBarVisibility="Auto">
+                                    <ListView.ItemContainerStyle>
+                                        <Style TargetType="ListViewItem">
+                                            <Setter Property="Padding" Value="0" />
+                                            <Setter Property="MinHeight" Value="0" />
+                                            <Setter Property="Margin" Value="0,3,0,3" />
+                                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                                        </Style>
+                                    </ListView.ItemContainerStyle>
+                                    <ListView.ItemTemplate>
+                                        <DataTemplate>
+                                            <Border Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{Binding CardBorderBrush}" BorderThickness="1" CornerRadius="10" Padding="14,10" HorizontalAlignment="Stretch">
+                                                <Grid ColumnSpacing="12">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <CheckBox Grid.Column="0" IsChecked="{Binding IsSelected, Mode=TwoWay}" VerticalAlignment="Center" Click="AppListCheck_Click" />
+
+                                                    <Border Grid.Column="1" Width="34" Height="34" CornerRadius="8" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Center">
+                                                        <Grid>
+                                                            <Image Source="{Binding IconSource}" Width="22" Height="22" Visibility="{Binding IconVisibility}" VerticalAlignment="Center" HorizontalAlignment="Center" />
+                                                            <FontIcon Glyph="&#xE71D;" FontSize="15" Foreground="{ThemeResource AccentFillColorDefaultBrush}" Visibility="{Binding GlyphVisibility}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                                        </Grid>
+                                                    </Border>
+
+                                                    <StackPanel Grid.Column="2" Spacing="2" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                                            <TextBlock Text="{Binding DisplayName}" FontWeight="SemiBold" FontSize="12.5" TextTrimming="CharacterEllipsis" />
+                                                            <Border Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="5" Padding="8,2" VerticalAlignment="Center" Visibility="{Binding TrialVisibility}" ToolTipService.ToolTip="{Binding TrialEvidence}">
+                                                                <TextBlock Text="{Binding TrialLabel}" FontSize="10" FontWeight="SemiBold" Foreground="{ThemeResource SystemFillColorCautionBrush}" />
+                                                            </Border>
+                                                        </StackPanel>
+                                                        <TextBlock Text="{Binding SubLine}" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis" TextAlignment="Start" />
+                                                        <TextBlock Text="{Binding TrialEvidence}" FontSize="10.5" Foreground="{ThemeResource TextFillColorTertiaryBrush}" TextTrimming="CharacterEllipsis" Visibility="{Binding EvidenceVisibility}" TextAlignment="Start" />
+                                                    </StackPanel>
+
+                                                    <Border Grid.Column="3" Background="{ThemeResource AppCardSecondaryBrush}" CornerRadius="5" Padding="8,2" VerticalAlignment="Center" Visibility="{Binding SizeVisibility}">
+                                                        <TextBlock Text="{Binding SizeText}" FontSize="10.5" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorSecondaryBrush}" FlowDirection="LeftToRight" />
+                                                    </Border>
+
+                                                    <Button Grid.Column="4" Content="حذف" FontSize="11.5" FontWeight="SemiBold" Height="30" Padding="14,0" CornerRadius="6" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" Foreground="{ThemeResource SystemFillColorCriticalBrush}" VerticalAlignment="Center" Click="AppListUninstall_Click" />
+                                                </Grid>
+                                            </Border>
+                                        </DataTemplate>
+                                    </ListView.ItemTemplate>
+                                </ListView>
+
+                                <StackPanel x:Name="UninstallerEmptyStack" Spacing="6" Visibility="Collapsed" />
                             </StackPanel>
 
                             <!-- =================================================== -->
