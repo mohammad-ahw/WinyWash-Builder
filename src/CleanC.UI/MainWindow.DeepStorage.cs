@@ -332,6 +332,7 @@ namespace CleanC.UI
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
                 var chk = new CheckBox
                 {
@@ -362,6 +363,12 @@ namespace CleanC.UI
                 var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
                 info.Children.Add(new TextBlock { Text = folder.FolderName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12 });
                 info.Children.Add(new TextBlock { Text = folder.FolderPath, FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, FlowDirection = FlowDirection.LeftToRight });
+
+                // شاهد D09 — «چرا» این پوشه پیشنهاد شده (گیت زمانی ۳۰ روزه)
+                if (!string.IsNullOrEmpty(folder.Evidence))
+                {
+                    info.Children.Add(new TextBlock { Text = folder.Evidence, FontSize = 10, Foreground = GetThemeBrush("TextFillColorTertiaryBrush") });
+                }
                 Grid.SetColumn(info, 2);
                 grid.Children.Add(info);
 
@@ -376,6 +383,14 @@ namespace CleanC.UI
                 Grid.SetColumn(pill, 3);
                 grid.Children.Add(pill);
 
+                var folderLockBtn = CreateLockToggleButton(folder.FolderPath, () =>
+                {
+                    folder.IsSelected = false;
+                    RenderDeepStorageItems();
+                });
+                Grid.SetColumn(folderLockBtn, 4);
+                grid.Children.Add(folderLockBtn);
+
                 card.Child = grid;
                 DeepStorageItemsStack.Children.Add(card);
             }
@@ -386,6 +401,7 @@ namespace CleanC.UI
             if (_deepScanResult == null || _deepScanResult.MessItems.Count == 0)
             {
                 DeepStorageItemsStack.Children.Add(CreateEmptyStateMessage("هیچ فایل زائد، موقت یا نصاب رها شده ای یافت نشد. دیسک کاملاً پاکیزه است."));
+                RenderSensitiveFilesSection();
                 return;
             }
 
@@ -412,6 +428,7 @@ namespace CleanC.UI
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
                 grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
@@ -444,6 +461,21 @@ namespace CleanC.UI
                 var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
                 info.Children.Add(new TextBlock { Text = item.FileName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis });
                 info.Children.Add(new TextBlock { Text = item.DirectoryPath, FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, FlowDirection = FlowDirection.LeftToRight });
+
+                // شواهد تشخیص — کاربر با اطلاعات کامل تصمیم بگیرد (خصیصه ی Evidence دیتکتورهای فاز ۶)
+                if (!string.IsNullOrEmpty(item.Evidence))
+                {
+                    string evidenceText = item.RequiresAdmin
+                        ? $"نیازمند دسترسی ادمین · {item.Evidence}"
+                        : item.Evidence;
+                    info.Children.Add(new TextBlock
+                    {
+                        Text = evidenceText,
+                        FontSize = 10,
+                        Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
+                        TextTrimming = TextTrimming.CharacterEllipsis
+                    });
+                }
                 Grid.SetColumn(info, 2);
                 grid.Children.Add(info);
 
@@ -468,6 +500,160 @@ namespace CleanC.UI
                     Child = new TextBlock { Text = item.FormattedSize, FontSize = 10.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FlowDirection = FlowDirection.LeftToRight }
                 };
                 Grid.SetColumn(sizeBadge, 4);
+                grid.Children.Add(sizeBadge);
+
+                // دکمه ی قفل/آنلاک (فاز ۶ قدم ۴): قفل کاربر یعنی این مسیر هرگز
+                // پیشنهاد نمی شود و حذفش وتو می شود (SafeDeleteService هم احترام می گذارد)
+                var lockBtn = CreateLockToggleButton(item.FilePath, () =>
+                {
+                    item.IsSelected = false;
+                    RenderDeepStorageItems();
+                });
+                Grid.SetColumn(lockBtn, 5);
+                grid.Children.Add(lockBtn);
+
+                card.Child = grid;
+                DeepStorageItemsStack.Children.Add(card);
+            }
+
+            RenderSensitiveFilesSection();
+        }
+
+        /// <summary>
+        /// دکمه ی قفل/آنلاکِ مسیر — مشترک بین کارت های پویش عمیق.
+        /// کلیک = افزودن/حذف قفل کاربر در locks.json + تازه سازی لیست.
+        /// </summary>
+        private Button CreateLockToggleButton(string path, Action onChanged)
+        {
+            bool isLocked = LockRegistryService.IsUserLockedPath(path);
+
+            var btn = new Button
+            {
+                Content = new FontIcon
+                {
+                    Glyph = isLocked ? "\uE785" : "\uE72E",
+                    FontSize = 12,
+                    Foreground = isLocked
+                        ? (Brush)Application.Current.Resources["AccentFillColorDefaultBrush"]
+                        : GetThemeBrush("TextFillColorTertiaryBrush")
+                },
+                Background = new SolidColorBrush(Microsoft.UI.Colors.Transparent),
+                BorderThickness = new Thickness(0),
+                Padding = new Thickness(6, 4, 6, 4),
+                VerticalAlignment = VerticalAlignment.Center,
+                Margin = new Thickness(6, 0, 0, 0)
+            };
+
+            ToolTipService.SetToolTip(btn, isLocked
+                ? "رفع قفل — این مسیر دوباره قابل پیشنهاد می شود"
+                : "قفل کردن — این مسیر هرگز پیشنهاد یا حذف نمی شود");
+
+            btn.Click += (s, e) =>
+            {
+                bool currentlyLocked = LockRegistryService.IsUserLockedPath(path);
+                bool ok = currentlyLocked
+                    ? LockRegistryService.RemoveLock(path)
+                    : LockRegistryService.AddLock(path, LockTypes.Folder, "قفل شده از صفحه ی پویش عمیق");
+
+                if (ok)
+                {
+                    onChanged();
+                }
+                else
+                {
+                    ShowInfoBar("قفل مسیر", "ذخیره ی قفل ناموفق بود — دسترسی به locks.json بررسی شود.", InfoBarSeverity.Warning);
+                }
+            };
+
+            return btn;
+        }
+
+        /// <summary>
+        /// D17 — بخش «فایل های حساس» (فقط گزارش): بدون چک باکس و بدون هیچ دکمه ی حذف.
+        /// این موارد عمداً در MessItems نیستند تا از چرخه ی حذف خارج بمانند.
+        /// </summary>
+        private void RenderSensitiveFilesSection()
+        {
+            if (_deepScanResult == null || _deepScanResult.SensitiveFiles.Count == 0) return;
+
+            var header = new StackPanel
+            {
+                Orientation = Orientation.Horizontal,
+                Spacing = 8,
+                Margin = new Thickness(0, 14, 0, 6)
+            };
+            header.Children.Add(new FontIcon
+            {
+                Glyph = "\uE83D",
+                FontSize = 14,
+                VerticalAlignment = VerticalAlignment.Center,
+                Foreground = (Brush)Application.Current.Resources["SystemFillColorCautionBrush"]
+            });
+            header.Children.Add(new TextBlock
+            {
+                Text = $"فایل های حساس شناسایی شده ({_deepScanResult.SensitiveFiles.Count} مورد — فقط گزارش، بدون حذف)",
+                FontSize = 12,
+                FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                VerticalAlignment = VerticalAlignment.Center
+            });
+            DeepStorageItemsStack.Children.Add(header);
+
+            foreach (var sensitive in _deepScanResult.SensitiveFiles)
+            {
+                var card = new Border
+                {
+                    Background = GetThemeBrush("AppCardBackgroundBrush"),
+                    BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8),
+                    Padding = new Thickness(12, 8, 12, 8),
+                    Margin = new Thickness(0, 0, 0, 4)
+                };
+
+                var grid = new Grid();
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                var icon = new FontIcon
+                {
+                    Glyph = "\uE8D7",
+                    FontSize = 14,
+                    Foreground = (Brush)Application.Current.Resources["SystemFillColorCautionBrush"],
+                    Margin = new Thickness(0, 0, 10, 0),
+                    VerticalAlignment = VerticalAlignment.Center
+                };
+                Grid.SetColumn(icon, 0);
+                grid.Children.Add(icon);
+
+                var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
+                info.Children.Add(new TextBlock { Text = sensitive.FileName, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12, TextTrimming = TextTrimming.CharacterEllipsis });
+                info.Children.Add(new TextBlock { Text = sensitive.DirectoryPath, FontSize = 10.5, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, FlowDirection = FlowDirection.LeftToRight });
+                Grid.SetColumn(info, 1);
+                grid.Children.Add(info);
+
+                var reasonPill = new Border
+                {
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    CornerRadius = new CornerRadius(4),
+                    Padding = new Thickness(6, 2, 6, 2),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Margin = new Thickness(0, 0, 8, 0),
+                    Child = new TextBlock { Text = sensitive.MatchReason, FontSize = 10, Foreground = GetThemeBrush("TextFillColorSecondaryBrush") }
+                };
+                Grid.SetColumn(reasonPill, 2);
+                grid.Children.Add(reasonPill);
+
+                var sizeBadge = new Border
+                {
+                    Background = GetThemeBrush("AppCardSecondaryBrush"),
+                    CornerRadius = new CornerRadius(4),
+                    Padding = new Thickness(7, 2, 7, 2),
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Child = new TextBlock { Text = sensitive.FormattedSize, FontSize = 10.5, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FlowDirection = FlowDirection.LeftToRight }
+                };
+                Grid.SetColumn(sizeBadge, 3);
                 grid.Children.Add(sizeBadge);
 
                 card.Child = grid;

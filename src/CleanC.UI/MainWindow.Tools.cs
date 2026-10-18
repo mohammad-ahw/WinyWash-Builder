@@ -923,8 +923,47 @@ namespace CleanC.UI
                     TextAlignment = TextAlignment.Start
                 };
 
-                infoStack.Children.Add(nameText);
+                // ردیف نام + نشان «نسخه آزمایشی» (D18 — فقط نمایشی، بدون حذف خودکار)
+                var nameRow = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                nameRow.Children.Add(nameText);
+                if (app.IsTrialBadge)
+                {
+                    var trialBadge = new Border
+                    {
+                        Background = GetThemeBrush("AppCardSecondaryBrush"),
+                        CornerRadius = new CornerRadius(5),
+                        Padding = new Thickness(8, 2, 8, 2),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    trialBadge.Child = new TextBlock
+                    {
+                        Text = "نسخه آزمایشی",
+                        FontSize = 10,
+                        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                        Foreground = GetThemeBrush("SystemFillColorCautionBrush")
+                    };
+                    if (!string.IsNullOrEmpty(app.TrialEvidence))
+                    {
+                        ToolTipService.SetToolTip(trialBadge, app.TrialEvidence);
+                    }
+                    nameRow.Children.Add(trialBadge);
+                }
+
+                infoStack.Children.Add(nameRow);
                 infoStack.Children.Add(subText);
+
+                // شاهد D18 — برچسبی که باعث تشخیص trial شده
+                if (app.IsTrialBadge && !string.IsNullOrEmpty(app.TrialEvidence))
+                {
+                    infoStack.Children.Add(new TextBlock
+                    {
+                        Text = app.TrialEvidence,
+                        FontSize = 10.5,
+                        Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
+                        TextTrimming = TextTrimming.CharacterEllipsis,
+                        TextAlignment = TextAlignment.Start
+                    });
+                }
                 Grid.SetColumn(infoStack, 2);
                 grid.Children.Add(infoStack);
 
@@ -2017,6 +2056,26 @@ namespace CleanC.UI
                     topRow.Children.Add(disBadge);
                 }
 
+                // D12 — نشان یتیم بودن: فایل اجرایی هدف دیگر روی دیسک نیست
+                if (item.TargetMissing)
+                {
+                    var orphanBadge = new Border
+                    {
+                        Background = GetThemeBrush("AppCardSecondaryBrush"),
+                        CornerRadius = new CornerRadius(5),
+                        Padding = new Thickness(8, 2, 8, 2),
+                        VerticalAlignment = VerticalAlignment.Center
+                    };
+                    orphanBadge.Child = new TextBlock
+                    {
+                        Text = "هدف ناموجود",
+                        FontSize = 10,
+                        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                        Foreground = GetThemeBrush("SystemFillColorCautionBrush")
+                    };
+                    topRow.Children.Add(orphanBadge);
+                }
+
                 textStack.Children.Add(topRow);
 
                 string cleanCmd = ExtractCleanExePath(item.Command);
@@ -2039,6 +2098,18 @@ namespace CleanC.UI
                         Text = $"تأخیر اندازه گیری شده در بالا آمدن ویندوز: {item.ImpactMs} میلی ثانیه",
                         FontSize = 10.5,
                         Foreground = GetThemeBrush("TextFillColorTertiaryBrush"),
+                        TextTrimming = TextTrimming.CharacterEllipsis
+                    });
+                }
+
+                // شاهد D12 — «چرا» یتیم تشخیص داده شد (مسیر exe گم شده)
+                if (item.TargetMissing && !string.IsNullOrEmpty(item.Evidence))
+                {
+                    textStack.Children.Add(new TextBlock
+                    {
+                        Text = item.Evidence,
+                        FontSize = 10.5,
+                        Foreground = GetThemeBrush("SystemFillColorCautionBrush"),
                         TextTrimming = TextTrimming.CharacterEllipsis
                     });
                 }
@@ -2503,8 +2574,19 @@ namespace CleanC.UI
                 DriversErrorCountText.Text = $"{stats.ErrorCount} خطا";
                 DriversDuplicateCountText.Text = $"{stats.DuplicateOldCount} بسته";
 
-                DriversDuplicateBanner.Visibility = stats.DuplicateOldCount > 0 ? Visibility.Visible : Visibility.Collapsed;
-                if (stats.DuplicateOldCount > 0)
+                // D14 — بنر خلاصه هم تکراری/قدیمی ها را پوشش می دهد هم بسته های بدون سخت افزار
+                bool hasDuplicates = stats.DuplicateOldCount > 0;
+                bool hasOrphans = stats.OrphanNoHardwareCount > 0;
+                DriversDuplicateBanner.Visibility = (hasDuplicates || hasOrphans) ? Visibility.Visible : Visibility.Collapsed;
+                if (hasDuplicates && hasOrphans)
+                {
+                    DriversDuplicateBannerTitle.Text = $"شناسایی {stats.DuplicateOldCount} بسته تکراری و قدیمی + {stats.OrphanNoHardwareCount} بسته بدون سخت افزار در DriverStore ویندوز";
+                }
+                else if (hasOrphans)
+                {
+                    DriversDuplicateBannerTitle.Text = $"شناسایی {stats.OrphanNoHardwareCount} بسته بدون سخت افزار (بازمانده ی دستگاه های جدا شده) در DriverStore ویندوز";
+                }
+                else if (hasDuplicates)
                 {
                     DriversDuplicateBannerTitle.Text = $"شناسایی {stats.DuplicateOldCount} بسته تکراری و قدیمی در DriverStore ویندوز";
                 }
@@ -2645,11 +2727,42 @@ namespace CleanC.UI
                     FlowDirection = FlowDirection.LeftToRight
                 });
 
+                // شاهد D14 — «چرا» این بسته بدون سخت افزار تشخیص داده شد
+                if (d.IsOrphanNoHardware && !string.IsNullOrEmpty(d.Evidence))
+                {
+                    textStack.Children.Add(new TextBlock
+                    {
+                        Text = d.Evidence,
+                        FontSize = 10.5,
+                        Foreground = GetThemeBrush("SystemFillColorCautionBrush"),
+                        TextTrimming = TextTrimming.CharacterEllipsis
+                    });
+                }
+
                 Grid.SetColumn(textStack, 2);
                 grid.Children.Add(textStack);
 
                 // Status Badge & Action
                 var rightStack = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8, VerticalAlignment = VerticalAlignment.Center };
+
+                // D14 — نشان بسته ی بدون سخت افزار (یتیم) کنار وضعیت سلامت
+                if (d.IsOrphanNoHardware)
+                {
+                    var orphanBadge = new Border
+                    {
+                        CornerRadius = new CornerRadius(5),
+                        Padding = new Thickness(8, 2, 8, 2),
+                        Background = GetThemeBrush("AppCardSecondaryBrush")
+                    };
+                    orphanBadge.Child = new TextBlock
+                    {
+                        Text = "بدون سخت افزار",
+                        FontSize = 10,
+                        FontWeight = Microsoft.UI.Text.FontWeights.SemiBold,
+                        Foreground = GetThemeBrush("SystemFillColorCautionBrush")
+                    };
+                    rightStack.Children.Add(orphanBadge);
+                }
                 
                 var badge = new Border
                 {
@@ -2668,7 +2781,7 @@ namespace CleanC.UI
                 };
                 rightStack.Children.Add(badge);
 
-                if (d.IsDuplicateOldVersion)
+                if (d.IsDuplicateOldVersion || d.IsOrphanNoHardware)
                 {
                     var delBtn = new Button
                     {
@@ -2768,11 +2881,19 @@ namespace CleanC.UI
 
         private async Task DeleteSingleDriverAsync(DriverItem driver)
         {
+            // متن تأیید بر اساس نوع تشخیص (تکراری/قدیمی در برابر بدون سخت افزار) تنظیم می شود
+            string dialogTitle = driver.IsOrphanNoHardware && !driver.IsDuplicateOldVersion
+                ? $"حذف بسته بدون سخت افزار {driver.PublishedName}"
+                : $"حذف درایور قدیمی {driver.PublishedName}";
+            string dialogContent = driver.IsOrphanNoHardware && !driver.IsDuplicateOldVersion
+                ? $"بسته '{driver.PublishedName}' متعلق به سخت افزاری است که دیگر به سیستم متصل نیست.\nآیا از حذف این بسته اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد."
+                : $"آیا از حذف بسته درایور قدیمی '{driver.OriginalName}' ({driver.PublishedName}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.";
+
             var dialog = new ContentDialog
             {
                 XamlRoot = this.Content.XamlRoot,
-                Title = $"حذف درایور قدیمی {driver.PublishedName}",
-                Content = $"آیا از حذف بسته درایور قدیمی '{driver.OriginalName}' ({driver.PublishedName}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.",
+                Title = dialogTitle,
+                Content = dialogContent,
                 PrimaryButtonText = "حذف ایمن",
                 CloseButtonText = "انصراف",
                 DefaultButton = ContentDialogButton.Primary

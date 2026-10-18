@@ -255,9 +255,13 @@ namespace CleanC.Core.Services
                     // چون برخلاف مقدارِ Run، خاموش کردنشان ممکن است سرویسی را از کار بیندازد.
                     if (item.IsRunOnce || item.IsScheduledTask || item.IsUwpStartupTask) continue;
 
-                    bool candidate = aggressive
-                        ? (item.IsNonEssential && !item.IsDisabled)
-                        : (!item.IsDisabled && IsSafeToAutoDisable(item.Name, item.Command));
+                    // D12 (T2 — پیش‌فرض روشن با مدرک قطعی): استارتاپ یتیم؛ مسیر exe
+                    // resolve شد ولی فایل روی دیسک نیست. غیرفعال کردنش فقط یک ورودی
+                    // مرده را خنثی می کند، پس بدون نیاز به هیوریستیک نام‌محور کاندید است.
+                    bool candidate = item.TargetMissing
+                        || (aggressive
+                            ? (item.IsNonEssential && !item.IsDisabled)
+                            : (!item.IsDisabled && IsSafeToAutoDisable(item.Name, item.Command)));
 
                     if (candidate)
                     {
