@@ -29,7 +29,7 @@ namespace CleanC.Core.Services
                     Path.Combine(userProfile, "AppData", "Local", "Temp"),
                     Path.Combine(userProfile, "AppData", "Local", "CrashDumps"),
                     Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "Temp")
-                }.Where(Directory.Exists).ToList();
+                }.Where(d => Directory.Exists(d) && !LockRegistryService.IsUserLockedPath(d)).ToList();
 
                 var enumOptions = new EnumerationOptions
                 {
@@ -72,6 +72,10 @@ namespace CleanC.Core.Services
                                     try
                                     {
                                         string fullName = subDir.FullName;
+
+                                        // قفل کاربر: پوشه های قفل شده پیشنهاد نمی شوند
+                                        if (LockRegistryService.IsUserLockedPath(fullName)) continue;
+
                                         if (fullName.Contains(".git", StringComparison.OrdinalIgnoreCase) ||
                                             fullName.Contains(".vs", StringComparison.OrdinalIgnoreCase) ||
                                             fullName.Contains(".idea", StringComparison.OrdinalIgnoreCase) ||
@@ -113,6 +117,9 @@ namespace CleanC.Core.Services
                         {
                             try
                             {
+                                // قفل کاربر: فایل های قفل شده (یا داخل پوشه ی قفل شده) پیشنهاد نمی شوند
+                                if (LockRegistryService.IsUserLockedPath(file.FullName)) continue;
+
                                 long size = file.Length;
                                 string ext = file.Extension;
                                 string name = file.Name;

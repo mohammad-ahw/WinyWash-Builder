@@ -207,6 +207,10 @@ namespace CleanC.Core.Services
         private static bool IsProtectedSystemPath(string path)
         {
             if (string.IsNullOrWhiteSpace(path)) return true;
+
+            // وتوی قفل کاربر — مسیری که کاربر قفل کرده حتی اگر زباله ی سیستمی باشد پاک نمی شود
+            if (LockRegistryService.IsUserLockedPath(path)) return true;
+
             try
             {
                 string full = Path.GetFullPath(path).TrimEnd('\\', '/');

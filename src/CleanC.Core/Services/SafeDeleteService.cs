@@ -260,6 +260,14 @@ namespace CleanC.Core.Services
 
             if (string.IsNullOrWhiteSpace(path)) { result.Outcome = SafeDeleteOutcome.NotFound; return result; }
 
+            // وتوی قفل کاربر: مسیری که کاربر قفل کرده حتی از Deep Cleanup هم حذف نمی شود
+            if (LockRegistryService.IsUserLockedPath(path))
+            {
+                result.Outcome = SafeDeleteOutcome.Failed;
+                result.Error = "این مسیر توسط کاربر قفل شده است";
+                return result;
+            }
+
             try
             {
                 bool fileExists = !isDirectory && File.Exists(path);

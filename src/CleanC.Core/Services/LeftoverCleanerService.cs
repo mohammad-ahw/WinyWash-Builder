@@ -17,49 +17,9 @@ namespace CleanC.Core.Services
 
     public class LeftoverCleanerService
     {
-        // Protected vendor & system directories that should NEVER be considered leftovers
-        private static readonly HashSet<string> ProtectedNames = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "Microsoft", "Windows", "WindowsApps", "Packages", "Common Files", "Internet Explorer",
-            "NVIDIA Corporation", "NVIDIA", "AMD", "Intel", "Realtek", "Synaptics", "Google",
-            "Mozilla", "CleanC", "Git", "dotnet", "Adobe", "Steam", "Epic Games", "Discord",
-            "Telegram Desktop", "Spotify", "Temp", "CrashDumps", "Programs", "System",
-            "Downloaded Installations", "Package Cache", "OEM", "ASUS", "Lenovo", "Dell", "HP", "MSI",
-            "PowerShell", "dotnet-tools", "yarn", "npm", "pip", "vcpkg", "VirtualStore",
-            "Apple", "Apple Computer", "Sony", "Logitech", "Corsair", "Razer", "SteelSeries",
-            "Kingston", "Samsung", "Crucial", "Western Digital", "Seagate", "Oracle", "Java",
-            "Android", "JetBrains", "Unity", "EpicGamesLauncher"
-        };
-
-        // Protected personal, system, and workspace folders in C:\Users\<Username> that must NEVER be touched under any circumstances
-        private static readonly HashSet<string> ProtectedUserProfileFolders = new(StringComparer.OrdinalIgnoreCase)
-        {
-            // Standard Windows Shell & User data folders
-            "Desktop", "Documents", "Downloads", "Pictures", "Music", "Videos",
-            "Favorites", "Links", "Contacts", "Searches", "Saved Games", "3D Objects",
-            "OneDrive", "AppData", "Cookies", "NetHood", "PrintHood", "Recent", "SendTo",
-            "Start Menu", "Templates", "Application Data", "Local Settings", "My Documents",
-
-            // User Work, Code Repositories, and Cloud Sync folders
-            "Projects", "Source", "source", "Repos", "repos", "Workspace", "workspace",
-            "Development", "Codes", "Code", "Work", "my files", "Dropbox", "Google Drive",
-            "iCloudDrive", "Virtual Machines", "VMs", "Box", "Creative Cloud Files",
-
-            // Active Developer & System Tools dot-directories
-            ".ssh", ".git", ".gemini", ".antigravity", ".antigravity-code", ".vscode",
-            ".vscode-insiders", ".cursor", ".copilot", ".claude", ".openai", ".npm",
-            ".node", ".yarn", ".nuget", ".dotnet", ".cargo", ".rustup", ".conda",
-            ".anaconda", ".jupyter", ".matplotlib", ".aws", ".azure", ".kube", ".docker",
-            ".config", ".local", ".gnupg", ".pki", ".platformio", ".android", ".gradle",
-            ".m2", ".atom", ".eclipse"
-        };
-
-        // Protected folders in C:\Users\Public
-        private static readonly HashSet<string> ProtectedPublicFolders = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "Desktop", "Documents", "Downloads", "Pictures", "Music", "Videos",
-            "Libraries", "AccountPictures", "Recorded Calls"
-        };
+        // توجه: سه لیست حفاظتی قبلی (ProtectedNames / ProtectedUserProfileFolders /
+        // ProtectedPublicFolders) به LockRegistryService منتقل شدند تا منبع واحدِ «قفل»
+        // برای همه ی دیتکتورها وجود داشته باشد. رفتار معادل، اتحاد همان نام هاست.
 
         // Extensions that identify personal user documents, media, or source code projects - if found, folder is NEVER a leftover!
         private static readonly HashSet<string> PersonalDocumentExtensions = new(StringComparer.OrdinalIgnoreCase)
@@ -130,7 +90,7 @@ namespace CleanC.Core.Services
                 {
                     string dirName = Path.GetFileName(dir);
 
-                    if (ProtectedNames.Contains(dirName)) continue;
+                    if (LockRegistryService.IsProtectedName(dirName)) continue;
                     if (dirName.StartsWith(".") || dirName.StartsWith("$")) continue;
 
                     // Skip junctions / symlinks
@@ -184,7 +144,7 @@ namespace CleanC.Core.Services
                     string dirName = Path.GetFileName(dir);
 
                     // 1. Never touch protected user folders (Documents, Desktop, Downloads, Projects, .ssh, .git, etc.)
-                    if (ProtectedUserProfileFolders.Contains(dirName) || ProtectedNames.Contains(dirName))
+                    if (LockRegistryService.IsProtectedName(dirName))
                         continue;
 
                     // 2. Ignore system or hidden NTUSER/desktop files/junctions
@@ -253,7 +213,7 @@ namespace CleanC.Core.Services
                 {
                     string dirName = Path.GetFileName(dir);
 
-                    if (ProtectedPublicFolders.Contains(dirName) || ProtectedNames.Contains(dirName))
+                    if (LockRegistryService.IsProtectedName(dirName))
                         continue;
 
                     try
@@ -541,9 +501,7 @@ namespace CleanC.Core.Services
                 string dirName = Path.GetFileName(full);
 
                 if (string.IsNullOrEmpty(dirName)) return false;
-                if (ProtectedNames.Contains(dirName)) return false;
-                if (ProtectedUserProfileFolders.Contains(dirName)) return false;
-                if (ProtectedPublicFolders.Contains(dirName)) return false;
+                if (LockRegistryService.IsProtectedName(dirName)) return false;
                 if (dirName.StartsWith(".") || dirName.StartsWith("$")) return false;
 
                 // فقط یک سطح زیر ریشه مجاز (دقیقاً همان چیزی که اسکنر دیده)

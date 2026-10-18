@@ -31,8 +31,10 @@ namespace CleanC.Core.Services
                     @"C:\Tools"
                 };
 
-                // Add existing folders to list
-                var activeFolders = scanFolders.Where(Directory.Exists).ToList();
+                // Add existing folders to list (پوشه های قفل شده توسط کاربر اسکن نمی شوند)
+                var activeFolders = scanFolders
+                    .Where(f => Directory.Exists(f) && !LockRegistryService.IsUserLockedPath(f))
+                    .ToList();
 
                 var enumOptions = new EnumerationOptions
                 {
@@ -51,6 +53,9 @@ namespace CleanC.Core.Services
                         {
                             try
                             {
+                                // قفل کاربر: فایل های داخل محدوده ی قفل شده پیشنهاد نمی شوند
+                                if (LockRegistryService.IsUserLockedPath(file.FullName)) continue;
+
                                 if (file.Length >= minSizeBytes)
                                 {
                                     results.Add(new LargeFileInfo
@@ -88,6 +93,7 @@ namespace CleanC.Core.Services
             try
             {
                 if (!File.Exists(filePath)) return false;
+                if (LockRegistryService.IsUserLockedPath(filePath)) return false;
 
                 var fi = new FileInfo(filePath);
                 if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden)) != 0)
