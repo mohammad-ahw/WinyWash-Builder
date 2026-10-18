@@ -809,21 +809,8 @@ namespace CleanC.UI
             string query = UninstallerSearchBox.Text?.Trim() ?? string.Empty;
             int sortIndex = UninstallerSortBox.SelectedIndex;
 
-            var filtered = string.IsNullOrEmpty(query)
-                ? apps
-                : apps.Where(a => a.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase) ||
-                                  a.Publisher.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
-
-            // Sort
-            filtered = sortIndex switch
-            {
-                1 => filtered.OrderByDescending(a => a.EstimatedSizeBytes).ToList(),
-                2 => filtered.OrderBy(a => a.DisplayName).ToList(),
-                _ => filtered.OrderByDescending(a => a.ParsedInstallDate.HasValue)
-                             .ThenByDescending(a => a.ParsedInstallDate ?? DateTime.MinValue)
-                             .ThenBy(a => a.DisplayName)
-                             .ToList()
-            };
+            // C6: فیلتر/مرتب‌سازی در Core تست‌پذیر شد (AppListQuery)
+            var filtered = AppListQuery.Sort(AppListQuery.Filter(apps, query), sortIndex);
 
             // B3: ساخت ViewModel به جای ساخت دستی کارت ها — ListView فقط کارت های داخل viewport را واقعی می کند
             Brush normalCardBrush = GetThemeBrush("AppCardBorderBrush");
@@ -905,9 +892,8 @@ namespace CleanC.UI
         {
             if (_allInstalledApps == null) return;
             string query = UninstallerSearchBox?.Text?.Trim() ?? string.Empty;
-            var targetList = string.IsNullOrEmpty(query) 
-                ? _allInstalledApps 
-                : _allInstalledApps.Where(a => a.DisplayName.Contains(query, StringComparison.OrdinalIgnoreCase)).ToList();
+            // C6: همان فیلتر لیست (نام + ناشر) تا «انتخاب همه» دقیقاً موارد دیده‌شده را انتخاب کند
+            var targetList = AppListQuery.Filter(_allInstalledApps, query);
 
             foreach (var app in targetList) app.IsSelected = true;
             FilterAndRenderApps();

@@ -625,27 +625,10 @@ namespace CleanC.UI
         {
             if (_deepScanResult == null) return;
 
-            int selectedCount = 0;
-            long selectedBytes = 0;
-
-            switch (_deepStorageActiveTab)
-            {
-                case "duplicates":
-                    selectedCount = _deepScanResult.Duplicates.SelectMany(g => g.Files).Count(f => f.IsSelectedForDeletion);
-                    selectedBytes = _deepScanResult.Duplicates.SelectMany(g => g.Files).Where(f => f.IsSelectedForDeletion).Sum(f => f.SizeBytes);
-                    break;
-                case "empty_folders":
-                    selectedCount = _deepScanResult.EmptyFolders.Count(f => f.IsSelected);
-                    break;
-                case "mess":
-                    selectedCount = _deepScanResult.MessItems.Count(m => m.IsSelected);
-                    selectedBytes = _deepScanResult.MessItems.Where(m => m.IsSelected).Sum(m => m.SizeBytes);
-                    break;
-                case "large_files":
-                    selectedCount = _deepScanResult.LargeFiles.Count(l => l.IsSelected);
-                    selectedBytes = _deepScanResult.LargeFiles.Where(l => l.IsSelected).Sum(l => l.SizeBytes);
-                    break;
-            }
+            // C6: جمع‌بندی در Core تست‌پذیر شد (DeepStorageSelection)
+            var summary = DeepStorageSelection.Summarize(_deepScanResult, _deepStorageActiveTab);
+            int selectedCount = summary.Count;
+            long selectedBytes = summary.Bytes;
 
             if (DeepStorageSelectedCountText != null)
             {
@@ -661,32 +644,19 @@ namespace CleanC.UI
         /// </summary>
         private async Task<bool> ConfirmDeepStorageBatchDeleteAsync()
         {
-            int count = 0;
-            long bytes = 0;
-            string title = "";
+            // C6: تعداد/حجم از منبع حقیقت مشترک؛ فقط عنوان مخصوص هر تب اینجا می ماند
+            var summary = DeepStorageSelection.Summarize(_deepScanResult, _deepStorageActiveTab);
+            int count = summary.Count;
+            long bytes = summary.Bytes;
 
-            switch (_deepStorageActiveTab)
+            string title = _deepStorageActiveTab switch
             {
-                case "duplicates":
-                    count = _deepScanResult!.Duplicates.SelectMany(g => g.Files).Count(f => f.IsSelectedForDeletion);
-                    bytes = _deepScanResult.Duplicates.SelectMany(g => g.Files).Where(f => f.IsSelectedForDeletion).Sum(f => f.SizeBytes);
-                    title = "پاکسازی فایل های تکراری";
-                    break;
-                case "empty_folders":
-                    count = _deepScanResult!.EmptyFolders.Count(f => f.IsSelected);
-                    title = "پاکسازی پوشه های خالی";
-                    break;
-                case "mess":
-                    count = _deepScanResult!.MessItems.Count(m => m.IsSelected);
-                    bytes = _deepScanResult.MessItems.Where(m => m.IsSelected).Sum(m => m.SizeBytes);
-                    title = "سازماندهی دانلودها و دسکتاپ";
-                    break;
-                case "large_files":
-                    count = _deepScanResult!.LargeFiles.Count(l => l.IsSelected);
-                    bytes = _deepScanResult.LargeFiles.Where(l => l.IsSelected).Sum(l => l.SizeBytes);
-                    title = "پاکسازی فایل های حجیم";
-                    break;
-            }
+                "duplicates" => "پاکسازی فایل های تکراری",
+                "empty_folders" => "پاکسازی پوشه های خالی",
+                "mess" => "سازماندهی دانلودها و دسکتاپ",
+                "large_files" => "پاکسازی فایل های حجیم",
+                _ => ""
+            };
 
             if (count == 0)
             {
