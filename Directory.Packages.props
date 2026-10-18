@@ -14,6 +14,8 @@
     <PackageVersion Include="Microsoft.Data.Sqlite" Version="10.0.12" />
     <!-- F6: خواندن EventID=101 از Microsoft-Windows-Diagnostics-Performance برای Impact Score -->
     <PackageVersion Include="System.Diagnostics.EventLog" Version="10.0.12" />
+    <!-- فاز ۳: مدیریت سرویس های ویندوز با API بومی (جایگزین sc.exe/net.exe در TelemetryOptimizer و WindowsUpdate) -->
+    <PackageVersion Include="System.ServiceProcess.ServiceController" Version="10.0.12" />
 
     <!-- CleanC.UI -->
     <PackageVersion Include="Microsoft.WindowsAppSDK" Version="2.5.1" />

@@ -51,9 +51,16 @@ namespace CleanC.Core.Services
 
             return await Task.Run(() =>
             {
+                // تغییر حرف درایو با اسکریپت diskpart انجام می شود؛ fallback قبلی با
+                // PowerShell + ExecutionPolicy Bypass برای آنتی ویروس الگوی مشکوکی بود
+                string tempScript = Path.Combine(Path.GetTempPath(), $"chgletter_{Guid.NewGuid():N}.txt");
+                string scriptContent = $"select volume {oldLetter}\r\nassign letter={newLetter}\r\n";
+
                 try
                 {
-                    var psi = new ProcessStartInfo("powershell.exe", $"-NoProfile -ExecutionPolicy Bypass -Command \"Get-Partition -DriveLetter {oldLetter} | Set-Partition -NewDriveLetter {newLetter}\"")
+                    File.WriteAllText(tempScript, scriptContent);
+
+                    var psi = new ProcessStartInfo("diskpart.exe", $"/s \"{tempScript}\"")
                     {
                         RedirectStandardOutput = true,
                         RedirectStandardError = true,
@@ -64,19 +71,27 @@ namespace CleanC.Core.Services
                     using var p = Process.Start(psi);
                     if (p == null) return (false, "عدم توانایی در فراخوانی ابزار مدیریت پارتیشن.");
 
-                    string err = p.StandardError.ReadToEnd();
-                    p.WaitForExit(8000);
+                    p.WaitForExit(15000);
 
-                    if (p.ExitCode == 0)
+                    // خروجی diskpart برای پارتیشن های داده قفل/محافظت شده همیشه خطا برنمی گرداند؛
+                    // بنابراین نتیجه ی واقعی از خود سیستم خوانده می شود (نه از exit code)
+                    bool newLetterExists = DriveInfo.GetDrives().Any(d =>
+                        d.Name.StartsWith(newLetter, StringComparison.OrdinalIgnoreCase));
+
+                    if (newLetterExists)
                     {
                         return (true, $"حرف درایو با موفقیت از {oldLetter}: به {newLetter}: تغییر یافت.");
                     }
 
-                    return (false, $"خطا در تغییر حرف درایو: {err}".Trim());
+                    return (false, "تغییر حرف درایو انجام نشد — احتمالاً پارتیشن در حال استفاده یا رزرو شده است.");
                 }
                 catch (Exception ex)
                 {
                     return (false, $"خطای سیستمی: {ex.Message}");
+                }
+                finally
+                {
+                    try { File.Delete(tempScript); } catch (Exception __ex) { CcLog.Ignore(__ex); }
                 }
             });
         }

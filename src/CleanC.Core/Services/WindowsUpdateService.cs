@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
+using System.ServiceProcess;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -461,28 +461,27 @@ namespace CleanC.Core.Services
             try
             {
                 int startMode = enable ? 2 : 4; // 2 = Automatic, 4 = Disabled
-                using var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\wuauserv", true);
-                if (key != null)
+                using (var key = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services\wuauserv", true))
                 {
-                    key.SetValue("Start", startMode, RegistryValueKind.DWord);
+                    key?.SetValue("Start", startMode, RegistryValueKind.DWord);
                 }
 
-                string arg = enable ? "config wuauserv start= auto" : "config wuauserv start= disabled";
-                RunCommandSilent("sc.exe", arg);
-
+                // جایگزین sc.exe / net.exe — از API مدیریت سرویس ویندوز استفاده می شود
+                // تا زنجیره ی فرمان های مشکوک برای آنتی ویروس حذف شود
                 if (enable)
                 {
-                    RunCommandSilent("net.exe", "start wuauserv");
+                    StartService("wuauserv");
                 }
                 else
                 {
-                    RunCommandSilent("net.exe", "stop wuauserv /y");
+                    StopService("wuauserv");
                 }
 
                 return true;
             }
-            catch
+            catch (Exception __ex)
             {
+                CcLog.Ignore(__ex, "WindowsUpdate.SetServiceState");
                 return false;
             }
         }
@@ -495,9 +494,9 @@ namespace CleanC.Core.Services
 
                 try
                 {
-                    // 1. Stop services
-                    RunCommandSilent("net.exe", "stop wuauserv /y");
-                    RunCommandSilent("net.exe", "stop bits /y");
+                    // 1. توقف سرویس ها از طریق ServiceController (جایگزین net.exe stop)
+                    StopService("wuauserv");
+                    StopService("bits");
 
                     // 2. Clear SoftwareDistribution
                     string distPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Windows), "SoftwareDistribution");
@@ -518,36 +517,54 @@ namespace CleanC.Core.Services
                         }
                     }
 
-                    // 3. Restart services
-                    RunCommandSilent("net.exe", "start bits");
-                    RunCommandSilent("net.exe", "start wuauserv");
+                    // 3. روشن کردن مجدد سرویس ها
+                    StartService("bits");
+                    StartService("wuauserv");
 
                     return (true, freed, $"کش آپدیت با موفقیت تخلیه گردید و سرویس ها نوسازی شدند. ({Models.SystemStats.FormatBytes(freed)} آزاد شد)");
                 }
                 catch (Exception ex)
                 {
                     // Ensure services restarted
-                    RunCommandSilent("net.exe", "start wuauserv");
+                    StartService("wuauserv");
                     return (false, freed, $"خطا در پاکسازی: {ex.Message}");
                 }
             });
         }
 
-        private static void RunCommandSilent(string exe, string args)
+        /// <summary>توقف سرویس ویندوز با API مدیریت سرویس (جایگزین net.exe stop).</summary>
+        private static void StopService(string serviceName)
         {
             try
             {
-                var psi = new ProcessStartInfo(exe, args)
+                using var sc = new ServiceController(serviceName);
+                if (sc.Status != ServiceControllerStatus.Stopped && sc.Status != ServiceControllerStatus.StopPending)
                 {
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                using var p = Process.Start(psi);
-                p?.WaitForExit(5000);
+                    sc.Stop();
+                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(20));
+                }
             }
             catch (Exception __ex)
             {
-                CcLog.Ignore(__ex);
+                CcLog.Ignore(__ex, $"WindowsUpdate.StopService.{serviceName}");
+            }
+        }
+
+        /// <summary>روشن کردن سرویس ویندوز با API مدیریت سرویس (جایگزین net.exe start).</summary>
+        private static void StartService(string serviceName)
+        {
+            try
+            {
+                using var sc = new ServiceController(serviceName);
+                if (sc.Status == ServiceControllerStatus.Stopped)
+                {
+                    sc.Start();
+                    sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(20));
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex, $"WindowsUpdate.StartService.{serviceName}");
             }
         }
 

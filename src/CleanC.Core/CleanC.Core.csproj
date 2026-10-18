@@ -12,9 +12,11 @@
   <ItemGroup>
     <!-- System.Management for WMI/DXDIAG and Microsoft.Data.Sqlite for reading the USO store.db in WindowsUpdateService -->
     <!-- System.Diagnostics.EventLog for reading boot degradation events (EventID=101) used by BootImpactService -->
+    <!-- System.ServiceProcess.ServiceController for native service management (TelemetryOptimizer/WindowsUpdate) -->
     <PackageReference Include="System.Management" />
     <PackageReference Include="Microsoft.Data.Sqlite" />
     <PackageReference Include="System.Diagnostics.EventLog" />
+    <PackageReference Include="System.ServiceProcess.ServiceController" />
   </ItemGroup>
 
   <ItemGroup>

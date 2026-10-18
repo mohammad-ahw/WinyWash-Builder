@@ -348,18 +348,15 @@ namespace CleanC.Core.Services
 
         public static async Task<bool> RemoveAppAsync(CandidateAppItem app)
         {
-            return await Task.Run(() =>
+            if (app.IsPackagedApp && !string.IsNullOrEmpty(app.PackageFullName))
             {
-                if (app.IsPackagedApp && !string.IsNullOrEmpty(app.PackageFullName))
-                {
-                    return RemoveAppxPackage(app.PackageFullName);
-                }
-                else if (!string.IsNullOrEmpty(app.UninstallString))
-                {
-                    return LaunchWin32Uninstaller(app.UninstallString);
-                }
-                return false;
-            });
+                return await RemoveAppxPackageAsync(app.PackageFullName);
+            }
+            if (!string.IsNullOrEmpty(app.UninstallString))
+            {
+                return await Task.Run(() => LaunchWin32Uninstaller(app.UninstallString));
+            }
+            return false;
         }
 
         public static async Task<List<CandidateAppItem>> ScanBorderlineReviewAppsAsync()
@@ -461,25 +458,29 @@ namespace CleanC.Core.Services
             return (removed, freed);
         }
 
-        private static bool RemoveAppxPackage(string packageFullName)
+        /// <summary>
+        /// حذف پکیج استور از طریق PackageManager ویندوز (جایگزین PowerShell + Remove-AppxPackage
+        /// که برای آنتی ویروس ها الگوی مشکوکی بود و نیاز به escape دستی کوتیشن داشت).
+        /// خطای واقعی حذف در ExtendedErrorCode نتیجه برمی گردد؛ حذف سنگین ممکن است
+        /// چند ده ثانیه طول بکشد و این متد تا پایان آن await می ماند.
+        /// </summary>
+        private static async Task<bool> RemoveAppxPackageAsync(string packageFullName)
         {
             try
             {
-                // کوتیشن تک داخل نام پکیج باید برای PowerShell escape شود تا فرمان نشکند (تزریق فرمان)
-                string escapedName = packageFullName.Replace("'", "''");
-                var psi = new ProcessStartInfo("powershell", $"-NoProfile -Command \"Remove-AppxPackage -Package '{escapedName}'\"")
+                var packageManager = new Windows.Management.Deployment.PackageManager();
+                var result = await packageManager.RemovePackageAsync(packageFullName);
+                if (result.ExtendedErrorCode != null)
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using var p = Process.Start(psi);
-                // حذف پکیج سنگین (مثلاً اپ فایننس دستی) می تواند چند ده ثانیه طول بکشد؛
-                // تایم اوت ۱۵ ثانیه پیش‌خوان، حذف در حال پیشرفت را «شکست» حساب می کرد
-                // و ExitCode پردازه هنوز زنده خوانده می شود -> خطای InvalidOperationException
-                return CleanC.Core.Native.ProcessRunner.WaitAndKillOnTimeout(p, 120000, out int code) && code == 0;
+                    CcLog.Report("Bloatware.Appx", new InvalidOperationException(
+                        $"حذف {packageFullName} ناموفق بود: {result.ExtendedErrorCode.Message}"));
+                    return false;
+                }
+                return true;
             }
-            catch
+            catch (Exception __ex)
             {
+                CcLog.Ignore(__ex, "Bloatware.Appx");
                 return false;
             }
         }

@@ -1,5 +1,5 @@
 using System;
-using System.Diagnostics;
+using System.ServiceProcess;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
@@ -27,20 +27,22 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        public static void SetDiagTrackDisabled(bool disable)
+        public static bool SetDiagTrackDisabled(bool disable)
         {
             try
             {
+                bool ok1;
                 if (disable)
                 {
-                    StopAndDisableService("DiagTrack");
+                    ok1 = StopAndDisableService("DiagTrack");
+                    // سرویس جانبی؛ روی بیلد های جدید ویندوز حذف شده و نبودنش طبیعی است
                     StopAndDisableService("dmwappushservice");
                     using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection");
                     key?.SetValue("AllowTelemetry", 0, RegistryValueKind.DWord);
                 }
                 else
                 {
-                    EnableAndStartService("DiagTrack");
+                    ok1 = EnableAndStartService("DiagTrack");
                     EnableAndStartService("dmwappushservice");
                     // مقدار AllowTelemetry را حذف می کنیم تا Windows به پیش فرض edition خودش
                     // (Home/Pro=Basic(1)، Enterprise/Education=0) برگردد.
@@ -49,10 +51,14 @@ namespace CleanC.Core.Services
                     using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection");
                     key?.DeleteValue("AllowTelemetry", false);
                 }
+
+                // ملاک اصلی موفقیت، سرویس DiagTrack است (سرویس اصلی تله متری ویندوز)
+                return ok1;
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
+                return false;
             }
         }
 
@@ -76,7 +82,7 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        public static void SetBingSearchDisabled(bool disable)
+        public static bool SetBingSearchDisabled(bool disable)
         {
             try
             {
@@ -88,10 +94,12 @@ namespace CleanC.Core.Services
                 {
                     k2?.SetValue("BingSearchEnabled", disable ? 0 : 1, RegistryValueKind.DWord);
                 }
+                return true;
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
+                return false;
             }
         }
 
@@ -111,16 +119,18 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        public static void SetAdvertisingIdDisabled(bool disable)
+        public static bool SetAdvertisingIdDisabled(bool disable)
         {
             try
             {
                 using var key = Registry.CurrentUser.CreateSubKey(@"Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo");
                 key?.SetValue("Enabled", disable ? 0 : 1, RegistryValueKind.DWord);
+                return true;
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
+                return false;
             }
         }
 
@@ -140,17 +150,19 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        public static void SetActivityHistoryDisabled(bool disable)
+        public static bool SetActivityHistoryDisabled(bool disable)
         {
             try
             {
                 using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\System");
                 key?.SetValue("PublishUserActivities", disable ? 0 : 1, RegistryValueKind.DWord);
                 key?.SetValue("EnableActivityFeed", disable ? 0 : 1, RegistryValueKind.DWord);
+                return true;
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
+                return false;
             }
         }
 
@@ -170,7 +182,7 @@ namespace CleanC.Core.Services
             return false;
         }
 
-        public static void SetFeedbackTrackingDisabled(bool disable)
+        public static bool SetFeedbackTrackingDisabled(bool disable)
         {
             try
             {
@@ -182,10 +194,12 @@ namespace CleanC.Core.Services
                 {
                     k2?.SetValue("NumberOfSIUFInPeriod", disable ? 0 : 1, RegistryValueKind.DWord);
                 }
+                return true;
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex);
+                return false;
             }
         }
 
@@ -194,12 +208,13 @@ namespace CleanC.Core.Services
         {
             return await Task.Run(() =>
             {
+                // شمارش فقط برای مواردی که واقعاً اعمال شده اند (به جای شمارش تلاش ها)
                 int count = 0;
-                SetDiagTrackDisabled(true); count++;
-                SetBingSearchDisabled(true); count++;
-                SetAdvertisingIdDisabled(true); count++;
-                SetActivityHistoryDisabled(true); count++;
-                SetFeedbackTrackingDisabled(true); count++;
+                if (SetDiagTrackDisabled(true)) count++;
+                if (SetBingSearchDisabled(true)) count++;
+                if (SetAdvertisingIdDisabled(true)) count++;
+                if (SetActivityHistoryDisabled(true)) count++;
+                if (SetFeedbackTrackingDisabled(true)) count++;
                 return count;
             });
         }
@@ -209,11 +224,11 @@ namespace CleanC.Core.Services
             return await Task.Run(() =>
             {
                 int count = 0;
-                SetDiagTrackDisabled(false); count++;
-                SetBingSearchDisabled(false); count++;
-                SetAdvertisingIdDisabled(false); count++;
-                SetActivityHistoryDisabled(false); count++;
-                SetFeedbackTrackingDisabled(false); count++;
+                if (SetDiagTrackDisabled(false)) count++;
+                if (SetBingSearchDisabled(false)) count++;
+                if (SetAdvertisingIdDisabled(false)) count++;
+                if (SetActivityHistoryDisabled(false)) count++;
+                if (SetFeedbackTrackingDisabled(false)) count++;
                 return count;
             });
         }
@@ -223,58 +238,86 @@ namespace CleanC.Core.Services
             return IsDiagTrackDisabled();
         }
 
+        /// <summary>
+        /// غیرفعال کردن نوع راه اندازی سرویس از طریق رجیستری و توقف آن با ServiceController
+        /// (جایگزین sc.exe که الگوی مشکوک آنتی ویروسی داشت). خروجی true یعنی سرویس واقعاً
+        /// در حالت Disabled ثبت شد؛ روی بیلد هایی که سرویس وجود ندارد false برمی گردد.
+        /// </summary>
         private static bool StopAndDisableService(string serviceName)
         {
+            bool registryChanged = false;
             try
             {
-                var psiConfig = new ProcessStartInfo("sc.exe", $"config {serviceName} start= disabled")
+                using (var key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", true))
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using var p1 = Process.Start(psiConfig);
-                p1?.WaitForExit(3000);
+                    if (key != null)
+                    {
+                        key.SetValue("Start", 4, RegistryValueKind.DWord); // 4 = Disabled
+                        registryChanged = true;
+                    }
+                }
 
-                var psiStop = new ProcessStartInfo("sc.exe", $"stop {serviceName}")
+                using var sc = new ServiceController(serviceName);
+                if (sc.Status != ServiceControllerStatus.Stopped)
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using var p2 = Process.Start(psiStop);
-                p2?.WaitForExit(3000);
+                    try
+                    {
+                        sc.Stop();
+                        sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(12));
+                    }
+                    catch (Exception __ex)
+                    {
+                        // سرویس هست ولی متوقف نشد (مثلاً Protected Process)؛
+                        // تغییر نوع راه اندازی به Disabled برای دفعات بعد کافی است
+                        CcLog.Ignore(__ex, $"Telemetry.StopService.{serviceName}");
+                    }
+                }
 
-                return true;
+                return registryChanged;
             }
-            catch
+            catch (Exception __ex)
             {
+                CcLog.Ignore(__ex, $"Telemetry.Service.{serviceName}");
                 return false;
             }
         }
 
+        /// <summary>
+        /// بازگرداندن سرویس به حالت Manual (پیش فرض DiagTrack) و روشن کردن آن.
+        /// </summary>
         private static bool EnableAndStartService(string serviceName)
         {
+            bool registryChanged = false;
             try
             {
-                var psiConfig = new ProcessStartInfo("sc.exe", $"config {serviceName} start= demand")
+                using (var key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", true))
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using var p1 = Process.Start(psiConfig);
-                p1?.WaitForExit(3000);
+                    if (key != null)
+                    {
+                        key.SetValue("Start", 3, RegistryValueKind.DWord); // 3 = Manual
+                        registryChanged = true;
+                    }
+                }
 
-                var psiStart = new ProcessStartInfo("sc.exe", $"start {serviceName}")
+                using var sc = new ServiceController(serviceName);
+                if (sc.Status == ServiceControllerStatus.Stopped)
                 {
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using var p2 = Process.Start(psiStart);
-                p2?.WaitForExit(3000);
+                    try
+                    {
+                        sc.Start();
+                        sc.WaitForStatus(ServiceControllerStatus.Running, TimeSpan.FromSeconds(12));
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex, $"Telemetry.StartService.{serviceName}");
+                    }
+                }
 
-                return true;
+                return registryChanged;
             }
-            catch
+            catch (Exception __ex)
             {
+                CcLog.Ignore(__ex, $"Telemetry.Service.{serviceName}");
                 return false;
             }
         }

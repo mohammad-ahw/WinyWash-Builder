@@ -52,7 +52,8 @@ namespace CleanC.Core.Services
                         CcLog.Ignore(__ex);
                     }
 
-                    // 2. Try native WMI
+                    // 2. نقطه بازگردانی فقط از طریق WMI ساخته می شود — fallback قبلی با
+                    // PowerShell (-ExecutionPolicy Bypass) به دلیل الگوی مشکوک برای آنتی ویروس حذف شد
                     try
                     {
                         var scope = new ManagementScope(@"\\localhost\root\default");
@@ -71,41 +72,14 @@ namespace CleanC.Core.Services
                             PruneOldRestorePoints(2);
                             return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند).");
                         }
-                    }
-                    catch (Exception __ex)
-                    {
-                        CcLog.Ignore(__ex);
-                    }
 
-                    // 3. Fallback to PowerShell Checkpoint-Computer
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Enable-ComputerRestore -Drive 'C:\\' -ErrorAction SilentlyContinue; Checkpoint-Computer -Description '{description}' -RestorePointType 'MODIFY_SETTINGS' -ErrorAction Stop\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true,
-                        RedirectStandardOutput = true,
-                        RedirectStandardError = true
-                    };
-
-                    using var ps = Process.Start(psi);
-                    if (ps != null)
-                    {
-                        ps.WaitForExit(45000);
-                        if (ps.ExitCode == 0)
-                        {
-                            PruneOldRestorePoints(2);
-                            return (true, "نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند).");
-                        }
-                        else
-                        {
-                            string err = ps.StandardError.ReadToEnd();
-                            if (string.IsNullOrWhiteSpace(err)) err = ps.StandardOutput.ReadToEnd();
-                            return (false, string.IsNullOrWhiteSpace(err) ? "خطا در ایجاد نقطه بازگردانی ویندوز." : err.Trim());
-                        }
+                        return (false, $"ویندوز ساخت نقطه بازگردانی را رد کرد (کد {returnCode}) — محافظت از سیستم (System Protection) را فعال کنید.");
                     }
-
-                    return (false, "عدم امکان اجرای دستور ساخت نقطه بازگردانی.");
+                    catch (Exception wmiEx)
+                    {
+                        CcLog.Ignore(wmiEx, "RestorePoint.WMI");
+                        return (false, "ساخت نقطه بازگردانی ناموفق بود: " + wmiEx.Message);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -151,25 +125,11 @@ namespace CleanC.Core.Services
                     }
                 }
             }
-            catch
+            catch (Exception __ex)
             {
-                // Fallback: PowerShell command to prune old shadow copies
-                try
-                {
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -ExecutionPolicy Bypass -Command \"Get-CimInstance Win32_ShadowCopy -ErrorAction SilentlyContinue | Sort-Object InstallDate | Select-Object -SkipLast {maxToKeep} | Remove-CimInstance -ErrorAction SilentlyContinue\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    using var ps = Process.Start(psi);
-                    ps?.WaitForExit(10000);
-                }
-                catch (Exception __ex)
-                {
-                    CcLog.Ignore(__ex);
-                }
+                // fallback قبلی (PowerShell + Bypass) حذف شد؛ اگر WMI در دسترس نباشد
+                // پاکسازی نقطه های قدیمی انجام نمی شود و فقط لاگ ثبت می شود
+                CcLog.Ignore(__ex, "RestorePoint.Prune");
             }
         }
     }

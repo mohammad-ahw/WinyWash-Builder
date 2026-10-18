@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Management;
 using System.Net.NetworkInformation;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
@@ -165,37 +166,31 @@ namespace CleanC.Core.Services
                         return (false, "هیچ کارت شبکه فعال متصل به اینترنت یافت نشد.");
                     }
 
-                    bool anySuccess = false;
+                    int okCount = 0;
+                    var errors = new List<string>();
                     foreach (var adapter in adapters)
                     {
-                        // 1. Set Primary
-                        var psiPrimary = new ProcessStartInfo("netsh", $"interface ipv4 set dnsservers name=\"{adapter}\" static {primaryDns} primary")
-                        {
-                            CreateNoWindow = true,
-                            UseShellExecute = false
-                        };
-                        using var p1 = Process.Start(psiPrimary);
-                        p1?.WaitForExit(4000);
+                        string[] servers = string.IsNullOrWhiteSpace(secondaryDns)
+                            ? new[] { primaryDns }
+                            : new[] { primaryDns, secondaryDns };
 
-                        // 2. Set Secondary if provided
-                        if (!string.IsNullOrWhiteSpace(secondaryDns))
-                        {
-                            var psiSecondary = new ProcessStartInfo("netsh", $"interface ipv4 add dnsservers name=\"{adapter}\" {secondaryDns} index=2")
-                            {
-                                CreateNoWindow = true,
-                                UseShellExecute = false
-                            };
-                            using var p2 = Process.Start(psiSecondary);
-                            p2?.WaitForExit(4000);
-                        }
-
-                        anySuccess = true;
+                        var (ok, error) = ApplyDnsViaWmi(adapter, servers);
+                        if (ok) okCount++;
+                        else errors.Add($"{adapter}: {error}");
                     }
 
                     // Flush DNS resolver cache
                     FlushDns();
 
-                    return (anySuccess, $"تنظیمات DNS با موفقیت به {primaryDns} اعمال و کش شبکه نوسازی شد.");
+                    if (okCount == adapters.Count)
+                    {
+                        return (true, $"تنظیمات DNS با موفقیت به {primaryDns} اعمال و کش شبکه نوسازی شد.");
+                    }
+                    if (okCount > 0)
+                    {
+                        return (true, $"DNSِ {okCount} کارت از {adapters.Count} کارت تنظیم شد. " + string.Join("؛ ", errors));
+                    }
+                    return (false, "تنظیم DNS ناموفق بود — " + string.Join("؛ ", errors));
                 }
                 catch (Exception ex)
                 {
@@ -216,26 +211,67 @@ namespace CleanC.Core.Services
                         return (false, "هیچ کارت شبکه فعال متصل به اینترنت یافت نشد.");
                     }
 
+                    int okCount = 0;
+                    var errors = new List<string>();
                     foreach (var adapter in adapters)
                     {
-                        var psi = new ProcessStartInfo("netsh", $"interface ipv4 set dnsservers name=\"{adapter}\" dhcp")
-                        {
-                            CreateNoWindow = true,
-                            UseShellExecute = false
-                        };
-                        using var p = Process.Start(psi);
-                        p?.WaitForExit(4000);
+                        var (ok, error) = ApplyDnsViaWmi(adapter, null);
+                        if (ok) okCount++;
+                        else errors.Add($"{adapter}: {error}");
                     }
 
                     FlushDns();
 
-                    return (true, "تنظیمات DNS تمامی کارت های شبکه به حالت خودکار (DHCP) بازگردانده شد.");
+                    if (okCount == adapters.Count)
+                    {
+                        return (true, "تنظیمات DNS تمامی کارت های شبکه به حالت خودکار (DHCP) بازگردانده شد.");
+                    }
+                    if (okCount > 0)
+                    {
+                        return (true, $"DNSِ {okCount} کارت از {adapters.Count} کارت به حالت خودکار برگشت. " + string.Join("؛ ", errors));
+                    }
+                    return (false, "بازگرداندن DNS به حالت خودکار ناموفق بود — " + string.Join("؛ ", errors));
                 }
                 catch (Exception ex)
                 {
                     return (false, $"خطا در ریست DNS: {ex.Message}");
                 }
             });
+        }
+
+        /// <summary>
+        /// اعمال DNS روی یک کارت شبکه از طریق WMI (جایگزین netsh که الگوی مشکوک آنتی ویروسی داشت).
+        /// اگر dnsServers برابر null باشد یعنی برگشت به DNS خودکارِ DHCP؛ برخلاف EnableDHCP فقط
+        /// تنظیمات DNS تغییر می کند و آدرس IP کارت دست نمی خورد.
+        /// </summary>
+        private static (bool ok, string error) ApplyDnsViaWmi(string adapterName, string[]? dnsServers)
+        {
+            try
+            {
+                using var searcher = new ManagementObjectSearcher(
+                    @"root\cimv2",
+                    "SELECT NetConnectionID FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = TRUE");
+                foreach (ManagementObject mo in searcher.Get())
+                {
+                    using var _mo = mo;
+                    string netId = mo["NetConnectionID"]?.ToString() ?? "";
+                    if (!string.Equals(netId, adapterName, StringComparison.OrdinalIgnoreCase)) continue;
+
+                    using var inParams = mo.GetMethodParameters("SetDNSServerSearchOrder");
+                    inParams["DNSServerSearchOrder"] = dnsServers; // null = برگشت به DNS خودکار
+                    using var outParams = mo.InvokeMethod("SetDNSServerSearchOrder", inParams, null);
+
+                    uint code = Convert.ToUInt32(outParams?["ReturnValue"] ?? 1u);
+                    if (code == 0 || code == 1) return (true, "");
+                    return (false, $"کد خطای WMI: {code}");
+                }
+                return (false, "کارت شبکه در WMI پیدا نشد");
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "Dns.WMI");
+                return (false, ex.Message);
+            }
         }
 
         public static (string primary, string secondary, string matchedPresetName) GetCurrentDns()

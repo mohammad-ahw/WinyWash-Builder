@@ -334,22 +334,40 @@ namespace CleanC.Core.Services
             return true;
         }
 
+        /// <summary>
+        /// حذف پکیج استور از طریق PackageManager ویندوز (جایگزین PowerShell + Remove-AppxPackage
+        /// که نیاز به escape دستی و پرچم Hidden داشت). نتیجه ی واقعی حذف برگردانده می شود.
+        /// </summary>
+        private static async Task<bool> RemoveStoreAppAsync(string packageFullName)
+        {
+            try
+            {
+                var packageManager = new Windows.Management.Deployment.PackageManager();
+                var result = await packageManager.RemovePackageAsync(packageFullName);
+                if (result.ExtendedErrorCode != null)
+                {
+                    CcLog.Report("AppUninstaller.Appx", new InvalidOperationException(
+                        $"حذف {packageFullName} ناموفق بود: {result.ExtendedErrorCode.Message}"));
+                    return false;
+                }
+                return true;
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex, "AppUninstaller.Appx");
+                return false;
+            }
+        }
+
         public static bool LaunchUninstall(InstalledAppInfo app)
         {
             try
             {
                 if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
                 {
-                    // PackageFullName داخل بولکوی PowerShell قرار می گیرد؛ آپاستریک را دوبل می کنیم
-                    string escaped = app.PackageFullName.Replace("'", "''");
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{escaped}'\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    Process.Start(psi);
+                    // حذف اپ استور ممکن است چند ده ثانیه طول بکشد؛ برای اینکه UI بلاک نشود
+                    // fire-and-forget می شود و نتیجه فقط در لاگ ثبت می گردد
+                    _ = RemoveStoreAppAsync(app.PackageFullName);
                     return true;
                 }
 
@@ -376,21 +394,7 @@ namespace CleanC.Core.Services
             {
                 if (app.IsStoreApp && !string.IsNullOrEmpty(app.PackageFullName))
                 {
-                    string escaped = app.PackageFullName.Replace("'", "''");
-                    var psi = new ProcessStartInfo
-                    {
-                        FileName = "powershell.exe",
-                        Arguments = $"-NoProfile -WindowStyle Hidden -Command \"Remove-AppxPackage -Package '{escaped}'\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    };
-                    using var proc = Process.Start(psi);
-                    if (proc != null)
-                    {
-                        await proc.WaitForExitAsync();
-                        return proc.ExitCode == 0;
-                    }
-                    return false;
+                    return await RemoveStoreAppAsync(app.PackageFullName);
                 }
 
                 var (fileName, args) = ResolveUninstallCommand(app);
