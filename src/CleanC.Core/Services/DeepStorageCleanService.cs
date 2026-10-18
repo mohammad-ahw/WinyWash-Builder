@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
+using Microsoft.Win32;
 
 namespace CleanC.Core.Services
 {
@@ -50,6 +51,10 @@ namespace CleanC.Core.Services
 
                 var now = DateTime.Now;
 
+                // D05: نام محصولات نصب شده برای تطبیق فازی با نصب کننده ها — فقط در صورت
+                // نیاز لود می شود (lazy) تا هزینه ی خواندن رجیستری بیهوده پرداخت نشود.
+                List<string>? installedProducts = null;
+
                 foreach (var dir in targetDirectories)
                 {
                     progress?.Invoke($"در حال بررسی پوشه: {Path.GetFileName(dir)}...");
@@ -58,11 +63,14 @@ namespace CleanC.Core.Services
                     {
                         var dirInfo = new DirectoryInfo(dir);
 
-                        // Empty folders check (Strictly safe: only in Downloads/Desktop/Temp, never in system/app/project folders)
+                        // Empty folders check (D09 — فقط در پوشه های کاربری/موقت، هرگز در پروژه/سیستم)
                         try
                         {
                             bool isSafeDirForEmptyFolders = dir.Contains("Downloads", StringComparison.OrdinalIgnoreCase) ||
                                                            dir.Contains("Desktop", StringComparison.OrdinalIgnoreCase) ||
+                                                           dir.Contains("Documents", StringComparison.OrdinalIgnoreCase) ||
+                                                           dir.Contains("Videos", StringComparison.OrdinalIgnoreCase) ||
+                                                           dir.Contains("Music", StringComparison.OrdinalIgnoreCase) ||
                                                            dir.Contains("Temp", StringComparison.OrdinalIgnoreCase);
 
                             if (isSafeDirForEmptyFolders)
@@ -91,12 +99,17 @@ namespace CleanC.Core.Services
 
                                         if (!subDir.EnumerateFileSystemInfos().Any())
                                         {
+                                            // D09: گیت زمانی ۳۰ روزه — پوشه ای که تازه خالی شده
+                                            // ممکن است بخشی از کار جاری کاربر باشد و پیشنهاد نمی شود.
+                                            if ((now - subDir.LastWriteTime).TotalDays < 30) continue;
+
                                             emptyFolders.Add(new EmptyFolderInfo
                                             {
                                                 FolderPath = subDir.FullName,
                                                 FolderName = subDir.Name,
                                                 ParentPath = subDir.Parent?.FullName ?? string.Empty,
-                                                IsSelected = false
+                                                IsSelected = false,
+                                                Evidence = $"بیش از ۳۰ روز خالی مانده (آخرین تغییر: {subDir.LastWriteTime:yyyy/MM/dd})"
                                             });
                                         }
                                     }
@@ -174,10 +187,39 @@ namespace CleanC.Core.Services
                                             });
                                         }
                                     }
-                                    // Smart Scenario 2: Incomplete / Broken Downloads (.crdownload, .part)
+                                    // Smart Scenario 2: Incomplete / Broken Downloads (D06 — آستانه ۲۴h، temp ۷۲h)
                                     else if (ext.Equals(".crdownload", StringComparison.OrdinalIgnoreCase) ||
                                              ext.Equals(".part", StringComparison.OrdinalIgnoreCase) ||
-                                             (ext.Equals(".tmp", StringComparison.OrdinalIgnoreCase) && (now - file.LastWriteTime).TotalDays > 2))
+                                             ext.Equals(".download", StringComparison.OrdinalIgnoreCase))
+                                    {
+                                        // فایلی که در حال دانلود است مدام mtime عوض می کند؛ ۲۴ ساعت
+                                        // بدون تغییر یعنی دانلود رها شده. (تب Clean برای حذف دائمی
+                                        // محافظه کارتر است و ۷۲ ساعت می گیرد.)
+                                        if ((now - file.LastWriteTime).TotalHours >= 24)
+                                        {
+                                            // شرط orphan: اگر فایل کاملِ نهایی همین دانلود وجود دارد،
+                                            // قطعاً این فایل بازمانده ی یک دانلود تمام شده است.
+                                            string completedPath = Path.Combine(
+                                                file.DirectoryName ?? string.Empty,
+                                                Path.GetFileNameWithoutExtension(file.Name));
+                                            bool completedExists = File.Exists(completedPath);
+
+                                            messItems.Add(new StorageMessItem
+                                            {
+                                                FilePath = file.FullName,
+                                                FileName = file.Name,
+                                                DirectoryPath = file.DirectoryName ?? string.Empty,
+                                                SizeBytes = size,
+                                                LastModified = file.LastWriteTime,
+                                                Category = StorageMessCategory.IncompleteDownload,
+                                                Evidence = completedExists
+                                                    ? $"فایل کامل «{Path.GetFileName(completedPath)}» موجود است — بازمانده ی دانلود تمام شده"
+                                                    : "بیش از ۲۴ ساعت بدون تغییر — دانلود رهاشده",
+                                                IsSelected = false
+                                            });
+                                        }
+                                    }
+                                    else if (ext.Equals(".tmp", StringComparison.OrdinalIgnoreCase) && (now - file.LastWriteTime).TotalHours >= 72)
                                     {
                                         messItems.Add(new StorageMessItem
                                         {
@@ -187,6 +229,7 @@ namespace CleanC.Core.Services
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
                                             Category = StorageMessCategory.IncompleteDownload,
+                                            Evidence = "فایل موقت .tmp قدیمی تر از ۷۲ ساعت در پوشه ی دانلود/دسکتاپ",
                                             IsSelected = false
                                         });
                                     }
@@ -204,9 +247,12 @@ namespace CleanC.Core.Services
                                             IsSelected = false
                                         });
                                     }
-                                    // Old setup/installers in downloads/desktop > 14 days old
+                                    // Old setup/installers in downloads/desktop > 14 days old (D05 — تطبیق فازی)
                                     else if (installerExtensions.Contains(ext) && (now - file.LastWriteTime).TotalDays > 14)
                                     {
+                                        installedProducts ??= LoadInstalledProductNames();
+                                        string? matchedProduct = MatchInstalledProduct(name, installedProducts);
+
                                         messItems.Add(new StorageMessItem
                                         {
                                             FilePath = file.FullName,
@@ -215,6 +261,9 @@ namespace CleanC.Core.Services
                                             SizeBytes = size,
                                             LastModified = file.LastWriteTime,
                                             Category = StorageMessCategory.OldInstaller,
+                                            Evidence = matchedProduct != null
+                                                ? $"نصب کننده ی «{matchedProduct}» — برنامه نصب شده و این فایل دیگر لازم نیست"
+                                                : "نصب کننده ی قدیمی (بیش از ۱۴ روز) — برنامه ی هم نامی روی سیستم پیدا نشد",
                                             IsSelected = false
                                         });
                                     }
@@ -332,6 +381,50 @@ namespace CleanC.Core.Services
                                 });
                             }
                         }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+
+                // -------------------------------------------------------------
+                // 1.7 D16 — بازمانده های sync / دستگاه (CrossDevice، تمپ OneDrive)
+                //      همیشه پیش فرض خاموش (تصمیم T3) — فقط با تیک دستی کاربر.
+                //      این پوشه ها انبار واسط انتقال فایل هستند و حذفشان
+                //      هیچ فایل اصلی کاربرها را از بین نمی برد.
+                // -------------------------------------------------------------
+                var syncLeftovers = new (string Path, string Name, string EvidenceDesc)[]
+                {
+                    (Path.Combine(userProfile, "CrossDevice"),
+                        "مبادله ی موقت دستگاه ها (CrossDevice)",
+                        "پوشه ی واسط Link to Windows / Phone Link برای انتقال فایل بین گوشی و کامپیوتر"),
+                    (Path.Combine(userProfile, "OneDrive", ".849C9593-D756-4E56-8D6E-42412F2A707B"),
+                        "پوشه ی موقت OneDrive",
+                        "انبار موقت فایل های در حال آپلود OneDrive که رها شده است")
+                };
+
+                foreach (var (sPath, sName, sEvidence) in syncLeftovers)
+                {
+                    try
+                    {
+                        if (!Directory.Exists(sPath)) continue;
+                        if (LockRegistryService.IsLockedPath(sPath)) continue;
+
+                        long size = RecycleBinService.ComputeDirectorySize(sPath);
+                        if (size < 1024 * 1024) continue; // زیر ۱ مگابایت ارزش پیشنهاد ندارد
+
+                        messItems.Add(new StorageMessItem
+                        {
+                            FilePath = sPath,
+                            FileName = sName,
+                            DirectoryPath = Path.GetDirectoryName(sPath) ?? sPath,
+                            SizeBytes = size,
+                            LastModified = Directory.GetLastWriteTime(sPath),
+                            Category = StorageMessCategory.SyncDeviceLeftover,
+                            Evidence = sEvidence,
+                            IsSelected = false
+                        });
                     }
                     catch (Exception __ex)
                     {
@@ -494,6 +587,83 @@ namespace CleanC.Core.Services
                 });
             }
             return group;
+        }
+
+        // ====================================================================
+        // D05 helpers — تطبیق فازی نصب کننده با برنامه های نصب شده
+        // ====================================================================
+
+        // توکن هایی که در نام نصب کننده ها عمومی هستند و به تنهایی مدرک تطبیق نیستند
+        // (وگرنه «setup.exe» با هر محصولی که کلمه Setup دارد تطبیق داده می شد).
+        private static readonly HashSet<string> GenericInstallerTokens = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "setup", "install", "installer", "update", "updater", "driver", "drivers",
+            "win", "windows", "x64", "x86", "amd64", "arm64", "full", "online",
+            "offline", "web", "beta", "final", "latest", "new", "app", "desktop"
+        };
+
+        // نام محصولات نصب شده از Uninstall registry (HKLM 64/32 + HKCU)
+        private static List<string> LoadInstalledProductNames()
+        {
+            var names = new List<string>();
+            string[] keyPaths =
+            {
+                @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall",
+                @"SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Uninstall"
+            };
+
+            foreach (var hive in new[] { Registry.LocalMachine, Registry.CurrentUser })
+            {
+                foreach (var keyPath in keyPaths)
+                {
+                    try
+                    {
+                        using var key = hive.OpenSubKey(keyPath);
+                        if (key == null) continue;
+
+                        foreach (var sub in key.GetSubKeyNames())
+                        {
+                            using var app = key.OpenSubKey(sub);
+                            string? display = app?.GetValue("DisplayName")?.ToString();
+                            if (!string.IsNullOrWhiteSpace(display)) names.Add(display);
+                        }
+                    }
+                    catch (Exception __ex)
+                    {
+                        CcLog.Ignore(__ex);
+                    }
+                }
+            }
+
+            return names;
+        }
+
+        // تطبیق فازی نام فایل نصب کننده با نام محصولات نصب شده (D05):
+        // توکن های ≥۴ حرفی و غیرعمومی نام فایل را در نام محصولات جستجو می کنیم.
+        // برگشت: نام محصول منطبق — یا null اگر تطبیق مطمئنی پیدا نشد.
+        private static string? MatchInstalledProduct(string fileName, List<string> installedProducts)
+        {
+            if (installedProducts.Count == 0) return null;
+
+            string baseName = Path.GetFileNameWithoutExtension(fileName).ToLowerInvariant();
+            var tokens = baseName
+                .Split(new[] { ' ', '-', '_', '.', '(', ')', '+' }, StringSplitOptions.RemoveEmptyEntries)
+                .Where(t => t.Length >= 4 && t.All(char.IsLetterOrDigit) && !GenericInstallerTokens.Contains(t))
+                .Distinct()
+                .ToList();
+
+            if (tokens.Count == 0) return null;
+
+            foreach (var product in installedProducts)
+            {
+                string lowerProduct = product.ToLowerInvariant();
+                if (tokens.Any(t => lowerProduct.Contains(t, StringComparison.Ordinal)))
+                {
+                    return product;
+                }
+            }
+
+            return null;
         }
 
         // ====================================================================

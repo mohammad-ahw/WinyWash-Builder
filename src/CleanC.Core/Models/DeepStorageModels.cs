@@ -34,6 +34,7 @@ namespace CleanC.Core.Models
         public string FolderName { get; set; } = string.Empty;
         public string ParentPath { get; set; } = string.Empty;
         public bool IsSelected { get; set; } = false;
+        public string Evidence { get; set; } = string.Empty;
     }
 
     public enum StorageMessCategory
@@ -49,7 +50,9 @@ namespace CleanC.Core.Models
         // D10 — بازمانده ی نصاب سازنده در ریشه ی درایو (C:\NVIDIA, C:\Aomei, ...)
         OemDriveRootLeftover,
         // D04 — بازمانده ی آپدیترهای Electron/Squirrel در LocalAppData
-        UpdaterLeftover
+        UpdaterLeftover,
+        // D16 — بازمانده ی انتقال دستگاه ها (CrossDevice) و پوشه ی موقت OneDrive
+        SyncDeviceLeftover
     }
 
     public class StorageMessItem
@@ -73,6 +76,7 @@ namespace CleanC.Core.Models
             StorageMessCategory.IncompleteDownload => "دانلود ناتمام و موقت (crdownload / part)",
             StorageMessCategory.OemDriveRootLeftover => "بازمانده ی نصب سازنده در ریشه ی درایو",
             StorageMessCategory.UpdaterLeftover => "بازمانده ی آپدیتر (Electron / Squirrel)",
+            StorageMessCategory.SyncDeviceLeftover => "بازمانده ی انتقال دستگاه / تمپ OneDrive",
             _ => "سایر"
         };
         public string CategoryTitle => CategoryName;
