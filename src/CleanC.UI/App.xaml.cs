@@ -68,13 +68,13 @@ namespace CleanC.UI
 
             this.InitializeComponent();
 
-            // C6 — ریشه ی ترکیب DI همین ابتدا ساخته می شود تا خطای ثبت سرویس ها
+            // ریشه ی ترکیب DI همین ابتدا ساخته می شود تا خطای ثبت سرویس ها
             // در همان لحظه ی اجرا دیده شود، نه وسط کارِ کاربر.
             AppServices.EnsureBuilt();
 
             this.UnhandledException += (sender, e) =>
             {
-                // C9 — عمداً Handed=false مانده: ادامه ی اجرا با state ناسازگار باعث
+                // عمداً Handled=false مانده: ادامه ی اجرا با state ناسازگار باعث
                 // خراب شدنِ بی صدای داده (تنظیمات/آمار/رجیستری) می شود. لاگ ثبت می شود
                 // و برنامه متوقف می شود تا خطا دفن نشود.
                 LogCrash("UnhandledException", e.Exception ?? new Exception(e.Message));

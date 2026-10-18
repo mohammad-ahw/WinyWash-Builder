@@ -1,5 +1,5 @@
 // src/CleanC.UI/ViewModels/SettingsViewModel.cs
-// C6 — ViewModel صفحه ی «تنظیمات برنامه» با CommunityToolkit.Mvvm.
+// ViewModel صفحه ی «تنظیمات برنامه» با CommunityToolkit.Mvvm.
 // وضعیت در VM زندگی می کند، نوشتن در تنظیمات از مسیر ISettingsStore انجام می شود،
 // و اثراتِ سمت رابط کاربری (اعمال تم، InfoBar هشدار حذف قطعی) از طریق رویداد به
 // MainWindow می رسد تا VM وابسته به WinUI نشود.

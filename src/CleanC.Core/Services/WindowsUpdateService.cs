@@ -300,9 +300,9 @@ namespace CleanC.Core.Services
             finally
             {
                 try { if (File.Exists(tempFile)) File.Delete(tempFile); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
 
             return results;
@@ -443,9 +443,9 @@ namespace CleanC.Core.Services
                 foreach (var v in valuesToRemove)
                 {
                     try { key.DeleteValue(v, false); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
 
                 return true;
@@ -560,9 +560,9 @@ namespace CleanC.Core.Services
                 foreach (var file in dir.EnumerateFiles("*", SearchOption.AllDirectories))
                 {
                     try { size += file.Length; } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                    {
+                        CcLog.Ignore(__ex);
+                    }
                 }
             }
             catch (Exception __ex)
@@ -578,16 +578,16 @@ namespace CleanC.Core.Services
             foreach (var file in dir.EnumerateFiles())
             {
                 try { file.Delete(); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
             foreach (var sub in dir.EnumerateDirectories())
             {
                 try { sub.Delete(true); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                {
+                    CcLog.Ignore(__ex);
+                }
             }
         }
     }

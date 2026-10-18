@@ -64,7 +64,7 @@ namespace CleanC.UI
         private const uint WM_LBUTTONDBLCLK = 0x0203;
         private const uint WM_RBUTTONUP = 0x0205;
 
-        // D13 — انتخاب آیکون تری با کیبورد (Shift+F10 / Enter در ناحیه اعلان)
+        // انتخاب آیکون تری با کیبورد (Shift+F10 / Enter در ناحیه اعلان)
         private const uint NIN_SELECT = 0x0400;
         private const uint NIN_KEYSELECT = 0x0401;
 
@@ -124,7 +124,7 @@ namespace CleanC.UI
 
         private IntPtr _hIcon = IntPtr.Zero;
 
-        // D13 — هِدِر منوی تری با کش ۱ ثانیه ای؛ GetCurrentStats نباید داخل
+        // هِدِر منوی تری با کش ۱ ثانیه ای؛ GetCurrentStats نباید داخل
         // window-proc هر بار اجرا شود چون پیام های پنجره را معطل می کند.
         private string _statusHeader = "CleanC";
         private DateTime _statusHeaderAtUtc = DateTime.MinValue;
@@ -195,7 +195,7 @@ namespace CleanC.UI
                         ShowTrayMenu();
                         return IntPtr.Zero;
 
-                    // D13 — دسترسی با کیبورد: وقتی آیکون تری با Enter/Space انتخاب می شود،
+                    // دسترسی با کیبورد: وقتی آیکون تری با Enter/Space انتخاب می شود،
                     // باید مثل کلیکِ ماوس پنجره فعال شود وگرنه تری با کیبورد غیرقابل دسترس است.
                     case NIN_SELECT:
                     case NIN_KEYSELECT:
@@ -221,7 +221,7 @@ namespace CleanC.UI
 
             try
             {
-                // D13 — آمار سیستم از کش ۱ ثانیه ای می آید (کلیکِ پشت سرهم روی تری
+                // آمار سیستم از کش ۱ ثانیه ای می آید (کلیکِ پشت سرهم روی تری
                 // نباید چند بار سیستم را اسکن کند)
                 DateTime nowUtc = DateTime.UtcNow;
                 if ((nowUtc - _statusHeaderAtUtc).TotalSeconds >= 1.0)
@@ -316,7 +316,7 @@ namespace CleanC.UI
             => ShowBalloonNotification(title, message, WinNotifySeverity.Info);
 
         /// <summary>
-        /// F5 — balloon با شدت واقعی: آیکون و رنگ هشدار/خطا متناسب با severity
+        /// balloon با شدت واقعی: آیکون و رنگ هشدار/خطا متناسب با severity
         /// تا کاربر از پشت پنجره هم بتواند فوریت پیام را تشخیص دهد.
         /// </summary>
         public void ShowBalloonNotification(string title, string message, WinNotifySeverity severity)
@@ -349,7 +349,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F5 — به روزرسانی tooltip تری آیکون؛ جایگزین badge ویندوز وقتی
+        /// به روزرسانی tooltip تری آیکون؛ جایگزین badge ویندوز وقتی
         /// API آن برای اپ unpackaged در دسترس نباشد.
         /// </summary>
         public void UpdateTooltip(string text)
@@ -391,7 +391,7 @@ namespace CleanC.UI
 
                 RemoveWindowSubclass(_hwnd, _subclassProc, new IntPtr(1001));
 
-                // D13 — آیکونِ بارگذاری شده با LR_LOADFROMFILE یک handle دستی دارد
+                // آیکونِ بارگذاری شده با LR_LOADFROMFILE یک handle دستی دارد
                 // و بدون DestroyIcon در GDI نشت می کند (حتی بعد از NIM_DELETE).
                 if (_hIcon != IntPtr.Zero)
                 {

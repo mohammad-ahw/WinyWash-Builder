@@ -1,5 +1,5 @@
 // src/CleanC.UI/AppServices.cs
-// C6 — ریشه ی ترکیب (composition root): ثبت سرویس ها و ViewModelها در کانتینر DI.
+// ریشه ی ترکیب (composition root): ثبت سرویس ها و ViewModelها در کانتینر DI.
 // کانتینر از App.Services در دسترس است؛ لایه ی نمایش دیگر نباید سرویس ها را با new می سازد.
 
 using CleanC.UI.ViewModels;

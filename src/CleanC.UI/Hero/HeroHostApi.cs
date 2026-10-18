@@ -85,7 +85,7 @@ namespace CleanC.UI.Hero
 
                     case "js.error":
                         // خطای زمانِ اجرای اسکریپت هیرو → در لاگ ثبت می‌شود تا «کاراکتر لود
-                        // نمی‌شود/هنگ می‌کند» بدون حدس و گمان عیب‌یابی شود (فاز ۱۹)
+                        // نمی‌شود/هنگ می‌کند» بدون حدس و گمان عیب‌یابی شود
                         CcLog.Report("Hero.JSError", new InvalidOperationException(
                             "خطای اسکریپت هیرو: " + (msg.Data.HasValue ? msg.Data.Value.ToString() : "بدون جزئیات")));
                         break;

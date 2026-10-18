@@ -1027,9 +1027,9 @@ namespace CleanC.Core.Services
                     {
                         if (files >= ScanMaxFiles || sw.Elapsed > ScanTimeBudget) return;
                         try { size += file.Length; files++; } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                     }
                     if (depth < ScanMaxDepth)
                     {

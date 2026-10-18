@@ -70,9 +70,9 @@ namespace CleanC.Core.Services
         private static void TryDeleteFlag(string path)
         {
             try { if (File.Exists(path)) File.Delete(path); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+            {
+                CcLog.Ignore(__ex);
+            }
         }
 
         public static void MarkTweaksApplied()

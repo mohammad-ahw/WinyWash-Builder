@@ -1,5 +1,5 @@
 // src/CleanC.UI/MainWindow.Quarantine.cs
-// F3 — بخش «فایل های قرنطینه شده» داخل مرکز بازیابی (Undo Center).
+// بخش «فایل های قرنطینه شده» داخل مرکز بازیابی (Undo Center).
 // منطق واقعی فایل سیستم در CleanC.Core/Services/SafeDeleteService.cs است؛
 // این فایل فقط لایه ی نمایش و کنترل رویدادهاست.
 

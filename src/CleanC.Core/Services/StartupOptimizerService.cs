@@ -30,7 +30,7 @@ namespace CleanC.Core.Services
         public string Category { get; set; } = "برنامه کاربردی (اختیاری)";
 
         // ====================================================================
-        // A10: منابعی که قبلاً اصلاً دیده نمی شدند
+        // منابعی که قبلاً اصلاً دیده نمی شدند
         // ====================================================================
         /// <summary>آیا این مورد از `RunOnce` است؟ (یک بار اجرا می شود و بعد پاک می شود)</summary>
         public bool IsRunOnce { get; set; }
@@ -40,7 +40,7 @@ namespace CleanC.Core.Services
         public bool IsUwpStartupTask { get; set; }
 
         // ====================================================================
-        // F6: Impact Score — از لاگ واقعیِ بوت اندازه گیری می شود
+        // Impact Score — از لاگ واقعیِ بوت اندازه گیری می شود
         // ====================================================================
         /// <summary>امتیاز تأثیر روی بوت، از ۰ (بی اثر) تا ۱۰۰ (بحرانی).</summary>
         public int ImpactScore { get; set; }
@@ -107,7 +107,7 @@ namespace CleanC.Core.Services
         /// منابع اضافه (RunOnce/StartupTask MSIX/تسک‌های Logon-Boot با schtasks) فقط برای
         /// نمایشِ کاملِ لیستِ مدیر استارتاپ لازم است؛ در بهینه‌سازی خودکار این موارد
         /// عمداً دست‌نخورده می‌مانند و پیمایشِ گران‌شان (schtasks حدود چند ثانیه) مصرف
-        /// ندارد — درخواستِ فاز ۱۹: اجرای کامل هیرو چند ثانیه در «مرتب‌سازی استارتاپ» معطل نفماند.
+        /// نمی شود تا اجرای کامل هیرو در «مرتب‌سازی استارتاپ» معطل نماند.
         /// </param>
         public static List<StartupItem> GetStartupItems(bool includeExtraSources = true)
         {
@@ -143,7 +143,7 @@ namespace CleanC.Core.Services
             // 7. Items previously disabled and backed up by CleanC
             ScanCleanCDisabledItems(list);
 
-            // F6: امتیاز تأثیر روی بوت را برای همه ی موارد محاسبه کن
+            // امتیاز تأثیر روی بوت را برای همه ی موارد محاسبه کن
             var impacts = BootImpactService.GetBootImpacts();
             foreach (var item in list)
             {
@@ -167,7 +167,7 @@ namespace CleanC.Core.Services
                     // Never silently disable VPNs or Chat apps during Quick Boost!
                     if (item.IsVpnOrProxy || item.Category.Contains("پیام رسان")) continue;
 
-                    // A10: RunOnce / تسک های زمان بندی شده / StartupTaskهای MSIX عمداً
+                    // RunOnce / تسک های زمان بندی شده / StartupTaskهای MSIX عمداً
                     // وارد بهینه سازی خودکار نمی شوند؛ غیرفعال کردنشان باید دستی و آگاهانه باشد
                     // چون برخلاف مقدارِ Run، خاموش کردنشان ممکن است سرویسی را از کار بیندازد.
                     if (item.IsRunOnce || item.IsScheduledTask || item.IsUwpStartupTask) continue;
@@ -258,7 +258,7 @@ namespace CleanC.Core.Services
                     File.Move(item.Command, disabledPath);
                     disabled = File.Exists(disabledPath) && !File.Exists(item.Command);
                 }
-                // A10: RunOnce — مثل Run فقط در کلید دیگر
+                // RunOnce — مثل Run فقط در کلید دیگر
                 else if (item.Location == "HKCU RunOnce" || item.Location == "HKLM RunOnce")
                 {
                     var runRoot = item.Location == "HKCU RunOnce" ? Registry.CurrentUser : Registry.LocalMachine;
@@ -269,14 +269,14 @@ namespace CleanC.Core.Services
                     runKey.DeleteValue(item.Name, false);
                     disabled = runKey.GetValue(item.Name) == null;
                 }
-                // A10: تسک Logon/Boot — با schtasks غیرفعال می شود (نیازی به بکاپ نیست، همان enable مجدد کافی است)
+                // تسک Logon/Boot — با schtasks غیرفعال می شود (نیازی به بکاپ نیست، همان enable مجدد کافی است)
                 else if (item.Location == "TaskScheduler")
                 {
                     if (string.IsNullOrWhiteSpace(serviceKey)) return false;
                     originalValue = "";
                     disabled = StartupExtraSources.RunSchtasks($"/change /tn \"{serviceKey}\" /disable", out _);
                 }
-                // A10: StartupTaskِ MSIX/UWP — مقدار State در SystemAppData
+                // StartupTaskِ MSIX/UWP — مقدار State در SystemAppData
                 else if (item.Location == "StartupTask")
                 {
                     if (string.IsNullOrWhiteSpace(serviceKey)) return false; // PackageFamilyName\AppId
@@ -791,7 +791,7 @@ namespace CleanC.Core.Services
             return VpnSignatures.Any(v => combined.Contains(v));
         }
 
-        // A10: StartupExtraSources برای تشخیص ایمنیِ آیتم های RunOnce به همین سفیدفهرست نیاز دارد
+        // StartupExtraSources برای تشخیص ایمنیِ آیتم های RunOnce به همین سفیدفهرست نیاز دارد
         public static bool IsWhitelisted(string name, string cmd)
         {
             string combined = $"{name} {cmd}".ToLowerInvariant();

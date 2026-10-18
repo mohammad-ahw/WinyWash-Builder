@@ -81,7 +81,7 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// D5 — انتقال فایل حجیم به سطل بازیافت (نه حذف دائمی).
+        /// انتقال فایل حجیم به سطل بازیافت (نه حذف دائمی).
         /// </summary>
         public static bool DeleteLargeFile(string filePath)
         {

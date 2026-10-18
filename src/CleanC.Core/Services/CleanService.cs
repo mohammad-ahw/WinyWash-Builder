@@ -53,7 +53,7 @@ namespace CleanC.Core.Services
             {
                 try
                 {
-                    // D5: تأیید خالی کردن سطل بازیافت را به خود ویندوز می سپاریم
+                    // تأیید خالی کردن سطل بازیافت را به خود ویندوز می سپاریم
                     // (SHERB_NOCONFIRMATION حذف شد) تا کاربر قبل از پاکسازی دائمی بداند چه می کند.
                     //
                     // SHEmptyRecycleBin نیازمند apartment سازگار با شل (STA/MMSTA) است؛

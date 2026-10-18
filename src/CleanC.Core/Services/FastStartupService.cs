@@ -116,9 +116,9 @@ namespace CleanC.Core.Services
                     {
                         // طولانی تر از حد انتظار → فرآیند را متوقف کن تا جزء آویزان نماند
                         try { p.Kill(); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                        {
+                            CcLog.Ignore(__ex);
+                        }
                         return false;
                     }
 

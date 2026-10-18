@@ -48,14 +48,14 @@ namespace CleanC.Core.Services
         public Dictionary<string, bool> JunkSelections { get; set; } = new();
 
         /// <summary>
-        /// F3 — رفتار حذفِ فایل های شخصی کاربر (تکراری/حجیم/دانلودها/دسکتاپ):
+        /// رفتار حذفِ فایل های شخصی کاربر (تکراری/حجیم/دانلودها/دسکتاپ):
         /// "RecycleBin" (پیش فرض) | "Quarantine" | "Permanent".
         /// کش و زباله ها همیشه قطعی حذف می شوند چون هدفشان آزادسازی فضاست.
         /// </summary>
         public string DeleteMode { get; set; } = "RecycleBin";
 
         /// <summary>
-        /// B4 — تاریخچه ی اعلان ها؛ باقی مانده ی ری استارت ها (سقف در Normalize).
+        /// تاریخچه ی اعلان ها؛ باقی مانده ی ری استارت ها (سقف در Normalize).
         /// Severity به صورت رشته ذخیره می شود تا JSON ساده بماند.
         /// </summary>
         public List<NotificationHistoryEntry> NotificationHistory { get; set; } = new();
@@ -235,10 +235,10 @@ namespace CleanC.Core.Services
 
             if (string.IsNullOrWhiteSpace(settings.Language)) settings.Language = "Auto";
 
-            // F3 — مقدار نامعتبر حذف به پیش فرض برمی گردد
+            // مقدار نامعتبر حذف به پیش فرض برمی گردد
             settings.DeleteMode = SafeDeleteService.ModeToString(SafeDeleteService.ParseMode(settings.DeleteMode));
 
-            // B4 — تاریخچه ی اعلان ها: سقف ۵۰ مورد، مرتب سازی جدیدترین اول،
+            // تاریخچه ی اعلان ها: سقف ۵۰ مورد، مرتب سازی جدیدترین اول،
             // حذف رکوردهای خالی و کوتاه کردن پیام های خیلی بلند.
             const int MaxNotifications = 50;
             settings.NotificationHistory = (settings.NotificationHistory ?? new List<NotificationHistoryEntry>())

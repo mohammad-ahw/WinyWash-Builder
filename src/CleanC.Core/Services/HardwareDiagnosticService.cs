@@ -133,7 +133,7 @@ namespace CleanC.Core.Services
                     CcLog.Ignore(__ex);
                 }
 
-                // 7. Ghost Proxy & VPN Conflict Check (M31)
+                // 7. Ghost Proxy & VPN Conflict Check
                 try
                 {
                     var proxyConflict = NetworkProxyDiagnosticService.DetectGhostProxyConflict();
@@ -155,7 +155,7 @@ namespace CleanC.Core.Services
                     CcLog.Ignore(__ex);
                 }
 
-                // 8. Orphaned Services Check (M08)
+                // 8. Orphaned Services Check
                 try
                 {
                     var orphanedServices = RegistryCleanerService.ScanOrphanedServices();
@@ -178,7 +178,7 @@ namespace CleanC.Core.Services
                     CcLog.Ignore(__ex);
                 }
 
-                // 9. WSL / Docker VHDX Compaction Check (M21)
+                // 9. WSL / Docker VHDX Compaction Check
                 try
                 {
                     var vhdxFiles = DiskMaintenanceService.GetWslDockerVhdxFiles();

@@ -6,7 +6,6 @@ using System.Management;
 using System.Net.Http;
 using System.Runtime.InteropServices;
 using System.Text;
-using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Xml.Linq;
@@ -517,9 +516,9 @@ namespace CleanC.Core.Services
                         finally
                         {
                             try { File.Delete(tempXml); } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                            {
+                                CcLog.Ignore(__ex);
+                            }
                         }
                     }
                 }
@@ -532,35 +531,14 @@ namespace CleanC.Core.Services
 
         private static void EnrichWithWmiData(DetailedSystemSpecs specs)
         {
-            // Try running CleanC.Cli.exe --specs-json to fetch extended WMI properties safely in an external CLI process
-            string baseDir = AppContext.BaseDirectory;
-            string cliPath = Path.Combine(baseDir, "CleanC.Cli.exe");
-            if (!File.Exists(cliPath))
-            {
-                cliPath = Path.Combine(baseDir, "..", "CleanC.Cli", "CleanC.Cli.exe");
-            }
+            // قبلاً غنی سازی WMI از طریق پروسه ی جداگانه ی CleanC.Cli.exe انجام می شد که در
+            // خروجی publish وجود ندارد؛ یعنی این غنی سازی در نسخه ی نهایی هرگز اجرا نمی شد.
+            // الان مستقیم و درون پروسه با همان مهلت ۲.۵ ثانیه انجام می شود تا WMI کند،
+            // ساخت گزارش را قفل نکند.
+            var wmiTask = GetDetailedSpecsWmiAsync();
+            if (!wmiTask.Wait(2500)) return; // مهلت تمام شد → گزارش پایه کافی است
 
-            if (!File.Exists(cliPath)) return;
-
-            var psi = new ProcessStartInfo
-            {
-                FileName = cliPath,
-                Arguments = "--specs-json",
-                RedirectStandardOutput = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using var p = Process.Start(psi);
-            if (p == null) return;
-
-            string json = p.StandardOutput.ReadToEnd();
-            p.WaitForExit(2500);
-
-            if (string.IsNullOrWhiteSpace(json) || !json.StartsWith("{")) return;
-
-            var wmiSpecs = JsonSerializer.Deserialize<DetailedSystemSpecs>(json);
-            if (wmiSpecs == null) return;
+            var wmiSpecs = wmiTask.Result;
 
             // Enrich motherboard & bios if fuller
             if (!string.IsNullOrEmpty(wmiSpecs.MotherboardManufacturer)) specs.MotherboardManufacturer = wmiSpecs.MotherboardManufacturer;

@@ -28,7 +28,7 @@ namespace CleanC.UI
         private static extern IntPtr GetForegroundWindow();
 
         /// <summary>
-        /// F5 — آیا پنجره ی اصلی همین حالا فوکوس دارد؟
+        /// آیا پنجره ی اصلی همین حالا فوکوس دارد؟
         /// نوتیفیکیشن ویندوزی فقط زمانی می فرستیم که کاربر پنجره را نمی بیند،
         /// وگرنه InfoBar داخلی خودش کافی است.
         /// </summary>

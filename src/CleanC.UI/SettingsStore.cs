@@ -1,5 +1,5 @@
 // src/CleanC.UI/SettingsStore.cs
-// C6 — لایه ی instance برای تنظیمات: به جای فراخوانی مستقیم های استاتیکِ SettingsService،
+// لایه ی instance برای تنظیمات: به جای فراخوانی مستقیم های استاتیکِ SettingsService،
 // یک سرویسِ قابلِ تزریق (ISettingsStore) داریم که debounce ذخیره را هم خودش مدیریت می کند.
 // برنامه ی میزبان (MainWindow) با OnSaveRequested می تواند قبل از نوشتن فایل،
 // داده ی زنده ی خودش (مثل موقعیت پنجره) را در AppSettings ثبت کند.

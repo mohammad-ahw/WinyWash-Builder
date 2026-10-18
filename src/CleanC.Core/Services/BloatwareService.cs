@@ -465,7 +465,9 @@ namespace CleanC.Core.Services
         {
             try
             {
-                var psi = new ProcessStartInfo("powershell", $"-NoProfile -Command \"Remove-AppxPackage -Package '{packageFullName}'\"")
+                // کوتیشن تک داخل نام پکیج باید برای PowerShell escape شود تا فرمان نشکند (تزریق فرمان)
+                string escapedName = packageFullName.Replace("'", "''");
+                var psi = new ProcessStartInfo("powershell", $"-NoProfile -Command \"Remove-AppxPackage -Package '{escapedName}'\"")
                 {
                     UseShellExecute = false,
                     CreateNoWindow = true

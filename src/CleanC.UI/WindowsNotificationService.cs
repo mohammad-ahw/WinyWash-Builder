@@ -1,5 +1,5 @@
 // src/CleanC.UI/WindowsNotificationService.cs
-// F5 — نوتیفیکیشن های واقعی ویندوز: toast (WinAppSDK AppNotification) + badge عدد سلامت.
+// نوتیفیکیشن های واقعی ویندوز: toast (WinAppSDK AppNotification) + badge عدد سلامت.
 //
 // چون CleanC unpackaged و با دسترسی administrator اجرا می شود، ثبت AUMID در HKCU
 // (Software\Classes\AppUserModelId) الزامی است و فعال سازی (کلیک روی toast) ممکن است

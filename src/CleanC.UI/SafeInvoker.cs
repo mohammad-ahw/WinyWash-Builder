@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace CleanC.UI
 {
     /// <summary>
-    /// C8 — جای امن برای event handlerهای async.
+    /// جای امن برای event handlerهای async.
     ///
     /// یک <c>async void</c> معمولی اگر استثنا پرتاب کند، آن استثنا از تهِ زنجیره به
     /// <c>Application.UnhandledException</c> می رسد؛ یعنی کل برنامه باید یک تصمیم

@@ -11,7 +11,7 @@ using Microsoft.Win32;
 namespace CleanC.Core.Services
 {
     /// <summary>
-    /// A10 — منابعِ استارت آپ که قبلاً هیچ کدام اسکن نمی شدند:
+    /// منابعِ استارت آپ که قبلاً هیچ کدام اسکن نمی شدند:
     ///
     ///  1. <c>RunOnce</c> (HKCU و HKLM) — کلیدهایی که یک بار اجرا و بعد پاک می شوند.
     ///  2. <c>StartupTask</c> برنامه های MSIX/UWP — مثل Spotify/Teams/OneDrive نسخه ی Store،
@@ -255,9 +255,10 @@ namespace CleanC.Core.Services
             if (s.StartsWith("At logon", StringComparison.OrdinalIgnoreCase)) return true;
             if (s.StartsWith("At system start", StringComparison.OrdinalIgnoreCase)) return true;
 
-            // نسخه های محلی سازی شده ی خروجی schtasks
+            // نسخه های محلی سازی شده ی خروجی schtasks؛ هر دو حالت «فاصله ساده» و
+            // «نیم فاصله (ZWNJ)» ممکن است در خروجی محلی ظاهر شوند
             if (s.Contains("ورود", StringComparison.Ordinal)) return true;
-            if (s.Contains("راه اندازی", StringComparison.Ordinal) || s.Contains("راه اندازی", StringComparison.Ordinal)) return true;
+            if (s.Contains("راه اندازی", StringComparison.Ordinal) || s.Contains("راه\u200Cاندازی", StringComparison.Ordinal)) return true;
 
             return false;
         }

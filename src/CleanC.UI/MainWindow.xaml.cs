@@ -51,16 +51,16 @@ namespace CleanC.UI
         private readonly DispatcherTimer _uninstallerSearchDebounce = new() { Interval = TimeSpan.FromMilliseconds(250) };
         private readonly DispatcherTimer _driversSearchDebounce = new() { Interval = TimeSpan.FromMilliseconds(250) };
         private TrayIconManager? _trayManager;
-        // F5 — نوتیفیکیشن ویندوزی (toast + badge)؛ وقتی پنجره فوکوس ندارد استفاده می شود
+        // نوتیفیکیشن ویندوزی (toast + badge)؛ وقتی پنجره فوکوس ندارد استفاده می شود
         private readonly WindowsNotificationService _windowsNotifications = new();
         // صف InfoBar تا پیام های پشت سرهم روی هم نیفتند و همه دیده شوند
         private readonly Queue<(string Title, string Message, InfoBarSeverity Severity)> _infoBarQueue = new();
         private readonly List<FontIcon> _toolBackIcons = new();
         private List<CleanupReportItem>? _lastCleanupItems;
         private long _lastFreedBytes;
-        // F5 — آخرین عدد صحیحِ ست شده روی badge (برای جلوگیری از فراخوانی تکراری)
+        // آخرین عدد صحیحِ ست شده روی badge (برای جلوگیری از فراخوانی تکراری)
         private int _lastBadgeScore = -1;
-        // B4 — سقف تاریخچه ی اعلان ها (در ذخیره و نمایش یکسان نگه داشته می شود)
+        // سقف تاریخچه ی اعلان ها (در ذخیره و نمایش یکسان نگه داشته می شود)
         private const int NotificationHistoryCapacity = 50;
 
         // Dashboard V2: Accent sync, Sparklines, and Gauge state
@@ -88,12 +88,12 @@ namespace CleanC.UI
         private string _deepStorageActiveTab = "duplicates";
 
         // ====================================================================
-        // D2: تنظیمات پایدار برنامه (settings.json)
+        // تنظیمات پایدار برنامه (settings.json)
         // ====================================================================
         /// <summary>سه نمای اصلی نوار ناوبری بالای صفحه.</summary>
         private enum AppView { Dashboard, Tools, Settings }
 
-        // C6 — تنظیمات از کانتینر DI می آیند؛ `_settings` فقط یک نمایِ راحت روی همان شیء است
+        // تنظیمات از کانتینر DI می آیند؛ `_settings` فقط یک نمایِ راحت روی همان شیء است
         private AppSettings _settings => _settingsStore.Current;
         private readonly ISettingsStore _settingsStore;
         /// <summary>ViewModel صفحه Settings (C6/MVVM)؛ state آن از طریق x:Bind به کنترل ها وصل است.</summary>
@@ -110,11 +110,11 @@ namespace CleanC.UI
 
         public MainWindow()
         {
-            // D2: تا پایان مقداردهی XAML و پر شدن کنترل ها، رویدادهای Toggled نباید
+            // تا پایان مقداردهی XAML و پر شدن کنترل ها، رویدادهای Toggled نباید
             // تنظیماتِ خوانده شده را با مقدار پیش فرضِ XAML بازنویسی کنند.
             _isLoadingSettings = true;
 
-            // C6: سرویس ها و ViewModel از کانتینر DI می آیند (SettingsStore خودش تنظیمات را load می کند).
+            // سرویس ها و ViewModel از کانتینر DI می آیند (SettingsStore خودش تنظیمات را load می کند).
             // قبل از InitializeComponent مقداردهی می شوند تا هیچ handler ای در حین parse به شیء null نرسد.
             _settingsStore = AppServices.GetRequired<ISettingsStore>();
             _settingsStore.OnSaveRequested += CapturePlacementForSave;
@@ -140,17 +140,17 @@ namespace CleanC.UI
             LocalizationService.SetLanguage(_settings.Language);
             ApplyLanguage();
 
-            // D2: تنظیمات پایدار باید قبل از هر تصمیم UI (تم، هندسه ی پنجره، نمای آخر) خوانده شوند
+            // تنظیمات پایدار باید قبل از هر تصمیم UI (تم، هندسه ی پنجره، نمای آخر) خوانده شوند
             PopulateSettingsUi();
 
-            // B4 — بازگرداندن تاریخچه ی اعلان های مانده از اجرای قبلی
+            // بازگرداندن تاریخچه ی اعلان های مانده از اجرای قبلی
             RenderPersistedNotificationHistory();
 
             // اگر فایل تنظیمات از قبل وجود ندارد، همین حالا با مقادیر پیش فرض ساخته شود
             // تا مسیر نمایش داده شده در صفحه Settings واقعی باشد و بار اول «بازنشانی» کار کند.
             if (!File.Exists(SettingsService.FilePath)) SaveSettingsNow();
 
-            // F3 — نشست های قرنطینه قدیمی تر از ۳۰ روز در پس زمینه پاک می شوند
+            // نشست های قرنطینه قدیمی تر از ۳۰ روز در پس زمینه پاک می شوند
             // (خودِ فایل ها هم بیش از این نگه داشته نمی شوند تا دیسک اشغال نماند)
             System.Threading.Tasks.Task.Run(() =>
             {
@@ -187,7 +187,7 @@ namespace CleanC.UI
                 {
                     if (e.WindowActivationState == WindowActivationState.Deactivated)
                     {
-                       // D3: کوچک نمایی → پنهان شدن در تری آیکون.
+                       // کوچک نمایی → پنهان شدن در تری آیکون.
                         // فقط وقتی پنجره واقعاً minimize است مخفی می شود تا Alt+Tab زدن
                         // باعث پنهان شدن برنامه نشود.
                         if (!_isExiting && _settings.MinimizeToTray && NativeMethods.IsWindowMinimized(_hWnd))
@@ -234,7 +234,7 @@ namespace CleanC.UI
             uint dpi = CleanC.Core.Native.Win32.GetDpiForWindow(_hWnd);
             double dpiScale = (dpi > 0) ? (dpi / 96.0) : 1.0;
 
-            // D2: بازیابی اندازه و موقعیت ذخیره شده — فقط اگر روی یکی از نمایشگرهای فعلی معتبر باشد
+            // بازیابی اندازه و موقعیت ذخیره شده — فقط اگر روی یکی از نمایشگرهای فعلی معتبر باشد
             if (_settings.SaveWindowPlacement &&
                 _settings.HasSavedPlacement &&
                 IsPlacementOnScreen(_settings.WindowX, _settings.WindowY, _settings.WindowWidth, _settings.WindowHeight))
@@ -268,7 +268,7 @@ namespace CleanC.UI
                 {
                     UpdateCaptionInsets();
 
-                    // D2: ثبت مکان یابی جدید با debounce تا پایان درگ/تغییر سایز
+                    // ثبت مکان یابی جدید با debounce تا پایان درگ/تغییر سایز
                     if (!_isExiting && !NativeMethods.IsWindowMinimized(_hWnd) && _settings.SaveWindowPlacement)
                     {
                         CaptureWindowPlacement();
@@ -277,7 +277,7 @@ namespace CleanC.UI
                 }
             };
 
-            // D3: بستن پنجره به جای خروج، برنامه را در تری آیکون نگه می دارد
+            // بستن پنجره به جای خروج، برنامه را در تری آیکون نگه می دارد
             _appWindow.Closing += (s, e) =>
             {
                 if (!_isExiting && _settings.CloseToTray)
@@ -314,11 +314,11 @@ namespace CleanC.UI
             };
             _statsTimer.Start();
 
-            // B6: تایمرها هنگام بستن پنجره متوقف نمی شدند و تا لحظه ی مرگ پروسه
+            // تایمرها هنگام بستن پنجره متوقف نمی شدند و تا لحظه ی مرگ پروسه
             // (مثلاً وقتی آیکون تری باعث زنده ماندن برنامه می شود) به کار ادامه می دادند.
             Closed += (s, e) =>
             {
-                // D2: آخرین وضعیت پیش از توقف تایمرها روی دیسک نوشته می شود
+                // آخرین وضعیت پیش از توقف تایمرها روی دیسک نوشته می شود
                 SaveSettingsNow();
                 StopBackgroundTimers();
             };
@@ -407,7 +407,7 @@ namespace CleanC.UI
                 CcLog.Ignore(__ex);
             }
 
-            // F5 — ثبت کانال نوتیفیکیشن ویندوزی (AUMID + AppNotificationManager).
+            // ثبت کانال نوتیفیکیشن ویندوزی (AUMID + AppNotificationManager).
             // اگر ثبت شکست بخورد، سرویس نشان می دهد toast در دسترس نیست و
             // همه ی مسیرها به balloon تری آیکون برمی گردند.
             _windowsNotifications.TryRegister();
@@ -509,7 +509,7 @@ namespace CleanC.UI
 
                 bool isDark = currentTheme == ElementTheme.Dark;
 
-                // D6: در High Contrast شفافیت و بلور مجاز نیست؛ Acrylic را خاموش می کنیم
+                // در High Contrast شفافیت و بلور مجاز نیست؛ Acrylic را خاموش می کنیم
                 // تا پس زمینه ی جامد و رنگ های سیستم جایگزین شوند.
                 if (IsHighContrastEnabled())
                 {
@@ -567,19 +567,15 @@ namespace CleanC.UI
                 }
                 else
                 {
-                    this.SystemBackdrop = new DesktopAcrylicBackdrop();
+                    // روی سیستم هایی که DesktopAcrylicController پشتیبانی نمی شود (مثل ویندوز ۱۰)
+                    // هیچ بک دراپی ست نمی شود و پس زمینه ی سالید XAML بر اساس تم نمایش داده می شود
+                    this.SystemBackdrop = null;
                 }
             }
-            catch
+            catch (Exception __ex)
             {
-                try
-                {
-                    this.SystemBackdrop = new DesktopAcrylicBackdrop();
-                }
-                catch (Exception __ex)
-                {
-                    CcLog.Ignore(__ex);
-                }
+                // ست نشدن بک دراپ نباید اجرای پنجره را متوقف کند؛ فقط لاگ می شود
+                CcLog.Ignore(__ex, "Backdrop.Configure");
             }
         }
 
@@ -601,7 +597,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// B6 — توقف همه ی تایمرها هنگام بسته شدن پنجره.
+        /// توقف همه ی تایمرها هنگام بسته شدن پنجره.
         ///
         /// بدون این، تایمر آمار داشبورد (۲٫۵ ثانیه) و تایمرهای debounce/toast
         /// بعد از Close هم اجرا می ماندند — یعنی کار غیرضروری در لحظه ی خروج
@@ -1681,7 +1677,7 @@ namespace CleanC.UI
 
                 var delBtn = new Button { Content = "حذف", FontSize = 11, Padding = new Thickness(8, 3, 8, 3), Height = 28, CornerRadius = new CornerRadius(5), Foreground = new SolidColorBrush(ColorHelper.FromArgb(255, 239, 68, 68)) };
 
-                // D5 — تأیید دومرحله ای حذف فایل حجیم.
+                // تأیید دومرحله ای حذف فایل حجیم.
                 // این دکمه داخل یک ContentDialog باز اجرا می شود و WinUI اجازه ی باز شدن
                 // هم زمان دیالوگ دوم را نمی دهد؛ پس کلیک اول دکمه را به حالت «تأیید»
                 // می برد و ۴ ثانیه فرصت انصراف می دهد.
@@ -1870,7 +1866,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// D2: تیک های ذخیره شده ی کاربر روی آیتم های تازه ی اسکن اعمال می شود.
+        /// تیک های ذخیره شده ی کاربر روی آیتم های تازه ی اسکن اعمال می شود.
         /// آیتم هایی که کلیدشان در تنظیمات نیست، حالت پیش فرض خودشان (تیک خورده) را نگه می دارند.
         /// </summary>
         private void ApplyPersistedJunkSelections(ScanResult scan)
@@ -2090,17 +2086,6 @@ namespace CleanC.UI
             ShowInfoBar("به‌روزرسانی شد", "اطلاعات مصرف رم، پردازنده و دیسک به‌روزرسانی شدند.", InfoBarSeverity.Informational);
         }
 
-        private void ThemeToggleBtn_Click(object sender, RoutedEventArgs e)
-        {
-            if (Content is FrameworkElement root)
-            {
-                ElementTheme newTheme = root.ActualTheme == ElementTheme.Dark ? ElementTheme.Light : ElementTheme.Dark;
-                ApplyTheme(newTheme);
-                // D2: تم صریح انتخابی کاربر (نه System) ذخیره می شود
-                PersistThemeChoice(newTheme);
-            }
-        }
-
         /// <summary>
         /// انتخاب صریح تم (دکمه ی تغییر تم در هدر) از مسیر VM در تنظیمات ثبت می شود؛
         /// VM رادیوهای صفحه Settings را هم با raise کردن PropertyChanged همگام می کند.
@@ -2121,7 +2106,7 @@ namespace CleanC.UI
         private bool _isApplyingTheme = false;
 
         /// <summary>
-        /// D6: آیا حالت High Contrast ویندوز فعال است؟
+        /// آیا حالت High Contrast ویندوز فعال است؟
         /// وقتی روشن باشد، رنگ های سفارشیِ برنامه روی رنگ های سیستم می نشینند
         /// و خوانایی را خراب می کنند؛ بنابراین باید از بازنویسی brushها صرف نظر کرد.
         /// </summary>
@@ -2140,7 +2125,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// D6: المانی را که LiveSetting گرفته وادار به اعلامِ تغییر برای screen reader می کند.
+        /// المانی را که LiveSetting گرفته وادار به اعلامِ تغییر برای screen reader می کند.
         /// بدون این فراخوانی، تغییر متن پیام ها از کنار خواننده ی صفحه می گذرد.
         /// </summary>
         private static void AnnounceForAccessibility(UIElement element)
@@ -2179,7 +2164,7 @@ namespace CleanC.UI
 
             try
             {
-                // D6: در High Contrast، صرف نظر از بازنویسی رنگ ها تا سیستم برنده شود.
+                // در High Contrast، صرف نظر از بازنویسی رنگ ها تا سیستم برنده شود.
                 bool highContrast = IsHighContrastEnabled();
 
                 // والپیپر فقط برای نورپردازی Acrylic استفاده می شود؛ هرگز روی رنگ متن اثر نمی گذارد
@@ -2400,7 +2385,7 @@ namespace CleanC.UI
                 SettingsHeaderIcon.Foreground = isSettingsActive ? accentBrush : (useLightText ? new SolidColorBrush(ColorHelper.FromArgb(230, 255, 255, 255)) : new SolidColorBrush(ColorHelper.FromArgb(200, 20, 20, 20)));
             }
 
-            // D2: نمای فعال برای اجرای بعدی ذخیره می شود
+            // نمای فعال برای اجرای بعدی ذخیره می شود
             if (persist && _settings.SaveLastView && !_isLoadingSettings)
             {
                 _settings.LastView = view switch
@@ -2443,7 +2428,7 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // D2: ذخیره ی تنظیمات (debounce) و مکان یابی پنجره
+        // ذخیره ی تنظیمات (debounce) و مکان یابی پنجره
         // ====================================================================
 
         /// <summary>کنترل های صفحه Settings را از تنظیمات پر می کند؛ اینجا Toggled نباید چیزی ذخیره کند.</summary>
@@ -2452,7 +2437,7 @@ namespace CleanC.UI
             _isLoadingSettings = true;
             try
             {
-                // C6: state صفحه Settings از طریق ViewModel پر می شود و x:Bind آن را
+                // state صفحه Settings از طریق ViewModel پر می شود و x:Bind آن را
                 // به رادیوها/سوییچ ها می رساند (هیچ ذخیره ای در حین hydration رخ نمی دهد).
                 SettingsVm.Hydrate();
 
@@ -2470,7 +2455,7 @@ namespace CleanC.UI
                     }
                 }
 
-                // F1 — وضعیت شروع خودکار از رجیستری خوانده می شود، نه از فایل تنظیمات
+                // وضعیت شروع خودکار از رجیستری خوانده می شود، نه از فایل تنظیمات
                 AutoStartToggle.IsOn = StartupOptimizerService.IsCleanCRegisteredAtStartup();
 
                 // 1.5 — کارت کاراکتر: آیتم های ComboBox را می سازیم و اندیس فعلی را از VM می خوانیم
@@ -2480,7 +2465,7 @@ namespace CleanC.UI
                 SettingsPathText.Text = Path.GetDirectoryName(SettingsService.FilePath) ?? string.Empty;
                 LogPathText.Text = CcLog.LogDirectory;
 
-                // D8 — بخش «درباره»
+                // بخش «درباره»
                 AboutVersionText.Text = ReportExportService.GetVersion(typeof(MainWindow).Assembly);
                 AboutDotNetText.Text = RuntimeInformation.FrameworkDescription;
                 AboutOsText.Text = $"{RuntimeInformation.OSDescription} ({RuntimeInformation.OSArchitecture})";
@@ -2709,7 +2694,7 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // D3: رفتار تری آیکون (مخفی سازی و خروج ایمن)
+        // رفتار تری آیکون (مخفی سازی و خروج ایمن)
         // ====================================================================
 
         /// <summary>پنهان کردن پنجره در تری آیکون؛ برنامه زنده می ماند و فقط HWND مخفی می شود.</summary>
@@ -2763,7 +2748,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F1 — ثبت/حذف CleanC در آیتم های اجرای خودکار ویندوز (HKCU\...\Run).
+        /// ثبت/حذف CleanC در آیتم های اجرای خودکار ویندوز (HKCU\...\Run).
         /// منبع حقیقت رجیستری است؛ اگر نوشتن شکست بخورد، کلید برمی گردد تا UI با
         /// وضعیت واقعی سیستم ناهمگام نماند.
         /// </summary>
@@ -2802,7 +2787,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F3 — اثرِ نمایشیِ تغییر رفتار حذفِ فایل های شخصی (از رویداد SettingsVm).
+        /// اثرِ نمایشیِ تغییر رفتار حذفِ فایل های شخصی (از رویداد SettingsVm).
         /// نوشتنِ تنظیم و همگام سازی <see cref="SafeDeleteService.DefaultMode"/> داخل VM است؛
         /// اینجا فقط هشدار حالت Permanent نشان داده می شود.
         /// </summary>
@@ -3249,7 +3234,7 @@ namespace CleanC.UI
         }
 
         // ====================================================================
-        // F7 — خروجی گزارش (TXT / CSV)
+        // خروجی گزارش (TXT / MD)
         // ====================================================================
 
         /// <summary>
@@ -3327,56 +3312,8 @@ namespace CleanC.UI
             }
         }
 
-        private void ExportStartupCsvBtn_Click(object sender, RoutedEventArgs e)
-            => SafeInvoker.Run(ExportStartupCsvBtn_ClickAsync());
-
-        private async Task ExportStartupCsvBtn_ClickAsync()
-        {
-            string? path = await PickSavePathAsync("جدول (CSV)", ".csv", $"CleanC-Startup-{Stamp()}");
-            if (string.IsNullOrEmpty(path)) return;
-
-            try
-            {
-                // GetStartupItems اسکن رجیستری + schtasks است؛ روی UI thread نباید بایستد
-                var items = await Task.Run(() => StartupOptimizerService.GetStartupItems());
-                string csv = ReportExportService.BuildStartupCsv(items);
-                ReportExportService.WriteUtf8Bom(path, csv);
-                ShowInfoBar("خروجی گزارش", $"فهرست {items.Count} آیتم استارت آپ در «{path}» ذخیره شد.", InfoBarSeverity.Success);
-            }
-            catch (Exception ex)
-            {
-                CcLog.Ignore(ex, "ExportStartupCsv");
-                ShowInfoBar("خروجی گزارش", "ذخیره ی فهرست استارت آپ انجام نشد.", InfoBarSeverity.Error);
-            }
-        }
-
-        private void ExportCleanupCsvBtn_Click(object sender, RoutedEventArgs e)
-            => SafeInvoker.Run(ExportCleanupCsvBtn_ClickAsync());
-
-        private async Task ExportCleanupCsvBtn_ClickAsync()
-        {
-            string? path = await PickSavePathAsync("جدول (CSV)", ".csv", $"CleanC-CleanupHistory-{Stamp()}");
-            if (string.IsNullOrEmpty(path)) return;
-
-            try
-            {
-                var rows = _cleanupHistory
-                    .Select(h => new CleanupHistoryRow { Date = h.Date, Bytes = h.Bytes })
-                    .ToList();
-
-                string csv = ReportExportService.BuildCleanupHistoryCsv(rows);
-                ReportExportService.WriteUtf8Bom(path, csv);
-                ShowInfoBar("خروجی گزارش", $"تاریخچه ی پاکسازی ({rows.Count} رکورد) در «{path}» ذخیره شد.", InfoBarSeverity.Success);
-            }
-            catch (Exception ex)
-            {
-                CcLog.Ignore(ex, "ExportCleanupCsv");
-                ShowInfoBar("خروجی گزارش", "ذخیره ی تاریخچه ی پاکسازی انجام نشد.", InfoBarSeverity.Error);
-            }
-        }
-
         // ====================================================================
-        // D8 — درباره، به روزرسانی و عیب یابی
+        // درباره، به روزرسانی و عیب یابی
         // ====================================================================
 
         /// <summary>مخزن پروژه — از remote واقعی git گرفته می شود، نه مقدار حدسی.</summary>
@@ -4007,7 +3944,7 @@ namespace CleanC.UI
             StatusInfoBar.Severity = severity;
             StatusInfoBar.IsOpen = true;
 
-            // D6: اعلامِ زنده برای خواننده ی صفحه
+            // اعلامِ زنده برای خواننده ی صفحه
             AnnounceForAccessibility(StatusInfoBar);
 
             _infoBarAutoDismissTimer.Stop();
@@ -4015,7 +3952,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// F5 — نوتیفیکیشن ویندوزی فقط وقتی پنجره ی CleanC فوکوس ندارد؛
+        /// نوتیفیکیشن ویندوزی فقط وقتی پنجره ی CleanC فوکوس ندارد؛
         /// اول toast (WinAppSDK) و اگر ثبت نشده باشد، balloon تری آیکون با شدت واقعی.
         /// </summary>
         private void NotifyOutsideWindow(string title, string message, InfoBarSeverity severity)
@@ -4054,7 +3991,7 @@ namespace CleanC.UI
                 return;
             }
 
-            // B4 — اعلان ها در settings.json هم نوشته می شوند تا بعد از ری استارت از بین نروند
+            // اعلان ها در settings.json هم نوشته می شوند تا بعد از ری استارت از بین نروند
             try
             {
                 _settings.NotificationHistory.Insert(0, new NotificationHistoryEntry
@@ -4208,7 +4145,7 @@ namespace CleanC.UI
             if (NotificationHistoryStack == null) return;
             NotificationHistoryStack.Children.Clear();
 
-            // B4 — پاک کردنِ UI باید ذخیره شده را هم پاک کند وگرنه بعد از ری استارت برمی گردد
+            // پاک کردنِ UI باید ذخیره شده را هم پاک کند وگرنه بعد از ری استارت برمی گردد
             try
             {
                 _settings.NotificationHistory.Clear();
@@ -4395,7 +4332,7 @@ namespace CleanC.UI
                     DispatcherQueue.TryEnqueue(() =>
                     {
                         UpdateAccentBrushes();
-                        // D6: تغییر رنگ سیستم می تواند روشن/خاموش شدن High Contrast باشد
+                        // تغییر رنگ سیستم می تواند روشن/خاموش شدن High Contrast باشد
                         ConfigureSystemBackdrop();
                         // هالهٔ دور کاراکتر داخل هیرو از همین Accent پیروی می کند
                         PushHeroTheme();
@@ -4577,7 +4514,7 @@ namespace CleanC.UI
         {
             _currentHealthScore = Math.Clamp(score, 0, 100);
 
-            // F5 — عدد سلامت روی آیکون تسک بار (badge)؛ فقط وقتی عدد صحیح عوض می شود
+            // عدد سلامت روی آیکون تسک بار (badge)؛ فقط وقتی عدد صحیح عوض می شود
             // تا حین انیمیشن گیج، هر فریم یک فراخوانی COM نزنیم.
             int roundedScore = (int)Math.Round(_currentHealthScore);
             if (roundedScore != _lastBadgeScore)

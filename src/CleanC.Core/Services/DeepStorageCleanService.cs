@@ -477,7 +477,7 @@ namespace CleanC.Core.Services
             return group;
         }
 
-        // F3 — همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند تا
+        // همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند تا
         // واقعاً به سطل بازیافت (یا قرنطینه) برسند و امکان بازگردانی داشته باشند.
 
         public static async Task<SafeDeleteBatchResult> DeleteDuplicateFilesAsync(IEnumerable<string> filePaths)

@@ -591,7 +591,15 @@ namespace CleanC.Core.Services
                             .Where(v => !string.IsNullOrEmpty(v))
                             .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-                        int index = key.ValueCount + 1;
+                        // بیشترین ایندکس عددی موجود + ۱ — ValueCount ساده در صورت وجود
+                        // حفره در ایندکس ها یا مقادیر غیرعددی، روی مقدار موجود overwrite می کرد
+                        int maxIndex = 0;
+                        foreach (var name in key.GetValueNames())
+                        {
+                            if (int.TryParse(name, out int n) && n > maxIndex) maxIndex = n;
+                        }
+
+                        int index = maxIndex + 1;
                         foreach (var id in idsToBlock)
                         {
                             if (!existingValues.Contains(id))

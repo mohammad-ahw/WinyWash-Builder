@@ -174,9 +174,9 @@ namespace CleanC.Core.Services
 
                             DateTime? installed = null;
                             try { installed = pkg.InstalledDate.DateTime; } catch (Exception __ex)
-{
-    CcLog.Ignore(__ex);
-}
+                            {
+                                CcLog.Ignore(__ex);
+                            }
 
                             string? logoPath = null;
                             try

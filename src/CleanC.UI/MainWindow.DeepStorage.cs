@@ -655,7 +655,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// D5 — تأیید حذف گروهی پیش از انتقال انتخاب ها به سطل بازیافت.
+        /// تأیید حذف گروهی پیش از انتقال انتخاب ها به سطل بازیافت.
         /// تعداد و حجم موارد انتخاب شده را نشان می دهد؛ اگر چیزی انتخاب نشده باشد
         /// همان پیام قبلی InfoBar را نمایش می دهد و بدون باز کردن دیالوگ برمی گردد.
         /// </summary>
@@ -696,7 +696,7 @@ namespace CleanC.UI
             }
 
             string sizeInfo = bytes > 0 ? $" مجموع حجم: {SystemStats.FormatBytes(bytes)}،" : "";
-            // F3 — دیالوگ دقیقاً همان رفتاری را وعده می دهد که واقعاً رخ می دهد
+            // دیالوگ دقیقاً همان رفتاری را وعده می دهد که واقعاً رخ می دهد
             string modeNote = SafeDeleteService.DescribeMode(SafeDeleteService.DefaultMode);
             var dialog = new ContentDialog
             {

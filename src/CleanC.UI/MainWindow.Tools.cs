@@ -1748,7 +1748,7 @@ namespace CleanC.UI
                     string ext = Path.GetExtension(exe).ToLowerInvariant();
                     if (ext == ".png" || ext == ".jpg" || ext == ".ico") return exe;
 
-                    // B3: هش قطعی به جای GetHashCode — جزئیات در StableHash32
+                    // هش قطعی به جای GetHashCode — جزئیات در StableHash32
                     string hash = StableHash32(exe + appName);
                     string cacheDir = Path.Combine(Path.GetTempPath(), "CleanC", "Icons");
                     string iconPath = Path.Combine(cacheDir, $"{hash}.png");
@@ -1776,7 +1776,7 @@ namespace CleanC.UI
         private static bool _iconCachePurged;
 
         /// <summary>
-        /// B3 — پاک سازی یک باره ی کش آیکون های قدیمی.
+        /// پاک سازی یک باره ی کش آیکون های قدیمی.
         ///
         /// نسخه های قبلی با هش randomize شده ی <c>GetHashCode()</c> فایل می ساختند که
         /// هیچ وقت دوباره پیدا نمی شد؛ در نتیجه پوشه ی کش انباشته می شد.
@@ -1821,7 +1821,7 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// B3 — هش FNV-1a (32 بیت) قطعی برای نام فایل کش آیکون.
+        /// هش FNV-1a (32 بیت) قطعی برای نام فایل کش آیکون.
         ///
         /// دلیل رد شدن از GetHashCode: در .NET Core رشته ها per-process randomize
         /// می شوند (یعنی کش هر بار از نو ساخته می شد) و <c>Math.Abs(int.MinValue)</c>
@@ -1973,7 +1973,7 @@ namespace CleanC.UI
                 var nameText = new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12.5, VerticalAlignment = VerticalAlignment.Center };
                 topRow.Children.Add(nameText);
 
-                // F6: امتیاز واقعی تأثیر روی بوت (اندازه گیری شده از رویدادهای ویندوز
+                // امتیاز واقعی تأثیر روی بوت (اندازه گیری شده از رویدادهای ویندوز
                 // یا تخمین بر اساس دسته بندی) به جای هیوریستیک ثابت
                 var impactBadge = new Border
                 {
@@ -2031,7 +2031,7 @@ namespace CleanC.UI
                 };
                 textStack.Children.Add(cmdText);
 
-                // F6: اگر ویندوز برای این برنامه تأخیر بوت ثبت کرده باشد، همان عدد واقعی را نشان بده
+                // اگر ویندوز برای این برنامه تأخیر بوت ثبت کرده باشد، همان عدد واقعی را نشان بده
                 if (item.ImpactMeasured && item.ImpactMs > 0)
                 {
                     textStack.Children.Add(new TextBlock

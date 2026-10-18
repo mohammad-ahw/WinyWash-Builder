@@ -1,5 +1,5 @@
 // src/CleanC.UI/MainWindow.RecycleBin.cs
-// F8 — پنل مدیریت سطل بازیافت: پیش نمایش آیتم به آیتم + بازگردانی/حذف قطعی.
+// پنل مدیریت سطل بازیافت: پیش نمایش آیتم به آیتم + بازگردانی/حذف قطعی.
 // منطق واقعی فایل سیستم در CleanC.Core/Services/RecycleBinService.cs است؛
 // این فایل فقط لایه ی نمایش و کنترل رویدادهاست.
 
@@ -222,8 +222,8 @@ namespace CleanC.UI
         }
 
         // ── اکشن های گروهی ────────────────────────────────────────────────
-        // C8: handlerها به الگوی SafeInvoker برده شدند؛ چون از فاز ۱۳ استثناهای
-        // خارج از catch دیگر خفه نمی شوند و کل برنامه را می کشند.
+        // handlerها به الگوی SafeInvoker برده شده اند؛ استثناهای خارج از catch
+        // دیگر خفه نمی شوند و می توانند کل برنامه را از پا دربیاورند.
 
         private void RecycleBinRestoreSelectedBtn_Click(object sender, RoutedEventArgs e)
             => SafeInvoker.Run(RecycleBinRestoreSelectedBtn_Async(sender, e));
