@@ -173,6 +173,34 @@ namespace CleanC.Core.Tests
         }
 
         [Fact]
+        public void AllIdentifierKeysUsedInGet_HaveEnglishEntry()
+        {
+            var englishKeys = LoadReswKeys(Path.Combine(StringsRoot, "en-US", "Resources.resw"));
+            var missing = new List<string>();
+
+            foreach (var file in EnumerateSourceFiles())
+            {
+                var lines = File.ReadAllLines(file, Encoding.UTF8);
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    foreach (Match m in GetCallRegex.Matches(lines[i]))
+                    {
+                        string key = UnescapeCSharpString(m.Groups[1].Value);
+                        if (ContainsPersianChars(key)) continue;
+                        if (!englishKeys.Contains(key))
+                        {
+                            missing.Add($"{Path.GetRelativePath(FindRepoRoot(), file)}:{i + 1}: {key}");
+                        }
+                    }
+                }
+            }
+
+            Assert.True(missing.Count == 0,
+                $"کلیدهای شناسه‌ایِ بدون ترجمه ی انگلیسی ({missing.Count} مورد):\n" +
+                string.Join("\n", missing.Distinct().Take(40)));
+        }
+
+        [Fact]
         public void AllLanguageFiles_ContainEveryNonPersianKeyFromEnglish()
         {
             var englishKeys = LoadReswKeys(Path.Combine(StringsRoot, "en-US", "Resources.resw"));

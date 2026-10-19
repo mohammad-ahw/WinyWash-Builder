@@ -24,10 +24,14 @@ Generated\ Files/
 ## Publish and Archive directories / files
 publish/
 Publish/
+publish-new/
 *.zip
 *.7z
 *.rar
 *.tar.gz
+
+## Local smoke-test helpers
+shutdown_1min.bat
 
 ## Windows / OS generated
 Thumbs.db

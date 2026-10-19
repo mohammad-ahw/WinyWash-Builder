@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Als Administrator ausgeführt</value></data>
@@ -66,8 +66,16 @@
   <data name="RamTitle" xml:space="preserve"><value>Arbeitsspeicher (RAM)</value></data>
   <data name="CpuTitle" xml:space="preserve"><value>Prozessor (CPU)</value></data>
   <data name="NetworkTitle" xml:space="preserve"><value>Netzwerk-Überwachung</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>Netzwerk</value></data>
   <data name="CleanupHistoryTitle" xml:space="preserve"><value>Kürzliche Bereinigungen</value></data>
   <data name="DiskBreakdownTitle" xml:space="preserve"><value>Speicherbelegung</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>Belegt</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>Bereinigbar</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>Frei</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>Elemente ausgewählt</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>Insgesamt erkannt</value></data>
+  <data name="Scanning" xml:space="preserve"><value>Wird gescannt...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>Nach der Bereinigung optimiert</value></data>
   <data name="ToolSpecsTitle" xml:space="preserve"><value>Detaillierte Systemspezifikationen</value></data>
   <data name="ToolBatteryTitle" xml:space="preserve"><value>Akkuzustand &amp; Energie</value></data>
   <data name="ToolUninstallerTitle" xml:space="preserve"><value>App- &amp; Bloatware-Deinstallationsprogramm</value></data>
@@ -80,14 +88,6 @@
   <data name="ToolDnsTitle" xml:space="preserve"><value>DNS-Manager</value></data>
   <data name="ToolContextMenuTitle" xml:space="preserve"><value>Kontextmenü-Manager</value></data>
   <data name="ToolDeepStorageTitle" xml:space="preserve"><value>Tiefenbereinigung</value></data>
-  <data name="NetworkTrafficTitle" xml:space="preserve"><value>Netzwerk</value></data>
-  <data name="DiskUsed" xml:space="preserve"><value>Belegt</value></data>
-  <data name="DiskCleanable" xml:space="preserve"><value>Bereinigbar</value></data>
-  <data name="DiskFree" xml:space="preserve"><value>Frei</value></data>
-  <data name="ItemsSelected" xml:space="preserve"><value>Elemente ausgewählt</value></data>
-  <data name="TotalDetected" xml:space="preserve"><value>Insgesamt erkannt</value></data>
-  <data name="Scanning" xml:space="preserve"><value>Wird gescannt...</value></data>
-  <data name="RefreshedAfterClean" xml:space="preserve"><value>Nach der Bereinigung optimiert</value></data>
   <data name="CharacterTitle" xml:space="preserve"><value>Heldenfigur</value></data>
   <data name="CharacterSub" xml:space="preserve"><value>Aussehen, Ton und Verhalten der Figur auf der Dashboard-Karte. Änderungen wirken sofort.</value></data>
   <data name="CharacterTone" xml:space="preserve"><value>Sprechton</value></data>
@@ -111,4 +111,1330 @@
   <data name="CharacterFast" xml:space="preserve"><value>Schnelle Reaktionen (kürzere Animationen)</value></data>
   <data name="CharacterCalm" xml:space="preserve"><value>Ruhemodus (reduzierte Bewegung, für langsamere PCs)</value></data>
   <data name="CharacterLun" xml:space="preserve"><value>Korrektur des Mondkalenders für Anlässe (±1 Tag)</value></data>
+  <data name="در حال ارزیابی فایل های موقت و موارد توصیه شده..." xml:space="preserve"><value>Überprüfen von temporären Dateien und empfohlenen Elementen...</value></data>
+  <data name="موارد پیشنهادی (Recommended items)" xml:space="preserve"><value>Empfohlene Elemente</value></data>
+  <data name="فایل های زائد و موقتی که پاکسازی آنها ۱۰۰٪ ایمن است" xml:space="preserve"><value>Müll- und temporäre Dateien, die zu 100 % sicher zu bereinigen sind</value></data>
+  <data name="فایل های موقت سیستم و کاربر" xml:space="preserve"><value>System- und Benutzertemporärdateien</value></data>
+  <data name="فایل های موقت، کش برنامه ها و پردازه ها در مسیرهای Temp" xml:space="preserve"><value>Temporäre Dateien, App- und Prozess-Caches in Temp-Ordnern</value></data>
+  <data name="سطل بازیافت (Recycle Bin)" xml:space="preserve"><value>Papierkorb</value></data>
+  <data name="فایل های حذف شده موجود در سطل بازیافت تمام درایوها" xml:space="preserve"><value>Gelöschte Dateien im Papierkorb auf allen Laufwerken</value></data>
+  <data name="گزارش های خطا و کرش دامپ ها" xml:space="preserve"><value>Fehlerberichte und Absturzabbilder</value></data>
+  <data name="حافظه کش مایکروسافت اج (Microsoft Edge)" xml:space="preserve"><value>Microsoft Edge-Cache</value></data>
+  <data name="کش صفحات وب، تصاویر و کدهای ذخیره شده مرورگر اج" xml:space="preserve"><value>Zwischengespeicherte Webseiten, Bilder und Skripte, die von Microsoft Edge gespeichert wurden</value></data>
+  <data name="حافظه کش گوگل کروم (Google Chrome)" xml:space="preserve"><value>Google Chrome-Cache</value></data>
+  <data name="کش صفحات وب، تصاویر و کدهای کامپایل شده مرورگر کروم" xml:space="preserve"><value>Zwischengespeicherte Webseiten, Bilder und kompilierte Skripte, die von Google Chrome gespeichert werden</value></data>
+  <data name="کش نصبی آپدیت های ویندوز" xml:space="preserve"><value>Windows Update-Download-Cache</value></data>
+  <data name="فایل های بسته های نصب شده Windows Update" xml:space="preserve"><value>Installierte Windows-Update-Paketdateien</value></data>
+  <data name="کش توزیع دانلود ویندوز (Delivery Optimization)" xml:space="preserve"><value>Cache für Windows Delivery Optimization herunterladen</value></data>
+  <data name="فایل های موقت بسته های دانلود آپدیت ها و استور مایکروسافت" xml:space="preserve"><value>Temporäre Dateien von Update- und Microsoft Store-Paketdownloads</value></data>
+  <data name="حافظه کش بندانگشتی ها (Thumbnail Cache)" xml:space="preserve"><value>Thumbnail-Cache</value></data>
+  <data name="پیش نمایش ذخیره شده فایل ها و تصاویر در فایل اکسپلورر" xml:space="preserve"><value>Zwischengespeicherte Vorschauen von Dateien und Bildern im Datei-Explorer</value></data>
+  <data name="پوشه‌های خالی رهاشده (Empty Folders)" xml:space="preserve"><value>Leere Ordner</value></data>
+  <data name="{0} پوشه کاملاً خالی در Downloads و Desktop" xml:space="preserve"><value>{0} vollständig leere Ordner in Downloads und Desktop</value></data>
+  <data name="پوشه خالی در پوشه‌های کاربری یافت نشد (سیستم مرتب است)" xml:space="preserve"><value>Keine leeren Ordner in Benutzerordnern gefunden (das System ist aufgeräumt)</value></data>
+  <data name="در حال ارزیابی شیدرهای گرافیکی و حافظه های سیستمی..." xml:space="preserve"><value>Bewertung von Grafikkarten-Shadern und Systemspeicher...</value></data>
+  <data name="سایر موارد سیستمی (Other system items)" xml:space="preserve"><value>Andere Systemelemente</value></data>
+  <data name="شیدرهای گرافیکی دایرکت ایکس و گزارش های سیستمی" xml:space="preserve"><value>DirectX-Grafik-Shader und Systemberichte</value></data>
+  <data name="کش شیدرهای گرافیکی (DirectX Shader Cache)" xml:space="preserve"><value>DirectX-Shader-Cache</value></data>
+  <data name="شیدرهای رندر گرافیکی ذخیره شده بازی ها و کارت گرافیک" xml:space="preserve"><value>Zwischengespeicherte Grafik-Shader für Spiele und die GPU</value></data>
+  <data name="ویجت های ویندوز (Windows Widgets)" xml:space="preserve"><value>Windows-Widgets</value></data>
+  <data name="داده های آفلاین و کش ویجت های ویندوز ۱۱" xml:space="preserve"><value>Offline-Daten und Cache für Windows 11-Widgets</value></data>
+  <data name="کش گواهی ها و شبکه ویندوز" xml:space="preserve"><value>Windows-Zertifikats- und Netzwerk-Cache</value></data>
+  <data name="فایل های موقت ارتباطی شبکه و ابزارهای سیستم" xml:space="preserve"><value>Temporäre Netzwerk- und Systemwerkzeugdateien</value></data>
+  <data name="مسیرها و کلیدهای نامعتبر رجیستری (Orphaned Registry)" xml:space="preserve"><value>Ungültige Registrierungspfade und -schlüssel (verwaiste Registrierung)</value></data>
+  <data name="{0} مسیر نامعتبر از برنامه های حذف شده در MuiCache رجیستری" xml:space="preserve"><value>{0} Ungültige Pfade von deinstallierten Programmen im Registry MuiCache</value></data>
+  <data name="در حال پویش نرم افزارهای نصب شده کاربر..." xml:space="preserve"><value>Benutzerinstallierte Software wird gescannt...</value></data>
+  <data name="سایر موارد برنامه ها (Other application items)" xml:space="preserve"><value>Andere Anwendungsgegenstände</value></data>
+  <data name="کش و لاگ های نرم افزارهای کشف شده در سیستم" xml:space="preserve"><value>Caches und Protokolle von auf dem System entdeckter Software</value></data>
+  <data name="کش پکیج های Node.js (npm)" xml:space="preserve"><value>Node.js-Paket-Cache (npm)</value></data>
+  <data name="بسته های موقت دانلودشده npm در سیستم" xml:space="preserve"><value>Temporäre npm-Pakete, die auf das System heruntergeladen wurden</value></data>
+  <data name="کش درایور و شیدرهای انویدیا (NVIDIA)" xml:space="preserve"><value>NVIDIA-Treiber- und Shader-Cache</value></data>
+  <data name="فایل های موقت و شیدرهای رندر کارت گرافیک انویدیا" xml:space="preserve"><value>Temporäre Dateien und Rendering-Shader für NVIDIA-Grafikkarten</value></data>
+  <data name="لاگ ها و گزارش های OneDrive" xml:space="preserve"><value>OneDrive-Protokolle und Berichte</value></data>
+  <data name="فایل های عیب یابی و لاگ های هماهنگ سازی وان درایو" xml:space="preserve"><value>OneDrive-Synchronisierungsprotokolle und Diagnose-Dateien</value></data>
+  <data name="کش پکیج های پایتون (Pip)" xml:space="preserve"><value>Python-Paket-Cache (Pip)</value></data>
+  <data name="بسته های دانلودشده مخزن پایتون" xml:space="preserve"><value>Vom Python-Repository heruntergeladene Pakete</value></data>
+  <data name="کش محیط برنامه نویسی VS Code" xml:space="preserve"><value>VS Code-Cache</value></data>
+  <data name="فایل های کش و داده های موقت ویرایشگر کد" xml:space="preserve"><value>Cache- und temporäre Daten-Dateien des Code-Editors</value></data>
+  <data name="کش پیام رسان دیسکورد (Discord)" xml:space="preserve"><value>Discord-Cache</value></data>
+  <data name="تصاویر و رسانه های موقت دانلودشده در دیسکورد" xml:space="preserve"><value>Temporäre Bilder und Medien, die von Discord heruntergeladen wurden</value></data>
+  <data name="دیتای پیام رسان تلگرام (Telegram Desktop)" xml:space="preserve"><value>Telegram Desktop-Daten</value></data>
+  <data name="پروفایل و رسانه های کش شده تلگرام؛ حاوی نشست ورود حساب شماست - پاکسازی خودکار عمداً غیرفعال است و فقط با تیک دستی انجام می شود" xml:space="preserve"><value>Zwischengespeichertes Telegram-Profil und Medien; enthält deine Kontologin-Sitzung – automatische Bereinigung ist absichtlich deaktiviert und wird nur bei manueller Auswahl ausgeführt</value></data>
+  <data name="کش نرم افزار اسپاتیفای (Spotify)" xml:space="preserve"><value>Spotify-Cache</value></data>
+  <data name="فایل های موقت موسیقی و کاور آلبوم ها" xml:space="preserve"><value>Temporäre Musik- und Albumcover-Dateien</value></data>
+  <data name="مدل ها و کش ابزارهای هوش مصنوعی (AI &amp; LLMs)" xml:space="preserve"><value>KI-Tool-Modelle und Cache (KI &amp; LLMs)</value></data>
+  <data name="مدل های دانلودشده Ollama و کش HuggingFace" xml:space="preserve"><value>Heruntergeladene Ollama-Modelle und HuggingFace-Cache</value></data>
+  <data name="بکاپ‌های قدیمی گوشی و تبلت (Apple، سامسونگ، هواوی)" xml:space="preserve"><value>Alte Handy- und Tablet-Backups (Apple, Samsung, Huawei)</value></data>
+  <data name="نسخه‌های پشتیبان حجیم دستگاه‌های موبایل؛ این تنها نسخه پشتیبان شماست - حذف خودکار عمداً غیرفعال است و فقط بعد از تیک دستی و مرور مسیر انجام می شود" xml:space="preserve"><value>Große Sicherungskopien von mobilen Geräten; dies ist Ihre einzige Sicherung - automatische Löschung ist absichtlich deaktiviert und läuft nur nach manueller Auswahl und Pfadüberprüfung</value></data>
+  <data name="هیچ بکاپ قدیمی از گوشی یا تبلت در کامپیوتر یافت نشد" xml:space="preserve"><value>Keine alten Telefon- oder Tablet-Sicherungen auf diesem PC gefunden</value></data>
+  <data name="افزونه‌های زائد و دیتابیس‌های منسوخ مرورگرها (Chrome / Edge)" xml:space="preserve"><value>Veraltete Browser-Erweiterungen und alte Datenbanken (Chrome / Edge)</value></data>
+  <data name="{0} افزونه منسوخ یا دیتابیس رهاشده با حفظ ۱۰۰٪ اطلاعات سایت‌ها" xml:space="preserve"><value>{0} veraltete Erweiterung oder verwaiste Datenbank unter Beibehaltung von 100 % der Standortdaten</value></data>
+  <data name="افزونه منسوخ یا دیتابیس زائد مرورگر یافت نشد (مرورگرها مرتب هستند)" xml:space="preserve"><value>Keine veralteten Erweiterungen oder unnötigen Browser-Datenbanken gefunden (Browser sind sauber)</value></data>
+  <data name="در حال بررسی تاریخچه و ردپای استفاده از سیستم..." xml:space="preserve"><value>Überprüfung der Systemnutzungsverläufe und Spuren...</value></data>
+  <data name="ردپای استفاده از کامپیوتر (Usage Traces)" xml:space="preserve"><value>Nutzungsspuren</value></data>
+  <data name="لیست فایل های اخیر، پرش سریع و تاریخچه های سیستم" xml:space="preserve"><value>Liste der zuletzt verwendeten Dateien, Sprunglisten und Systemverläufe</value></data>
+  <data name="تاریخچه فایل های اخیر (Recent Items)" xml:space="preserve"><value>Zuletzt verwendete Elemente</value></data>
+  <data name="شورتکات های ثبت شده فایل های اخیراً باز شده در ویندوز" xml:space="preserve"><value>Verknüpfungen für zuletzt geöffnete Dateien in Windows aufgezeichnet</value></data>
+  <data name="لیست های پرش اکسپلورر (Jump Lists)" xml:space="preserve"><value>Sprunglisten</value></data>
+  <data name="میانبرهای برنامه های اخیر در تسک بار ویندوز" xml:space="preserve"><value>Verknüpfungen zu kürzlich verwendeten Apps in der Windows-Taskleiste</value></data>
+  <data name="در حال ارزیابی دانلود منیجرها و فایل های ناقص..." xml:space="preserve"><value>Bewertung von Download-Managern und unvollständigen Dateien...</value></data>
+  <data name="دانلود منیجرها و فایل های ناتمام (Download Managers)" xml:space="preserve"><value>Download-Manager</value></data>
+  <data name="چانک های موقت، تکه های دانلود ناقص و فایل های رهاشده" xml:space="preserve"><value>Temporäre Fragmente, unvollständige Download-Teile und aufgegebene Dateien</value></data>
+  <data name="فایل های موقت و چانک های ناتمام IDM" xml:space="preserve"><value>IDM-Temporärdateien und unvollendete Fragmente</value></data>
+  <data name="قطعات موقت دانلودهای متوقف شده، لغوشده و رهاشده در اینترنت دانلود منیجر" xml:space="preserve"><value>Temporäre Teile von pausierten, abgebrochenen und aufgegebenen Downloads im Internet Download Manager</value></data>
+  <data name="فایل های موقت Free Download Manager (FDM)" xml:space="preserve"><value>Free Download Manager (FDM) temporäre Dateien</value></data>
+  <data name="کش و قطعات موقت دانلودهای ناتمام FDM" xml:space="preserve"><value>FDM-Cache und temporäre Teile unvollständiger Downloads</value></data>
+  <data name="دانلودهای ناتمام و ناقص قدیمی مرورگرها" xml:space="preserve"><value>Alte unvollständige Browser-Downloads</value></data>
+  <data name="{0} فایل ناقص رهاشده در پوشه Downloads (.crdownload / .part)" xml:space="preserve"><value>{0} aufgegebene unvollständige Dateien im Download-Ordner (.crdownload / .part)</value></data>
+  <data name="فایل‌های نصبی و اینستالرهای قدیمی (.exe / .iso)" xml:space="preserve"><value>Alte Installations- und Setup-Dateien (.exe / .iso)</value></data>
+  <data name="{0} فایل نصبی با بیش از ۱۴ روز عدم استفاده در Downloads" xml:space="preserve"><value>{0} nicht genutzte Installationsdateien seit über 14 Tagen im Downloads-Ordner</value></data>
+  <data name="اینستالر یا ستاپ قدیمی با بیش از ۱۴ روز قدمت یافت نشد" xml:space="preserve"><value>Kein Installations- oder Setup-Datei älter als 14 Tage gefunden</value></data>
+  <data name="فایل‌های بسیار حجیم قدیمی (بالای ۲۰۰ مگابایت)" xml:space="preserve"><value>Sehr große alte Dateien (über 200 MB)</value></data>
+  <data name="{0} فایل حجیم با بیش از ۲۱ روز عدم تغییر در پوشه Downloads" xml:space="preserve"><value>{0} große Dateien unverändert seit mehr als 21 Tagen im Downloads-Ordner</value></data>
+  <data name="فایل حجیم قدیمی بالای ۲۰۰ مگابایت در Downloads یافت نشد" xml:space="preserve"><value>Keine alten Dateien über 200 MB im Downloads-Ordner gefunden</value></data>
+  <data name="در حال پویش پوشه های باقیمانده نرم افزارهای حذف شده..." xml:space="preserve"><value>Durchsuche verbleibende Ordner von deinstallierter Software...</value></data>
+  <data name="پوشه های باقیمانده نرم افزارهای حذف شده (Leftovers)" xml:space="preserve"><value>Verbleibende Ordner von deinstallierter Software (Reste)</value></data>
+  <data name="پوشه های حجیم برنامه هایی که از سیستم حذف شده اند ولی داده هایشان باقی مانده است" xml:space="preserve"><value>Große Ordner von Programmen, die vom System entfernt wurden, deren Daten aber erhalten geblieben sind</value></data>
+  <data name="پوشه رهاشده: {0} ({1})" xml:space="preserve"><value>Verbleibender Ordner: {0} ({1})</value></data>
+  <data name="مسیر: {0}" xml:space="preserve"><value>Pfad: {0}</value></data>
+  <data name="در حال ارزیابی گزینه های بهینه سازی زنده و پایداری..." xml:space="preserve"><value>Bewertung von Live-Optimierungs- und Stabilitätsoptionen...</value></data>
+  <data name="بهینه سازی زنده و پایداری سیستم (Performance &amp; Boost)" xml:space="preserve"><value>Live-Optimierung und Systemstabilität (Leistung &amp; Boost)</value></data>
+  <data name="آزادسازی رم، کش شبکه، پروسس های اضافی، استارتاپ، Debloat و پلن انرژی" xml:space="preserve"><value>RAM, Netzwerk-Cache, zusätzliche Prozesse, Autostart, Bereinigung und Energieplan freigeben</value></data>
+  <data name="آزادسازی حافظه فعال رم (RAM Working Set)" xml:space="preserve"><value>Freier aktiver RAM (RAM-Arbeitsbereich)</value></data>
+  <data name="تخلیه Working Set پردازه ها و آزادسازی فوری حافظه اشغال شده بدون بستن برنامه ها" xml:space="preserve"><value>Arbeitssätze von Prozessen kürzen und sofort belegten Speicher freigeben, ohne Apps zu schließen</value></data>
+  <data name="تخلیه کش DNS و نوسازی ارتباطات شبکه" xml:space="preserve"><value>DNS-Cache leeren und Netzwerkverbindungen aktualisieren</value></data>
+  <data name="پاکسازی رکوردهای نامعتبر دامنه از کش ویندوز و رفع کندی ارتباطات اینترنتی" xml:space="preserve"><value>Ungültige Domänen-Einträge aus dem Windows-Cache entfernen und langsame Internetverbindungen reparieren</value></data>
+  <data name="بستن پردازه ها و کمک کننده های اضافی در پس زمینه" xml:space="preserve"><value>Zusätzliche Hintergrundprozesse und Hilfsprogramme schließen</value></data>
+  <data name="توقف سرویس های جانبی، پروسه های گزارش گیری و آپدیترهای مقیم در پس زمینه" xml:space="preserve"><value>Hintergrunddienste, Telemetrieprozesse und residente Updater stoppen</value></data>
+  <data name="خاموش سازی تسک های پس زمینه مرورگرها (Edge / Chrome)" xml:space="preserve"><value>Hintergrundaufgaben für Browser deaktivieren (Edge / Chrome)</value></data>
+  <data name="غیرفعال سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته شدن" xml:space="preserve"><value>Startup Boost deaktivieren und Browser daran hindern, nach dem Schließen verdeckte Aktivitäten auszuführen</value></data>
+  <data name="بهینه سازی استارتاپ ویندوز" xml:space="preserve"><value>Windows-Start optimieren</value></data>
+  <data name="غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم" xml:space="preserve"><value>Schwere Autostart-Apps und Launcher deaktivieren, um das Systemstarten zu beschleunigen</value></data>
+  <data name="حذف برنامه ها و بازی های تبلیغاتی پیش فرض (Debloat)" xml:space="preserve"><value>Standardmäßige Werbe-Apps und Spiele entfernen (Debloat)</value></data>
+  <data name="حذف نرم افزارها و بازی های تبلیغاتی پیش فرض و بررسی برنامه های کم استفاده" xml:space="preserve"><value>Entfernen Sie standardmäßige Werbesoftware und Spiele und überprüfen Sie selten genutzte Apps</value></data>
+  <data name="کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)" xml:space="preserve"><value>Systemabschaltzeit beschleunigen (Schnellstart)</value></data>
+  <data name="فعال سازی خاموش سازی و راه اندازی فوق سریع ویندوز" xml:space="preserve"><value>Ultra-schnelles Windows-Herunterfahren und -Starten aktivieren</value></data>
+  <data name="تخصیص هوشمند کارت گرافیک مجزا" xml:space="preserve"><value>Intelligente Zuweisung diskreter GPUs</value></data>
+  <data name="هدایت بازی ها و برنامه های سنگین به پردازنده گرافیکی قدرتمند اصلی" xml:space="preserve"><value>Spiele und rechenintensive Apps der primären Hochleistungs-GPU zuweisen</value></data>
+  <data name="بهینه سازی تنظیمات عملکرد و حریم خصوصی ویندوز" xml:space="preserve"><value>Windows-Leistung und Datenschutzeinstellungen optimieren</value></data>
+  <data name="غیرفعال سازی تله متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز" xml:space="preserve"><value>Telemetrie, den DiagTrack-Dienst, Startmenü-Werbung und Windows-Suche deaktivieren</value></data>
+  <data name="بازبینی نرم‌افزارهای حجیم و کم‌استفاده (&gt; 500MB با بیش از ۳۰ روز عدم اجرا)" xml:space="preserve"><value>Große und selten genutzte Software überprüfen (&gt; 500 MB und länger als 30 Tage nicht benutzt)</value></data>
+  <data name="مکث تعاملی جهت نمایش لیست برنامه‌های سنگین بلااستفاده و تایید اختیاری کاربر برای حذف" xml:space="preserve"><value>Interaktive Pause, um die Liste der schweren, ungenutzten Apps anzuzeigen und dem Benutzer optional die Entfernung zu genehmigen</value></data>
+  <data name="اشتراکی (Shared)" xml:space="preserve"><value>Geteilt</value></data>
+  <data name="سالم (Healthy)" xml:space="preserve"><value>Gesund</value></data>
+  <data name="در دسترس نیست" xml:space="preserve"><value>Nicht verfügbar</value></data>
+  <data name="نامشخص" xml:space="preserve"><value>Unbekannt</value></data>
+  <data name="{0} روز و " xml:space="preserve"><value>{0} Tage und </value></data>
+  <data name="{0}{1} ساعت و {2} دقیقه (روشن شده در {3:HH:mm})" xml:space="preserve"><value>{0}{1} Stunden und {2} Minuten (laufend seit {3:HH:mm})</value></data>
+  <data name="درایو محلی ({0})" xml:space="preserve"><value>Lokale Festplatte ({0})</value></data>
+  <data name="{0} ({1} آزاد)" xml:space="preserve"><value>{0} ({1} frei)</value></data>
+  <data name="سالم و فعال" xml:space="preserve"><value>Gesund und aktiv</value></data>
+  <data name="فعال شده با لایسنس معتبر (Licensed)" xml:space="preserve"><value>Mit gültiger Lizenz aktiviert (Lizenziert)</value></data>
+  <data name="دوره آزمایشی اولیه (OOB Grace)" xml:space="preserve"><value>Anfängliche Kulanzfrist (OOB Kulanz)</value></data>
+  <data name="دوره مهلت تمدید (OOT Grace)" xml:space="preserve"><value>Verlängerte Kulanzfrist (OOT Kulanz)</value></data>
+  <data name="لایسنس غیرمعتبر یا جعلی (Non-Genuine)" xml:space="preserve"><value>Ungültige oder gefälschte Lizenz (Nicht echt)</value></data>
+  <data name="فعال نشده / نیازمند فعال سازی (Notification)" xml:space="preserve"><value>Nicht aktiviert / Aktivierung erforderlich (Benachrichtigung)</value></data>
+  <data name="مهلت فعال سازی تمدید شده (Extended Grace)" xml:space="preserve"><value>Verlängerte Aktivierungskulanz (Verlängerte Kulanz)</value></data>
+  <data name="لایسنس نامعتبر یا غیرفعال" xml:space="preserve"><value>Ungültige oder inaktive Lizenz</value></data>
+  <data name="اطلاعات لایسنس در دسترس نیست" xml:space="preserve"><value>Lizenzinformationen nicht verfügbar</value></data>
+  <data name="دیسک فیزیکی" xml:space="preserve"><value>Physische Festplatte</value></data>
+  <data name="حافظه" xml:space="preserve"><value>Speicher</value></data>
+  <data name="هشدار (Warning)" xml:space="preserve"><value>Warnung</value></data>
+  <data name="نامطلوب" xml:space="preserve"><value>Schlecht</value></data>
+  <data name="{0}% سلامت" xml:space="preserve"><value>{0}% Gesundheit</value></data>
+  <data name="{0:N0} ساعت" xml:space="preserve"><value>{0:N0} Stunden</value></data>
+  <data name="         گزارش مشخصات سیستم و سخت افزار (CleanC)     " xml:space="preserve"><value>         System- &amp; Hardwarebericht (CleanC)     </value></data>
+  <data name="تاریخ گزارش: {0:yyyy.MM.dd HH:mm:ss}" xml:space="preserve"><value>Berichtsdatum: {0:yyyy.MM.dd HH:mm:ss}</value></data>
+  <data name="[پردازنده مرکزی - CPU]" xml:space="preserve"><value>[Zentrale Verarbeitungseinheit - CPU]</value></data>
+  <data name="  مدل: {0}" xml:space="preserve"><value>  Modell: {0}</value></data>
+  <data name="  مشخصات: {0} هسته فیزیکی | {1} رشته منطقی" xml:space="preserve"><value>  Spezifikationen: {0} physische Kerne | {1} logische Threads</value></data>
+  <data name="  فرکانس: {0} MHz" xml:space="preserve"><value>  Taktfrequenz: {0} MHz</value></data>
+  <data name="  حافظه کش L3: {0} KB" xml:space="preserve"><value>  L3-Cache: {0} KB</value></data>
+  <data name="[حافظه رم - RAM]" xml:space="preserve"><value>[Arbeitsspeicher - RAM]</value></data>
+  <data name="  ظرفیت کل: {0} ({1})" xml:space="preserve"><value>  Gesamtkapazität: {0} ({1})</value></data>
+  <data name="  اسلات های فعال: {0}" xml:space="preserve"><value>  Aktive Steckplätze: {0}</value></data>
+  <data name="  سرعت باس: {0} MHz" xml:space="preserve"><value>  Busgeschwindigkeit: {0} MHz</value></data>
+  <data name="  سازنده: {0}" xml:space="preserve"><value>  Hersteller: {0}</value></data>
+  <data name="[مادربرد و بایوس]" xml:space="preserve"><value>[Motherboard und BIOS]</value></data>
+  <data name="  سازنده مادربرد: {0}" xml:space="preserve"><value>  Motherboard-Hersteller: {0}</value></data>
+  <data name="  مدل مادربرد: {0}" xml:space="preserve"><value>  Motherboard-Modell: {0}</value></data>
+  <data name="  نسخه بایوس: {0}" xml:space="preserve"><value>  BIOS-Version: {0}</value></data>
+  <data name="  تاریخ بایوس: {0}" xml:space="preserve"><value>  BIOS-Datum: {0}</value></data>
+  <data name="[کارت های گرافیک - GPU]" xml:space="preserve"><value>[Grafikkarten - GPU]</value></data>
+  <data name="    حافظه اختصاصی VRAM: {0}" xml:space="preserve"><value>    Dedizierter VRAM: {0}</value></data>
+  <data name="    نسخه درایور: {0}" xml:space="preserve"><value>    Treiberversion: {0}</value></data>
+  <data name="[حافظه های ذخیره سازی]" xml:space="preserve"><value>[Speicherlaufwerke]</value></data>
+  <data name="    وضعیت: {0} | دما: {1} | کارکرد: {2}" xml:space="preserve"><value>    Status: {0} | Temperatur: {1} | Betriebszeit: {2}</value></data>
+  <data name="[باتری لپ تاپ]" xml:space="preserve"><value>[Laptop-Akku]</value></data>
+  <data name="  سلامت باتری: {0}%" xml:space="preserve"><value>  Batteriezustand: {0} %</value></data>
+  <data name="  ظرفیت اولیه کارخانه: {0} mWh" xml:space="preserve"><value>  Werksdesignkapazität: {0} mWh</value></data>
+  <data name="  ظرفیت شارژ فعلی: {0} mWh" xml:space="preserve"><value>  Aktuelle volle Ladekapazität: {0} mWh</value></data>
+  <data name="  تعداد دفعات شارژ (سیکل): {0}" xml:space="preserve"><value>  Ladezyklen: {0}</value></data>
+  <data name="[سیستم عامل و پایداری]" xml:space="preserve"><value>[Betriebssystem und Stabilität]</value></data>
+  <data name="  ویندوز: {0} ({1})" xml:space="preserve"><value>  Windows: {0} ({1})</value></data>
+  <data name="  شماره ساخت: Build {0}" xml:space="preserve"><value>  Build-Nummer: Build {0}</value></data>
+  <data name="  تاریخ نصب: {0}" xml:space="preserve"><value>  Installationsdatum: {0}</value></data>
+  <data name="  مدت زمان روشن بودن سیستم: {0}" xml:space="preserve"><value>  Systembetriebszeit: {0}</value></data>
+  <data name="سخت افزار" xml:space="preserve"><value>Hardware</value></data>
+  <data name="اعمال تغییر" xml:space="preserve"><value>Änderung anwenden</value></data>
+  <data name="{0} برنامه غیرضروری، تبلیغاتی یا کم استفاده شناسایی شد" xml:space="preserve"><value>{0} unnötige, werbliche oder selten genutzte Apps erkannt</value></data>
+  <data name="برنامه های تبلیغاتی و بلااستفاده پیش فرض که حدود {0} از فضای دیسک و منابع سیستم را درگیر کرده اند." xml:space="preserve"><value>Standardmäßige Werbe- und ungenutzte Apps, die etwa {0} des Speicherplatzes und der Systemressourcen verbrauchen.</value></data>
+  <data name="مدیریت نرم افزارها" xml:space="preserve"><value>Softwareverwaltung</value></data>
+  <data name="بررسی و حذف" xml:space="preserve"><value>Überprüfen und entfernen</value></data>
+  <data name="کاهش بحرانی فضای درایو ویندوز ({0} GB معادل {1:0}% آزاد)" xml:space="preserve"><value>Kritisch wenig Speicher auf dem Windows-Laufwerk ({0} GB, {1:0}% frei)</value></data>
+  <data name="پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول های فلش می شود. توصیه می شود پاکسازی و دستور TRIM انجام شود." xml:space="preserve"><value>Wenn eine SSD mehr als 85% gefüllt ist, kann dies zu bis zu 50% Geschwindigkeitseinbußen und vorzeitigem Verschleiß der Flash-Zellen führen. Es wird empfohlen, sie zu reinigen und TRIM auszuführen.</value></data>
+  <data name="حافظه و دیسک" xml:space="preserve"><value>Speicher und Festplatte</value></data>
+  <data name="بهینه سازی TRIM دیسک" xml:space="preserve"><value>TRIM auf der Festplatte optimieren</value></data>
+  <data name="شتاب دهنده سخت افزاری گرافیک (HAGS) فعال نیست" xml:space="preserve"><value>Hardware-beschleunigtes GPU-Scheduling (HAGS) ist nicht aktiviert</value></data>
+  <data name="با فعال سازی Hardware Accelerated GPU Scheduling، پردازش زمان بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم ها کاهش می یابد." xml:space="preserve"><value>Die Aktivierung von Hardware-beschleunigtem GPU-Scheduling überträgt das Render-Scheduling direkt an die GPU und reduziert die Frame-Latenz.</value></data>
+  <data name="کارت گرافیک و گیمینگ" xml:space="preserve"><value>GPU und Gaming</value></data>
+  <data name="فعال سازی HAGS" xml:space="preserve"><value>HAGS aktivieren</value></data>
+  <data name="تداخل پراکسی سیستم و قطعی اینترنت ({0})" xml:space="preserve"><value>System-Proxy-Konflikt und internetausfälle ({0})</value></data>
+  <data name="شبکه و ارتباطات" xml:space="preserve"><value>Netzwerk und Konnektivität</value></data>
+  <data name="رفع قطعی و حذف پراکسی" xml:space="preserve"><value>Ausfälle beheben und Proxy entfernen</value></data>
+  <data name="{0} سرویس یتیم در ویندوز شناسایی شد" xml:space="preserve"><value>{0} verwaiste Dienste in Windows erkannt</value></data>
+  <data name="سرویس‌هایی که فایل اجرایی آن‌ها از روی دیسک پاک شده اما ورودی آن‌ها در ویندوز مانده و باعث کندی استارتاپ سیستم می‌شوند." xml:space="preserve"><value>Dienste, deren ausführbare Dateien von der Festplatte gelöscht wurden, deren Einträge in Windows jedoch verbleiben, was den Systemstart verlangsamt.</value></data>
+  <data name="سرویس‌ها و بوت" xml:space="preserve"><value>Dienste und Start</value></data>
+  <data name="غیرفعال‌سازی سرویس‌ها" xml:space="preserve"><value>Dienste deaktivieren</value></data>
+  <data name="فشرده‌سازی دیسک‌های مجازی WSL و داکر ({0})" xml:space="preserve"><value>WSL- und Docker-virtuelle Festplatten komprimieren ({0})</value></data>
+  <data name="دیسک‌های مجازی پس از حذف فایل‌ها و کانتینرها حجم خود را پس نمی‌دهند. فشرده‌سازی VHDX می‌تواند گیگابایت‌ها فضا را آزاد کند." xml:space="preserve"><value>Virtuelle Festplatten schrumpfen nach dem Löschen von Dateien und Containern nicht. Die Komprimierung von VHDX kann Gigabyte an Speicherplatz freigeben.</value></data>
+  <data name="مجازی‌سازی و دیسک" xml:space="preserve"><value>Virtualisierung und Festplatten</value></data>
+  <data name="فشرده‌سازی دیسک‌ها" xml:space="preserve"><value>Festplatten komprimieren</value></data>
+  <data name="ارتقای نرخ نوسازی مانیتور از {0}Hz به {1}Hz" xml:space="preserve"><value>Bildwiederholfrequenz des Monitors von {0}Hz auf {1}Hz erhöhen</value></data>
+  <data name="مانیتور شما با رزولوشن {0}×{1} از فرکانس بالاتر {2}Hz پشتیبانی می کند که روانی و سرعت تصویر را ۲ برابر خواهد کرد." xml:space="preserve"><value>Ihr Monitor mit {0}×{1} unterstützt eine höhere {2}Hz-Bildwiederholfrequenz, die Bewegungen etwa doppelt so flüssig macht.</value></data>
+  <data name="نمایشگر و مانیتور" xml:space="preserve"><value>Anzeige und Monitor</value></data>
+  <data name="ارتقا به {0}Hz" xml:space="preserve"><value>Auf {0}Hz aufrüsten</value></data>
+  <data name="نرم افزار نقاشی پیش فرض ویندوز" xml:space="preserve"><value>Standard-Paint-App von Windows</value></data>
+  <data name="برنامه اصلی ایکس باکس و بازی های ویندوز" xml:space="preserve"><value>Haupt-Xbox-App und Windows-Spiele</value></data>
+  <data name="نوار ابزار و ضبط ویدیوی بازی" xml:space="preserve"><value>In-Game-Overlay-Symbolleiste und Videoaufnahme</value></data>
+  <data name="پوشش درون بازی ایکس باکس" xml:space="preserve"><value>Xbox-In-Game-Overlay</value></data>
+  <data name="سرویس ورود به اکانت مایکروسافت در بازی ها" xml:space="preserve"><value>Microsoft-Konto-Anmeldedienst für Spiele</value></data>
+  <data name="ابزار تبدیل گفتار به نوشتار ایکس باکس" xml:space="preserve"><value>Xbox-Sprach-zu-Text-Tool</value></data>
+  <data name="برنامه اتصال و همگام سازی گوشی با ویندوز" xml:space="preserve"><value>App zur Verbindung und Synchronisierung von Telefon zu Windows</value></data>
+  <data name="ابزار اتوماسیون کارهای تکراری مایکروسافت (RPA) — اگر استفاده نمی کنید لازم نیست" xml:space="preserve"><value>Microsoft RPA-Tool zur Automatisierung wiederholter Aufgaben — nicht erforderlich, wenn Sie es nicht verwenden</value></data>
+  <data name="برای همگام سازی آیفون با iTunes قدیمی — اگر آیفون وصل نمی کنید لازم نیست" xml:space="preserve"><value>Zum Synchronisieren des iPhones mit dem alten iTunes — nicht erforderlich, wenn Sie kein iPhone anschließen</value></data>
+  <data name="سرویس کشف شبکه ی اپل — فقط برای iTunes و چاپگرهای اپل لازم است" xml:space="preserve"><value>Apple-Netzwerkerkennungsdienst — nur erforderlich für iTunes und Apple-Drucker</value></data>
+  <data name="کلاینت VPN بدون استفاده" xml:space="preserve"><value>Nicht verwendeter VPN-Client</value></data>
+  <data name="نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست" xml:space="preserve"><value>Veraltete Java-Version (JDK 8) — nur erforderlich, wenn Sie Legacy-Projekte betreuen</value></data>
+  <data name="ابزار منسوخ بررسی سلامت ویندوز — مایکروسافت بازنشسته اش کرده؛ جایگزین: PC Manager" xml:space="preserve"><value>Veraltetes Windows-Gesundheitsprüfungs-Tool — von Microsoft eingestellt; ersetzt durch PC Manager</value></data>
+  <data name="درایور ADB قدیمی و عمومی — برای گوشی های جدید، درایور رسمی گوگل یا سازنده بهتر است" xml:space="preserve"><value>Alter generischer ADB-Treiber — für neuere Telefone ist der offizielle Google- oder Hersteller-Treiber besser</value></data>
+  <data name="بازی تبلیغاتی پیش فرض ویندوز" xml:space="preserve"><value>Vorinstalliertes Werbespiel von Windows</value></data>
+  <data name="برنامه تبلیغاتی تیک تاک" xml:space="preserve"><value>TikTok-Werbeapp</value></data>
+  <data name="برنامه اشتراک دیزنی پلاس" xml:space="preserve"><value>Disney+ Streaming-App</value></data>
+  <data name="برنامه فیس بوک" xml:space="preserve"><value>Facebook-App</value></data>
+  <data name="برنامه اینستاگرام" xml:space="preserve"><value>Instagram-App</value></data>
+  <data name="برنامه تبلیغاتی آمازون پرایم" xml:space="preserve"><value>Amazon Prime Video Werbe-App</value></data>
+  <data name="برنامه پخش فیلم نتفلیکس" xml:space="preserve"><value>Netflix Streaming-App</value></data>
+  <data name="نسخه استور از پیش نصب شده اسپاتیفای" xml:space="preserve"><value>Vorinstallierte Store-Version von Spotify</value></data>
+  <data name="بازی تبلیغاتی پیش فرض" xml:space="preserve"><value>Vorinstalliertes Werbespiel</value></data>
+  <data name="اپ قدیمی توییتر از پیش نصب شده — سرویس آن سال ها پیش تعطیل شده است" xml:space="preserve"><value>Vorinstallierte Legacy-Twitter-App — der Dienst wurde vor Jahren eingestellt</value></data>
+  <data name="دستیار صوتی قدیمی و غیرفعال مایکروسافت" xml:space="preserve"><value>Microsofts veralteter, eingestellter Sprachassistent</value></data>
+  <data name="فید اخبار و مقالات مایکروسافت" xml:space="preserve"><value>Microsoft Newsfeed und Artikel</value></data>
+  <data name="برنامه هواشناسی پیش فرض ویندوز" xml:space="preserve"><value>Windows Standard-Wetter-App</value></data>
+  <data name="برنامه راهنما و پیشنهادات ویندوز" xml:space="preserve"><value>Windows Tipps- und Vorschläge-App</value></data>
+  <data name="ابزار پشتیبانی و راهنمایی مایکروسافت" xml:space="preserve"><value>Microsoft-Support- und Hilfetool</value></data>
+  <data name="ویرایشگر ویدیوی پیش فرض مایکروسافت" xml:space="preserve"><value>Standard-Videoeditor von Microsoft</value></data>
+  <data name="بازی های ورق پیش فرض ویندوز" xml:space="preserve"><value>Standard-Kartenspiele von Windows</value></data>
+  <data name="مرکز ارسال بازخورد و باگ به مایکروسافت" xml:space="preserve"><value>Zentrale zum Senden von Feedback und Fehlerberichten an Microsoft</value></data>
+  <data name="پورتال واقعیت ترکیبی ویندوز" xml:space="preserve"><value>Windows Mixed-Reality-Portal</value></data>
+  <data name="نمایشگر فایل های سه بعدی ویندوز" xml:space="preserve"><value>Windows 3D-Dateibetrachter</value></data>
+  <data name="برنامه مخاطبین قدیمی ویندوز" xml:space="preserve"><value>Alte Windows-Kontakte-App</value></data>
+  <data name="برنامه اخبار ورزشی مایکروسافت" xml:space="preserve"><value>Microsoft-Sportnachrichten-App</value></data>
+  <data name="برنامه اخبار مالی مایکروسافت" xml:space="preserve"><value>Microsoft-Finanznachrichten-App</value></data>
+  <data name="تبلیغاتی / پیش فرض" xml:space="preserve"><value>Werbung / Standard</value></data>
+  <data name="ویندوز (غیرضروری)" xml:space="preserve"><value>Windows (nicht wesentlich)</value></data>
+  <data name="نرم افزار لپ تاپ / تریال" xml:space="preserve"><value>Laptop-Software / Testversion</value></data>
+  <data name="نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم" xml:space="preserve"><value>OEM-Werbe- oder Testsoftware</value></data>
+  <data name="برنامه حجیم" xml:space="preserve"><value>Große App</value></data>
+  <data name="بیش از ۳۰ روز است اجرا نشده (آخرین اجرا: {0:yyyy.MM.dd})" xml:space="preserve"><value>Über 30 Tage nicht ausgeführt (zuletzt ausgeführt: {0:yyyy.MM.dd})</value></data>
+  <data name="نصب شده در تاریخ {0:yyyy.MM.dd} ولی ثبت استفاده ای از آن نشده است" xml:space="preserve"><value>Installiert am {0:yyyy.MM.dd} ohne aufgezeichnete Nutzung</value></data>
+  <data name="حجیم و کم استفاده" xml:space="preserve"><value>Groß und selten verwendet</value></data>
+  <data name="اختیاری / در صورت عدم نیاز" xml:space="preserve"><value>Optional / Wenn nicht benötigt</value></data>
+  <data name="حذف {0} ناموفق بود: {1}" xml:space="preserve"><value>Fehler beim Entfernen von {0}: {1}</value></data>
+  <data name="در حال بررسی پوشه: {0}..." xml:space="preserve"><value>Ordner wird gescannt: {0}...</value></data>
+  <data name="در حال بررسی حافظه های موقت توسعه دهندگان و کانتینرها..." xml:space="preserve"><value>Scanne Entwickler-Caches und Container-Müll...</value></data>
+  <data name="کش پکیج های npm" xml:space="preserve"><value>npm-Paketcache</value></data>
+  <data name="کش پکیج های npm (Roaming)" xml:space="preserve"><value>npm-Paketcache (Roaming)</value></data>
+  <data name="کش پکیج های NuGet" xml:space="preserve"><value>NuGet-Paketcache</value></data>
+  <data name="کش HTTP پکیج های NuGet" xml:space="preserve"><value>NuGet HTTP-Paketcache</value></data>
+  <data name="کش پکیج های Python pip" xml:space="preserve"><value>Python pip-Paketcache</value></data>
+  <data name="کش پکیج های Bun" xml:space="preserve"><value>Bun-Paketcache</value></data>
+  <data name="کش بیلد و ابزارهای Gradle" xml:space="preserve"><value>Gradle Build- und Tooling-Cache</value></data>
+  <data name="کش پکیج های Rust Cargo" xml:space="preserve"><value>Rust Cargo-Paketcache</value></data>
+  <data name="کش کامپایل Android Studio" xml:space="preserve"><value>Android Studio Build-Cache</value></data>
+  <data name="کش ادیتور VS Code" xml:space="preserve"><value>VS Code-Editor-Cache</value></data>
+  <data name="داده های کش شده VS Code" xml:space="preserve"><value>VS Code zwischengespeicherte Daten</value></data>
+  <data name="کش و لاگ های Docker" xml:space="preserve"><value>Docker-Cache und Logs</value></data>
+  <data name="مدل های هوش مصنوعی Ollama (.gguf)" xml:space="preserve"><value>Ollama KI-Modelle (.gguf)</value></data>
+  <data name="کش مدل های HuggingFace" xml:space="preserve"><value>HuggingFace Modell-Cache</value></data>
+  <data name="بکاپ های آیفون (Apple MobileSync)" xml:space="preserve"><value>iPhone-Backups (Apple MobileSync)</value></data>
+  <data name="بکاپ های آیفون (iTunes)" xml:space="preserve"><value>iPhone-Backups (iTunes)</value></data>
+  <data name="در حال تحلیل و مقایسه فایل های یکسان..." xml:space="preserve"><value>Analyse und Vergleich identischer Dateien...</value></data>
+  <data name="سرویس Docker روی سیستم نصب یا فعال نیست." xml:space="preserve"><value>Docker-Dienst ist nicht installiert oder wird nicht ausgeführt.</value></data>
+  <data name="کش داکر، ایمیج های بی استفاده و کانتینرهای متوقف شده با موفقیت پاکسازی شدند." xml:space="preserve"><value>Docker-Cache, ungenutzte Images und gestoppte Container wurden erfolgreich bereinigt.</value></data>
+  <data name="خطا در پاکسازی کش Docker." xml:space="preserve"><value>Fehler beim Bereinigen des Docker-Cache.</value></data>
+  <data name="سرویس Docker در دسترس نیست." xml:space="preserve"><value>Docker-Dienst ist nicht verfügbar.</value></data>
+  <data name="کش های محیط های برنامه نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({0} آزاد شد)" xml:space="preserve"><value>Entwicklungsumgebungs-Caches (npm, pip, NuGet, Gradle, VS Code) wurden bereinigt. ({0} freigegeben)</value></data>
+  <data name="سرویس WSL2 خاموش و حافظه رم آزاد شد. فایل دیسک مجازی vhdx مجزا یافت نشد." xml:space="preserve"><value>WSL2-Dienst wurde heruntergefahren und RAM freigegeben. Keine separate vhdx-Virtuellen-Festplatte wurde gefunden.</value></data>
+  <data name="تعداد {0} دیسک مجازی WSL2 متراکم شد؛ {1} مورد کامل نشد (دیسک حجم غالب می تواند کامل نشود)." xml:space="preserve"><value>Kompaktierte {0} WSL2-Virtuelle Festplatten; {1} nicht abgeschlossen (die dominante Volumen-Festplatte kann nicht vollständig komprimiert werden).</value></data>
+  <data name="تعداد {0} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد." xml:space="preserve"><value>Erfolgreich optimierte und komprimierte {0} WSL2-Virtuelle Festplatten.</value></data>
+  <data name="خطا در متراکم سازی دیسک WSL2." xml:space="preserve"><value>Fehler beim Komprimieren der WSL2-Festplatte.</value></data>
+  <data name="امکان اجرای ابزار DISM وجود ندارد." xml:space="preserve"><value>Das DISM-Tool kann nicht ausgeführt werden.</value></data>
+  <data name="فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته های قدیمی حذف شدند." xml:space="preserve"><value>Der Windows-Komponentenstore (WinSxS / DISM) wurde bereinigt und alte Pakete erfolgreich entfernt.</value></data>
+  <data name="عملیات DISM با خطا، تایم اوت یا نیاز به دسترسی Administrator پایان یافت." xml:space="preserve"><value>Der DISM-Vorgang endete mit einem Fehler, lief zeitlich ab oder erforderte Administratorrechte.</value></data>
+  <data name="خطا در اجرای ابزار پاکسازی DISM." xml:space="preserve"><value>Fehler beim Ausführen des DISM-Bereinigungstools.</value></data>
+  <data name="تحریم شکن شکن (Shecan)" xml:space="preserve"><value>Shecan Anti-Sanktions-DNS</value></data>
+  <data name="عبور مطمئن از تحریم های توسعه دهندگان، داکر، انویدیا، اوراکل و ادوبی" xml:space="preserve"><value>Zuverlässiger Zugang trotz Sanktionen bei Entwicklerdiensten, Docker, NVIDIA, Oracle und Adobe</value></data>
+  <data name="تحریم شکن الکترو (Electro)" xml:space="preserve"><value>Electro Anti-Sanktions-DNS</value></data>
+  <data name="مخصوص عبور از تحریم های گیمینگ، دیسکورد، اپیک گیمز و دانلود سریع" xml:space="preserve"><value>Entwickelt zum Umgehen von Gaming-Sanktionen, Discord, Epic Games und für schnelle Downloads</value></data>
+  <data name="تحریم شکن ۴۰۳ آنلاین" xml:space="preserve"><value>403 Online Anti-Sanktions-DNS</value></data>
+  <data name="سرویس رفع تحریم سرویس های خارجی برای کاربران، استارتاپ ها و توسعه دهندگان" xml:space="preserve"><value>Sanktionsentlastungsdienst für ausländische Dienste, für Benutzer, Start-ups und Entwickler</value></data>
+  <data name="رادار بازی (Radar Game)" xml:space="preserve"><value>Radar-Spiel</value></data>
+  <data name="کاهش پینگ و رفع اختلال اتصال به سرور بازی های آنلاین" xml:space="preserve"><value>Verringert Ping und behebt Verbindungsprobleme mit Online-Spielservern</value></data>
+  <data name="گیمینگ و پینگ" xml:space="preserve"><value>Gaming und Ping</value></data>
+  <data name="کلودفلر (Cloudflare 1.1.1.1)" xml:space="preserve"><value>Cloudflare (1.1.1.1)</value></data>
+  <data name="سریع ترین و امن ترین دی ان اس عمومی جهان با حداقل تاخیر" xml:space="preserve"><value>Der weltweit schnellste und sicherste öffentliche DNS mit minimaler Latenz</value></data>
+  <data name="بین المللی" xml:space="preserve"><value>International</value></data>
+  <data name="گوگل (Google Public DNS)" xml:space="preserve"><value>Google Public DNS</value></data>
+  <data name="پایدارترین دی ان اس جهانی با کش گسترده سرورها در سراسر دنیا" xml:space="preserve"><value>Der zuverlässigste globale DNS mit umfangreichem Server-Caching weltweit</value></data>
+  <data name="ادگارد ضد تبلیغات (AdGuard DNS)" xml:space="preserve"><value>AdGuard DNS (Werbeblockierung)</value></data>
+  <data name="مسدودسازی تبلیغات وب، ترکرها و پاپ آپ های مزاحم اینترنتی" xml:space="preserve"><value>Blockiert Web-Werbung, Tracker und aufdringliche Internet-Pop-ups</value></data>
+  <data name="امنیت و حریم خصوصی" xml:space="preserve"><value>Sicherheit und Datenschutz</value></data>
+  <data name="خودکار شبکه (DHCP پیش فرض)" xml:space="preserve"><value>Netzwerk Automatisch (Standard DHCP)</value></data>
+  <data name="تنظیم دریافت خودکار آدرس DNS از مودم یا ارائه دهنده اینترنت" xml:space="preserve"><value>DNS-Adresse automatisch vom Router oder ISP beziehen</value></data>
+  <data name="پیش فرض سیستم" xml:space="preserve"><value>Systemstandard</value></data>
+  <data name="هیچ کارت شبکه فعال متصل به اینترنت یافت نشد." xml:space="preserve"><value>Es wurde kein aktiver internetverbundener Netzwerkadapter gefunden.</value></data>
+  <data name="تنظیمات DNS با موفقیت به {0} اعمال و کش شبکه نوسازی شد." xml:space="preserve"><value>DNS-Einstellungen wurden auf {0} angewendet und der DNS-Cache wurde geleert.</value></data>
+  <data name="DNSِ {0} کارت از {1} کارت تنظیم شد. " xml:space="preserve"><value>DNS auf {0} von {1} Adaptern konfiguriert. </value></data>
+  <data name="؛ " xml:space="preserve"><value>; </value></data>
+  <data name="تنظیم DNS ناموفق بود — " xml:space="preserve"><value>DNS-Konfiguration fehlgeschlagen — </value></data>
+  <data name="خطا در تنظیم DNS: {0}" xml:space="preserve"><value>Fehler beim Einstellen des DNS: {0}</value></data>
+  <data name="تنظیمات DNS تمامی کارت های شبکه به حالت خودکار (DHCP) بازگردانده شد." xml:space="preserve"><value>DNS-Einstellungen aller Netzwerkadapter wurden auf Automatisch (DHCP) zurückgesetzt.</value></data>
+  <data name="DNSِ {0} کارت از {1} کارت به حالت خودکار برگشت. " xml:space="preserve"><value>DNS auf {0} von {1} Adaptern wurde auf Automatisch zurückgesetzt. </value></data>
+  <data name="بازگرداندن DNS به حالت خودکار ناموفق بود — " xml:space="preserve"><value>Fehler beim Zurücksetzen des DNS auf Automatisch — </value></data>
+  <data name="خطا در ریست DNS: {0}" xml:space="preserve"><value>Fehler beim Zurücksetzen des DNS: {0}</value></data>
+  <data name="کد خطای WMI: {0}" xml:space="preserve"><value>WMI-Fehlercode: {0}</value></data>
+  <data name="کارت شبکه در WMI پیدا نشد" xml:space="preserve"><value>Netzwerkadapter wurde in WMI nicht gefunden</value></data>
+  <data name="سفارشی / مودم" xml:space="preserve"><value>Benutzerdefiniert / Router</value></data>
+  <data name="خودکار (DHCP)" xml:space="preserve"><value>Automatisch (DHCP)</value></data>
+  <data name="آماده و سالم" xml:space="preserve"><value>Bereit und gesund</value></data>
+  <data name="نسخه قدیمی DriverStore (تکراری)" xml:space="preserve"><value>Alte DriverStore-Version (Duplikat)</value></data>
+  <data name="دستگاه نامشخص" xml:space="preserve"><value>Unbekanntes Gerät</value></data>
+  <data name="دستگاه معیوب '{0}' با موفقیت از سیستم حذف و جدا شد." xml:space="preserve"><value>Fehlerhaftes Gerät '{0}' wurde erfolgreich entfernt und vom System getrennt.</value></data>
+  <data name="عدم توانایی در اجرای ابزار جداسازی سخت افزار." xml:space="preserve"><value>Das Hardware-Entfernungswerkzeug kann nicht ausgeführt werden.</value></data>
+  <data name="عدم توانایی در اجرای ابزار pnputil." xml:space="preserve"><value>Das pnputil-Tool kann nicht ausgeführt werden.</value></data>
+  <data name="بسته درایور {0} با موفقیت از مخزن درایورها حذف شد." xml:space="preserve"><value>Treiberpaket {0} wurde erfolgreich aus dem Treiberspeicher entfernt.</value></data>
+  <data name="بسته درایور {0} در حال استفاده توسط سخت‌افزار فعال سیستم است و جهت حفظ پایداری حذف نشد." xml:space="preserve"><value>Treiberpaket {0} wird von aktiver Systemhardware verwendet und wurde zur Wahrung der Stabilität nicht entfernt.</value></data>
+  <data name="بسته درایور {0} از طریق سرویس DISM با موفقیت حذف شد." xml:space="preserve"><value>Treiberpaket {0} wurde erfolgreich über den DISM-Dienst entfernt.</value></data>
+  <data name="امکان حذف درایور {0} وجود ندارد زیرا توسط هسته سیستم در حال استفاده فعال است." xml:space="preserve"><value>Treiber {0} kann nicht entfernt werden, da er aktiv vom Systemkernel verwendet wird.</value></data>
+  <data name="عدم موفقیت در حذف درایور: {0}" xml:space="preserve"><value>Treiber konnte nicht entfernt werden: {0}</value></data>
+  <data name="خطا در فرآیند حذف: {0}" xml:space="preserve"><value>Fehler während der Entfernung: {0}</value></data>
+  <data name="آپدیت درایور" xml:space="preserve"><value>Treiberaktualisierung</value></data>
+  <data name="دستگاه به درستی پیکربندی نشده است (Code 1)" xml:space="preserve"><value>Gerät ist nicht korrekt konfiguriert (Code 1)</value></data>
+  <data name="دستگاه امکان راه اندازی ندارد (Code 10)" xml:space="preserve"><value>Gerät kann nicht gestartet werden (Code 10)</value></data>
+  <data name="سیستم برای استفاده نیازمند ریستارت است (Code 14)" xml:space="preserve"><value>Ein Systemneustart ist vor der Verwendung erforderlich (Code 14)</value></data>
+  <data name="دستگاه توسط ویندوز غیرفعال شده است (Code 22)" xml:space="preserve"><value>Gerät wurde von Windows deaktiviert (Code 22)</value></data>
+  <data name="درایور این سخت افزار نصب نشده است (Code 28)" xml:space="preserve"><value>Der Treiber für diese Hardware ist nicht installiert (Code 28)</value></data>
+  <data name="ویندوز نمی تواند درایور را بارگذاری کند (Code 31)" xml:space="preserve"><value>Windows kann den Treiber nicht laden (Code 31)</value></data>
+  <data name="درایور آسیب دیده یا مفقود شده است (Code 39)" xml:space="preserve"><value>Der Treiber ist beschädigt oder fehlt (Code 39)</value></data>
+  <data name="سخت افزار به دلیل گزارش خطا متوقف شده است (Code 43)" xml:space="preserve"><value>Die Hardware wurde gestoppt, da ein Problem gemeldet wurde (Code 43)</value></data>
+  <data name="کد خطای سخت افزاری ({0})" xml:space="preserve"><value>Hardwarefehlercode ({0})</value></data>
+  <data name="شناسه (PID): {0}" xml:space="preserve"><value>PID: {0}</value></data>
+  <data name="متصل به برق" xml:space="preserve"><value>Eingesteckt</value></data>
+  <data name="0 بایت" xml:space="preserve"><value>0 Bytes</value></data>
+  <data name="بایت" xml:space="preserve"><value>B</value></data>
+  <data name="کیلوبایت" xml:space="preserve"><value>KB</value></data>
+  <data name="مگابایت" xml:space="preserve"><value>MB</value></data>
+  <data name="گیگابایت" xml:space="preserve"><value>GB</value></data>
+  <data name="ترابایت" xml:space="preserve"><value>TB</value></data>
+  <data name="بهینه سازی پیشرفته شبکه و پاسخ دهی سیستم (Advanced Tweaks)" xml:space="preserve"><value>Erweiterte Netzwerk- &amp; Reaktionsoptimierung (Erweiterte Anpassungen)</value></data>
+  <data name="حذف محدودیت عمدی ویندوز برای پکت های شبکه، غیرفعال سازی GameDVR و افزایش اولویت پردازشی برنامه ها." xml:space="preserve"><value>Entfernt die absichtliche Netzwerkpaket-Drosselung von Windows, deaktiviert GameDVR und erhöht die Verarbeitungpriorität von Apps.</value></data>
+  <data name="شبکه و کارایی" xml:space="preserve"><value>Netzwerk &amp; Leistung</value></data>
+  <data name="اعمال بهینه سازی ها" xml:space="preserve"><value>Optimierungen anwenden</value></data>
+  <data name="زیاد" xml:space="preserve"><value>Hoch</value></data>
+  <data name="متوسط" xml:space="preserve"><value>Mittel</value></data>
+  <data name="کم" xml:space="preserve"><value>Niedrig</value></data>
+  <data name="پسماند تنظیمات افزونه ({0})" xml:space="preserve"><value>Überbleibsel der Erweiterung ({0})</value></data>
+  <data name="دایرکتوری باقیمانده از افزونه حذف‌شده (Orphaned Remnant)" xml:space="preserve"><value>Verbleibendes Verzeichnis einer entfernten Erweiterung (Verwaistes Überbleibsel)</value></data>
+  <data name="افزونه دارای خطای داخلی یا مسدود شده توسط استور (Corrupted/Policy)" xml:space="preserve"><value>Erweiterung hat einen internen Fehler oder wurde vom Store blockiert (Beschädigt/Richtlinie)</value></data>
+  <data name="افزونه کلیدی و حفاظت‌شده (دانلود منیجر، مترجم، AI RTL)" xml:space="preserve"><value>Geschützte essentielle Erweiterung (Download-Manager, Übersetzer, KI RTL)</value></data>
+  <data name="افزونه منسوخ‌شده، غیرفعال یا جایگزین‌شده (Safe to Clean)" xml:space="preserve"><value>Veraltete, deaktivierte oder ersetzte Erweiterung (Kann sicher gelöscht werden)</value></data>
+  <data name="حجم بسیار بالا (&gt; 50MB) با احتمال مصرف سنگین رم" xml:space="preserve"><value>Sehr große Größe (&gt; 50MB) mit wahrscheinlich hohem RAM-Verbrauch</value></data>
+  <data name="تزریق اسکریپت به تمام صفحات (&lt;all_urls&gt;) - پایش دائمی DOM" xml:space="preserve"><value>Skripteinfügung auf allen Seiten (&lt;all_urls&gt;) - ständige DOM-Überwachung</value></data>
+  <data name="افزونه غیرفعال توسط کاربر" xml:space="preserve"><value>Vom Benutzer deaktivierte Erweiterung</value></data>
+  <data name="افزونه فعال استاندارد" xml:space="preserve"><value>Standardmäßig aktive Erweiterung</value></data>
+  <data name="در حال پاک سازی: {0}..." xml:space="preserve"><value>Bereinigung: {0}...</value></data>
+  <data name="بهینه سازی حافظه و رفرش شبکه..." xml:space="preserve"><value>Optimierung des Speichers und Aktualisierung des Netzwerks...</value></data>
+  <data name="تغییر حرف درایو سیستم عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست." xml:space="preserve"><value>Das Ändern des Windows-Systemlaufwerksbuchstabens (C:) ist aus Sicherheits- und Systemstabilitätsgründen nicht erlaubt.</value></data>
+  <data name="حرف انتخابی با حرف فعلی درایو یکسان است." xml:space="preserve"><value>Der gewählte Buchstabe ist derselbe wie der aktuelle Buchstabe des Laufwerks.</value></data>
+  <data name="حرف درایو {0}: در حال حاضر توسط درایو دیگری در سیستم در حال استفاده است." xml:space="preserve"><value>Laufwerksbuchstabe {0}: wird derzeit von einem anderen Laufwerk im System verwendet.</value></data>
+  <data name="عدم توانایی در فراخوانی ابزار مدیریت پارتیشن." xml:space="preserve"><value>Das Partitionierungs-Tool konnte nicht aufgerufen werden.</value></data>
+  <data name="حرف درایو با موفقیت از {0}: به {1}: تغییر یافت." xml:space="preserve"><value>Laufwerksbuchstabe erfolgreich von {0}: auf {1}: geändert.</value></data>
+  <data name="تغییر حرف درایو انجام نشد — احتمالاً پارتیشن در حال استفاده یا رزرو شده است." xml:space="preserve"><value>Änderung des Laufwerksbuchstabens fehlgeschlagen — die Partition wird wahrscheinlich gerade verwendet oder ist reserviert.</value></data>
+  <data name="خطای سیستمی: {0}" xml:space="preserve"><value>Systemfehler: {0}</value></data>
+  <data name="درایو محلی" xml:space="preserve"><value>Lokale Festplatte</value></data>
+  <data name="۰ بایت (حذف شده)" xml:space="preserve"><value>0 Bytes (entfernt)</value></data>
+  <data name="عالی" xml:space="preserve"><value>Ausgezeichnet</value></data>
+  <data name="خوب" xml:space="preserve"><value>Gut</value></data>
+  <data name="عالی (بدون لگ)" xml:space="preserve"><value>Ausgezeichnet (kein Verzögerung)</value></data>
+  <data name="بسیار خوب" xml:space="preserve"><value>Sehr gut</value></data>
+  <data name="قابل قبول" xml:space="preserve"><value>Akzeptabel</value></data>
+  <data name="دارای تاخیر" xml:space="preserve"><value>Hohe Latenz</value></data>
+  <data name="کیفیت عالی (HD)" xml:space="preserve"><value>Ausgezeichnete Qualität (HD)</value></data>
+  <data name="کیفیت مطلوب" xml:space="preserve"><value>Gute Qualität</value></data>
+  <data name="کیفیت پایه" xml:space="preserve"><value>Grundlegende Qualität</value></data>
+  <data name="شبکه اینترنت" xml:space="preserve"><value>Internetdienst</value></data>
+  <data name="جهانی" xml:space="preserve"><value>Global</value></data>
+  <data name="اتصال فعال" xml:space="preserve"><value>Aktive Verbindung</value></data>
+  <data name="تست توسط کاربر لغو گردید." xml:space="preserve"><value>Test vom Benutzer abgebrochen.</value></data>
+  <data name="خطا در اتصال به سرور دانلود اینترنت." xml:space="preserve"><value>Verbindung zum Geschwindigkeitstest-Server des Internets fehlgeschlagen.</value></data>
+  <data name="در حال اسکن پوشه: {0}..." xml:space="preserve"><value>Ordner wird gescannt: {0}...</value></data>
+  <data name="C:\Users (پروفایل کاربر)" xml:space="preserve"><value>C:\Users (Benutzerprofil)</value></data>
+  <data name="ریشه ی سیستمی ویندوز — هرگز حذف نمی شود" xml:space="preserve"><value>Windows-Systemwurzel — niemals löschen</value></data>
+  <data name="لیست حفاظت پیش فرض CleanC" xml:space="preserve"><value>CleanC Standardschutzliste</value></data>
+  <data name="پراکسی سیستم روی پورت {0} فعال مانده در حالی که کلاینت VPN بسته شده است و اینترنت ترمینال و ویندوز قطع می باشد." xml:space="preserve"><value>Systemproxy ist noch auf Port {0} aktiv, während der VPN-Client geschlossen ist, wodurch die Terminal- und Windows-Internetverbindung unterbrochen wird.</value></data>
+  <data name="پایدار" xml:space="preserve"><value>Stabil</value></data>
+  <data name="لپ تاپ شما به شارژر متصل است" xml:space="preserve"><value>Ihr Laptop ist an das Ladegerät angeschlossen</value></data>
+  <data name="سیستم دسکتاپ شما با برق مستقیم کار می کند" xml:space="preserve"><value>Ihr Desktop-System läuft mit direkter Netzstromversorgung</value></data>
+  <data name="فعال سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)" xml:space="preserve"><value>Aktivieren Sie den Energieplan für maximale Leistung (Hohe Leistung)</value></data>
+  <data name="{0}. برای حذف تأخیر کلاک پردازنده و پایدار ماندن حداکثر توان پردازشی، پلن High Performance فعال شود؟" xml:space="preserve"><value>{0}. Um CPU-Taktsperren zu entfernen und die maximale Verarbeitungsleistung stabil zu halten, sollte der Energieplan 'Hohe Leistung' aktiviert werden?</value></data>
+  <data name="انرژی و پردازنده" xml:space="preserve"><value>Energie &amp; Prozessor</value></data>
+  <data name="فعال سازی High Performance" xml:space="preserve"><value>Hohe Leistung aktivieren</value></data>
+  <data name="شیء انتخاب نشده است." xml:space="preserve"><value>Kein Element ausgewählt.</value></data>
+  <data name="داده ی شیء دیگر در سطل موجود نیست." xml:space="preserve"><value>Die Daten des Elements existieren nicht mehr im Papierkorb.</value></data>
+  <data name="مسیر مقصد نامعتبر است." xml:space="preserve"><value>Der Zielpfad ist ungültig.</value></data>
+  <data name="نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند)." xml:space="preserve"><value>Wiederherstellungspunkt von Windows erfolgreich erstellt (ältere wurden automatisch bereinigt).</value></data>
+  <data name="ویندوز ساخت نقطه بازگردانی را رد کرد (کد {0}) — محافظت از سیستم (System Protection) را فعال کنید." xml:space="preserve"><value>Windows hat die Erstellung des Wiederherstellungspunkts verweigert (Code {0}) – aktivieren Sie den Systemschutz.</value></data>
+  <data name="ساخت نقطه بازگردانی ناموفق بود: " xml:space="preserve"><value>Fehler beim Erstellen des Wiederherstellungspunkts: </value></data>
+  <data name="در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)" xml:space="preserve"><value>Wird in CleanC Quarantäne gespeichert (wiederherstellbar aus dem Wiederherstellungszentrum)</value></data>
+  <data name="برای همیشه حذف خواهد شد (قابل بازگردانی نیست)" xml:space="preserve"><value>Wird dauerhaft gelöscht (kann nicht wiederhergestellt werden)</value></data>
+  <data name="به سطل بازیافت منتقل خواهد شد" xml:space="preserve"><value>Wird in den Papierkorb verschoben</value></data>
+  <data name="هیچ موردی حذف نشد." xml:space="preserve"><value>Es wurden keine Elemente gelöscht.</value></data>
+  <data name="{0} مورد به سطل بازیافت منتقل شد" xml:space="preserve"><value>{0} Element(e) in den Papierkorb verschoben</value></data>
+  <data name="{0} مورد در قرنطینه ذخیره شد" xml:space="preserve"><value>{0} Element(e) in Quarantäne gespeichert</value></data>
+  <data name="{0} مورد حذف قطعی شد" xml:space="preserve"><value>{0} Element(e) dauerhaft gelöscht</value></data>
+  <data name="، " xml:space="preserve"><value>, </value></data>
+  <data name="هیچ موردی حذف نشد" xml:space="preserve"><value>Es wurden keine Elemente gelöscht</value></data>
+  <data name="؛ {0} مورد از قبل وجود نداشت" xml:space="preserve"><value>; {0} Element(e) existierten nicht mehr</value></data>
+  <data name="؛ {0} مورد ناموفق" xml:space="preserve"><value>; {0} Element(e) fehlgeschlagen</value></data>
+  <data name=" — {0} فضا آزاد گردید" xml:space="preserve"><value> — {0} freigegeben</value></data>
+  <data name=" — {0} جابه جا شد (تا خالی کردن سطل آزاد نمی شود)" xml:space="preserve"><value> — {0} verschoben (nicht freigegeben, bis der Papierkorb geleert ist)</value></data>
+  <data name="دسترسی کافی نیست" xml:space="preserve"><value>Unzureichende Berechtigungen</value></data>
+  <data name="مسیر پیدا نشد" xml:space="preserve"><value>Pfad nicht gefunden</value></data>
+  <data name="فایل پیدا نشد" xml:space="preserve"><value>Datei nicht gefunden</value></data>
+  <data name="سطل بازیافت در دسترس نیست" xml:space="preserve"><value>Papierkorb ist nicht verfügbar</value></data>
+  <data name="فایل توسط برنامه ی دیگری قفل است" xml:space="preserve"><value>Datei ist von einem anderen Programm gesperrt</value></data>
+  <data name="نشست قرنطینه پیدا نشد." xml:space="preserve"><value>Quarantäne-Sitzung nicht gefunden.</value></data>
+  <data name="برنامه کاربردی (اختیاری)" xml:space="preserve"><value>Allgemeine Anwendung (Optional)</value></data>
+  <data name="درایو محلی ویندوز" xml:space="preserve"><value>Windows Lokale Festplatte</value></data>
+  <data name="متصل به شارژر" xml:space="preserve"><value>Aufladen</value></data>
+  <data name="{0}% باتری" xml:space="preserve"><value>{0}% Akku</value></data>
+  <data name="نیازمند بررسی" xml:space="preserve"><value>Benötigt Aufmerksamkeit</value></data>
+  <data name="حجم متغیر / آنلاین" xml:space="preserve"><value>Variable Größe / Online</value></data>
+  <data name="آپدیت کیفی و امنیتی" xml:space="preserve"><value>Qualitäts- &amp; Sicherheitsupdate</value></data>
+  <data name="درحال اجرا" xml:space="preserve"><value>Läuft</value></data>
+  <data name="غیرفعال (Disabled)" xml:space="preserve"><value>Deaktiviert</value></data>
+  <data name="آماده به کار (فعال)" xml:space="preserve"><value>Bereit (Aktiviert)</value></data>
+  <data name="آپدیت ویندوز" xml:space="preserve"><value>Windows Update</value></data>
+  <data name="ارتقای نسل سیستم عامل" xml:space="preserve"><value>Betriebssystem-Generation-Upgrade</value></data>
+  <data name="آپدیت اختیاری ویندوز" xml:space="preserve"><value>Optionales Windows-Update</value></data>
+  <data name="ارتقای نسل جدید (اختیاری)" xml:space="preserve"><value>Neues Generation-Upgrade (Optional)</value></data>
+  <data name="درایور سخت افزار (اختیاری)" xml:space="preserve"><value>Hardware-Treiber (Optional)</value></data>
+  <data name="بروزرسانی نسل جدید ویندوز ۱۱ (بیلد {0})" xml:space="preserve"><value>Neues Windows 11 Update der neuen Generation (Build {0})</value></data>
+  <data name="ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {0} - بیلد {1}) شامل قابلیت های هوش مصنوعی و بهینه سازی های عمیق هسته سیستم عامل" xml:space="preserve"><value>Offizielles Upgrade auf die neue Windows 11-Version der neuen Generation ({0} - Build {1}) mit KI-Funktionen und tiefgreifenden Kernel-Optimierungen des Betriebssystems</value></data>
+  <data name="ارتقای رسمی به نسخه جدید ویندوز ۱۱ ({0})" xml:space="preserve"><value>Offizielles Upgrade auf die neue Windows 11-Version ({0})</value></data>
+  <data name="نسل بعد ({0})" xml:space="preserve"><value>Nächste Generation ({0})</value></data>
+  <data name="نسل جدید اختیاری" xml:space="preserve"><value>Optionale neue Generation</value></data>
+  <data name="ارتقای نسل سیستم عامل (Next-Gen OS Upgrade)" xml:space="preserve"><value>Betriebssystem-Generation-Upgrade (Next-Gen OS Upgrade)</value></data>
+  <data name="کش آپدیت با موفقیت تخلیه گردید و سرویس ها نوسازی شدند. ({0} آزاد شد)" xml:space="preserve"><value>Cache-Aktualisierung erfolgreich geleert und Dienste wurden neu gestartet. ({0} freigegeben)</value></data>
+  <data name="خطا در پاکسازی: {0}" xml:space="preserve"><value>Bereinigungsfehler: {0}</value></data>
+  <data name="خطا در خواندن مشخصات سیستم: {0}" xml:space="preserve"><value>Fehler beim Lesen der Systemspezifikationen: {0}</value></data>
+  <data name="{0} رشته" xml:space="preserve"><value>{0} Threads</value></data>
+  <data name="{0} هسته" xml:space="preserve"><value>{0} Kerne</value></data>
+  <data name="پردازنده" xml:space="preserve"><value>Prozessor</value></data>
+  <data name="{0} اسلات" xml:space="preserve"><value>{0} Steckplätze</value></data>
+  <data name="حافظه رم" xml:space="preserve"><value>RAM</value></data>
+  <data name="درایور: {0}" xml:space="preserve"><value>Treiber: {0}</value></data>
+  <data name="گرافیک" xml:space="preserve"><value>Grafik</value></data>
+  <data name="رندرینگ گرافیکی" xml:space="preserve"><value>Grafik-Rendering</value></data>
+  <data name="مادربرد" xml:space="preserve"><value>Motherboard</value></data>
+  <data name="روشن: {0}" xml:space="preserve"><value>Betriebszeit: {0}</value></data>
+  <data name="سیستم عامل" xml:space="preserve"><value>Betriebssystem</value></data>
+  <data name="لایسنس ویندوز" xml:space="preserve"><value>Windows-Lizenz</value></data>
+  <data name="سیکل: {0}" xml:space="preserve"><value>Zyklen: {0}</value></data>
+  <data name="{0}% سلامت باتری" xml:space="preserve"><value>{0}% Batteriezustand</value></data>
+  <data name="باتری و برق" xml:space="preserve"><value>Batterie &amp; Energie</value></data>
+  <data name="مشخصات جامع سیستم با فرمت استاندارد در کلیپ بورد کپی شد." xml:space="preserve"><value>Umfassende Systeminformationen in Standardformat in die Zwischenablage kopiert.</value></data>
+  <data name="کپی گزارش مشخصات" xml:space="preserve"><value>Spezifikationsbericht kopieren</value></data>
+  <data name="مشخصات سخت افزار و سنسورهای سیستم بروزرسانی شدند." xml:space="preserve"><value>Hardware- und Systemsensorinformationen aktualisiert.</value></data>
+  <data name="بروزرسانی مشخصات" xml:space="preserve"><value>Spezifikationen aktualisieren</value></data>
+  <data name="مدیریت درایوهای سیستم عامل (This PC Drives)" xml:space="preserve"><value>Systemlaufwerke verwalten (Dieser PC Laufwerke)</value></data>
+  <data name="مشاهده ظرفیت، تغییر نام برچسب درایوها و تغییر حرف درایو (Drive Letter) با ایمنی کامل" xml:space="preserve"><value>Kapazität anzeigen, Laufwerksbezeichnungen umbenennen und Laufwerksbuchstaben sicher ändern</value></data>
+  <data name="تغییر نام" xml:space="preserve"><value>Umbenennen</value></data>
+  <data name="تغییر حرف" xml:space="preserve"><value>Buchstaben ändern</value></data>
+  <data name="امکان تغییر حرف درایو ویندوز (C:) به دلیل حفظ پایداری سیستم وجود ندارد." xml:space="preserve"><value>Der Laufwerksbuchstabe von Windows (C:) kann nicht geändert werden, um die Systemstabilität zu erhalten.</value></data>
+  <data name="طرح مصرف انرژی ویندوز (Power Plan)" xml:space="preserve"><value>Windows-Energieplan</value></data>
+  <data name="اعمال آنی powercfg بدون نیاز به ریستارت | پلن فعلی: {0}" xml:space="preserve"><value>Sofortige Powercfg-Anpassung ohne Neustart | Aktueller Plan: {0}</value></data>
+  <data name="حداکثر کارایی" xml:space="preserve"><value>Maximale Leistung</value></data>
+  <data name="کارایی بالا" xml:space="preserve"><value>Hohe Leistung</value></data>
+  <data name="متعادل" xml:space="preserve"><value>Ausgewogen</value></data>
+  <data name="ذخیره انرژی" xml:space="preserve"><value>Energiesparmodus</value></data>
+  <data name="پلن انرژی ویندوز با موفقیت به «{0}» تغییر یافت." xml:space="preserve"><value>Windows-Energieplan erfolgreich auf „{0}“ geändert.</value></data>
+  <data name="تغییر پلن انرژی" xml:space="preserve"><value>Energieplan geändert</value></data>
+  <data name="امکان تغییر پلن انرژی وجود ندارد (نیازمند دسترسی Administrator)." xml:space="preserve"><value>Energieplan kann nicht geändert werden (Administratorrechte erforderlich).</value></data>
+  <data name="خطا در تغییر پلن" xml:space="preserve"><value>Energieplanänderung fehlgeschlagen</value></data>
+  <data name="تغییر نام درایو {0}" xml:space="preserve"><value>Laufwerk {0} umbenennen</value></data>
+  <data name="ذخیره نام جدید" xml:space="preserve"><value>Neuen Namen speichern</value></data>
+  <data name="انصراف" xml:space="preserve"><value>Abbrechen</value></data>
+  <data name="نام یا برچسب (Volume Label) جدید را وارد نمایید:" xml:space="preserve"><value>Geben Sie den neuen Namen oder das Volume-Label ein:</value></data>
+  <data name="مثال: Data, Games, Works" xml:space="preserve"><value>Beispiel: Daten, Spiele, Arbeiten</value></data>
+  <data name="نام درایو {0} با موفقیت به '{1}' تغییر یافت." xml:space="preserve"><value>Laufwerk {0} erfolgreich in '{1}' umbenannt.</value></data>
+  <data name="تغییر نام درایو" xml:space="preserve"><value>Laufwerk umbenennen</value></data>
+  <data name="عدم موفقیت در تغییر نام درایو {0}." xml:space="preserve"><value>Laufwerk {0} konnte nicht umbenannt werden.</value></data>
+  <data name="خطا" xml:space="preserve"><value>Fehler</value></data>
+  <data name="تغییر حرف درایو {0}" xml:space="preserve"><value>Laufwerksbuchstaben {0} ändern</value></data>
+  <data name="تغییر و اعمال" xml:space="preserve"><value>Ändern &amp; Anwenden</value></data>
+  <data name="توجه: تغییر حرف درایو {0} ممکن است دسترسی میانبرهایی که به این درایو اشاره دارند را موقتاً تحت تاثیر قرار دهد." xml:space="preserve"><value>Hinweis: Das Ändern des Laufwerksbuchstabens {0} kann vorübergehend Verknüpfungen beeinträchtigen, die auf dieses Laufwerk zeigen.</value></data>
+  <data name="حرف جدید مورد نظر را انتخاب کنید:" xml:space="preserve"><value>Wählen Sie den neuen Laufwerksbuchstaben:</value></data>
+  <data name="تغییر حرف درایو" xml:space="preserve"><value>Laufwerksbuchstaben ändern</value></data>
+  <data name="خطا در تغییر حرف درایو" xml:space="preserve"><value>Änderung des Laufwerksbuchstabens fehlgeschlagen</value></data>
+  <data name="تعداد کل: {0} نرم افزار  •  حجم کل: {1}" xml:space="preserve"><value>Gesamt: {0} Apps  •  Gesamtgröße: {1}</value></data>
+  <data name="خطا در بارگذاری برنامه ها: {0}" xml:space="preserve"><value>Fehler beim Laden der Apps: {0}</value></data>
+  <data name="{0} برنامه{1}" xml:space="preserve"><value>{0} Apps{1}</value></data>
+  <data name="هیچ نرم افزاری روی سیستم شناسایی نشد." xml:space="preserve"><value>Auf diesem System wurden keine Apps erkannt.</value></data>
+  <data name="هیچ نرم افزاری مطابق با «{0}» پیدا نشد." xml:space="preserve"><value>Keine Apps gefunden, die „{0}“ entsprechen.</value></data>
+  <data name="{0} نرم افزار انتخاب گردیده{1}" xml:space="preserve"><value>{0} ausgewählte Apps{1}</value></data>
+  <data name="حذف {0} برنامه انتخاب شده" xml:space="preserve"><value>Deinstallieren {0} ausgewählte Apps</value></data>
+  <data name="تأیید حذف گروهی نرم افزارها" xml:space="preserve"><value>Batch-Deinstallation bestätigen</value></data>
+  <data name="آیا از حذف {0} برنامه انتخاب شده اطمینان دارید؟ به منظور جلوگیری از تداخل فرآیندهای ویندوز، حذف هر برنامه به ترتیب (FIFO) و با باز شدن ایمن آنیستالر انجام خواهد شد." xml:space="preserve"><value>Sind Sie sicher, dass Sie die {0} ausgewählten Apps deinstallieren möchten? Um Konflikte mit Windows-Prozessen zu vermeiden, wird jede App nacheinander (FIFO) mit ihrem offiziellen Deinstallationsprogramm sicher deinstalliert.</value></data>
+  <data name="شروع حذف گروهی" xml:space="preserve"><value>Batch-Deinstallation starten</value></data>
+  <data name="در حال اجرای آنیستالر {0} ({1} از {2})..." xml:space="preserve"><value>Deinstallationsprogramm für {0} wird ausgeführt ({1} von {2}])...</value></data>
+  <data name="فرآیند حذف گروهی" xml:space="preserve"><value>Batch-Deinstallation</value></data>
+  <data name="تمام برنامه های انتخاب شده ({0} مورد) در صف آنیستال قرار گرفتند." xml:space="preserve"><value>Alle ausgewählten Apps ({0} Elemente) wurden zur Deinstallation in die Warteschlange gestellt.</value></data>
+  <data name="پایان عملیات حذف" xml:space="preserve"><value>Deinstallation abgeschlossen</value></data>
+  <data name="تأیید حذف نرم افزار" xml:space="preserve"><value>Deinstallation bestätigen</value></data>
+  <data name="حذف" xml:space="preserve"><value>Deinstallieren</value></data>
+  <data name="آنیستالر رسمی {0} با موفقیت اجرا گردید." xml:space="preserve"><value>Der offizielle Deinstaller für {0} wurde erfolgreich gestartet.</value></data>
+  <data name="حذف نرم افزار" xml:space="preserve"><value>App deinstallieren</value></data>
+  <data name="امکان اجرای آنیستالر برای {0} وجود ندارد." xml:space="preserve"><value>Der Deinstaller für {0} konnte nicht gestartet werden.</value></data>
+  <data name="خطا در حذف" xml:space="preserve"><value>Deinstallation fehlgeschlagen</value></data>
+  <data name="در حال اتصال به سرور..." xml:space="preserve"><value>Verbindung zum Server wird hergestellt...</value></data>
+  <data name="در حال آماده سازی و سنجش تاخیر..." xml:space="preserve"><value>Bereite vor und messe Latenz...</value></data>
+  <data name="ارائه دهنده فعال" xml:space="preserve"><value>Aktiver Anbieter</value></data>
+  <data name="سرور ابری جهانی" xml:space="preserve"><value>Globaler Cloud-Server</value></data>
+  <data name="اطلاعات شبکه دریافت شد. در حال سنجش تاخیر..." xml:space="preserve"><value>Netzwerkinformationen empfangen. Messe Latenz...</value></data>
+  <data name="در حال سنجش تاخیر پینگ..." xml:space="preserve"><value>Ping-Latenz wird gemessen...</value></data>
+  <data name="در حال سنجش سرعت دانلود چندکاناله..." xml:space="preserve"><value>Multi-Channel-Downloadgeschwindigkeit wird gemessen...</value></data>
+  <data name="{0} MB/s (پیک: {1} MB/s)" xml:space="preserve"><value>{0} MB/s (Spitze: {1} MB/s)</value></data>
+  <data name="در حال ارسال داده (آپلود)..." xml:space="preserve"><value>Daten werden hochgeladen...</value></data>
+  <data name="تست با موفقیت تکمیل شد" xml:space="preserve"><value>Test erfolgreich abgeschlossen</value></data>
+  <data name="{0} MB/s (اوج دانلود: {1} MB/s)" xml:space="preserve"><value>{0} MB/s (Download-Spitze: {1} MB/s)</value></data>
+  <data name="دانلود: {0} Mbps ({1} MB/s)" xml:space="preserve"><value>Download: {0} Mbps ({1} MB/s)</value></data>
+  <data name="تست تکمیل شد: دانلود {0} Mbps ({1} MB/s) | آپلود {2} Mbps | پینگ: {3} ms" xml:space="preserve"><value>Test abgeschlossen: Download {0} Mbit/s ({1} MB/s) | Upload {2} Mbit/s | Ping: {3} ms</value></data>
+  <data name="تست سرعت اینترنت" xml:space="preserve"><value>Internetspeedtest</value></data>
+  <data name="خطا در تست" xml:space="preserve"><value>Test fehlgeschlagen</value></data>
+  <data name="نتیجه تست" xml:space="preserve"><value>Testergebnis</value></data>
+  <data name="تست متوقف شد" xml:space="preserve"><value>Test gestoppt</value></data>
+  <data name="تست با خطا مواجه شد." xml:space="preserve"><value>Beim Test ist ein Fehler aufgetreten.</value></data>
+  <data name="فعال سازی افکت شیشه ای در تسک بار، استارت و پنجره های ویندوز" xml:space="preserve"><value>Glass-Effekt in der Taskleiste, im Startmenü und in App-Fenstern aktivieren</value></data>
+  <data name="شفافیت شیشه ای ویندوز (Transparency)" xml:space="preserve"><value>Windows-Glas-Transparenz</value></data>
+  <data name="افکت شیشه ای غیرفعال شد." xml:space="preserve"><value>Glaseffekt deaktiviert.</value></data>
+  <data name="افکت شیشه ای فعال شد." xml:space="preserve"><value>Glaseffekt aktiviert.</value></data>
+  <data name="شفافیت ویندوز" xml:space="preserve"><value>Windows-Transparenz</value></data>
+  <data name="استخراج و هماهنگ سازی خودکار رنگ اصلی ویندوز از تصویر دسکتاپ" xml:space="preserve"><value>Die Windows-Akzentfarbe automatisch von der Desktop-Hintergrundgestaltung extrahieren und anpassen</value></data>
+  <data name="رنگ Accent هوشمند والپیپر" xml:space="preserve"><value>Intelligente Akzentfarbe vom Hintergrundbild</value></data>
+  <data name="هماهنگی خودکار غیرفعال شد." xml:space="preserve"><value>Automatische Farbabstimmung deaktiviert.</value></data>
+  <data name="هماهنگی خودکار رنگ با والپیپر فعال شد." xml:space="preserve"><value>Automatische Farbabstimmung mit dem Hintergrundbild aktiviert.</value></data>
+  <data name="رنگ ویندوز" xml:space="preserve"><value>Windows-Farbe</value></data>
+  <data name="اعمال پوسته تیره روی محیط ویندوز و نرم افزارهای سیستمی" xml:space="preserve"><value>Wenden Sie ein dunkles Thema auf die Windows-Oberfläche und System-Apps an</value></data>
+  <data name="تم تاریک ویندوز (Dark Mode)" xml:space="preserve"><value>Windows-Dunkelmodus</value></data>
+  <data name="حالت روشن فعال شد." xml:space="preserve"><value>Lightmode aktiviert.</value></data>
+  <data name="حالت تاریک فعال شد." xml:space="preserve"><value>Dunkelmodus aktiviert.</value></data>
+  <data name="تم ویندوز" xml:space="preserve"><value>Windows-Design</value></data>
+  <data name="کاهش انیمیشن های اضافی ویندوز برای افزایش سرعت پاسخ دهی سیستم" xml:space="preserve"><value>Reduzieren Sie zusätzliche Windows-Animationen, um die Systemreaktionsfähigkeit zu verbessern</value></data>
+  <data name="حالت عملکرد و چابکی بالا (Best Performance)" xml:space="preserve"><value>Hochleistungsmodus (Beste Leistung)</value></data>
+  <data name="تنظیمات روی حالت پیش فرض قرار گرفت." xml:space="preserve"><value>Einstellungen auf Standard zurückgesetzt.</value></data>
+  <data name="تنظیمات روی حداکثر کارایی قرار گرفت." xml:space="preserve"><value>Einstellungen auf maximale Leistung gesetzt.</value></data>
+  <data name="افکت های بصری" xml:space="preserve"><value>Visuelle Effekte</value></data>
+  <data name="نمایش پسوند نام فایل ها (مانند .exe, .pdf, .docx) در File Explorer" xml:space="preserve"><value>Dateinamenerweiterungen (wie .exe, .pdf, .docx) im Datei-Explorer anzeigen</value></data>
+  <data name="نمایش پسوند فایل ها در ویندوز" xml:space="preserve"><value>Dateierweiterungen in Windows anzeigen</value></data>
+  <data name="پسوند فایل ها پنهان شد." xml:space="preserve"><value>Dateierweiterungen verborgen.</value></data>
+  <data name="نمایش پسوند فایل ها فعال شد." xml:space="preserve"><value>Anzeige der Dateierweiterungen aktiviert.</value></data>
+  <data name="نمایش پسوندها" xml:space="preserve"><value>Dateierweiterungen</value></data>
+  <data name="آشکارسازی فایل ها و پوشه های پنهان سیستمی در فایل اکسپلورر" xml:space="preserve"><value>Versteckte Systemdateien und -ordner im Datei-Explorer anzeigen</value></data>
+  <data name="نمایش فایل ها و پوشه های مخفی" xml:space="preserve"><value>Versteckte Dateien und Ordner anzeigen</value></data>
+  <data name="فایل های مخفی پنهان شدند." xml:space="preserve"><value>Versteckte Dateien sind jetzt versteckt.</value></data>
+  <data name="فایل های مخفی آشکار شدند." xml:space="preserve"><value>Versteckte Dateien werden jetzt angezeigt.</value></data>
+  <data name="فایل های مخفی" xml:space="preserve"><value>Versteckte Dateien</value></data>
+  <data name="بازگشت منوی راست کلیک کامل و سنتی بدون نیاز به فشردن Show more options" xml:space="preserve"><value>Das vollständige klassische Rechtsklick-Menü wiederherstellen, ohne auf "Weitere Optionen anzeigen" zu klicken</value></data>
+  <data name="منوی راست کلیک کلاسیک ویندوز ۱۱" xml:space="preserve"><value>Windows 11 Klassisches Kontextmenü</value></data>
+  <data name="منوی راست کلیک مدرن ویندوز ۱۱ فعال شد." xml:space="preserve"><value>Windows 11 modernes Kontextmenü aktiviert.</value></data>
+  <data name="منوی راست کلیک کلاسیک فعال شد." xml:space="preserve"><value>Klassisches Kontextmenü aktiviert.</value></data>
+  <data name="منوی راست کلیک" xml:space="preserve"><value>Kontextmenü</value></data>
+  <data name="خاموش سازی حالت هایبرید ویندوز جهت ریست کامل درایورها هنگام خاموشی، پیشگیری از خطای کارت شبکه و کاهش استهلاک SSD" xml:space="preserve"><value>Deaktivieren Sie den hybriden Windows-Herunterfahrmodus für einen vollständigen Treiber-Reset beim Ausschalten, wodurch Netzwerkadapterfehler verhindert und der SSD-Verschleiß reduziert werden.</value></data>
+  <data name="بوت سریع ویندوز (Fast Startup / Hiberboot)" xml:space="preserve"><value>Windows Schnellstart (Hiberboot)</value></data>
+  <data name="قابلیت Fast Startup غیرفعال شد (خاموشی کامل و سالم درایورها)." xml:space="preserve"><value>Schnellstart deaktiviert (vollständiges, sauberes Herunterfahren der Treiber beim Ausschalten).</value></data>
+  <data name="قابلیت بوت سریع فعال شد." xml:space="preserve"><value>Schnellstart aktiviert.</value></data>
+  <data name="بوت سریع ویندوز" xml:space="preserve"><value>Windows Schnellstart</value></data>
+  <data name="جهت تغییر تنظیمات بوت سریع نیاز به اجرای برنامه با دسترسی Administrator است." xml:space="preserve"><value>Die Einstellungen für den Schnellstart zu ändern, erfordert das Ausführen der App als Administrator.</value></data>
+  <data name="خطای دسترسی" xml:space="preserve"><value>Zugriffsfehler</value></data>
+  <data name="فعال است (حجم اشغال شده توسط hiberfil.sys: {0}) - غیرفعال سازی فضای عظیمی را روی درایو C آزاد می کند." xml:space="preserve"><value>Aktiviert (vom hiberfil.sys belegter Speicher: {0}) - Deaktivieren gibt viel Speicherplatz auf Laufwerk C frei.</value></data>
+  <data name="غیرفعال است (فایل hiberfil.sys حذف شده و فضای درایو C آزاد است)." xml:space="preserve"><value>Deaktiviert (hiberfil.sys wurde entfernt und der Speicherplatz auf Laufwerk C ist frei).</value></data>
+  <data name="خواب زمستانی و پاکسازی hiberfil.sys" xml:space="preserve"><value>Ruhezustand &amp; hiberfil.sys-Bereinigung</value></data>
+  <data name="خواب زمستانی غیرفعال و فایل hiberfil.sys از درایو C حذف گردید." xml:space="preserve"><value>Ruhezustand deaktiviert und hiberfil.sys von Laufwerk C entfernt.</value></data>
+  <data name="خواب زمستانی فعال شد." xml:space="preserve"><value>Ruhezustand aktiviert.</value></data>
+  <data name="هایبرنیشن و دیسک" xml:space="preserve"><value>Ruhezustand &amp; Datenträger</value></data>
+  <data name="برای تغییر وضعیت هایبرنیشن اجرای برنامه با دسترسی Administrator الزامی است." xml:space="preserve"><value>Ändern des Ruhezustand-Status erfordert das Ausführen der App als Administrator.</value></data>
+  <data name="تنظیمات امنیت" xml:space="preserve"><value>Sicherheitseinstellungen</value></data>
+  <data name="دسترسی مستقیم به تنظیمات محافظت بلادرنگ، فایروال و Tamper Protection" xml:space="preserve"><value>Direkter Zugriff auf Echtzeitschutz-, Firewall- und Manipulationsschutz-Einstellungen</value></data>
+  <data name="امنیت و آنتی ویروس ویندوز (Windows Security &amp; Defender)" xml:space="preserve"><value>Windows-Sicherheit &amp; Defender</value></data>
+  <data name="امکان باز کردن مستقیم مرکز امنیت ویندوز فراهم نشد." xml:space="preserve"><value>Konnte das Windows-Sicherheitscenter nicht direkt öffnen.</value></data>
+  <data name="امنیت ویندوز" xml:space="preserve"><value>Windows-Sicherheit</value></data>
+  <data name="پیکربندی شیشه ای و بلور ویندوز" xml:space="preserve"><value>Windows-Glas- &amp; Blur-Konfiguration</value></data>
+  <data name="تنظیمات پیشرفته شفافیت پنجره ها، نوار آدرس و حاشیه ها با اعمال بلادرنگ" xml:space="preserve"><value>Erweiterte Transparenz für Fensterhintergründe, Adressleiste und Ränder mit Echtzeitanwendung</value></data>
+  <data name="شفاف سازی کامل نوار آدرس فایل اکسپلورر" xml:space="preserve"><value>Volle Transparenz für die Adressleiste des Datei-Explorers</value></data>
+  <data name="شفاف سازی نوار ابزار و تب ها" xml:space="preserve"><value>Transparenz für Symbolleisten und Registerkarten</value></data>
+  <data name="شفاف سازی پس زمینه کنترل های مدرن WinUI" xml:space="preserve"><value>Transparenz für moderne WinUI-Steuerelementhintergründe</value></data>
+  <data name="نمایش حاشیه و خط تفکیک دور پنجره ها" xml:space="preserve"><value>Ränder und Trennlinien um Fenster anzeigen</value></data>
+  <data name="ذخیره و اعمال تنظیمات" xml:space="preserve"><value>Einstellungen speichern &amp; anwenden</value></data>
+  <data name="تنظیمات شفافیت با موفقیت ذخیره و در ویندوز اعمال شد." xml:space="preserve"><value>Transparenzeinstellungen erfolgreich gespeichert und auf Windows angewendet.</value></data>
+  <data name="تنظیمات شیشه ای" xml:space="preserve"><value>Glaseinstellungen</value></data>
+  <data name="بازنشانی به پیش فرض" xml:space="preserve"><value>Auf Standard zurücksetzen</value></data>
+  <data name="تنظیمات به مقادیر پیش فرض بازنشانی شد." xml:space="preserve"><value>Einstellungen auf Standard zurückgesetzt.</value></data>
+  <data name="بازنشانی تنظیمات" xml:space="preserve"><value>Einstellungen zurücksetzen</value></data>
+  <data name="گالری والپیپرهای CleanC و تصویر پس زمینه ویندوز" xml:space="preserve"><value>CleanC Wallpaper-Galerie &amp; Windows-Hintergrund</value></data>
+  <data name="انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({0} والپیپر گلچین 4K)" xml:space="preserve"><value>Wählen Sie zwischen dem aktuellen Windows-Hintergrund oder der benutzerdefinierten Wallpaper-Galerie von CleanC ({0} kuratierte 4K-Wallpapers)</value></data>
+  <data name="والپیپر پیش فرض سیستم" xml:space="preserve"><value>Systemstandard-Hintergrund</value></data>
+  <data name="تصویر فعلی پس زمینه: {0}" xml:space="preserve"><value>Aktuelles Hintergrundbild: {0}</value></data>
+  <data name="🎲 اعمال والپیپر تصادفی جدید CleanC" xml:space="preserve"><value>🎲 Neues zufälliges CleanC Wallpaper anwenden</value></data>
+  <data name="تصویر پس زمینه دسکتاپ به «{0}» تغییر یافت." xml:space="preserve"><value>Desktop-Hintergrund geändert zu „{0}“.</value></data>
+  <data name="والپیپر دسکتاپ" xml:space="preserve"><value>Desktop-Hintergrund</value></data>
+  <data name="امکان تغییر والپیپر دسکتاپ وجود ندارد." xml:space="preserve"><value>Desktop-Hintergrund konnte nicht geändert werden.</value></data>
+  <data name="خطا در تغییر والپیپر" xml:space="preserve"><value>Hintergrundänderung fehlgeschlagen</value></data>
+  <data name="هیچ فایلی در پوشه والپیپرها یافت نشد." xml:space="preserve"><value>In dem Wallpaper-Ordner wurden keine Dateien gefunden.</value></data>
+  <data name="والپیپر" xml:space="preserve"><value>Hintergrundbild</value></data>
+  <data name="باز کردن پوشه والپیپرها" xml:space="preserve"><value>Wallpaper-Ordner öffnen</value></data>
+  <data name="در حال دریافت فهرست برنامه های استارتاپ..." xml:space="preserve"><value>Lade die Liste der Start-Apps...</value></data>
+  <data name="تعداد کل: {0} برنامه  •  {1} برنامه فعال  •  {2} برنامه غیرفعال" xml:space="preserve"><value>Insgesamt: {0} Apps  •  {1} aktiv  •  {2} deaktiviert</value></data>
+  <data name="{0} فعال از {1}" xml:space="preserve"><value>{0} von {1} aktiv</value></data>
+  <data name="هیچ برنامه ای در استارتاپ ویندوز یافت نشد." xml:space="preserve"><value>Es wurden keine Start-Apps gefunden.</value></data>
+  <data name="برنامه های غیرفعال در شروع ویندوز" xml:space="preserve"><value>Deaktivierte Start-Apps</value></data>
+  <data name="تأثیر {0} ({1})" xml:space="preserve"><value>Auswirkung {0} ({1})</value></data>
+  <data name="تأثیر عادی" xml:space="preserve"><value>Normale Auswirkung</value></data>
+  <data name="غیرفعال" xml:space="preserve"><value>Deaktiviert</value></data>
+  <data name="تأخیر اندازه گیری شده در بالا آمدن ویندوز: {0} میلی ثانیه" xml:space="preserve"><value>Gemessene Windows-Startverzögerung: {0} ms</value></data>
+  <data name="غیرفعال کردن «{0}» انجام نشد (دسترسی غیرمجاز یا آیتم مربوط به ویندوز است)." xml:space="preserve"><value>„{0}“ konnte nicht deaktiviert werden (Zugriff verweigert oder das Element gehört zu Windows).</value></data>
+  <data name="استارتاپ ویندوز" xml:space="preserve"><value>Windows-Start</value></data>
+  <data name="برنامه {0} غیرفعال شد و از اجرای خودکار آن جلوگیری می شود." xml:space="preserve"><value>App {0} wurde deaktiviert und startet nicht mehr automatisch.</value></data>
+  <data name="فعال کردن «{0}» انجام نشد." xml:space="preserve"><value>„{0}“ konnte nicht aktiviert werden.</value></data>
+  <data name="برنامه {0} مجدداً فعال شد." xml:space="preserve"><value>App {0} wurde wieder aktiviert.</value></data>
+  <data name="لیست برنامه های استارتاپ بروزرسانی شد." xml:space="preserve"><value>Liste der Start-Apps aktualisiert.</value></data>
+  <data name="در حال بررسی..." xml:space="preserve"><value>Überprüfe...</value></data>
+  <data name="{0} بروزرسانی" xml:space="preserve"><value>{0} Updates</value></data>
+  <data name="{0} آپدیت در انتظار" xml:space="preserve"><value>{0} Updates ausstehend</value></data>
+  <data name="سیستم به روز است ✓" xml:space="preserve"><value>System ist auf dem neuesten Stand ✓</value></data>
+  <data name="خطا در بررسی" xml:space="preserve"><value>Überprüfung fehlgeschlagen</value></data>
+  <data name="خطا در جستجوی آپدیت ها: {0}" xml:space="preserve"><value>Fehler bei der Suche nach Updates: {0}</value></data>
+  <data name="بروزرسانی ویندوز" xml:space="preserve"><value>Windows Update</value></data>
+  <data name="بررسی آپدیت های جدید" xml:space="preserve"><value>Auf neue Updates prüfen</value></data>
+  <data name="آپدیت های سیستم عامل تا تاریخ {0} متوقف هستند" xml:space="preserve"><value>Betriebssystem-Updates sind bis {0} pausiert</value></data>
+  <data name="توقف رسمی ۵ هفته ای فعال است. دریافت هرگونه بسته و آپدیت خودکار تا {0} به تعویق افتاده است." xml:space="preserve"><value>Die offizielle 5-wöchige Pause ist aktiv. Alle Paketdownloads und automatischen Updates sind bis {0} verschoben.</value></data>
+  <data name="وضعیت بروزرسانی ها: فعال و استاندارد ویندوز" xml:space="preserve"><value>Update-Status: aktiv — Standardverhalten von Windows</value></data>
+  <data name="توقف موقت فعال نیست. ویندوز مجاز به بررسی و دانلود دوره ای آپدیت ها است." xml:space="preserve"><value>Keine Pause ist aktiv. Windows darf periodisch nach Updates suchen und diese herunterladen.</value></data>
+  <data name="وضعیت سرویس اصلی (wuauserv): {0}" xml:space="preserve"><value>Hauptdienststatus (wuauserv): {0}</value></data>
+  <data name="امنیتی" xml:space="preserve"><value>Sicherheit</value></data>
+  <data name="نصب" xml:space="preserve"><value>Installieren</value></data>
+  <data name="وضعیت و لیست بروزرسانی‌های سیستم به‌روزرسانی شد." xml:space="preserve"><value>Update-Status und Liste wurden aktualisiert.</value></data>
+  <data name="دریافت آپدیت های سیستم عامل به مدت ۵ هفته متوقف شد." xml:space="preserve"><value>Betriebssystem-Update-Downloads für 5 Wochen pausiert.</value></data>
+  <data name="توقف آپدیت ها" xml:space="preserve"><value>Updates pausiert</value></data>
+  <data name="تغییر تنظیمات توقف نیازمند دسترسی Administrator است." xml:space="preserve"><value>Zum Ändern der Pauseneinstellungen sind Administratorrechte erforderlich.</value></data>
+  <data name="توقف برداشته شد و روند عادی آپدیت ها از سر گرفته شد." xml:space="preserve"><value>Die Pause wurde aufgehoben und die Updates wie gewohnt fortgesetzt.</value></data>
+  <data name="ادامه آپدیت ها" xml:space="preserve"><value>Updates fortgesetzt</value></data>
+  <data name="امکان لغو توقف آپدیت ها میسر نشد." xml:space="preserve"><value>Konnte die Update-Pause nicht abbrechen.</value></data>
+  <data name="سرویس Windows Update (wuauserv) با موفقیت متوقف و غیرفعال (Disabled) شد." xml:space="preserve"><value>Der Windows Update-Dienst (wuauserv) wurde erfolgreich gestoppt und deaktiviert.</value></data>
+  <data name="سرویس آپدیت" xml:space="preserve"><value>Update-Dienst</value></data>
+  <data name="تغییر سرویس نیازمند دسترسی Administrator است." xml:space="preserve"><value>Zum Ändern des Dienstes wird Administratorzugriff benötigt.</value></data>
+  <data name="سرویس Windows Update به حالت خودکار (Automatic) بازگردانی و شروع به کار کرد." xml:space="preserve"><value>Der Windows Update-Dienst wurde auf Automatisch zurückgesetzt und gestartet.</value></data>
+  <data name="رفع مشکل آپدیت" xml:space="preserve"><value>Update-Reparatur</value></data>
+  <data name="خطا در رفع مشکل" xml:space="preserve"><value>Reparatur fehlgeschlagen</value></data>
+  <data name="{0} بسته" xml:space="preserve"><value>{0} Pakete</value></data>
+  <data name="{0} خطا" xml:space="preserve"><value>{0} Fehler</value></data>
+  <data name="خطا در واکشی اطلاعات درایورها: {0}" xml:space="preserve"><value>Fehler beim Abrufen der Treiberinformationen: {0}</value></data>
+  <data name="هیچ درایوری با مشخصات جستجو شده یافت نشد." xml:space="preserve"><value>Keine Treiber entsprechen Ihrer Suche.</value></data>
+  <data name="حذف بسته" xml:space="preserve"><value>Paket löschen</value></data>
+  <data name="{0} درایور انتخاب شده است" xml:space="preserve"><value>{0} Treiber ausgewählt</value></data>
+  <data name="حذف {0} درایور انتخاب شده" xml:space="preserve"><value>Lösche {0} ausgewählte Treiber</value></data>
+  <data name="حذف دسته جمعی درایورهای انتخاب شده" xml:space="preserve"><value>Ausgewählte Treiber stapelweise löschen</value></data>
+  <data name="حذف درایورها" xml:space="preserve"><value>Treiber löschen</value></data>
+  <data name="{0} بسته درایور حذف شد. ({1} بسته در استفاده فعال سیستم بودند)" xml:space="preserve"><value>{0} Treiberpakete gelöscht. ({1} Pakete wurden aktiv verwendet)</value></data>
+  <data name="نتیجه حذف دسته ای درایورها" xml:space="preserve"><value>Batch-Treiberlöschungs-Ergebnis</value></data>
+  <data name="حذف ایمن" xml:space="preserve"><value>Sicher löschen</value></data>
+  <data name="حذف درایور" xml:space="preserve"><value>Treiber gelöscht</value></data>
+  <data name="عدم امکان حذف" xml:space="preserve"><value>Löschung nicht möglich</value></data>
+  <data name="هیچ درایور قدیمی یا انتخاب‌شده‌ای برای حذف وجود ندارد." xml:space="preserve"><value>Es gibt keine alten oder ausgewählten Treiber zum Löschen.</value></data>
+  <data name="پاکسازی درایورها" xml:space="preserve"><value>Treiberbereinigung</value></data>
+  <data name="پاکسازی درایورهای قدیمی DriverStore" xml:space="preserve"><value>Alte DriverStore-Treiber bereinigen</value></data>
+  <data name="پاکسازی درایورهای انتخاب‌شده" xml:space="preserve"><value>Ausgewählte Treiber bereinigen</value></data>
+  <data name="شروع پاکسازی ایمن" xml:space="preserve"><value>Sichere Bereinigung starten</value></data>
+  <data name="در حال ایجاد Restore Point قبل از پاکسازی درایورها..." xml:space="preserve"><value>Erstelle einen Wiederherstellungspunkt vor der Treiberbereinigung...</value></data>
+  <data name="ایجاد نقطه بازیابی" xml:space="preserve"><value>Wiederherstellungspunkt erstellen</value></data>
+  <data name="قبل از پاکسازی درایورهای DriverStore" xml:space="preserve"><value>Vor der DriverStore-Bereinigung</value></data>
+  <data name="پاکسازی تکمیل شد: {0} بسته با موفقیت حذف شد. ({1} بسته در حال استفاده فعال سیستم بودند و حفظ شدند)" xml:space="preserve"><value>Bereinigung abgeschlossen: {0} Pakete erfolgreich gelöscht. ({1} Pakete waren in Benutzung und wurden behalten)</value></data>
+  <data name="نتیجه پاکسازی درایورها" xml:space="preserve"><value>Treiberbereinigungsergebnis</value></data>
+  <data name="در حال جستجوی آپدیت های درایور از سرور مایکروسافت..." xml:space="preserve"><value>Suche nach Treiberaktualisierungen auf Microsoft-Servern...</value></data>
+  <data name="بررسی درایورها" xml:space="preserve"><value>Treiber überprüfen</value></data>
+  <data name="تعداد {0} بروزرسانی درایور یافت شد" xml:space="preserve"><value>{0} Treiberaktualisierungen gefunden</value></data>
+  <data name="متوجه شدم" xml:space="preserve"><value>Verstanden</value></data>
+  <data name="تمامی درایورهای سخت افزاری شما بروز و آپدیت هستند." xml:space="preserve"><value>Alle Ihre Hardware-Treiber sind auf dem neuesten Stand.</value></data>
+  <data name="بروزرسانی درایورها" xml:space="preserve"><value>Treiber-Updates</value></data>
+  <data name="لیست درایورها و بسته های سخت افزاری بروزرسانی شد." xml:space="preserve"><value>Die Treiber- und Hardwarepaketliste wurde aktualisiert.</value></data>
+  <data name="(دریافت خودکار از مودم / DHCP)" xml:space="preserve"><value>(Automatisch vom Modem / DHCP erhalten)</value></data>
+  <data name="تحریم شکن تخصصی" xml:space="preserve"><value>Spezialisierte Anti-Sanktion</value></data>
+  <data name="فعال" xml:space="preserve"><value>Aktiv</value></data>
+  <data name="اعمال" xml:space="preserve"><value>Anwenden</value></data>
+  <data name="تغییر DNS" xml:space="preserve"><value>DNS geändert</value></data>
+  <data name="خطا در تنظیم DNS" xml:space="preserve"><value>DNS-Einrichtung fehlgeschlagen</value></data>
+  <data name="بازنشانی DNS" xml:space="preserve"><value>DNS zurückgesetzt</value></data>
+  <data name="خطا در ریست DNS" xml:space="preserve"><value>DNS-Zurücksetzung fehlgeschlagen</value></data>
+  <data name="کش DNS ویندوز با موفقیت تخلیه شد." xml:space="preserve"><value>Windows DNS-Cache erfolgreich geleert.</value></data>
+  <data name="تخلیه کش DNS" xml:space="preserve"><value>DNS-Cache leeren</value></data>
+  <data name="قطع کامل سرویس تلمتری و گزارش DiagTrack" xml:space="preserve"><value>Die DiagTrack-Telemetriedienste vollständig deaktivieren</value></data>
+  <data name="غیرفعال سازی سرویس Connected User Experiences و توقف ارسال بسته های تشخیصی و لاگ به سرورهای مایکروسافت" xml:space="preserve"><value>Den Dienst für verbundene Benutzererfahrungen deaktivieren und keine Diagnosepakete und Protokolle mehr an Microsoft-Server senden</value></data>
+  <data name="سرویس تلمتری به حالت پیش فرض ویندوز بازگشت." xml:space="preserve"><value>Telemetriedienst auf die Windows-Standardeinstellungen wiederhergestellt.</value></data>
+  <data name="سرویس تلمتری قطع و غیرفعال شد." xml:space="preserve"><value>Telemetriedienst gestoppt und deaktiviert.</value></data>
+  <data name="تلمتری DiagTrack" xml:space="preserve"><value>DiagTrack Telemetrie</value></data>
+  <data name="حذف جستجوی وب بینگ از استارت منو (Bing Search)" xml:space="preserve"><value>Bing-Websuche vom Startmenü entfernen</value></data>
+  <data name="جلوگیری از ارسال متن های تایپ شده شما در منوی استارت به وب و افزایش چشمگیر سرعت باز شدن و جستجوی فایل ها" xml:space="preserve"><value>Verhindern, dass Ihre Tastatureingaben im Startmenü ins Internet gesendet werden, und die Suche im Startmenü sowie nach Dateien deutlich beschleunigen</value></data>
+  <data name="جستجوی وب در استارت فعال شد." xml:space="preserve"><value>Websuche im Startmenü aktiviert.</value></data>
+  <data name="سرچ وب بینگ غیرفعال شد (جستجوی محلی فوق سریع)." xml:space="preserve"><value>Bing-Websuche deaktiviert (ultraschnelle lokale Suche).</value></data>
+  <data name="جستجوی استارت منو" xml:space="preserve"><value>Startmenü-Suche</value></data>
+  <data name="غیرفعال سازی شناسه تبلیغاتی ویندوز (Advertising ID)" xml:space="preserve"><value>Windows-Werbe-ID deaktivieren</value></data>
+  <data name="جلوگیری از ساخت و ردگیری پروفایل کاربری تبلیغاتی توسط برنامه ها و مایکروسافت استور" xml:space="preserve"><value>Verhindern, dass Apps und der Microsoft Store ein Werbeprofil erstellen und verfolgen</value></data>
+  <data name="شناسه تبلیغاتی فعال شد." xml:space="preserve"><value>Werbe-ID aktiviert.</value></data>
+  <data name="شناسه تبلیغاتی ویندوز مسدود گردید." xml:space="preserve"><value>Windows-Werbe-ID blockiert.</value></data>
+  <data name="شناسه تبلیغاتی" xml:space="preserve"><value>Werbe-ID</value></data>
+  <data name="توقف ثبت تاریخچه فعالیت ها و فایل ها (Activity History)" xml:space="preserve"><value>Aufzeichnen von Aktivitäten &amp; Dateiverlauf stoppen</value></data>
+  <data name="توقف ذخیره و همگام سازی سوابق باز کردن برنامه ها، اسناد و مرور وب توسط ویندوز" xml:space="preserve"><value>Verhindern, dass Windows Aufzeichnungen geöffneter Apps, Dokumente und Webaktivitäten speichert und synchronisiert</value></data>
+  <data name="ثبت سوابق فعالیت ها فعال شد." xml:space="preserve"><value>Aufzeichung der Aktivitätenhistorie aktiviert.</value></data>
+  <data name="ثبت فعالیت ها متوقف و غیرفعال شد." xml:space="preserve"><value>Aufzeichnung der Aktivitäten gestoppt und deaktiviert.</value></data>
+  <data name="تاریخچه فعالیت ها" xml:space="preserve"><value>Aktivitätsverlauf</value></data>
+  <data name="قطع نظرسنجی ها و تجربیات شخصی سازی مایکروسافت" xml:space="preserve"><value>Microsoft-Umfragen &amp; personalisierte Erfahrungen blockieren</value></data>
+  <data name="جلوگیری از نمایش پاپ آپ های ارزیابی و توقف پایش نحوه استفاده از ابزارهای ویندوز" xml:space="preserve"><value>Feedback-Pop-ups verhindern und die Überwachung Ihrer Nutzung von Windows-Tools stoppen</value></data>
+  <data name="پایش تجربیات فعال شد." xml:space="preserve"><value>Erfahrungsüberwachung aktiviert.</value></data>
+  <data name="نظرسنجی ها و پایش تجربیات قطع شدند." xml:space="preserve"><value>Umfragen und Erfahrungsüberwachung deaktiviert.</value></data>
+  <data name="بازخورد مایکروسافت" xml:space="preserve"><value>Microsoft-Feedback</value></data>
+  <data name="تمامی {0} گزینه محافظتی با موفقیت فعال و در ویندوز ذخیره شدند." xml:space="preserve"><value>Alle {0} Schutzoptionen wurden aktiviert und erfolgreich in Windows gespeichert.</value></data>
+  <data name="حریم خصوصی ویندوز ۱۱" xml:space="preserve"><value>Windows 11 Datenschutz</value></data>
+  <data name="تنظیمات به حالت استاندارد و پیش فرض اولیه ویندوز بازگردانی شدند." xml:space="preserve"><value>Einstellungen auf die Standardwerte von Windows wiederhergestellt.</value></data>
+  <data name=" (تخمینی)" xml:space="preserve"><value> (geschätzt)</value></data>
+  <data name=" پرمصرف‌ترین: {0}." xml:space="preserve"><value> Top-Verbraucher: {0}.</value></data>
+  <data name="{0} از {1} کشف شده · {2} اجرا در هفته" xml:space="preserve"><value>{0} von {1} entdeckt · {2} Läufe diese Woche</value></data>
+  <data name="{0} برنامه با موفقیت حذف گردید ({1} فضا آزاد شد)." xml:space="preserve"><value>{0} Apps wurden erfolgreich entfernt ({1} freigegeben).</value></data>
+  <data name="{0} برنامه بهینه سازی شد ✓" xml:space="preserve"><value>{0} Apps optimiert ✓</value></data>
+  <data name="{0} برنامه حذف شد ✓" xml:space="preserve"><value>{0} Apps entfernt ✓</value></data>
+  <data name="{0} پردازهٔ سنگین به اولویت پایین منتقل و {1} روندهای پس‌زمینه بسته شد.{2}" xml:space="preserve"><value>{0} schwere Prozesse auf niedrigere Priorität verschoben und {1} Hintergrundaufgaben geschlossen.{2}</value></data>
+  <data name="{0} روندهای پس‌زمینه بسته شد و پردازنده پایش شد.{1}" xml:space="preserve"><value>{0} Hintergrundaufgaben geschlossen und die CPU wurde überwacht.{1}</value></data>
+  <data name="{0} سرفصل دیگر سیستم بررسی شدند و از قبل کاملاً پاکیزه و بهینه بودند." xml:space="preserve"><value>{0} weitere Systembereiche überprüft und bereits vollständig sauber und optimiert.</value></data>
+  <data name="{0} سرویس با فایل اجرایی ناموجود غیرفعال شدند تا بوت سیستم روان تر شود." xml:space="preserve"><value>{0} Dienste mit fehlenden ausführbaren Dateien wurden deaktiviert, um den Startvorgang reibungsloser zu gestalten.</value></data>
+  <data name="{0}، {1:HH:mm}" xml:space="preserve"><value>{0}, {1:HH:mm}</value></data>
+  <data name="+ {0} آزاد شد" xml:space="preserve"><value>+ {0} freigegeben</value></data>
+  <data name="+ {0} آزاد شد ✓" xml:space="preserve"><value>+ {0} freigegeben ✓</value></data>
+  <data name="+ {0} آزادسازی رم" xml:space="preserve"><value>+ {0} RAM freigegeben</value></data>
+  <data name="+ {0} پاکسازی دیسک" xml:space="preserve"><value>+ {0} Datenträgerbereinigung</value></data>
+  <data name="+ {0} فضا آزاد شد." xml:space="preserve"><value>+ {0} Speicherplatz freigegeben.</value></data>
+  <data name="+ 0 بایت آزاد شد" xml:space="preserve"><value>+ 0 Bytes freigegeben</value></data>
+  <data name="BoostRamAsync نتیجه‌ای برنگرداند" xml:space="preserve"><value>BoostRamAsync hat kein Ergebnis zurückgegeben</value></data>
+  <data name="CleanC — سلامت سیستم: {0}%" xml:space="preserve"><value>CleanC — Systemzustand: {0}%</value></data>
+  <data name="CleanC در تری آیکون" xml:space="preserve"><value>CleanC im Infobereich</value></data>
+  <data name="CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود." xml:space="preserve"><value>CleanC wird automatisch gestartet, wenn Windows startet.</value></data>
+  <data name="Fast Startup (خاموش شدن سریع ویندوز)" xml:space="preserve"><value>Schnellstart (Windows Schnellstart)</value></data>
+  <data name="ابزار بازیابی سیستم ویندوز (System Restore)" xml:space="preserve"><value>Windows-Systemwiederherstellungstool</value></data>
+  <data name="اجرای خودکار CleanC غیرفعال شد." xml:space="preserve"><value>CleanC Autostart wurde deaktiviert.</value></data>
+  <data name="اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی." xml:space="preserve"><value>Führen Sie den standardmäßigen Windows-Wiederherstellungsassistenten aus, um zu früheren Zeitpunkten zurückzukehren.</value></data>
+  <data name="ارتقا یافت ✓" xml:space="preserve"><value>Aufgerüstet ✓</value></data>
+  <data name="ارزیابی و بهینه‌سازی استارتاپ ویندوز" xml:space="preserve"><value>Bewertung und Optimierung des Windows-Starts</value></data>
+  <data name="از" xml:space="preserve"><value>von</value></data>
+  <data name="از 100" xml:space="preserve"><value>von 100</value></data>
+  <data name="از قبل فعال بود ✓" xml:space="preserve"><value>War bereits aktiviert ✓</value></data>
+  <data name="آزاد از" xml:space="preserve"><value>frei von</value></data>
+  <data name="آزادسازی حافظه رم (RAM Working Set)" xml:space="preserve"><value>RAM freigeben (RAM-Arbeitsmenge)</value></data>
+  <data name="آزادسازی رم" xml:space="preserve"><value>RAM freigeben</value></data>
+  <data name="استریم اسپاتیفای" xml:space="preserve"><value>Spotify-Streaming</value></data>
+  <data name="اصلاح اتصال اینترنت" xml:space="preserve"><value>Internetverbindungsreparatur</value></data>
+  <data name="اطلاعات عیب یابی" xml:space="preserve"><value>Diagnoseinformationen</value></data>
+  <data name="اطلاعات عیب یابی کپی شد" xml:space="preserve"><value>Diagnoseinformationen kopiert</value></data>
+  <data name="اطلاعات مصرف رم، پردازنده و دیسک به‌روزرسانی شدند." xml:space="preserve"><value>RAM-, CPU- und Festplattennutzungsinformationen wurden aktualisiert.</value></data>
+  <data name="اعمال شد ✓" xml:space="preserve"><value>Angewendet ✓</value></data>
+  <data name="امکان تغییر پلن برق در این لحظه وجود ندارد." xml:space="preserve"><value>Der Energiesparplan kann gerade nicht geändert werden.</value></data>
+  <data name="امکان تغییر تنظیمات پراکسی در این لحظه وجود ندارد." xml:space="preserve"><value>Die Proxy-Einstellungen können gerade nicht geändert werden.</value></data>
+  <data name="امکان تغییر نرخ نوسازی مانیتور در این لحظه وجود ندارد." xml:space="preserve"><value>Die Bildwiederholfrequenz des Monitors kann gerade nicht geändert werden.</value></data>
+  <data name="انتخاب همه برنامه ها" xml:space="preserve"><value>Alle Apps auswählen</value></data>
+  <data name="انجام شد ✓" xml:space="preserve"><value>Fertig ✓</value></data>
+  <data name="انجام نشد ✗ — هایبرنیشن خاموش است (فعال سازی آن فایل hiberfil.sys می سازد)" xml:space="preserve"><value>Nicht durchgeführt ✗ — Ruhezustand ist ausgeschaltet (das Aktivieren erstellt eine hiberfil.sys-Datei)</value></data>
+  <data name="اندازه ی پنجره بازنشانی شد" xml:space="preserve"><value>Fenstergröße wurde zurückgesetzt</value></data>
+  <data name="ایجاد Restore Point" xml:space="preserve"><value>Wiederherstellungspunkt erstellen</value></data>
+  <data name="ایجاد شد ✓" xml:space="preserve"><value>Erstellt ✓</value></data>
+  <data name="ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه سازی ها یا تغییرات عمده." xml:space="preserve"><value>Erstellen Sie einen Windows-Wiederherstellungspunkt, bevor Sie Optimierungen oder größere Änderungen anwenden.</value></data>
+  <data name="این برنامه‌ها ممکن است به دردت بخورند؛ هر کدام را خواستی انتخاب کن." xml:space="preserve"><value>Diese Apps könnten noch nützlich sein; wählen Sie diejenigen aus, die Sie möchten.</value></data>
+  <data name="این مورد نیازمند دسترسی مدیر (Administrator) است." xml:space="preserve"><value>Dieser Punkt erfordert Administratorrechte.</value></data>
+  <data name="با موفقیت نوسازی شد ✓" xml:space="preserve"><value>Erfolgreich aktualisiert ✓</value></data>
+  <data name="باز کردن System Restore" xml:space="preserve"><value>Systemwiederherstellung öffnen</value></data>
+  <data name="باز کردن صفحه ی پروژه ممکن نشد." xml:space="preserve"><value>Konnte die Projektseite nicht öffnen.</value></data>
+  <data name="بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز." xml:space="preserve"><value>Alle von CleanC geänderten Registrierungsschlüssel und Dienste auf die Windows-Standardeinstellungen wiederherstellen.</value></data>
+  <data name="بازگردانده شد ✓" xml:space="preserve"><value>Wiederhergestellt ✓</value></data>
+  <data name="بازگردانی تغییرات" xml:space="preserve"><value>Änderungen rückgängig gemacht</value></data>
+  <data name="بازگردانی تنظیمات" xml:space="preserve"><value>Einstellungen wiederherstellen</value></data>
+  <data name="بازگردانی تنظیمات بهینه شده به حالت اولیه (Undo)" xml:space="preserve"><value>Optimierte Einstellungen auf den ursprünglichen Zustand zurücksetzen (Rückgängig)</value></data>
+  <data name="بدون تغییر" xml:space="preserve"><value>Keine Änderung</value></data>
+  <data name="بدون فایل زائد (پاک)" xml:space="preserve"><value>Keine Junk-Dateien (sauber)</value></data>
+  <data name="برای بازگرداندن پنجره روی آیکون کنار ساعت کلیک کنید." xml:space="preserve"><value>Klicken Sie auf das Symbol neben der Uhr, um das Fenster zurückzubringen.</value></data>
+  <data name="بررسی اولویت بارگذاری و غیرفعال‌سازی سرویس‌ها و لانچرهای کندکننده بوت" xml:space="preserve"><value>Ladepriorität prüfen und Dienste sowie Starter deaktivieren, die den Systemstart verlangsamen</value></data>
+  <data name="بررسی به‌روزرسانی" xml:space="preserve"><value>Nach Updates suchen</value></data>
+  <data name="بررسی به‌روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخهٔ فعلی: {0}" xml:space="preserve"><value>Konnte nicht nach Updates suchen (Internetverbindung oder Netzwerkzugriff fehlt). Aktuelle Version: {0}</value></data>
+  <data name="بررسی شد ✓" xml:space="preserve"><value>Geprüft ✓</value></data>
+  <data name="بررسی متوالی فایل های موقت، کش ها و فضاهای ذخیره سازی" xml:space="preserve"><value>Temporäre Dateien, Caches und Speicherplätze nacheinander überprüfen</value></data>
+  <data name="بررسی و بازبینی نرم افزارهای کم استفاده و پیش فرض" xml:space="preserve"><value>Überprüfung selten genutzter und vorinstallierter Apps</value></data>
+  <data name="برطرف شد ✓" xml:space="preserve"><value>Behoben ✓</value></data>
+  <data name="برنامه ها" xml:space="preserve"><value>Apps</value></data>
+  <data name="برنامه های زیر در ویندوز شناسایی شدند که ممکن است به آن ها نیاز داشته باشید (مانند Paint، سرویس های بازی Xbox یا نرم افزارهای حجیم با بیش از ۳۰ روز عدم استفاده). مواردی که مایل به حذف آن ها هستید را علامت بزنید:" xml:space="preserve"><value>Die folgenden Apps wurden unter Windows erkannt und werden möglicherweise noch benötigt (wie Paint, Xbox-Spiel-Dienste oder große nicht genutzte Apps für mehr als 30 Tage). Wählen Sie die aus, die Sie entfernen möchten:</value></data>
+  <data name="برنامه های زیر می توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:" xml:space="preserve"><value>Die folgenden Apps können entfernt werden, um Systemressourcen freizugeben. Klicken Sie auf eine beliebige Zeile, um sie auszuwählen:</value></data>
+  <data name="برنامه‌های مرزی پیدا شد" xml:space="preserve"><value>Grenzfälle von Apps gefunden</value></data>
+  <data name="بستن" xml:space="preserve"><value>Schließen</value></data>
+  <data name="بستن Background Tasks مرورگرهای Edge و Chrome و آزادسازی کش افزونه‌ها" xml:space="preserve"><value>Schließen von Edge- und Chrome-Browser-Hintergrundprozessen und Freigeben von Erweiterungs-Caches</value></data>
+  <data name="به‌روز هستی؛ آخرین نسخهٔ منتشرشده {0} است." xml:space="preserve"><value>Sie sind auf dem neuesten Stand; die aktuell veröffentlichte Version ist {0}.</value></data>
+  <data name="به‌روزرسانی شد" xml:space="preserve"><value>Aktualisiert</value></data>
+  <data name="بهینه سازی SSD" xml:space="preserve"><value>SSD-Optimierung</value></data>
+  <data name="بهینه سازی استارتاپ ({0} برنامه غیرضروری)" xml:space="preserve"><value>Startoptimierung ({0} unnötige Apps)</value></data>
+  <data name="بهینه سازی پیشرفته" xml:space="preserve"><value>Erweiterte Optimierung</value></data>
+  <data name="بهینه سازی خودکار سیستم با موفقیت به پایان رسید!" xml:space="preserve"><value>Automatische Systemoptimierung erfolgreich abgeschlossen!</value></data>
+  <data name="بهینه سازی زنده سیستم و پایداری" xml:space="preserve"><value>Live-Systemoptimierung und Stabilität</value></data>
+  <data name="بهینه سازی مرورگر و پاکسازی افزونه ها" xml:space="preserve"><value>Browser-Optimierung und Erweiterungsbereinigung</value></data>
+  <data name="بهینه سازی مرورگرها و حذف افزونه های زائد" xml:space="preserve"><value>Optimierung der Browser und Entfernen ungenutzter Erweiterungen</value></data>
+  <data name="بهینه‌سازی استارتاپ و سرعت بوت" xml:space="preserve"><value>Start- und Bootgeschwindigkeitsoptimierung</value></data>
+  <data name="بهینه‌سازی عمیق حافظه رم (RAM Working Set)" xml:space="preserve"><value>Tiefe RAM-Optimierung (RAM Working Set)</value></data>
+  <data name="پاسخ منبع نامعتبر بود. نسخهٔ فعلی: {0}" xml:space="preserve"><value>Die Quellantwort war ungültig. Aktuelle Version: {0}</value></data>
+  <data name="پاکسازی Candy Crush و بازی های پیش فرض و بررسی برنامه های کم استفاده" xml:space="preserve"><value>Bereinigung von Candy Crush und vorinstallierten Spielen sowie Überprüfung selten genutzter Apps</value></data>
+  <data name="پاکسازی برنامه های اختیاری تاییدشده ({0} برنامه)" xml:space="preserve"><value>Genehmigte optionale Apps bereinigt ({0} Apps)</value></data>
+  <data name="پاکسازی شد ✓" xml:space="preserve"><value>Bereinigt ✓</value></data>
+  <data name="پاکسازی عمیق ({0} کلید نامعتبر رجیستری + {1} پوشه رهاشده)" xml:space="preserve"><value>Tiefenbereinigung ({0} ungültige Registrierungsschlüssel + {1} Restordner)</value></data>
+  <data name="پاکسازی عمیق بقایای نرم افزارها" xml:space="preserve"><value>Tiefenbereinigung von Software-Restbeständen</value></data>
+  <data name="پاک‌سازی فعال: {0}" xml:space="preserve"><value>Bereinigung: {0}</value></data>
+  <data name="پاکسازی موارد انتخاب شده" xml:space="preserve"><value>Ausgewählte Elemente bereinigen</value></data>
+  <data name="پاکسازی نرم افزارها" xml:space="preserve"><value>Softwarebereinigung</value></data>
+  <data name="پراکسی معلق غیرفعال شد و اتصال مستقیم اینترنت به ترمینال و ویندوز بازگشت." xml:space="preserve"><value>Der hängende Proxy wurde deaktiviert und der direkte Internetzugang zum Terminal und zu Windows wurde wiederhergestellt.</value></data>
+  <data name="پراکسی نامعتبر ویندوز خاموش شد و تنظیمات شبکه نوسازی گردید." xml:space="preserve"><value>Der ungültige Windows-Proxy wurde ausgeschaltet und die Netzwerkeinstellungen wurden aktualisiert.</value></data>
+  <data name="پردازنده پایش شد؛ پردازهٔ قابل مداخله‌ای پیدا نشد.{0}" xml:space="preserve"><value>CPU überwacht; kein Prozess erforderte Eingreifen.{0}</value></data>
+  <data name="پردازه‌ها و تب‌های پس‌زمینهٔ مرورگر با موفقیت سبک شدند ({0} مگابایت رم آزاد شد)." xml:space="preserve"><value>Hintergrundprozesse und Tabs des Browsers wurden erfolgreich reduziert ({0} MB RAM freigegeben).</value></data>
+  <data name="پردازه‌ها و وظایف پس‌زمینهٔ مرورگر با موفقیت بهینه‌سازی شدند." xml:space="preserve"><value>Hintergrundprozesse und Aufgaben des Browsers wurden erfolgreich optimiert.</value></data>
+  <data name="پلن High Performance با حداکثر توان پردازشی فعال گردید." xml:space="preserve"><value>Der Hochleistungsplan wurde mit maximaler Rechenleistung aktiviert.</value></data>
+  <data name="پنجره با ابعاد پیش فرض ۱۰۸۰×۸۰۰ در مرکز صفحه قرار گرفت." xml:space="preserve"><value>Das Fenster wurde in der Bildschirmmitte in der Standardgröße 1080×800 platziert.</value></data>
+  <data name="پوشه" xml:space="preserve"><value>Ordner</value></data>
+  <data name="پویش سکتورها و پاک‌سازی فضای شناسایی‌شده · حجم: {0}" xml:space="preserve"><value>Sektoren werden gescannt und entdeckter Speicher wird bereinigt · Größe: {0}.</value></data>
+  <data name="پویش عمیق رجیستری و بقایای نرم‌افزارها" xml:space="preserve"><value>Tiefen-Scan von Registrierungs- und Software-Rückständen</value></data>
+  <data name="پیام رسان تلگرام" xml:space="preserve"><value>Telegram Messenger</value></data>
+  <data name="تأیید حذف؟" xml:space="preserve"><value>Löschen bestätigen?</value></data>
+  <data name="تخصیص کارت گرافیک مجزا" xml:space="preserve"><value>Dedizierte GPU-Zuweisung</value></data>
+  <data name="تخصیص کارت گرافیک مجزا ({0})" xml:space="preserve"><value>Dedizierte GPU-Zuweisung ({0})</value></data>
+  <data name="تخلیه Resolve Cache، پاک‌سازی جدول ARP و ریست بافرهای Winsock" xml:space="preserve"><value>Auflösen-Cache leeren, ARP-Tabelle löschen und Winsock-Puffer zurücksetzen</value></data>
+  <data name="تخلیه Working Set پردازه‌ها و بازیابی بلوک‌های غیرفعال حافظه فیزیکی" xml:space="preserve"><value>Arbeitsmengen von Prozessen kürzen und inaktive physische Speicherblöcke zurückgewinnen</value></data>
+  <data name="تخلیه کش DNS و نوسازی کانکشن ها" xml:space="preserve"><value>DNS-Cache leeren und Verbindungen aktualisieren</value></data>
+  <data name="تعداد {0} فایل حجیم شناسایی شد (مجموع حجم: {1}):" xml:space="preserve"><value>{0} große Dateien wurden erkannt (Gesamtgröße: {1}):</value></data>
+  <data name="تعداد {0} مورد از تنظیمات و توئیک ها به حالت اولیه ویندوز بازگردانده شدند." xml:space="preserve"><value>Einstellungen und Anpassungen von {0} wurden auf die Windows-Standardeinstellungen zurückgesetzt.</value></data>
+  <data name="تلاش مجدد" xml:space="preserve"><value>Erneut versuchen</value></data>
+  <data name="تنظیمات بازنشانی شد" xml:space="preserve"><value>Einstellungen wurden zurückgesetzt</value></data>
+  <data name="تنظیمات مانیتور" xml:space="preserve"><value>Monitoreinstellungen</value></data>
+  <data name="توقف تسک‌های پس‌زمینهٔ مرورگرها" xml:space="preserve"><value>Hintergrundaufgaben des Browsers stoppen</value></data>
+  <data name="توقف تله متری و تنظیمات عملکرد ویندوز" xml:space="preserve"><value>Telemetrie und Windows-Leistungsanpassungen stoppen</value></data>
+  <data name="توقف تله‌متری و روان‌سازی پردازشی ویندوز" xml:space="preserve"><value>Deaktivieren von Telemetrie und Optimierung der Windows-Leistung</value></data>
+  <data name="توقف تله‌متری و روان‌سازی ویندوز" xml:space="preserve"><value>Deaktivieren von Telemetrie und Optimierung von Windows</value></data>
+  <data name="توقف تله‌متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز" xml:space="preserve"><value>Deaktivieren von Telemetrie; Beschleunigung von Suche, Explorer und Windows-Werbung</value></data>
+  <data name="ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست." xml:space="preserve"><value>CleanC konnte nicht für den Autostart registriert werden; der ausführbare Pfad der App ist nicht verfügbar.</value></data>
+  <data name="حافظه رم با موفقیت بهینه‌سازی شد ({0} آزاد شد)." xml:space="preserve"><value>RAM wurde erfolgreich optimiert ({0} freigegeben).</value></data>
+  <data name="حافظه رم بررسی و تمام کش‌های غیرضروری تخلیه شدند." xml:space="preserve"><value>RAM wurde überprüft und alle unnötigen Caches wurden geleert.</value></data>
+  <data name="حافظه رم بهینه شد ({0} آزاد شد) و {1} روندهای پس‌زمینه بسته شدند." xml:space="preserve"><value>RAM wurde optimiert ({0} freigegeben) und {1} Hintergrundaufgaben wurden geschlossen.</value></data>
+  <data name="حالا می توانی آن را در گزارش باگ جای گذاری کنی." xml:space="preserve"><value>Sie können es jetzt in Ihren Fehlerbericht einfügen.</value></data>
+  <data name="حدود" xml:space="preserve"><value>über</value></data>
+  <data name="حذف {0} برنامه غیرضروری و بلااستفاده" xml:space="preserve"><value>Entfernen von {0} unnötigen und ungenutzten Apps</value></data>
+  <data name="حذف انتخاب‌شده‌ها" xml:space="preserve"><value>Ausgewählte entfernen</value></data>
+  <data name="حذف برنامه ها و بازی های تبلیغاتی" xml:space="preserve"><value>Entfernen von Bloatware-Apps und Spielen</value></data>
+  <data name="حذف خودکار برنامه ها و بازی های تبلیغاتی ({0} برنامه)" xml:space="preserve"><value>Automatisches Entfernen von Bloatware-Apps und Spielen ({0} Apps)</value></data>
+  <data name="حذف فایل" xml:space="preserve"><value>Datei gelöscht</value></data>
+  <data name="حذف قطعی فعال شد" xml:space="preserve"><value>Dauerhaftes Löschen aktiviert</value></data>
+  <data name="حذف موارد انتخاب شده" xml:space="preserve"><value>Ausgewählte Elemente entfernen</value></data>
+  <data name="خالی بود (بدون تغییر)" xml:space="preserve"><value>War leer (keine Änderung)</value></data>
+  <data name="خروجی گزارش" xml:space="preserve"><value>Bericht exportieren</value></data>
+  <data name="خلاصهٔ اقدامات کلیدی و آزادسازی حافظه، دیسک، استارتاپ و اتصالات شبکه" xml:space="preserve"><value>Zusammenfassung der wichtigsten Maßnahmen: RAM-, Festplatten-, Start- und Netzwerkoptimierungen</value></data>
+  <data name="خلق و خو: {0} · {1} روز حضور" xml:space="preserve"><value>Stimmung: {0} · {1} Tage anwesend</value></data>
+  <data name="دانلود فعال (IDM)" xml:space="preserve"><value>Aktiver Download (IDM)</value></data>
+  <data name="در حال اسکن فایل های بالای ۵۰۰ مگابایت در مسیرهای کاربری..." xml:space="preserve"><value>Suche nach Dateien über 500 MB in Benutzerordnern...</value></data>
+  <data name="در حال آماده سازی و ارزیابی سرفصل های سیستم..." xml:space="preserve"><value>Systembereiche vorbereiten und auswerten...</value></data>
+  <data name="در حال ایجاد..." xml:space="preserve"><value>Erstellen...</value></data>
+  <data name="در حال بازگردانی..." xml:space="preserve"><value>Wiederherstellen...</value></data>
+  <data name="در حال بررسی و اعمال Fast Startup..." xml:space="preserve"><value>Schnellstart prüfen und anwenden...</value></data>
+  <data name="در حال بررسی وضعیت مانیتور و توان سیستم..." xml:space="preserve"><value>Monitorstatus und Systemleistung prüfen...</value></data>
+  <data name="در حال بهینه سازی..." xml:space="preserve"><value>Optimieren...</value></data>
+  <data name="در حال پردازش سکتورها..." xml:space="preserve"><value>Sektoren verarbeiten...</value></data>
+  <data name="در حال پویش سریع سرفصل های سیستم..." xml:space="preserve"><value>Systembereiche schnell scannen...</value></data>
+  <data name="در حال تخصیص هوشمند کارت گرافیک..." xml:space="preserve"><value>Intelligente GPU-Zuweisung läuft...</value></data>
+  <data name="در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)..." xml:space="preserve"><value>Entfernen von überflüssigen Apps und Spielen (Debloat)...</value></data>
+  <data name="در حال فشرده سازی..." xml:space="preserve"><value>Kompaktierung...</value></data>
+  <data name="درباره CleanC" xml:space="preserve"><value>Über CleanC</value></data>
+  <data name="دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم" xml:space="preserve"><value>Systemoptimierung und Beschleunigungserfolge</value></data>
+  <data name="دسترسی لازم برای تخلیه Working Set فراهم نشد" xml:space="preserve"><value>Der erforderliche Zugriff zum Kürzen des Arbeitssatzes war nicht verfügbar</value></data>
+  <data name="دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه سازی گردیدند." xml:space="preserve"><value>Der TRIM-Befehl wurde erfolgreich ausgeführt und die Windows-Laufwerkssektoren wurden optimiert.</value></data>
+  <data name="دفترچه کشفیات" xml:space="preserve"><value>Entdeckungsprotokoll</value></data>
+  <data name="دیسک های مجازی با موفقیت فشرده سازی شدند." xml:space="preserve"><value>Virtuelle Laufwerke wurden erfolgreich komprimiert.</value></data>
+  <data name="ذخیره ی گزارش مشخصات انجام نشد (مسیر در دسترس نیست)." xml:space="preserve"><value>Konnte den Systembericht nicht speichern (Pfad nicht verfügbar).</value></data>
+  <data name="ذخیره ی گزارش هوش مصنوعی انجام نشد." xml:space="preserve"><value>Konnte den KI-Bericht nicht speichern.</value></data>
+  <data name="رفع تداخل پراکسی" xml:space="preserve"><value>Proxy-Konflikt behoben</value></data>
+  <data name="ساخت نقطه بازگردانی ویندوز (Restore Point)" xml:space="preserve"><value>Windows-Wiederherstellungspunkt erstellen</value></data>
+  <data name="سبک‌سازی مرورگر" xml:space="preserve"><value>Browser-Verschlankung</value></data>
+  <data name="سبک‌سازی مرورگر و توقف پردازه‌های مخفی" xml:space="preserve"><value>Browser verschlanken und versteckte Prozesse stoppen</value></data>
+  <data name="سرفصل {0} از {1} · {2}" xml:space="preserve"><value>Bereich {0} von {1} · {2}</value></data>
+  <data name="سرویس آپدیت ویندوز" xml:space="preserve"><value>Windows Update-Dienst</value></data>
+  <data name="سرویس های یتیم" xml:space="preserve"><value>Verwaiste Dienste</value></data>
+  <data name="سنجش نرخ نوسازی تصویر و پلن مصرف انرژی" xml:space="preserve"><value>Bildwiederholfrequenz und Energieplan messen</value></data>
+  <data name="شبکه آزاد و پایدار" xml:space="preserve"><value>Netzwerk frei und stabil</value></data>
+  <data name="شتاب دهنده گرافیک" xml:space="preserve"><value>Grafikbeschleunigung</value></data>
+  <data name="شروع همراه با ویندوز" xml:space="preserve"><value>Mit Windows starten</value></data>
+  <data name="شناسایی ارجاعات مفقود در AppData و حذف کلیدهای نامعتبر رجیستری" xml:space="preserve"><value>Fehlende Verweise in AppData erkennen und ungültige Registrierungsschlüssel entfernen</value></data>
+  <data name="شناسایی فایل های زائد و گزینه های قابل بهینه سازی" xml:space="preserve"><value>Junk-Dateien und Optimierungsoptionen erkennen</value></data>
+  <data name="شناسایی و پاک‌سازی فایل‌های زائد و کش سرفصل {0}" xml:space="preserve"><value>Junk-Dateien und Cache für Bereich {0} erkennen und bereinigen</value></data>
+  <data name="صرف نظر و ادامه بهینه سازی" xml:space="preserve"><value>Überspringen und Optimierung fortsetzen</value></data>
+  <data name="غیرفعال شد ✓" xml:space="preserve"><value>Deaktiviert ✓</value></data>
+  <data name="غیرفعال‌سازی DiagTrack و اعمال تنظیمات افزایش پاسخ‌دهی سیستم‌عامل" xml:space="preserve"><value>DiagTrack deaktivieren und Einstellungen anwenden, die die Reaktionsfähigkeit des Betriebssystems verbessern</value></data>
+  <data name="فایل {0} به سطل بازیافت منتقل شد." xml:space="preserve"><value>Datei {0} wurde in den Papierkorb verschoben.</value></data>
+  <data name="فایل های شخصی دیگر به سطل بازیافت نمی روند و قابل بازگردانی نخواهند بود. کش و زباله ها همچنان قطعی حذف می شوند." xml:space="preserve"><value>Persönliche Dateien gehen nicht mehr in den Papierkorb und können nicht wiederhergestellt werden. Caches und Junk werden weiterhin dauerhaft gelöscht.</value></data>
+  <data name="فشرده سازی VHDX" xml:space="preserve"><value>VHDX-Kompaktierung</value></data>
+  <data name="فشرده شد ✓" xml:space="preserve"><value>Komprimiert ✓</value></data>
+  <data name="فعال ✓" xml:space="preserve"><value>Aktiviert ✓</value></data>
+  <data name="فعال شد ✓" xml:space="preserve"><value>Aktiviert ✓</value></data>
+  <data name="قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)" xml:space="preserve"><value>HAGS wurde erfolgreich aktiviert. (Ein Neustart von Windows ist erforderlich, damit es vollständig wirksam wird)</value></data>
+  <data name="قبلاً پاک بود" xml:space="preserve"><value>War bereits sauber</value></data>
+  <data name="قبلاً پاک بود ✓" xml:space="preserve"><value>War bereits sauber ✓</value></data>
+  <data name="کپی کردن ممکن نشد." xml:space="preserve"><value>Kopie fehlgeschlagen.</value></data>
+  <data name="کلاینت استیم (Steam)" xml:space="preserve"><value>Steam-Client</value></data>
+  <data name="کلاینت تورنت (Torrent)" xml:space="preserve"><value>Torrent-Client</value></data>
+  <data name="کلیدهای نامعتبر پاکسازی شدند ✓" xml:space="preserve"><value>Ungültige Schlüssel wurden bereinigt ✓</value></data>
+  <data name="کیلوبیت" xml:space="preserve"><value>Kbps</value></data>
+  <data name="گزارش مشخصات سیستم در «{0}» ذخیره شد." xml:space="preserve"><value>System-Spezifikationsbericht wurde in „{0}“ gespeichert.</value></data>
+  <data name="گزارش هوش مصنوعی (Markdown)" xml:space="preserve"><value>KI-Bericht (Markdown)</value></data>
+  <data name="گزارش هوش مصنوعی در «{0}» ذخیره شد." xml:space="preserve"><value>KI-Bericht wurde in „{0}“ gespeichert.</value></data>
+  <data name="مجموعاً {0} آزاد گردید." xml:space="preserve"><value>Insgesamt wurden {0} freigegeben.</value></data>
+  <data name="محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت." xml:space="preserve"><value>Das Netzwerkbandbreitenlimit wurde entfernt und die Systemprozesspriorität erhöht.</value></data>
+  <data name="مدیریت پردازش‌ها" xml:space="preserve"><value>Prozessverwaltung</value></data>
+  <data name="مدیریت مصرف انرژی" xml:space="preserve"><value>Energieverwaltung</value></data>
+  <data name="مدیریت نقاط بازگردانی سیستم عامل و بازگرداندن تغییرات رجیستری و بهینه سازی ها با یک کلیک:" xml:space="preserve"><value>Verwalten Sie Wiederherstellungspunkte des Betriebssystems und setzen Sie Registrierungs- und Optimierungsänderungen mit einem Klick zurück:</value></data>
+  <data name="مدیریت و حذف برنامه های غیرضروری و کم استفاده" xml:space="preserve"><value>Verwalten und Entfernen unnötiger und selten verwendeter Apps</value></data>
+  <data name="مرکز بازیابی و بازگشت تغییرات (Restore &amp; Undo Center)" xml:space="preserve"><value>Wiederherstellungs- &amp; Rückgängigmachen-Zentrum</value></data>
+  <data name="مرورگر فایرفاکس" xml:space="preserve"><value>Mozilla Firefox</value></data>
+  <data name="مرورگر گوگل کروم" xml:space="preserve"><value>Google Chrome</value></data>
+  <data name="مرورگر مایکروسافت اج" xml:space="preserve"><value>Microsoft Edge</value></data>
+  <data name="مشخصات سیستم (TXT)" xml:space="preserve"><value>Systeminformationen (TXT)</value></data>
+  <data name="مگابیت" xml:space="preserve"><value>Mbps</value></data>
+  <data name="ناموفق ✗ — {0}" xml:space="preserve"><value>Fehlgeschlagen ✗ — {0}</value></data>
+  <data name="ناموفق ✗ — دسترسی Administrator لازم است" xml:space="preserve"><value>Fehlgeschlagen ✗ — Administrationsrechte erforderlich</value></data>
+  <data name="نتوانستم منبع نسخه‌ها را بخوانم (کد {0}). نسخهٔ فعلی: {1}" xml:space="preserve"><value>Quelle der Version konnte nicht gelesen werden (Code {0}). Aktuelle Version: {1}</value></data>
+  <data name="نرخ نوسازی با موفقیت به {0}Hz ارتقا یافت." xml:space="preserve"><value>Die Bildwiederholfrequenz wurde erfolgreich auf {0}Hz erhöht.</value></data>
+  <data name="نسخهٔ جدیدتری منتشر شده: {0} (نسخهٔ فعلی: {1})" xml:space="preserve"><value>Eine neuere Version wurde veröffentlicht: {0} (aktuelle Version: {1})</value></data>
+  <data name="نقطه بازگردانی" xml:space="preserve"><value>Wiederherstellungspunkt</value></data>
+  <data name="نگه داشتن همه" xml:space="preserve"><value>Alle behalten</value></data>
+  <data name="نوسازی کش DNS و سوکت‌های شبکه" xml:space="preserve"><value>DNS-Cache und Netzwerksockets werden geleert</value></data>
+  <data name="هدایت برنامه های سنگین و بازی ها به پردازنده گرافیکی قدرتمند" xml:space="preserve"><value>Schwere Apps und Spiele auf die leistungsstarke GPU umleiten</value></data>
+  <data name="همه ی تنظیمات به حالت پیش فرض برگشت." xml:space="preserve"><value>Alle Einstellungen wurden auf die Standardwerte zurückgesetzt.</value></data>
+  <data name="هنوز نسخه‌ای منتشر نشده (یا مخزن خصوصی است). نسخهٔ فعلی: {0}" xml:space="preserve"><value>Es wurde noch keine Version veröffentlicht (oder das Repository ist privat). Aktuelle Version: {0}</value></data>
+  <data name="هیچ برنامه غیرضروری یا کم استفاده ای یافت نشد." xml:space="preserve"><value>Es wurden keine unnötigen oder selten verwendeten Apps gefunden.</value></data>
+  <data name="هیچ فایل حجیمی بالای ۵۰۰ مگابایت در مسیرهای کاربری یافت نشد." xml:space="preserve"><value>Es wurden keine großen Dateien über 500 MB in Ihren Benutzerordnern gefunden.</value></data>
+  <data name="هیچ موردی در این بخش شناسایی نشد (کاملاً تمیز است)." xml:space="preserve"><value>In diesem Abschnitt wurden keine Elemente entdeckt (es ist vollständig sauber).</value></data>
+  <data name="یافتن و مدیریت فایل های بسیار حجیم (Large Files Finder)" xml:space="preserve"><value>Sehr große Dateien finden und verwalten (Large Files Finder)</value></data>
+  <data name="بدون اکسسوری" xml:space="preserve"><value>Kein Zubehör</value></data>
+  <data name="تکنسین" xml:space="preserve"><value>Techniker</value></data>
+  <data name="گیمر" xml:space="preserve"><value>Spieler</value></data>
+  <data name="دانشجو" xml:space="preserve"><value>Student</value></data>
+  <data name="رسمی" xml:space="preserve"><value>Formell</value></data>
+  <data name="کارآگاه" xml:space="preserve"><value>Detektiv</value></data>
+  <data name="جادوگر" xml:space="preserve"><value>Zauberer</value></data>
+  <data name="فضانورد" xml:space="preserve"><value>Astronaut</value></data>
+  <data name="نینجا" xml:space="preserve"><value>Ninja</value></data>
+  <data name="دانشمند" xml:space="preserve"><value>Wissenschaftler</value></data>
+  <data name="ماجراجو" xml:space="preserve"><value>Entdecker</value></data>
+  <data name="هنرمند" xml:space="preserve"><value>Künstler</value></data>
+  <data name="عکاس" xml:space="preserve"><value>Fotograf</value></data>
+  <data name="موسیقی‌دان" xml:space="preserve"><value>Musiker</value></data>
+  <data name="دزد دریایی" xml:space="preserve"><value>Pirat</value></data>
+  <data name="طبیعت‌گرا" xml:space="preserve"><value>Naturfreund</value></data>
+  <data name="یخی" xml:space="preserve"><value>Eis</value></data>
+  <data name="آتشین" xml:space="preserve"><value>Feurig</value></data>
+  <data name="دیسکو" xml:space="preserve"><value>Disco</value></data>
+  <data name="کریستالی" xml:space="preserve"><value>Kristall</value></data>
+  <data name="شوخ‌طبع" xml:space="preserve"><value>Verspielt</value></data>
+  <data name="آرام" xml:space="preserve"><value>Ruhig</value></data>
+  <data name="جدی" xml:space="preserve"><value>Ernst</value></data>
+  <data name="خاموش" xml:space="preserve"><value>Aus</value></data>
+  <data name="بدون" xml:space="preserve"><value>Keine</value></data>
+  <data name="CleanC - بهینه ساز هوشمند ویندوز" xml:space="preserve"><value>CleanC – Intelligenter Windows-Optimierer</value></data>
+  <data name="CleanC (پردازنده: {0}% • رم: {1}%)" xml:space="preserve"><value>CleanC (CPU: {0}% • RAM: {1}%)</value></data>
+  <data name="🪟 نمایش پنجره اصلی CleanC" xml:space="preserve"><value>🪟 CleanC Hauptfenster anzeigen</value></data>
+  <data name="🚀 آزادسازی آنی حافظه رم (RAM Boost)" xml:space="preserve"><value>🚀 Sofort RAM freigeben (RAM-Boost)</value></data>
+  <data name="🧹 بهینه سازی کامل سیستم (Quick Boost)" xml:space="preserve"><value>🧹 Vollständige Systemoptimierung (Schnell-Boost)</value></data>
+  <data name="🌐 تغییر سریع DNS و تحریم شکن" xml:space="preserve"><value>🌐 Schneller DNS- &amp; Anti-Zensur-Wechsel</value></data>
+  <data name="❌ خروج از CleanC" xml:space="preserve"><value>❌ CleanC beenden</value></data>
+  <data name="آزادسازی حافظه رم" xml:space="preserve"><value>RAM-Boost</value></data>
+  <data name="مقدار {0} حافظه رم با موفقیت آزاد شد." xml:space="preserve"><value>{0} des RAMs wurde erfolgreich freigegeben.</value></data>
+  <data name="اجرای آزادسازی رم با خطا مواجه شد — جزئیات در crash.log ثبت شد." xml:space="preserve"><value>RAM-Boost fehlgeschlagen — Details wurden in crash.log geschrieben.</value></data>
+  <data name="خطای اسکریپت هیرو: " xml:space="preserve"><value>Fehler im Hero-Skript: </value></data>
+  <data name="بدون جزئیات" xml:space="preserve"><value>Keine Details</value></data>
+  <data name="پیام ناشناخته از هیرو: " xml:space="preserve"><value>Unbekannte Nachricht vom Hero: </value></data>
+  <data name="نمایش گرافیکی داروگ روی این دستگاه در دسترس نیست" xml:space="preserve"><value>Daroogs grafische Ansicht ist auf diesem Gerät nicht verfügbar</value></data>
+  <data name=" (راهنما: نصب «Microsoft WebView2 Runtime»)، ولی بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر کار می‌کنند." xml:space="preserve"><value> (Tipp: «Microsoft WebView2 Runtime» installieren), aber intelligentes Scannen und Optimierungen funktionieren weiterhin unverändert.</value></data>
+  <data name="SettingsStore باید روی UI thread ساخته شود." xml:space="preserve"><value>SettingsStore muss im UI-Thread erstellt werden.</value></data>
+  <data name="در صف بهینه سازی" xml:space="preserve"><value>Für Optimierung in Warteschlange</value></data>
+  <data name="نصب: {0}" xml:space="preserve"><value>Installiert: {0}</value></data>
+  <data name="در حال خواندن فهرست سطل بازیافت..." xml:space="preserve"><value>Papierkorb-Elemente werden geladen...</value></data>
+  <data name="انتخاب {0}" xml:space="preserve"><value>Wählen Sie {0}</value></data>
+  <data name="{0} شیء" xml:space="preserve"><value>{0} Elemente</value></data>
+  <data name="سطل بازیافت" xml:space="preserve"><value>Papierkorb</value></data>
+  <data name="فهرست سطل بازیافت قابل خواندن نیست." xml:space="preserve"><value>Die Liste des Papierkorbs konnte nicht gelesen werden.</value></data>
+  <data name="فایل" xml:space="preserve"><value>Datei</value></data>
+  <data name="زمان حذف نامشخص" xml:space="preserve"><value>Löschzeit unbekannt</value></data>
+  <data name="داده موجود نیست" xml:space="preserve"><value>Daten nicht verfügbar</value></data>
+  <data name="بازگردانی" xml:space="preserve"><value>Wiederherstellen</value></data>
+  <data name="بازگردانی {0}" xml:space="preserve"><value>{0} wiederherstellen</value></data>
+  <data name="حذف قطعی" xml:space="preserve"><value>Endgültig löschen</value></data>
+  <data name="حذف قطعی {0}" xml:space="preserve"><value>Permanently löschen {0}</value></data>
+  <data name="ابتدا دست کم یک شیء را انتخاب کنید." xml:space="preserve"><value>Wählen Sie zuerst mindestens ein Element aus.</value></data>
+  <data name="{0} شیء به مسیر اصلی بازگردانده شد." xml:space="preserve"><value>{0} Elemente wurden an ihren ursprünglichen Speicherort wiederhergestellt.</value></data>
+  <data name="{0} شیء بازگردانده شد؛ {1} مورد ناموفق ({2})" xml:space="preserve"><value>{0} Elemente wiederhergestellt; {1} fehlgeschlagen ({2})</value></data>
+  <data name="حذف قطعی اشیاء انتخاب شده" xml:space="preserve"><value>Ausgewählte Elemente dauerhaft löschen</value></data>
+  <data name="{0} شیء با حجم {1} برای همیشه حذف می شود.&#xA;این عملیات قابل بازگشت نیست." xml:space="preserve"><value>{0} Elemente ({1}) werden dauerhaft gelöscht.
+Dieser Vorgang kann nicht rückgängig gemacht werden.</value></data>
+  <data name="{0} شیء برای همیشه حذف شد." xml:space="preserve"><value>{0} Elemente dauerhaft gelöscht.</value></data>
+  <data name="{0} شیء حذف شد؛ {1} مورد ناموفق ({2})" xml:space="preserve"><value>{0} Elemente gelöscht; {1} fehlgeschlagen ({2})</value></data>
+  <data name="خالی کردن کل سطل بازیافت" xml:space="preserve"><value>Den gesamten Papierkorb leeren</value></data>
+  <data name="{0} شیء با حجم {1} برای همیشه حذف می شود.&#xA;پس از خالی کردن، هیچ شیء قابل بازگردانی نخواهد بود." xml:space="preserve"><value>{0} Elemente ({1}) werden dauerhaft gelöscht.
+Nach dem Leeren können keine Elemente wiederhergestellt werden.</value></data>
+  <data name="خالی کردن" xml:space="preserve"><value>Leeren</value></data>
+  <data name="سطل خالی شد؛ {0} شیء حذف قطعی گردید." xml:space="preserve"><value>Papierkorb geleert; {0} Elemente dauerhaft gelöscht.</value></data>
+  <data name="خالی کردن سطل کامل نشد: {0}" xml:space="preserve"><value>Das Leeren des Papierkorbs wurde nicht abgeschlossen: {0}</value></data>
+  <data name="چیزی برای حذف وجود نداشت." xml:space="preserve"><value>Es gab nichts zu löschen.</value></data>
+  <data name="«{0}» به مسیر اصلی بازگردانده شد." xml:space="preserve"><value>"{0}" wurde an seinen ursprünglichen Ort wiederhergestellt.</value></data>
+  <data name="بازگردانی انجام نشد." xml:space="preserve"><value>Die Wiederherstellung wurde nicht abgeschlossen.</value></data>
+  <data name="بازگردانی شیء با خطای غیرمنتظره مواجه شد." xml:space="preserve"><value>Die Wiederherstellung des Elements ist aufgrund eines unerwarteten Fehlers fehlgeschlagen.</value></data>
+  <data name="حذف قطعی شیء" xml:space="preserve"><value>Element dauerhaft löschen</value></data>
+  <data name="«{0}» ({1}) برای همیشه حذف می شود.&#xA;این عملیات قابل بازگشت نیست." xml:space="preserve"><value>"{0}" ({1}) wird dauerhaft gelöscht.
+Dies kann nicht rückgängig gemacht werden.</value></data>
+  <data name="«{0}» برای همیشه حذف شد." xml:space="preserve"><value>"{0}" wurde dauerhaft gelöscht.</value></data>
+  <data name="حذف انجام نشد." xml:space="preserve"><value>Die Löschung wurde nicht abgeschlossen.</value></data>
+  <data name="حذف شیء با خطای غیرمنتظره مواجه شد." xml:space="preserve"><value>Die Löschung des Elements ist aufgrund eines unerwarteten Fehlers fehlgeschlagen.</value></data>
+  <data name="{0} گروه تکراری" xml:space="preserve"><value>{0} Duplikatgruppen</value></data>
+  <data name="{0} فضا" xml:space="preserve"><value>{0} Speicherplatz</value></data>
+  <data name="{0} پوشه خالی" xml:space="preserve"><value>{0} leere Ordner</value></data>
+  <data name="{0} فایل زائد و نامرتب" xml:space="preserve"><value>{0} unordentliche Dateien</value></data>
+  <data name="{0} فایل حجیم" xml:space="preserve"><value>{0} große Dateien</value></data>
+  <data name="خطا در پویش عمیق" xml:space="preserve"><value>Fehler beim Tiefenscan</value></data>
+  <data name="هیچ فایل تکراری با محتوا و سایز یکسان در سیستم یافت نشد. دیسک بهینه است!" xml:space="preserve"><value>Keine doppelten Dateien mit identischem Inhalt und Größe gefunden. Ihre Festplatte ist optimiert!</value></data>
+  <data name="{0} نسخه یکسان · {1}" xml:space="preserve"><value>{0} identische Kopien · {1}</value></data>
+  <data name="حجم هر فایل: {0} · هش محتوا: {1}" xml:space="preserve"><value>Größe pro Datei: {0} · Inhalts-Hash: {1}</value></data>
+  <data name="+ {0} قابل آزادسازی" xml:space="preserve"><value>+ {0} wiederherstellbar</value></data>
+  <data name="نسخه اصلی (نگه داری)" xml:space="preserve"><value>Original (behalten)</value></data>
+  <data name="نسخه کپی (اضافی)" xml:space="preserve"><value>Doppelte Kopie (extra)</value></data>
+  <data name="هیچ پوشه خالی بلااستفاده ای در دایرکتوری های انتخابی یافت نشد." xml:space="preserve"><value>Keine ungenutzten leeren Ordner in den ausgewählten Verzeichnissen gefunden.</value></data>
+  <data name="پوشه خالی" xml:space="preserve"><value>Leerer Ordner</value></data>
+  <data name="هیچ فایل زائد، موقت یا نصاب رها شده ای یافت نشد. دیسک کاملاً پاکیزه است." xml:space="preserve"><value>Keine Junk-, temporären oder verbleibenden Installationsdateien gefunden. Die Festplatte ist vollständig sauber.</value></data>
+  <data name="فایل حجیم تر از ۵۰۰ مگابایت در پوشه های شخصی کاربر یافت نشد." xml:space="preserve"><value>Keine Dateien größer als 500 MB in persönlichen Ordnern gefunden.</value></data>
+  <data name="پاکسازی فایل های تکراری" xml:space="preserve"><value>Saubere doppelte Dateien</value></data>
+  <data name="پاکسازی پوشه های خالی" xml:space="preserve"><value>Saubere leere Ordner</value></data>
+  <data name="سازماندهی دانلودها و دسکتاپ" xml:space="preserve"><value>Downloads und Desktop organisieren</value></data>
+  <data name="پاکسازی فایل های حجیم" xml:space="preserve"><value>Große Dateien bereinigen</value></data>
+  <data name="هیچ موردی انتخاب نشده است." xml:space="preserve"><value>Keine Elemente ausgewählt.</value></data>
+  <data name=" مجموع حجم: {0}،" xml:space="preserve"><value> gesamtgröße: {0},</value></data>
+  <data name="تأیید حذف گروهی" xml:space="preserve"><value>Batch-Löschung bestätigen</value></data>
+  <data name="{0} مورد انتخاب شده{1} {2}. ادامه می دهید؟" xml:space="preserve"><value>{0} Elemente ausgewählt{1} {2}. Fortfahren?</value></data>
+  <data name="بله، حذف شود" xml:space="preserve"><value>Ja, löschen</value></data>
+  <data name="در حال حذف ایمن..." xml:space="preserve"><value>Sicher löschen...</value></data>
+  <data name=" — از «مرکز بازیابی» قابل بازگردانی است." xml:space="preserve"><value> — kann aus dem Wiederherstellungszentrum wiederhergestellt werden.</value></data>
+  <data name="پاکسازی عمیق دیسک" xml:space="preserve"><value>Tiefenreinigung der Festplatte</value></data>
+  <data name="✓ {0} مورد با موفقیت پاکسازی شد" xml:space="preserve"><value>✓ {0} Elemente erfolgreich bereinigt</value></data>
+  <data name="خطا در پاکسازی" xml:space="preserve"><value>Reinigungsfehler</value></data>
+  <data name="حذف ایمن موارد انتخاب شده" xml:space="preserve"><value>Ausgewählte Elemente sicher löschen</value></data>
+  <data name="قرنطینه خالی است؛ چیزی برای بازگردانی وجود ندارد." xml:space="preserve"><value>Die Quarantäne ist leer; es gibt nichts wiederherzustellen.</value></data>
+  <data name="فایل های قرنطینه شده CleanC" xml:space="preserve"><value>Von CleanC in Quarantäne gestellte Dateien</value></data>
+  <data name="حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند." xml:space="preserve"><value>Diese Löschungen wurden im Quarantäne-Modus vorgenommen; sie können wiederhergestellt werden, bis Sie sie dauerhaft löschen.</value></data>
+  <data name="مسیر نامشخص" xml:space="preserve"><value>Unbekannter Pfad</value></data>
+  <data name="{0} مورد · {1} · {2}" xml:space="preserve"><value>{0} Elemente · {1} · {2}</value></data>
+  <data name="از: {0}" xml:space="preserve"><value>Von: {0}</value></data>
+  <data name="بازگردانی همه" xml:space="preserve"><value>Alle wiederherstellen</value></data>
+  <data name="بازگردانی نشست {0}" xml:space="preserve"><value>Sitzung {0} wiederherstellen</value></data>
+  <data name="حذف قطعی نشست {0}" xml:space="preserve"><value>Sitzung {0} dauerhaft löschen</value></data>
+  <data name="حذف شود؟" xml:space="preserve"><value>Löschen?</value></data>
+  <data name="قرنطینه" xml:space="preserve"><value>Quarantäne</value></data>
+  <data name="{0} مورد به مسیر اصلی خود بازگردانده شد." xml:space="preserve"><value>{0} Elemente wieder an ihren ursprünglichen Ort wiederhergestellt.</value></data>
+  <data name="{0} مورد بازگردانده شد؛ {1} مورد ناموفق{2}." xml:space="preserve"><value>{0} Elemente wiederhergestellt; {1} fehlgeschlagen{2}.</value></data>
+  <data name="بازگردانی انجام نشد: " xml:space="preserve"><value>Die Wiederherstellung wurde nicht abgeschlossen: </value></data>
+  <data name="نشست قرنطینه و فایل های آن برای همیشه حذف شد." xml:space="preserve"><value>Die Quarantäne-Sitzung und ihre Dateien wurden dauerhaft gelöscht.</value></data>
+  <data name="حذف نشست قرنطینه انجام نشد." xml:space="preserve"><value>Das Löschen der Quarantäne-Sitzung wurde nicht abgeschlossen.</value></data>
+  <data name="حذف انجام نشد: " xml:space="preserve"><value>Löschen wurde nicht abgeschlossen: </value></data>
+  <data name="آیا از حذف «{0}» اطمینان دارید؟&#xA;آنیستالر رسمی برنامه باز خواهد شد و ادامه ی حذف در اختیار خودش است." xml:space="preserve"><value>Sind Sie sicher, dass Sie "{0}" entfernen möchten?
+Der offizielle Deinstallationsprogramm des Programms wird geöffnet, und der Rest der Entfernung liegt in seiner Verantwortung.</value></data>
+  <data name="آیا از حذف {0} بسته درایور انتخاب شده اطمینان دارید؟&#xA;این عملیات با بررسی ایمنی انجام خواهد شد." xml:space="preserve"><value>Sind Sie sicher, dass Sie die {0} ausgewählten Treiberpakete entfernen möchten?
+Dieser Vorgang wird mit einer Sicherheitsprüfung durchgeführt.</value></data>
+  <data name="تعداد {0} بسته درایور انتخاب‌شده توسط شما شناسایی شده است.&#xA;&#xA;پیش از شروع، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.&#xA;آیا مایل به حذف بسته‌های انتخاب‌شده هستید؟" xml:space="preserve"><value>{0} von Ihnen ausgewählte Treiberpakete wurden erkannt.
+
+Vor dem Start wird ein Systemwiederherstellungspunkt zur vollständigen Sicherheit erstellt.
+Möchten Sie die ausgewählten Pakete entfernen?</value></data>
+  <data name="تعداد {0} بسته درایور قدیمی و تکراری شناسایی شده است.&#xA;&#xA;پیش از شروع، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.&#xA;آیا مایل به شروع فرآیند پاکسازی هستید؟" xml:space="preserve"><value>{0} Alte und doppelte Treiberpakete wurden erkannt.
+
+Vor dem Start wird ein Wiederherstellungspunkt des Systems zur vollständigen Sicherheit erstellt.
+Möchten Sie den Bereinigungsprozess starten?</value></data>
+  <data name="{0}&#xA;&#xA;جهت دریافت و نصب، به بخش 'آپدیت ویندوز' مراجعه فرمایید." xml:space="preserve"><value>{0}
+
+Zum Herunterladen und Installieren gehen Sie zum Abschnitt 'Windows Update'.</value></data>
+  <data name="پاکسازی تاریخچه" xml:space="preserve"><value>Verlauf löschen</value></data>
+  <data name="بروزرسانی فهرست درایورها" xml:space="preserve"><value>Treiberliste aktualisieren</value></data>
+  <data name="گزارش دستاوردهای بهینه‌سازی سیستم" xml:space="preserve"><value>Bericht über Systemoptimierungsleistungen</value></data>
+  <data name="عملیات با موفقیت پایان یافت؛ خلاصهٔ فضای آزادشده و اقدامات انجام‌شده در زیر آمده است:" xml:space="preserve"><value>Der Vorgang wurde erfolgreich abgeschlossen; eine Zusammenfassung des freigegebenen Speicherplatzes und der durchgeführten Aktionen wird unten angezeigt:</value></data>
+  <data name="فایل های موقت با موفقیت پاکسازی شدند و به اطلاعات شخصی آسیبی نرسید." xml:space="preserve"><value>Temporäre Dateien wurden erfolgreich bereinigt und keine persönlichen Daten wurden betroffen.</value></data>
+  <data name="تأیید و بازگشت به داشبورد" xml:space="preserve"><value>Bestätigen und zum Dashboard zurückkehren</value></data>
+  <data name="مثلاً سی‌سی" xml:space="preserve"><value>z. B. Winy</value></data>
+  <data name="حجم بالای ۱.۲۵× از درون کارت بیرون می زند" xml:space="preserve"><value>Größen über 1,25× überschreiten die Karte</value></data>
+  <data name="خودکار (بر اساس ساعت و منطقه)" xml:space="preserve"><value>Automatisch (basierend auf Zeit und Region)</value></data>
+  <data name="CleanC در حال مراقبت از سیستم شماست" xml:space="preserve"><value>CleanC kümmert sich um Ihr System</value></data>
+  <data name="{0} مورد انتخاب شده{1}. ادامه می دهید؟" xml:space="preserve"><value>{0} Elemente ausgewählt{1}. Fortfahren?</value></data>
+  <data name="DeepStoragePermanentNote" xml:space="preserve"><value>Diese Elemente werden endgültig gelöscht und können nicht wiederhergestellt werden.</value></data>
+  <data name="DeepStorageRecycleOptIn" xml:space="preserve"><value>In den Papierkorb verschieben statt endgültig zu löschen (Speicherplatz wird nicht freigegeben)</value></data>
+  <data name="DeepStorageDeletingProgress" xml:space="preserve"><value>Wird gelöscht… {0} von {1}</value></data>
+  <data name="MessCatOldInstaller" xml:space="preserve"><value>Alter Installer (Setup / Installer)</value></data>
+  <data name="MessCatOldArchive" xml:space="preserve"><value>Archiv (Zip / Rar)</value></data>
+  <data name="MessCatDuplicateCopy" xml:space="preserve"><value>Doppelte Kopie (Kopie / Duplikat)</value></data>
+  <data name="MessCatOldScreenshot" xml:space="preserve"><value>Alter Screenshot</value></data>
+  <data name="MessCatTempJunk" xml:space="preserve"><value>Temporäre / Müll-Datei</value></data>
+  <data name="MessCatLargeFile" xml:space="preserve"><value>Sehr große Datei (&gt;200MB)</value></data>
+  <data name="MessCatExtractedArchiveDup" xml:space="preserve"><value>Extrahiertes Archiv-Duplikat (Ordner mit demselben Namen existiert)</value></data>
+  <data name="MessCatIncompleteDownload" xml:space="preserve"><value>Unvollständiger temporärer Download (crdownload / Teil)</value></data>
+  <data name="MessCatOemDriveRoot" xml:space="preserve"><value>OEM-Installationsreste im Laufwerksstamm</value></data>
+  <data name="MessCatUpdater" xml:space="preserve"><value>Updater-Reste (Electron / Squirrel)</value></data>
+  <data name="MessCatSyncDevice" xml:space="preserve"><value>Gerätetransfer / OneDrive-Temporärreste</value></data>
+  <data name="MessCatOfficeLock" xml:space="preserve"><value>Office temporäre Sperrdatei (~$)</value></data>
+  <data name="MessCatOther" xml:space="preserve"><value>Andere</value></data>
+  <data name="EvSystemComponent" xml:space="preserve"><value>Systemkomponenten-Eintrag (SystemComponent) — normalerweise ein Treiber oder Hardware-Dienstprogramm; nur mit voller Kenntnis entfernen</value></data>
+  <data name="EvTrialInName" xml:space="preserve"><value>Der App-Name enthält "Trial"</value></data>
+  <data name="EvTrialInNameLocalized" xml:space="preserve"><value>App-Name enthält "Testversion"</value></data>
+  <data name="NoteProvisioned" xml:space="preserve"><value> — in das Windows-Image integriert und für neue Benutzer automatisch installiert</value></data>
+  <data name="EvEmptyFolder30Days" xml:space="preserve"><value>Seit über 30 Tagen leer (zuletzt geändert: {0:yyyy/MM/dd})</value></data>
+  <data name="EvOfficeLockFile" xml:space="preserve"><value>Temporäre Office-Sperrdatei — das Dokument ist geschlossen und diese Datei wurde zurückgelassen</value></data>
+  <data name="EvDownloadCompleted" xml:space="preserve"><value>Vollständige Datei "{0}" existiert — Restbestände von einem abgeschlossenen Download</value></data>
+  <data name="EvDownloadAbandoned" xml:space="preserve"><value>Keine Änderungen seit über 24 Stunden – abgebrochener Download</value></data>
+  <data name="EvTmpOld72h" xml:space="preserve"><value>.tmp-Datei älter als 72 Stunden in Downloads/Desktop</value></data>
+  <data name="EvInstallerMatched" xml:space="preserve"><value>Installer für "{0}" — die App ist installiert und diese Datei wird nicht mehr benötigt</value></data>
+  <data name="EvInstallerNoMatch" xml:space="preserve"><value>Alter Installer (über 14 Tage) — keine App mit demselben Namen im System gefunden</value></data>
+  <data name="EvCrossDevice" xml:space="preserve"><value>Temporärer Geräteaustausch (CrossDevice)</value></data>
+  <data name="EvCrossDeviceSub" xml:space="preserve"><value>Link zum Windows / Phone Link Staging-Ordner für Dateiübertragungen vom Telefon zum PC</value></data>
+  <data name="EvOneDriveTemp" xml:space="preserve"><value>OneDrive-Temp-Ordner</value></data>
+  <data name="EvOneDriveTempSub" xml:space="preserve"><value>Temporäre Speicherung für aufgegebene OneDrive-Uploads</value></data>
+  <data name="ScanProgressDriveRoots" xml:space="preserve"><value>Scanne Laufwerkswurzeln und Updater-Reste...</value></data>
+  <data name="EvDriveRootLeftover" xml:space="preserve"><value>Laufwerks-Stammordner benannt nach dem Anbieter {0} — Nachweis: {1}</value></data>
+  <data name="EvRemnantInstallerFile" xml:space="preserve"><value>Übrig gebliebenes Installationsprogramm-Datei "{0}"</value></data>
+  <data name="EvVendorArtifact" xml:space="preserve"><value>Anbieterspezifisches Artefakt "{0}" (Boot-Image / Treiberpaket)</value></data>
+  <data name="EvPreloadFile" xml:space="preserve"><value>Anbietervorlade-Datei "{0}"</value></data>
+  <data name="EvRootEmptyFolder" xml:space="preserve"><value>Leerer Ordner im Stammverzeichnis des Laufwerks — keine Inhalte seit über 30 Tagen (zuletzt geändert: {0:yyyy/MM/dd})</value></data>
+  <data name="EvUpdaterPendingInstaller" xml:space="preserve"><value>Der Updater-Ordner enthält den übrig gebliebenen Installer "{0}" — unvollständiges Update</value></data>
+  <data name="EvUpdaterNoPending" xml:space="preserve"><value>Updater-Ordner passend zu *-updater / SquirrelTemp (keine ausstehende Installation gefunden)</value></data>
+  <data name="EvBlockmapOld" xml:space="preserve"><value>Electron-Updater-Restdatei .blockmap (über 30 Tage unberührt)</value></data>
+  <data name="SensitiveKeyFile" xml:space="preserve"><value>Schlüssel-/Sicherheitsdatei ({0})</value></data>
+  <data name="EvDriverNoHardware" xml:space="preserve"><value>Kein Gerät (auch nicht getrennt) ist mit diesem Paket verbunden — die Hardware war nie vorhanden oder ist nicht mehr vorhanden</value></data>
+  <data name="LockUserVetoError" xml:space="preserve"><value>Dieser Pfad ist vom Benutzer gesperrt</value></data>
+  <data name="EvStartupFileMissing" xml:space="preserve"><value>Startdatei "{0}" existiert nicht auf der Festplatte</value></data>
+  <data name="EvStartupExeMissing" xml:space="preserve"><value>Ausführbare Datei "{0}" existiert nicht — Restdatei einer deinstallierten App</value></data>
+  <data name="DescCrashLogs" xml:space="preserve"><value>Absturzberichtprotokolle, WER-Dateien, Speicherabbilder und Kernelberichte (LiveKernelReports)</value></data>
+  <data name="JunkPrefetchTitle" xml:space="preserve"><value>Windows Prefetch-Cache (.pf-Dateien)</value></data>
+  <data name="JunkPrefetchDesc" xml:space="preserve"><value>Beschleunigt App-Starts — wird automatisch neu erstellt und kann sicher gelöscht werden</value></data>
+  <data name="AdminRequired" xml:space="preserve"><value>Administratorzugriff erforderlich</value></data>
+  <data name="LockReasonDeepScan" xml:space="preserve"><value>Von der Deep-Scan-Seite gesperrt</value></data>
+  <data name="LockInfoBarTitle" xml:space="preserve"><value>Pfad gesperrt</value></data>
+  <data name="LockSaveFailed" xml:space="preserve"><value>Speichern des Locks fehlgeschlagen — Überprüfen Sie den Zugriff auf locks.json.</value></data>
+  <data name="SensitiveSectionTitle" xml:space="preserve"><value>Empfindliche Dateien erkannt ({0} Elemente — nur gemeldet, nicht gelöscht)</value></data>
+  <data name="SpeedTestCancelled" xml:space="preserve"><value>Test gestoppt</value></data>
+  <data name="BadgeTargetMissing" xml:space="preserve"><value>Ziel fehlt</value></data>
+  <data name="DriverBannerDupAndOrphan" xml:space="preserve"><value>Gefunden {0} doppelte und alte Pakete + {1} Pakete ohne Hardware in der Windows DriverStore</value></data>
+  <data name="DriverBannerOrphan" xml:space="preserve"><value>Gefunden {0} Pakete ohne Hardware (Reste von getrennten Geräten) in der Windows DriverStore</value></data>
+  <data name="DriverBannerDup" xml:space="preserve"><value>Gefunden {0} doppelte und alte Pakete in der Windows DriverStore</value></data>
+  <data name="BadgeNoHardware" xml:space="preserve"><value>Keine Hardware</value></data>
+  <data name="DriverDeleteOrphanTitle" xml:space="preserve"><value>Lösche Paket ohne Hardware {0}</value></data>
+  <data name="DriverDeleteOldTitle" xml:space="preserve"><value>Lösche alten Treiber {0}</value></data>
+  <data name="DriverDeleteOrphanBody" xml:space="preserve"><value>Das Paket '{0}' gehört zu Hardware, die nicht mehr mit dem System verbunden ist.&amp;#10;Sind Sie sicher, dass Sie dieses Paket löschen möchten?&amp;#10;Dieser Vorgang wird ohne den Force-Schalter ausgeführt und wird gestoppt, wenn das System es verwendet.</value></data>
+  <data name="DriverDeleteOldBody" xml:space="preserve"><value>Sind Sie sicher, dass Sie das alte Treiberpaket '{0}' ({1}) löschen möchten?&amp;#10;Dieser Vorgang wird ohne den Force-Schalter ausgeführt und wird gestoppt, wenn das System es verwendet.</value></data>
+  <data name="RamCurrentlyUsed" xml:space="preserve"><value>Derzeit genutzter Speicher</value></data>
+  <data name="Total" xml:space="preserve"><value>Gesamt</value></data>
+  <data name="HighUsage" xml:space="preserve"><value>Hohe Nutzung</value></data>
+  <data name="MediumUsage" xml:space="preserve"><value>Mittlere Nutzung</value></data>
+  <data name="SmoothUsage" xml:space="preserve"><value>Flüssig</value></data>
+  <data name="ActiveTraffic" xml:space="preserve"><value>Aktiver Verkehr</value></data>
+  <data name="IdleTraffic" xml:space="preserve"><value>Leerlauf</value></data>
+  <data name="NoBackgroundTraffic" xml:space="preserve"><value>Kein Hintergrundverkehr (Netzwerk stabil)</value></data>
+  <data name="CpuLoadSummary" xml:space="preserve"><value>Kernlast</value></data>
+  <data name="PowerPlugged" xml:space="preserve"><value>Angeschlossen</value></data>
+  <data name="PowerCharging" xml:space="preserve"><value>Lädt</value></data>
+  <data name="PowerBattery" xml:space="preserve"><value>Batterie</value></data>
+  <data name="BoostError" xml:space="preserve"><value>Systemoptimierung fehlgeschlagen</value></data>
+  <data name="OptimizationFeatures" xml:space="preserve"><value>Optimierungsfunktionen</value></data>
+  <data name="ToolsHeaderSubtitle" xml:space="preserve"><value>Eine Sammlung nützlicher Systemverwaltungs- und Optimierungstools</value></data>
+  <data name="LauncherWindowsUpdateTitle" xml:space="preserve"><value>Windows-Update</value></data>
+  <data name="LauncherWindowsUpdateDesc" xml:space="preserve"><value>Überprüfen, 5 Wochen pausieren und feststeckende Downloads beheben</value></data>
+  <data name="LauncherUninstallerTitle" xml:space="preserve"><value>Apps deinstallieren</value></data>
+  <data name="LauncherUninstallerDesc" xml:space="preserve"><value>App-Liste mit Symbolen und einfacher Entfernung</value></data>
+  <data name="LauncherStartupTitle" xml:space="preserve"><value>Autostart-Apps</value></data>
+  <data name="LauncherStartupDesc" xml:space="preserve"><value>Autostart-Apps und Bootgeschwindigkeit verwalten</value></data>
+  <data name="LauncherSpeedTestTitle" xml:space="preserve"><value>Internet-Geschwindigkeitstest</value></data>
+  <data name="LauncherSpeedTestDesc" xml:space="preserve"><value>Echter Download, Upload, Ping und ISP-Messung</value></data>
+  <data name="ToolsSectionFrequentlyUsed" xml:space="preserve"><value>Häufig verwendet</value></data>
+  <data name="ToolsSectionOtherTools" xml:space="preserve"><value>Andere Tools</value></data>
+  <data name="LauncherToolDeepStorage" xml:space="preserve"><value>Tiefenreinigung der Festplatte</value></data>
+  <data name="LauncherToolSpecs" xml:space="preserve"><value>Systeminformationen</value></data>
+  <data name="LauncherToolPersonalization" xml:space="preserve"><value>Stil &amp; Grafik</value></data>
+  <data name="LauncherToolDrivers" xml:space="preserve"><value>Treiberverwaltung</value></data>
+  <data name="LauncherToolDns" xml:space="preserve"><value>DNS- &amp; Umgehungseinstellungen</value></data>
+  <data name="LauncherToolPrivacy" xml:space="preserve"><value>Datenschutz &amp; Anti-Tracking</value></data>
+  <data name="LauncherToolRecycleBin" xml:space="preserve"><value>Papierkorb</value></data>
+  <data name="AutoStartDesc" xml:space="preserve"><value>Starte CleanC automatisch, wenn du dich anmeldest. Dies ist derselbe Eintrag, der im Task-Manager › Autostart angezeigt wird.</value></data>
+  <data name="AppDataSettingsLabel" xml:space="preserve"><value>Einstellungen:</value></data>
+  <data name="AppDataLogsLabel" xml:space="preserve"><value>Fehlerprotokolle:</value></data>
+  <data name="VersionLabel" xml:space="preserve"><value>App-Version:</value></data>
+  <data name="OsLabel" xml:space="preserve"><value>Betriebssystem:</value></data>
+  <data name="NotificationHistoryTitle" xml:space="preserve"><value>Benachrichtigungs- und Aktionsverlauf</value></data>
+  <data name="NotificationClear" xml:space="preserve"><value>Löschen</value></data>
+  <data name="NotificationEmpty" xml:space="preserve"><value>Noch keine Benachrichtigungen.</value></data>
+  <data name="SelectAll" xml:space="preserve"><value>Alle auswählen</value></data>
+  <data name="SpecsHeaderTitle" xml:space="preserve"><value>Vollständige Hardware-Spezifikationen</value></data>
+  <data name="SpecsHeaderSubtitle" xml:space="preserve"><value>Live CPU-, RAM-, Mainboard-, GPU-, Laufwerks- und Lizenzinformationen</value></data>
+  <data name="CopySpecs" xml:space="preserve"><value>Spezifikationen kopieren</value></data>
+  <data name="RefreshSpecs" xml:space="preserve"><value>Aktualisieren</value></data>
+  <data name="UninstallerHeaderTitle" xml:space="preserve"><value>Apps verwalten und deinstallieren</value></data>
+  <data name="UninstallerSearchPlaceholder" xml:space="preserve"><value>Apps suchen...</value></data>
+  <data name="UninstallerSortNewest" xml:space="preserve"><value>Neueste Installation</value></data>
+  <data name="UninstallerSortLargest" xml:space="preserve"><value>Größte Größe</value></data>
+  <data name="UninstallerSortName" xml:space="preserve"><value>Name (A-Z)</value></data>
+  <data name="SpeedTestHeaderTitle" xml:space="preserve"><value>Internetgeschwindigkeitstest</value></data>
+  <data name="SpeedTestHeaderSubtitle" xml:space="preserve"><value>Messen Sie Download, Upload und Latenz von Cloudflare-Servern</value></data>
+  <data name="SpeedIp" xml:space="preserve"><value>IP</value></data>
+  <data name="SpeedIsp" xml:space="preserve"><value>ISP</value></data>
+  <data name="SpeedLocation" xml:space="preserve"><value>Standort</value></data>
+  <data name="ReadyToStartSpeedTest" xml:space="preserve"><value>Bereit, den Geschwindigkeitstest zu starten</value></data>
+  <data name="StartSpeedTest" xml:space="preserve"><value>Geschwindigkeitstest starten</value></data>
+  <data name="StopSpeedTest" xml:space="preserve"><value>Test stoppen</value></data>
+  <data name="PingLatency" xml:space="preserve"><value>Ping-Latenz</value></data>
+  <data name="DownloadSpeed" xml:space="preserve"><value>Download-Geschwindigkeit</value></data>
+  <data name="UploadSpeed" xml:space="preserve"><value>Upload-Geschwindigkeit</value></data>
+  <data name="PersonalizationHeaderTitle" xml:space="preserve"><value>Windows-Stil, Thema und Grafik</value></data>
+  <data name="PersonalizationHeaderSubtitle" xml:space="preserve"><value>Sofort ohne Neustart anwenden</value></data>
+  <data name="StartupHeaderTitle" xml:space="preserve"><value>Autostart-Apps verwalten</value></data>
+  <data name="StartupRefresh" xml:space="preserve"><value>Liste aktualisieren</value></data>
+  <data name="WindowsUpdateHeaderTitle" xml:space="preserve"><value>Windows-Updates verwalten</value></data>
+  <data name="WindowsUpdateHeaderSubtitle" xml:space="preserve"><value>Updates prüfen, offiziell bis zu 5 Wochen pausieren und hängen gebliebene Downloads beheben</value></data>
+  <data name="CheckNewUpdates" xml:space="preserve"><value>Nach neuen Updates suchen</value></data>
+  <data name="UpdateStatusHeadline" xml:space="preserve"><value>Status des Betriebssystem-Updates</value></data>
+  <data name="UpdateStatusActive" xml:space="preserve"><value>Aktiv</value></data>
+  <data name="UpdateRow1Title" xml:space="preserve"><value>Offizielle Pause bis zu 5 Wochen</value></data>
+  <data name="UpdateRow1Sub" xml:space="preserve"><value>Pausieren Sie die Paketlieferung über den offiziellen Windows-Einstellungsmechanismus</value></data>
+  <data name="Pause5Weeks" xml:space="preserve"><value>Pause für 5 Wochen</value></data>
+  <data name="ResumeUpdates" xml:space="preserve"><value>Updates fortsetzen</value></data>
+  <data name="UpdateRow2Title" xml:space="preserve"><value>Windows Update-Dienst (wuauserv)</value></data>
+  <data name="UpdateRow2Sub" xml:space="preserve"><value>Hintergrunddienst vollständig aktivieren oder deaktivieren</value></data>
+  <data name="DisableService" xml:space="preserve"><value>Deaktivieren</value></data>
+  <data name="EnableService" xml:space="preserve"><value>Aktivieren</value></data>
+  <data name="UpdateRow3Title" xml:space="preserve"><value>Hängengebliebene Updates beheben (Cache löschen)</value></data>
+  <data name="UpdateRow3Sub" xml:space="preserve"><value>Dienst stoppen, den SoftwareDistribution-Ordner vollständig löschen und neu starten</value></data>
+  <data name="CleanCache" xml:space="preserve"><value>Cache leeren</value></data>
+  <data name="UpdatePendingSectionTitle" xml:space="preserve"><value>Zur Installation ausstehende Updates</value></data>
+  <data name="NoUpdatesBanner" xml:space="preserve"><value>Keine ausstehenden oder wartenden Updates gefunden. Windows ist vollständig aktuell.</value></data>
+  <data name="DriversHeaderTitle" xml:space="preserve"><value>Treiber verwalten und bereinigen</value></data>
+  <data name="DriversHeaderSubtitle" xml:space="preserve"><value>Fehler erkennen und doppelte DriverStore-Versionen sicher bereinigen</value></data>
+  <data name="CheckDriverUpdates" xml:space="preserve"><value>Treiber-Updates prüfen</value></data>
+  <data name="DriversTotalLabel" xml:space="preserve"><value>Gesamtanzahl der Treiberpakete</value></data>
+  <data name="DriversErrorLabel" xml:space="preserve"><value>Hardwarefehler</value></data>
+  <data name="DriversDuplicateLabel" xml:space="preserve"><value>Doppelte Versionen</value></data>
+  <data name="DriversDuplicateBannerTitle" xml:space="preserve"><value>Doppelte Pakete bereinigen, die Speicherplatz verschwenden</value></data>
+  <data name="DriversDuplicateBannerSub" xml:space="preserve"><value>Alte Versionen werden nach der Erstellung eines Wiederherstellungspunkts sicher entfernt.</value></data>
+  <data name="CleanDriverStore" xml:space="preserve"><value>DriverStore bereinigen</value></data>
+  <data name="DriversSearchPlaceholder" xml:space="preserve"><value>Treiber suchen...</value></data>
+  <data name="DriversSelectAll" xml:space="preserve"><value>Alle auswählen</value></data>
+  <data name="DriversBatchDelete" xml:space="preserve"><value>Ausgewählte löschen</value></data>
+  <data name="DnsHeaderTitle" xml:space="preserve"><value>Smart-DNS-Einstellungen</value></data>
+  <data name="DnsHeaderSubtitle" xml:space="preserve"><value>Zuverlässige Umgehung und niedrigere Verbindungslatenz</value></data>
+  <data name="ResetDnsDhcp" xml:space="preserve"><value>Auf automatisch zurücksetzen (DHCP)</value></data>
+  <data name="ActiveDnsLabel" xml:space="preserve"><value>Aktiver DNS</value></data>
+  <data name="FlushDns" xml:space="preserve"><value>DNS-Cache leeren</value></data>
+  <data name="DnsPresetsTitle" xml:space="preserve"><value>Voreinstellungen</value></data>
+  <data name="PrivacyHeaderTitle" xml:space="preserve"><value>Datenschutz- und Telemetrie-Entfernung</value></data>
+  <data name="PrivacyHeaderSubtitle" xml:space="preserve"><value>Berichtversand und Suchoptimierung stoppen</value></data>
+  <data name="PrivacyBannerTitle" xml:space="preserve"><value>In Echtzeit angewendet und gespeichert</value></data>
+  <data name="PrivacyBannerSub" xml:space="preserve"><value>Jeder Schalter wird sofort in der Registrierung und den Diensten angewendet.</value></data>
+  <data name="PrivacyBannerBadge" xml:space="preserve"><value>Aktiv</value></data>
+  <data name="PrivacyFooterHint" xml:space="preserve"><value>Für maximale Sicherheit wird empfohlen, alle Optionen aktiviert zu lassen.</value></data>
+  <data name="PrivacyResetDefaults" xml:space="preserve"><value>Windows-Standardeinstellungen</value></data>
+  <data name="PrivacyEnableAll" xml:space="preserve"><value>Alle aktivieren</value></data>
+  <data name="DeepStorageHeaderTitle" xml:space="preserve"><value>Tiefgreifende Datenträgerbereinigung und Müllorganisation</value></data>
+  <data name="DeepStorageHeaderSubtitle" xml:space="preserve"><value>Doppelte Dateien, leere Ordner, Downloads und große Dateien finden</value></data>
+  <data name="StartDeepScan" xml:space="preserve"><value>Tiefenscan starten</value></data>
+  <data name="DeepStorageDuplicatesLabel" xml:space="preserve"><value>Doppelte Dateien</value></data>
+  <data name="DeepStorageEmptyFoldersLabel" xml:space="preserve"><value>Leere Ordner</value></data>
+  <data name="DeepStorageEmptyFoldersSub" xml:space="preserve"><value>Keine Dateien oder Unterordner</value></data>
+  <data name="TabMess" xml:space="preserve"><value>Junk- und unübersichtliche Dateien</value></data>
+  <data name="DeepStorageLargeFilesLabel" xml:space="preserve"><value>Große Dateien</value></data>
+  <data name="DeepStorageLargeFilesSub" xml:space="preserve"><value>Über 500 MB</value></data>
+  <data name="DeepStorageSortLabel" xml:space="preserve"><value>Sortieren:</value></data>
+  <data name="DeepStorageSortSize" xml:space="preserve"><value>Größe</value></data>
+  <data name="DeepStorageSortDate" xml:space="preserve"><value>Datum</value></data>
+  <data name="DeepStorageSortName" xml:space="preserve"><value>Name</value></data>
+  <data name="CleanSelectedItems" xml:space="preserve"><value>Ausgewählte Elemente bereinigen</value></data>
+  <data name="DeepStorageScanStatus" xml:space="preserve"><value>Dateistruktur wird tiefgehend gescannt und Inhalte werden gehasht...</value></data>
+  <data name="RecycleBinHeaderTitle" xml:space="preserve"><value>Papierkorb verwalten</value></data>
+  <data name="RecycleBinHeaderSubtitle" xml:space="preserve"><value>Element für Element ansehen; jedes Objekt wiederherstellen oder dauerhaft löschen</value></data>
+  <data name="RecycleBinRefresh" xml:space="preserve"><value>Aktualisieren</value></data>
+  <data name="RecycleBinTotalLabel" xml:space="preserve"><value>Anzahl der Elemente</value></data>
+  <data name="RecycleBinSizeLabel" xml:space="preserve"><value>Genutzter Speicherplatz</value></data>
+  <data name="RecycleBinRestoreSelected" xml:space="preserve"><value>Ausgewählte wiederherstellen</value></data>
+  <data name="RecycleBinDeleteSelected" xml:space="preserve"><value>Ausgewählte dauerhaft löschen</value></data>
+  <data name="RecycleBinEmptyBtn" xml:space="preserve"><value>Gesamten Papierkorb leeren</value></data>
+  <data name="RecycleBinEmptyHint" xml:space="preserve"><value>Der Papierkorb ist leer; es gibt nichts wiederherzustellen oder zu löschen.</value></data>
+  <data name="RecycleBinLoading" xml:space="preserve"><value>Papierkorb-Liste wird gelesen...</value></data>
+  <data name="NetworkSysTraffic" xml:space="preserve"><value>System- &amp; Windows-Verkehr</value></data>
+  <data name="HealthExcellent" xml:space="preserve"><value>Ausgezeichnet</value></data>
+  <data name="HealthDescExcellent" xml:space="preserve"><value>Systemgesundheit ist stabil und ausgezeichnet</value></data>
+  <data name="HealthGood" xml:space="preserve"><value>Gut</value></data>
+  <data name="HealthDescGood" xml:space="preserve"><value>Die Gesamtleistung des Systems ist gut</value></data>
+  <data name="HealthFair" xml:space="preserve"><value>Befriedigend</value></data>
+  <data name="HealthDescFair" xml:space="preserve"><value>Das System benötigt RAM-Bereinigung und Dateoptimierung</value></data>
+  <data name="HealthNeedsOpt" xml:space="preserve"><value>Optimierung erforderlich</value></data>
+  <data name="HealthDescPoor" xml:space="preserve"><value>Hohe Ressourcennutzung; eine schnelle Bereinigung wird empfohlen</value></data>
+  <data name="BadgeTrial" xml:space="preserve"><value>Testversion</value></data>
+  <data name="BadgeComponent" xml:space="preserve"><value>Komponente / Treiber</value></data>
+  <data name="LockTooltipUnlock" xml:space="preserve"><value>Entsperren — dieser Pfad kann wieder vorgeschlagen werden</value></data>
+  <data name="LockTooltipLock" xml:space="preserve"><value>Sperren — dieser Pfad wird niemals vorgeschlagen oder gelöscht</value></data>
+  <data name="JunkApps" xml:space="preserve"><value>App- &amp; Entwickler-Caches</value></data>
+  <data name="JunkBoost" xml:space="preserve"><value>Live-System-Boost</value></data>
+  <data name="آماده اسکن برنامه ها" xml:space="preserve"><value>Bereit zum Scannen von Apps</value></data>
+  <data name="بررسی استارتاپ" xml:space="preserve"><value>Startüberprüfung</value></data>
+  <data name="سنجش بلادرنگ پینگ و سرعت" xml:space="preserve"><value>Live-Ping und Geschwindigkeitstest</value></data>
+  <data name="DeepStorageMessSub" xml:space="preserve"><value>Temporäre Dateien, Installer und Müll</value></data>
+  <data name="سخت افزار معیوب" xml:space="preserve"><value>Fehlerhafte Hardware</value></data>
+  <data name="در حال شناسایی..." xml:space="preserve"><value>Wird erkannt...</value></data>
+  <data name="اکسپدیشن وینی" xml:space="preserve"><value>Winys Expedition</value></data>
+  <data name="اجرای بازی گرافیکی در دسترس نیست (WebView2 Runtime نصب شده باشد)." xml:space="preserve"><value>Das grafische Spiel ist nicht verfügbar (Microsoft WebView2 Runtime muss installiert sein).</value></data>
+  <data name="کپی نام‌دار «({0})»" xml:space="preserve"><value>Benannte Kopie "({0})"</value></data>
+  <data name="دوقلوی اصلی همین پوشه: {0}" xml:space="preserve"><value>Originalzwilling in diesem Ordner: {0}</value></data>
+  <data name="حجم همتا: {0}" xml:space="preserve"><value>Zwillinggröße: {0}</value></data>
+  <data name="پسوند نیمه‌تمام مرورگر ({0})" xml:space="preserve"><value>Unvollständiger Browser-Download ({0})</value></data>
+  <data name="عمر: {0}" xml:space="preserve"><value>Alter: {0}</value></data>
+  <data name="پسوند موقت ({0})" xml:space="preserve"><value>Vorübergehende Erweiterung ({0})</value></data>
+  <data name="نصب‌کننده ({0}) به حجم {1}" xml:space="preserve"><value>Installer ({0}) bei {1}</value></data>
+  <data name="نصب‌کننده پس از نصب معمولاً بی‌استفاده می‌ماند" xml:space="preserve"><value>Installer bleiben nach der Installation normalerweise ungenutzt</value></data>
+  <data name="حجم {0}" xml:space="preserve"><value>Größe {0}</value></data>
+  <data name="هیچ الگوی کپی یا موقتی ندارد؛ داوری با شماست" xml:space="preserve"><value>Kein Kopier- oder Temp-Muster; Ihr Urteil entscheidet</value></data>
+  <data name="حجم صفر (خالی) و قدیمی" xml:space="preserve"><value>Null Bytes (leer) und alt</value></data>
+  <data name="مسیر دانلودها در دسترس نیست" xml:space="preserve"><value>Der Downloads-Ordner ist nicht verfügbar</value></data>
+  <data name="API ناشناخته است: {0}" xml:space="preserve"><value>Unbekannte API: {0}</value></data>
+  <data name="سال" xml:space="preserve"><value>Jahr</value></data>
+  <data name="ماه" xml:space="preserve"><value>Monat</value></data>
+  <data name="هفته" xml:space="preserve"><value>Woche</value></data>
+  <data name="روز" xml:space="preserve"><value>Tag</value></data>
 </root>

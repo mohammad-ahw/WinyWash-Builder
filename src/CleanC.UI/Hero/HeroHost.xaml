@@ -20,7 +20,7 @@
         -->
         <Border x:Name="FallbackPanel" Background="Transparent" Visibility="Collapsed" Padding="18,8">
             <StackPanel Spacing="5" VerticalAlignment="Center" HorizontalAlignment="Center">
-                <TextBlock x:Name="FallbackTitle" Text="CleanC در حال مراقبت از سیستم شماست" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" TextWrapping="Wrap" />
+                <TextBlock x:Name="FallbackTitle" Text="WinyWash در حال مراقبت از سیستم شماست" FontWeight="SemiBold" FontSize="14" TextAlignment="Center" TextWrapping="Wrap" />
                 <TextBlock x:Name="FallbackSubtitle"
                            Text="نمایش گرافیکی داروگ بر روی این دستگاه در دسترس نیست؛ بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر فعال هستند."
                            FontSize="11" Opacity="0.75" TextWrapping="Wrap" TextAlignment="Center" />

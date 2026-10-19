@@ -126,7 +126,7 @@ namespace CleanC.UI
 
         // هِدِر منوی تری با کش ۱ ثانیه ای؛ GetCurrentStats نباید داخل
         // window-proc هر بار اجرا شود چون پیام های پنجره را معطل می کند.
-        private string _statusHeader = "CleanC";
+        private string _statusHeader = "WinyWash";
         private DateTime _statusHeaderAtUtc = DateTime.MinValue;
 
         // onExit: خروج باید از مسیر MainWindow بگذرد تا تنظیمات ذخیره شود و

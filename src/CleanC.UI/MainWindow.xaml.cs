@@ -41,6 +41,12 @@ namespace CleanC.UI
         private ObservableCollection<JunkItemViewModel> _activeCleaningItems = new();
         private ScanResult? _cachedScanResult;
         private bool _isBusy = false;
+        // نسخه ی زبان UI؛ برای اطمینان از این که نتیجه ی اسکن پس از تغییر زبان
+        // واقعاً با کاتالوگ جدید ساخته شده است (نه اسکن در جریان با زبان قبلی).
+        private int _uiLanguageVersion;
+        private int _heroScanLanguageVersion;
+        private bool _advancedRelocalizeRunning;
+        private bool _advancedRelocalizePending;
         private long _displayedFreedBytes = 0;
         private long _currentReportTotalFreed = 0;
         private DesktopAcrylicController? _acrylicController;
@@ -104,6 +110,10 @@ namespace CleanC.UI
         // کنترل های کارت کاراکتر تا پایان اولین PopulateSettingsUi مقادیر را به VM نمی نویسند؛
         // وگرنه مقداردهی اولیه ی XAML (مثلاً Value اسلایدر) «تنظیمات دست نخورده» را پر می کرد.
         private bool _characterUiReady = false;
+        // پیشنهادهای شهر با debounce گرفته می‌شوند؛ درخواست قبلی با CTS جدید لغو می‌شود.
+        private CancellationTokenSource? _citySuggestCts;
+        private string _lastValidCity = string.Empty;
+        private bool _cityDefaultRequested;
         private AppView _currentView = AppView.Dashboard;
         private bool _isExiting = false;
         /// <summary>هشدار تری فقط یک بار در هر اجرا نمایش داده شود تا آزاردهنده نشود.</summary>
@@ -143,6 +153,9 @@ namespace CleanC.UI
 
             // تنظیمات پایدار باید قبل از هر تصمیم UI (تم، هندسه ی پنجره، نمای آخر) خوانده شوند
             PopulateSettingsUi();
+
+            // اگر کاربر هنوز شهری انتخاب نکرده باشد، یک بار شهر انگلیسیِ فعلی را از IP تشخیص می‌دهیم.
+            _ = EnsureDefaultCityAsync();
 
             // بازگرداندن تاریخچه ی اعلان های مانده از اجرای قبلی
             RenderPersistedNotificationHistory();
@@ -222,6 +235,14 @@ namespace CleanC.UI
                 {
                     if (e.Key == Windows.System.VirtualKey.Escape)
                     {
+                        // بازی اکسپدیشن روی هر چیز دیگری ارجحیت دارد؛ ESC اول آن را می‌بندد
+                        if (ExpeditionOverlay != null && ExpeditionOverlay.Visibility == Visibility.Visible)
+                        {
+                            CloseExpedition();
+                            e.Handled = true;
+                            return;
+                        }
+
                         if (ToolsView != null && ToolsView.Visibility == Visibility.Visible && ToolsLauncherPanel != null && ToolsLauncherPanel.Visibility != Visibility.Visible)
                         {
                             NavigateToToolPage(null);
@@ -1765,7 +1786,7 @@ namespace CleanC.UI
             {
                 btn.Content = LocalizationService.Get("در حال ایجاد...");
                 btn.IsEnabled = false;
-                var (ok, msg) = await RestorePointService.CreateRestorePointAsync($"CleanC Backup - {DateTime.Now:yyyy.MM.dd HH:mm}");
+                var (ok, msg) = await RestorePointService.CreateRestorePointAsync($"WinyWash Backup - {DateTime.Now:yyyy.MM.dd HH:mm}");
                 btn.Content = ok ? LocalizationService.Get("ایجاد شد ✓") : LocalizationService.Get("تلاش مجدد");
                 btn.IsEnabled = !ok;
                 ShowInfoBar(LocalizationService.Get("نقطه بازگردانی"), msg, ok ? InfoBarSeverity.Success : InfoBarSeverity.Warning);
@@ -1915,6 +1936,101 @@ namespace CleanC.UI
             }
         }
 
+        /// <summary>
+        /// عنوان و توضیح آیتم ها هنگام اسکن با زبان فعلی ساخته می شوند؛ پس از تغییر زنده ی زبان
+        /// باید یک اسکن تازه با کاتالوگ جدید گرفته شود. این متد تیک های فعلی کاربر را قبل از اسکن
+        /// نگه می دارد و بعد از جایگزینی نتیجه، دقیقاً همان تیک ها را برمی گرداند.
+        /// </summary>
+        private void RelocalizeAdvancedGroupsAfterLanguageChange()
+        {
+            if (_cachedScanResult == null || _isExiting)
+            {
+                _advancedRelocalizePending = false;
+                return;
+            }
+            if (_isBusy)
+            {
+                // تغییر زبان وسط پاکسازی انجام شده؛ بعد از پایان کار، تازه‌سازی را ادامه می‌دهیم.
+                _advancedRelocalizePending = true;
+                return;
+            }
+            if (_advancedRelocalizeRunning) return;
+            _ = RelocalizeAdvancedGroupsAfterLanguageChangeAsync();
+        }
+
+        private async Task RelocalizeAdvancedGroupsAfterLanguageChangeAsync()
+        {
+            _advancedRelocalizeRunning = true;
+            try
+            {
+                var snapshot = CaptureJunkSelectionSnapshot();
+
+                // اگر اسکن در جریان با زبان قبلی شروع شده باشد، نتیجه اش نباید اعمال شود.
+                // حداکثر سه تلاش: در عمل بار اول یا دوم به اسکن هم زبان با UI می رسیم.
+                for (int attempt = 0; attempt < 3; attempt++)
+                {
+                    var scan = await GetHeroScanAsync();
+                    if (_isExiting) return;
+                    if (_heroScanLanguageVersion != _uiLanguageVersion)
+                    {
+                        continue;
+                    }
+
+                    ApplyHeroScanResult(scan, renderAdvanced: false);
+                    ApplyJunkSelectionSnapshot(scan, snapshot);
+                    RenderAdvancedGroups(scan);
+                    SavePersistedJunkSelections();
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "RelocalizeAdvancedGroups");
+            }
+            finally
+            {
+                _advancedRelocalizeRunning = false;
+                if (_advancedRelocalizePending && !_isBusy && !_isExiting)
+                {
+                    _advancedRelocalizePending = false;
+                    RelocalizeAdvancedGroupsAfterLanguageChange();
+                }
+            }
+        }
+
+        private Dictionary<string, bool> CaptureJunkSelectionSnapshot()
+        {
+            var snapshot = new Dictionary<string, bool>(StringComparer.Ordinal);
+            if (_cachedScanResult == null) return snapshot;
+
+            foreach (var group in _cachedScanResult.Groups)
+            {
+                foreach (var item in group.Items)
+                {
+                    if (string.IsNullOrEmpty(item.Id)) continue;
+                    snapshot[group.Id + "\u001F" + item.Id] = item.IsChecked;
+                }
+            }
+            return snapshot;
+        }
+
+        private static void ApplyJunkSelectionSnapshot(ScanResult scan, Dictionary<string, bool> snapshot)
+        {
+            if (snapshot.Count == 0) return;
+
+            foreach (var group in scan.Groups)
+            {
+                foreach (var item in group.Items)
+                {
+                    if (string.IsNullOrEmpty(item.Id)) continue;
+                    if (snapshot.TryGetValue(group.Id + "\u001F" + item.Id, out bool isChecked))
+                    {
+                        item.IsChecked = isChecked;
+                    }
+                }
+            }
+        }
+
         private void RenderAdvancedGroups(ScanResult scan)
         {
             AdvancedGroupsContainer.Children.Clear();
@@ -1958,12 +2074,7 @@ namespace CleanC.UI
 
                 string grpTitle = grp.Id switch
                 {
-                    "system_junk" => LocalizationService.Get("JunkCleanSystem", grp.Title),
-                    "browsers" => LocalizationService.Get("JunkBrowsers", grp.Title),
                     "apps" => LocalizationService.Get("JunkApps", grp.Title),
-                    "windows_caches" => LocalizationService.Get("JunkWindowsCaches", grp.Title),
-                    "event_logs" => LocalizationService.Get("JunkLogs", grp.Title),
-                    "delivery_opt" => LocalizationService.Get("JunkDelivery", grp.Title),
                     "system_boost" => LocalizationService.Get("JunkBoost", grp.Title),
                     _ => grp.Title
                 };
@@ -2516,10 +2627,185 @@ namespace CleanC.UI
                 // اسلایدرها → رویداد ValueChanged متن نمایشی را هم تازه می کند
                 if (CharSizeSlider != null) CharSizeSlider.Value = SettingsVm.CharacterSize;
                 if (CharLunSlider != null) CharLunSlider.Value = SettingsVm.CharacterLun;
+
+                _lastValidCity = (SettingsVm.CharacterCity ?? string.Empty).Trim();
+                SyncCityBoxText();
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "PopulateCharacterSettingsUi");
+            }
+        }
+
+        private void SyncCityBoxText()
+        {
+            if (CharCityBox == null || SettingsVm == null) return;
+            string city = (SettingsVm.CharacterCity ?? string.Empty).Trim();
+            _lastValidCity = city;
+            // اگر کاربر در حال تایپ است، متن کادر را با مقدار قدیمی ذخیره‌شده عوض نکن.
+            if (CharCityBox.FocusState == FocusState.Unfocused)
+                CharCityBox.Text = city;
+        }
+
+        private async Task EnsureDefaultCityAsync()
+        {
+            if (_cityDefaultRequested || _isExiting || SettingsVm == null) return;
+            _cityDefaultRequested = true;
+
+            string existing = (SettingsVm.CharacterCity ?? string.Empty).Trim();
+            if (existing.Length > 0)
+            {
+                _lastValidCity = existing;
+                SyncCityBoxText();
+                return;
+            }
+
+            try
+            {
+                string? detected = await CityGeocodingService.DetectEnglishCityAsync();
+                if (_isExiting || SettingsVm == null || string.IsNullOrWhiteSpace(detected)) return;
+                // کاربر ممکن است در همین فاصله خودش شهری وارد کرده باشد.
+                if (!string.IsNullOrWhiteSpace(SettingsVm.CharacterCity)) return;
+                CommitCity(detected, CharCityBox);
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "EnsureDefaultCity");
+            }
+        }
+
+        private void CharCityBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)
+        {
+            if (args.Reason != AutoSuggestionBoxTextChangeReason.UserInput) return;
+
+            _citySuggestCts?.Cancel();
+            _citySuggestCts?.Dispose();
+            _citySuggestCts = null;
+
+            string query = (sender.Text ?? string.Empty).Trim();
+            if (query.Length < 2)
+            {
+                sender.ItemsSource = null;
+                return;
+            }
+
+            var cts = new CancellationTokenSource();
+            _citySuggestCts = cts;
+            _ = LoadCitySuggestionsAsync(sender, query, cts);
+        }
+
+        private async Task LoadCitySuggestionsAsync(AutoSuggestBox sender, string query, CancellationTokenSource cts)
+        {
+            try
+            {
+                // debounce: تا کاربر تایپ می کند درخواست شبکه فرستاده نمی شود.
+                await Task.Delay(350, cts.Token);
+                var results = await CityGeocodingService.SearchAsync(query, 8, cts.Token);
+                if (cts.IsCancellationRequested || _isExiting) return;
+                if (!string.Equals((sender.Text ?? string.Empty).Trim(), query, StringComparison.Ordinal)) return;
+
+                sender.ItemsSource = results;
+                sender.IsSuggestionListOpen = results.Count > 0;
+            }
+            catch (OperationCanceledException)
+            {
+                // تایپ ادامه دارد؛ درخواست قبلی عمداً لغو شده است.
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "LoadCitySuggestions");
+            }
+            finally
+            {
+                if (ReferenceEquals(_citySuggestCts, cts)) _citySuggestCts = null;
+                cts.Dispose();
+            }
+        }
+
+        private void CharCityBox_SuggestionChosen(AutoSuggestBox sender, AutoSuggestBoxSuggestionChosenEventArgs args)
+        {
+            if (args.SelectedItem is CitySuggestion city)
+                CommitCity(city.Name, sender);
+        }
+
+        private void CharCityBox_QuerySubmitted(AutoSuggestBox sender, AutoSuggestBoxQuerySubmittedEventArgs args)
+        {
+            if (args.ChosenSuggestion is CitySuggestion city)
+            {
+                CommitCity(city.Name, sender);
+                return;
+            }
+            _ = ValidateCityInputAsync(sender, args.QueryText ?? sender.Text);
+        }
+
+        private void CharCityBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (sender is not AutoSuggestBox box || SettingsVm == null) return;
+            string typed = (box.Text ?? string.Empty).Trim();
+            if (string.Equals(typed, (SettingsVm.CharacterCity ?? string.Empty).Trim(), StringComparison.Ordinal))
+                return;
+            _ = ValidateCityInputAsync(box, typed);
+        }
+
+        private async Task ValidateCityInputAsync(AutoSuggestBox sender, string? raw)
+        {
+            string typed = (raw ?? string.Empty).Trim();
+            if (typed.Length > 40) typed = typed[..40];
+            if (typed.Length == 0)
+            {
+                // خالی کردن کادر یعنی خاموش کردن ماژول آب‌وهوا؛ معتبر است.
+                CommitCity(string.Empty, sender);
+                return;
+            }
+
+            // اگر کاربر نام نمایشی «Tehran, Iran» را دستی وارد کند، فقط بخش نام را
+            // به Geocoding می فرستیم؛ ذخیره نهایی همیشه Name خالص است.
+            string lookupText = typed;
+            int comma = lookupText.IndexOf(',');
+            if (comma > 0) lookupText = lookupText[..comma].Trim();
+
+            try
+            {
+                var lookup = await CityGeocodingService.ValidateAsync(lookupText);
+                if (_isExiting) return;
+                if (!string.Equals((sender.Text ?? string.Empty).Trim(), typed, StringComparison.Ordinal)) return;
+
+                if (lookup.Status == CityLookupStatus.Found && lookup.City != null)
+                {
+                    CommitCity(lookup.City.Name, sender);
+                }
+                else if (lookup.Status == CityLookupStatus.NotFound)
+                {
+                    // شهر پیدا نشد؛ به آخرین مقدار معتبر برمی گردیم تا آب‌وهوا با نام اشتباه خراب نشود.
+                    CommitCity(_lastValidCity, sender);
+                }
+                else
+                {
+                    // شبکه/سرویس در دسترس نیست؛ ورودی کاربر را حفظ می کنیم.
+                    CommitCity(typed, sender);
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "ValidateCityInput");
+                CommitCity(typed, sender);
+            }
+        }
+
+        private void CommitCity(string? city, AutoSuggestBox? sender)
+        {
+            string value = (city ?? string.Empty).Trim();
+            if (value.Length > 40) value = value[..40];
+
+            _lastValidCity = value;
+            if (SettingsVm != null &&
+                !string.Equals((SettingsVm.CharacterCity ?? string.Empty).Trim(), value, StringComparison.Ordinal))
+            {
+                SettingsVm.CharacterCity = value;
+            }
+            if (sender != null && !string.Equals((sender.Text ?? string.Empty).Trim(), value, StringComparison.Ordinal))
+            {
+                sender.Text = value;
             }
         }
 
@@ -2536,6 +2822,55 @@ namespace CleanC.UI
                 }
             }
             if (combo.Items.Count > 0) combo.SelectedIndex = 0;
+        }
+
+        /// <summary>
+        /// برچسب های کمبوباکس کاراکتر را بعد از تغییر زبان بازسازی می کند.
+        /// لیست اکسسوری/مناسبت از HeroLooks می آید و آیتم های لحن/شدت هم باید
+        /// انتخاب فعلی را دوباره رندر کنند تا متن قدیمی در کادر انتخاب نماند.
+        /// </summary>
+        private void RefreshCharacterComboItems()
+        {
+            bool wasReady = _characterUiReady;
+            _characterUiReady = false;
+            try
+            {
+                if (SettingsVm == null) return;
+
+                HeroLooks.RefreshLocalizedNames();
+
+                if (CharLookCombo != null)
+                {
+                    var items = HeroLooks.All;
+                    CharLookCombo.Items.Clear();
+                    foreach (var (_, name) in items) CharLookCombo.Items.Add(name);
+                    CharLookCombo.SelectedIndex = HeroLooks.IndexOf(items, SettingsVm.CharacterLook);
+                }
+
+                if (CharOccLookCombo != null)
+                {
+                    var items = HeroLooks.Occasion();
+                    CharOccLookCombo.Items.Clear();
+                    foreach (var (_, name) in items) CharOccLookCombo.Items.Add(name);
+                    CharOccLookCombo.SelectedIndex = HeroLooks.IndexOf(items, SettingsVm.CharacterOccLook);
+                }
+
+                RefreshSelectedComboText(CharToneCombo);
+                RefreshSelectedComboText(CharIntensityCombo);
+            }
+            finally
+            {
+                _characterUiReady = wasReady;
+            }
+        }
+
+        private static void RefreshSelectedComboText(ComboBox? combo)
+        {
+            if (combo == null) return;
+            int index = combo.SelectedIndex;
+            if (index < 0) return;
+            combo.SelectedIndex = -1;
+            combo.SelectedIndex = index;
         }
 
         private void CharToneCombo_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -2869,6 +3204,7 @@ namespace CleanC.UI
         {
             try
             {
+                _uiLanguageVersion++;
                 bool isRtl = LocalizationService.IsRtl;
                 var dir = isRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight;
 
@@ -2901,7 +3237,9 @@ namespace CleanC.UI
                 if (NavToolsText != null) NavToolsText.Text = LocalizationService.Get("NavTools", "ابزارهای سیستمی ویندوز");
 
                 // متن‌های هیرو (عنوان/زیرعنوان/دسته‌بندی/دکمه) در BuildHeroState از همین
-                // LocalizationService ساخته می‌شوند؛ فقط وضعیت جدید را به JS می‌فرستیم.
+                // LocalizationService ساخته می‌شوند؛ تنظیمات هم جداگانه می‌رود تا زبان
+                // کاراکتر/دیالوگ‌ها در همان لحظه عوض شود، نه بعد از ری‌استارت.
+                PushHeroSettings();
                 PushHeroState();
 
                 // Bento Cards
@@ -2961,7 +3299,8 @@ namespace CleanC.UI
                 if (SettingsHeaderSubtitle != null) SettingsHeaderSubtitle.Text = LocalizationService.Get("SettingsSub", "شخصی سازی ظاهر، زبان، رفتار پس زمینه و تهیه گزارش");
                 
                 string rawLang = LocalizationService.Get("LanguageTitle", "زبان برنامه");
-                if (!rawLang.Contains("(Language)", StringComparison.OrdinalIgnoreCase))
+                if (!string.Equals(LocalizationService.CurrentLanguage.Code, "en-US", StringComparison.OrdinalIgnoreCase) &&
+                    !rawLang.Contains("(Language)", StringComparison.OrdinalIgnoreCase))
                 {
                     rawLang = $"{rawLang} (Language)";
                 }
@@ -3037,17 +3376,43 @@ namespace CleanC.UI
                 if (CharFastText != null) CharFastText.Text = LocalizationService.Get("CharacterFast", "عکس العمل سریع (کوتاه کردن انیمیشن ها)");
                 if (CharCalmText != null) CharCalmText.Text = LocalizationService.Get("CharacterCalm", "حالت آرام (کم تحرک، مناسب سیستم های کند)");
                 if (CharLunText != null) CharLunText.Text = LocalizationService.Get("CharacterLun", "تنظیم تقویم قمری برای مناسبت ها (±۱ روز)");
+                RefreshCharacterComboItems();
+                SyncCityBoxText();
                 if (AboutVersionLabel != null) AboutVersionLabel.Text = LocalizationService.Get("VersionLabel", "نسخه برنامه:");
                 if (AboutOsLabel != null) AboutOsLabel.Text = LocalizationService.Get("OsLabel", "سیستم عامل:");
                 if (CheckAppUpdatesText != null) CheckAppUpdatesText.Text = LocalizationService.Get("CheckUpdates", "بررسی به روزرسانی");
                 if (OpenProjectPageText != null) OpenProjectPageText.Text = LocalizationService.Get("ProjectPage", "صفحه پروژه");
                 if (CopyDiagnosticsText != null) CopyDiagnosticsText.Text = LocalizationService.Get("CopyDiagnostics", "کپی اطلاعات عیب یابی");
 
-                if (SettingsHeaderBtn != null) ToolTipService.SetToolTip(SettingsHeaderBtn, LocalizationService.Get("Settings", "تنظیمات برنامه (Settings)"));
+                if (SettingsHeaderBtn != null)
+                {
+                    string settingsText = LocalizationService.Get("Settings", "تنظیمات برنامه (Settings)");
+                    ToolTipService.SetToolTip(SettingsHeaderBtn, settingsText);
+                    AutomationProperties.SetName(SettingsHeaderBtn, settingsText);
+                }
                 if (AdminBadgeText != null) AdminBadgeText.Text = LocalizationService.Get("RunningAsAdmin", "Running as administrator");
-                if (UndoCenterBtn != null) ToolTipService.SetToolTip(UndoCenterBtn, LocalizationService.Get("RestoreCenter", "مرکز بازیابی و بازگشت تغییرات"));
-                if (RefreshStatsBtn != null) ToolTipService.SetToolTip(RefreshStatsBtn, LocalizationService.Get("RefreshStatus", "به‌روزرسانی وضعیت سیستم"));
-                if (NotificationHistoryBtn != null) ToolTipService.SetToolTip(NotificationHistoryBtn, LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها"));
+                if (UndoCenterBtn != null)
+                {
+                    string restoreText = LocalizationService.Get("RestoreCenter", "مرکز بازیابی و بازگشت تغییرات");
+                    ToolTipService.SetToolTip(UndoCenterBtn, restoreText);
+                    AutomationProperties.SetName(UndoCenterBtn, restoreText);
+                }
+                if (RefreshStatsBtn != null)
+                {
+                    string refreshText = LocalizationService.Get("RefreshStatus", "به‌روزرسانی وضعیت سیستم");
+                    ToolTipService.SetToolTip(RefreshStatsBtn, refreshText);
+                    AutomationProperties.SetName(RefreshStatsBtn, refreshText);
+                }
+                if (NotificationHistoryBtn != null)
+                {
+                    string historyText = LocalizationService.Get("NotificationHistory", "تاریخچه عملیات و اعلان ها");
+                    ToolTipService.SetToolTip(NotificationHistoryBtn, historyText);
+                    AutomationProperties.SetName(NotificationHistoryBtn, historyText);
+                }
+                if (LauncherWindowsUpdateBadge != null) LauncherWindowsUpdateBadge.Text = LocalizationService.Get("سیستم به روز است ✓");
+                if (LauncherUninstallerBadge != null) LauncherUninstallerBadge.Text = LocalizationService.Get("آماده اسکن برنامه ها");
+                if (LauncherStartupBadge != null) LauncherStartupBadge.Text = LocalizationService.Get("بررسی استارتاپ");
+                if (LauncherSpeedTestBadge != null) LauncherSpeedTestBadge.Text = LocalizationService.Get("سنجش بلادرنگ پینگ و سرعت");
 
                 if (HealthScoreOutOfText != null) HealthScoreOutOfText.Text = isRtl ? LocalizationService.Get("از 100") : "of 100";
 
@@ -3101,7 +3466,7 @@ namespace CleanC.UI
 
                 // حذف نرم افزار — چک باکس «انتخاب همه» + placeholder جعبه اسم کاراکتر
                 if (UninstallerSelectAllCheck != null) UninstallerSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
-                if (CharNameBox != null) CharNameBox.PlaceholderText = LocalizationService.Get("مثلاً سی‌سی");
+                if (CharNameBox != null) CharNameBox.PlaceholderText = LocalizationService.Get("مثلاً سی‌سی", "مثلاً وینی");
 
                 // تنظیمات ظاهر — توضیح اسلایدر اندازه کاراکتر
                 if (CharSizeSlider != null) ToolTipService.SetToolTip(CharSizeSlider, LocalizationService.Get("حجم بالای ۱.۲۵× از درون کارت بیرون می زند"));
@@ -3135,6 +3500,8 @@ namespace CleanC.UI
                 if (SpeedGaugePhaseText != null && !_isBusy) SpeedGaugePhaseText.Text = LocalizationService.Get("ReadyToStartSpeedTest", "آماده شروع تست سرعت");
                 if (StartSpeedTestBtnText != null) StartSpeedTestBtnText.Text = LocalizationService.Get("StartSpeedTest", "شروع تست سرعت");
                 if (StopSpeedTestBtnText != null) StopSpeedTestBtnText.Text = LocalizationService.Get("StopSpeedTest", "توقف تست");
+                if (SpeedIspChipText != null) SpeedIspChipText.Text = LocalizationService.Get("در حال شناسایی...");
+                if (SpeedLocationChipText != null) SpeedLocationChipText.Text = LocalizationService.Get("در حال شناسایی...");
                 if (SpeedPingTitleText != null) SpeedPingTitleText.Text = LocalizationService.Get("PingLatency", "تاخیر پینگ (Ping)");
                 if (SpeedDownloadTitleText != null) SpeedDownloadTitleText.Text = LocalizationService.Get("DownloadSpeed", "سرعت دانلود");
                 if (SpeedUploadTitleText != null) SpeedUploadTitleText.Text = LocalizationService.Get("UploadSpeed", "سرعت آپلود");
@@ -3209,6 +3576,13 @@ namespace CleanC.UI
                 if (DeepStorageMessTitleText != null) DeepStorageMessTitleText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
                 if (DeepStorageLargeFilesLabel != null) DeepStorageLargeFilesLabel.Text = LocalizationService.Get("DeepStorageLargeFilesLabel", "فایل های حجیم");
                 if (DeepStorageLargeFilesSizeText != null) DeepStorageLargeFilesSizeText.Text = LocalizationService.Get("DeepStorageLargeFilesSub", "بالاتر از ۵۰۰ مگابایت");
+                if (DeepStorageDuplicatesCountText != null) DeepStorageDuplicatesCountText.Text = string.Format(LocalizationService.Get("{0} گروه تکراری"), 0);
+                if (DeepStorageDuplicatesSizeText != null) DeepStorageDuplicatesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(0));
+                if (DeepStorageEmptyFoldersCountText != null) DeepStorageEmptyFoldersCountText.Text = string.Format(LocalizationService.Get("{0} پوشه خالی"), 0);
+                if (DeepStorageMessCountText != null) DeepStorageMessCountText.Text = string.Format(LocalizationService.Get("{0} فایل زائد و نامرتب"), 0);
+                if (DeepStorageMessSizeText != null) DeepStorageMessSizeText.Text = LocalizationService.Get("DeepStorageMessSub", "موقت، نصاب ها و زائد");
+                if (DeepStorageLargeFilesCountText != null) DeepStorageLargeFilesCountText.Text = string.Format(LocalizationService.Get("{0} فایل حجیم"), 0);
+                if (DeepStorageSelectedCountText != null) DeepStorageSelectedCountText.Text = $"0 {LocalizationService.Get("ItemsSelected", "مورد انتخاب شده")}";
                 if (DeepStorageTabDuplicatesText != null) DeepStorageTabDuplicatesText.Text = LocalizationService.Get("DeepStorageDuplicatesLabel", "فایل های تکراری");
                 if (DeepStorageTabEmptyFoldersText != null) DeepStorageTabEmptyFoldersText.Text = LocalizationService.Get("DeepStorageEmptyFoldersLabel", "پوشه های خالی");
                 if (DeepStorageTabMessText != null) DeepStorageTabMessText.Text = LocalizationService.Get("TabMess", "فایل های زائد و نامرتب");
@@ -3238,10 +3612,14 @@ namespace CleanC.UI
                 RefreshSystemStats();
                 UpdateCumulativeChipsUI();
                 RenderDiskBreakdown(_diskTotalGb, _diskFreeGb, _lastScanCleanableBytes);
+                // نمودار ۷ روزه هم باید با زبان جدید بازرندر شود؛ وگرنه واحدها و اعداد
+                // تا اسکن بعدی به زبان قبلی می‌مانند. (i18n زنده)
+                RenderCleanupHistory();
 
                 if (_cachedScanResult != null)
                 {
                     RenderAdvancedGroups(_cachedScanResult);
+                    RelocalizeAdvancedGroupsAfterLanguageChange();
                 }
 
                 if (ToolSystemSpecsPanel != null && ToolSystemSpecsPanel.Visibility == Visibility.Visible && _cachedSpecs != null)
@@ -3326,7 +3704,7 @@ namespace CleanC.UI
 
         private async Task ExportAiReportBtn_ClickAsync()
         {
-            string? path = await PickSavePathAsync(LocalizationService.Get("گزارش هوش مصنوعی (Markdown)"), ".md", $"CleanC-AI-Report-{Stamp()}");
+            string? path = await PickSavePathAsync(LocalizationService.Get("گزارش هوش مصنوعی (Markdown)"), ".md", $"WinyWash-AI-Report-{Stamp()}");
             if (string.IsNullOrEmpty(path)) return;
 
             try
@@ -3350,7 +3728,7 @@ namespace CleanC.UI
 
         private async Task ExportSpecsTxtBtn_ClickAsync()
         {
-            string? path = await PickSavePathAsync(LocalizationService.Get("مشخصات سیستم (TXT)"), ".txt", $"CleanC-Specs-{Stamp()}");
+            string? path = await PickSavePathAsync(LocalizationService.Get("مشخصات سیستم (TXT)"), ".txt", $"WinyWash-Specs-{Stamp()}");
             if (string.IsNullOrEmpty(path)) return; // کاربر انصراف داد
 
             try
@@ -3423,7 +3801,7 @@ namespace CleanC.UI
                 using var client = new System.Net.Http.HttpClient();
                 client.Timeout = TimeSpan.FromSeconds(15);
                 // GitHub API بدون User-Agent درخواست را رد می کند
-                client.DefaultRequestHeaders.UserAgent.ParseAdd("CleanC-UpdateCheck");
+                client.DefaultRequestHeaders.UserAgent.ParseAdd("WinyWash-UpdateCheck");
 
                 using var resp = await client.GetAsync(ReleasesApiUrl);
 
@@ -3693,6 +4071,39 @@ namespace CleanC.UI
             public long Bytes { get; set; } = 0;
         }
 
+        /// <summary>کلید تاریخِ تاریخچه همیشه میلادی/Invariant است تا با تغییر زبان عوض نشود.</summary>
+        private static string ToCanonicalHistoryDate(DateTime date)
+            => date.ToString("yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        /// <summary>
+        /// نسخه های قبلی تاریخ را با تقویم زبان جاری (مثلاً ۱۴۰۵-۰۷-۲۶ در fa-IR) ذخیره
+        /// می کردند؛ اینجا هم آن ها را به میلادی تبدیل می کنیم و هم از این به بعد
+        /// فقط کلید Invariant می نویسیم.
+        /// </summary>
+        private static string NormalizeHistoryDate(string? raw)
+        {
+            if (string.IsNullOrWhiteSpace(raw)) return "";
+            string[] parts = raw.Trim().Split('-');
+            if (parts.Length == 3
+                && int.TryParse(parts[0], NumberStyles.Integer, CultureInfo.InvariantCulture, out int year)
+                && int.TryParse(parts[1], NumberStyles.Integer, CultureInfo.InvariantCulture, out int month)
+                && int.TryParse(parts[2], NumberStyles.Integer, CultureInfo.InvariantCulture, out int day))
+            {
+                try
+                {
+                    DateTime date = year >= 1900
+                        ? new DateTime(year, month, day)
+                        : new PersianCalendar().ToDateTime(year, month, day, 0, 0, 0, 0);
+                    return ToCanonicalHistoryDate(date);
+                }
+                catch (ArgumentOutOfRangeException)
+                {
+                    // تاریخ نامعتبر/خراب → نادیده گرفته می شود
+                }
+            }
+            return "";
+        }
+
         /// <summary>
         /// مقدار آزادشده یک نوبت پاکسازی را در تاریخچه روزانه ثبت می کند.
         /// اگر امروز قبلاً رکورد داشته باشیم، جمع می شود (چند پاکسازی در یک روز).
@@ -3700,7 +4111,7 @@ namespace CleanC.UI
         private void RecordCleanupSession(long bytes)
         {
             if (bytes <= 0) return;
-            string today = DateTime.Now.ToString("yyyy-MM-dd");
+            string today = ToCanonicalHistoryDate(DateTime.Now);
             var existing = _cleanupHistory.FirstOrDefault(h => h.Date == today);
             if (existing != null) existing.Bytes += bytes;
             else _cleanupHistory.Add(new CleanupHistoryEntry { Date = today, Bytes = bytes });
@@ -3716,6 +4127,7 @@ namespace CleanC.UI
             _lastCleanFreedBytes = 0;
             _lastCleanDateTime = DateTime.MinValue;
             _cleanupHistory.Clear();
+            bool historyDatesMigrated = false;
 
             try
             {
@@ -3751,10 +4163,15 @@ namespace CleanC.UI
                         foreach (var entry in histProp.EnumerateArray())
                         {
                             if (!entry.TryGetProperty("date", out var dProp)) continue;
-                            string? date = dProp.GetString();
+                            string? rawDate = dProp.GetString();
+                            string date = NormalizeHistoryDate(rawDate);
                             if (string.IsNullOrWhiteSpace(date)) continue;
-                            long bytes = entry.TryGetProperty("bytes", out var bProp) ? bProp.GetInt64() : 0;
-                            _cleanupHistory.Add(new CleanupHistoryEntry { Date = date, Bytes = Math.Max(0, bytes) });
+                            if (!string.Equals(date, rawDate, StringComparison.Ordinal)) historyDatesMigrated = true;
+
+                            long bytes = Math.Max(0, entry.TryGetProperty("bytes", out var bProp) ? bProp.GetInt64() : 0);
+                            var existing = _cleanupHistory.FirstOrDefault(h => h.Date == date);
+                            if (existing != null) existing.Bytes += bytes;
+                            else _cleanupHistory.Add(new CleanupHistoryEntry { Date = date, Bytes = bytes });
                         }
                     }
                 }
@@ -3763,6 +4180,9 @@ namespace CleanC.UI
             {
                 // فایل خراب/غیرقابل خواندن → همه چیز صفر می ماند
             }
+
+            // فقط وقتی واقعاً تاریخ قدیمی تبدیل شد فایل را بازنویسی می کنیم.
+            if (historyDatesMigrated) SaveCumulativeFreedStats();
 
             UpdateCumulativeChipsUI();
             RenderCleanupHistory();
@@ -3881,7 +4301,7 @@ namespace CleanC.UI
             for (int i = 0; i < 7; i++)
             {
                 var day = DateTime.Now.AddDays(-(6 - i));
-                string key = day.ToString("yyyy-MM-dd");
+                string key = ToCanonicalHistoryDate(day);
                 days[i] = byDate.TryGetValue(key, out var b) ? b : 0;
                 maxBytes = Math.Max(maxBytes, days[i]);
                 labels[i] = day.ToString("dd.MM", CultureInfo.InvariantCulture);

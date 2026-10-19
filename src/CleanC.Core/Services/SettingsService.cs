@@ -81,7 +81,7 @@ namespace CleanC.Core.Services
         public string? CharacterUserName { get; set; }
 
         /// <summary>اسم خود کاراکتر (پیش فرض خود HTML «سی‌سی» است).</summary>
-        public string? CharacterName { get; set; }
+        public string? CharacterName { get; set; } = "Winy";
 
         /// <summary>شهر برای ماژول آب و هوا؛ خالی یعنی تشخیص خودکار از IP.</summary>
         public string? CharacterCity { get; set; }

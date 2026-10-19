@@ -1079,7 +1079,7 @@ namespace CleanC.Core.Services
             // Try current language
             if (_catalogs.TryGetValue(_current.Code, out var dict) && dict.TryGetValue(key, out var val))
             {
-                return val;
+                return WithBrand(val);
             }
 
             // Fallback to English
@@ -1090,22 +1090,28 @@ namespace CleanC.Core.Services
                 // همان متن منبع ترجمه ی درست است و نباید به انگلیسی fallback کند.
                 if (string.Equals(_current.Code, "fa-IR", StringComparison.OrdinalIgnoreCase) && ContainsPersian(key))
                 {
-                    return key;
+                    return WithBrand(key);
                 }
 
-                return enVal;
+                return WithBrand(enVal);
             }
 
             // Fallback to Persian
             if (!string.Equals(_current.Code, "fa-IR", StringComparison.OrdinalIgnoreCase) &&
                 _catalogs.TryGetValue("fa-IR", out var faDict) && faDict.TryGetValue(key, out var faVal))
             {
-                return faVal;
+                return WithBrand(faVal);
             }
 
-            return defaultVal ?? key;
+            return WithBrand(defaultVal ?? key);
         }
 
+        /// <summary>
+        /// نام برند در همه ی رشته های UI یکسان می ماند؛ کلیدها و ترجمه های قدیمی
+        /// هنوز CleanC دارند و این لایه بدون دست زدن به ۱۰ فایل resw آن ها را هماهنگ می کند.
+        /// </summary>
+        private static string WithBrand(string value) =>
+            value.Replace("CleanC", "WinyWash", StringComparison.Ordinal);
         /// <summary>
         /// بررسی اینکه رشته حاوی حداقل یک کاراکتر فارسی/عربی است — برای تشخیص کلیدهای gettext-style
         /// (کلیدهایی که خودشان متن منبع فارسی هستند).

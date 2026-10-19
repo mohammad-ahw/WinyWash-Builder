@@ -99,10 +99,10 @@ namespace CleanC.Core.Services
         public static string BuildAiReportMarkdown(DetailedSystemSpecs? specs, IReadOnlyList<CleanupReportItem>? cleanupItems, long freedBytes, string? osFlight = null)
         {
             var sb = new StringBuilder();
-            sb.AppendLine("# CleanC System State & Optimization Diagnostic Report");
+            sb.AppendLine("# WinyWash System State & Optimization Diagnostic Report");
             sb.AppendLine();
             sb.AppendLine("> **Generated:** " + DateTime.UtcNow.ToString("yyyy-MM-dd HH:mm:ss 'UTC'", CultureInfo.InvariantCulture));
-            sb.AppendLine("> **CleanC Version:** " + GetVersion(typeof(ReportExportService).Assembly));
+            sb.AppendLine("> **WinyWash Version:** " + GetVersion(typeof(ReportExportService).Assembly));
             sb.AppendLine("> **Target Environment:** Windows 11 / x64 Architecture");
             sb.AppendLine();
 
@@ -222,7 +222,7 @@ namespace CleanC.Core.Services
             sb.AppendLine();
 
             sb.AppendLine("---");
-            sb.AppendLine("*End of CleanC Diagnostic Export. This markdown document can be directly supplied to language models for system context and tuning.*");
+            sb.AppendLine("*End of WinyWash Diagnostic Export. This markdown document can be directly supplied to language models for system context and tuning.*");
 
             return sb.ToString();
         }
@@ -234,12 +234,12 @@ namespace CleanC.Core.Services
         {
             var sb = new StringBuilder();
             sb.AppendLine("================================================================================");
-            sb.AppendLine("           CLEANC SYSTEM HARDWARE & PERFORMANCE SPECIFICATION REPORT            ");
+            sb.AppendLine("      WINYWASH SYSTEM HARDWARE & PERFORMANCE SPECIFICATION REPORT      ");
             sb.AppendLine("================================================================================");
             sb.AppendLine("Generated      : " + DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture));
             sb.AppendLine("Machine Name   : " + Environment.MachineName);
             sb.AppendLine("OS Version     : " + RuntimeInformation.OSDescription);
-            sb.AppendLine("CleanC Core    : " + GetVersion(typeof(ReportExportService).Assembly));
+            sb.AppendLine("WinyWash Core  : " + GetVersion(typeof(ReportExportService).Assembly));
             sb.AppendLine("--------------------------------------------------------------------------------");
             sb.AppendLine();
 
@@ -346,7 +346,7 @@ namespace CleanC.Core.Services
             catch (Exception ex) { CcLog.Ignore(ex, "Diagnostics.BuiltAt"); }
 
             var sb = new StringBuilder();
-            sb.AppendLine("=== CleanC — Diagnostics ===");
+            sb.AppendLine("=== WinyWash — Diagnostics ===");
             sb.AppendLine($"App Version   : {version}");
             sb.AppendLine($"Build Time    : {builtAt ?? "-"}");
             sb.AppendLine($"Framework     : {RuntimeInformation.FrameworkDescription}");

@@ -23,7 +23,7 @@ namespace CleanC.UI
         {
             try
             {
-                var m = new Mutex(true, @"Global\CleanC.SingleInstance", out bool createdNew);
+                var m = new Mutex(true, @"Global\WinyWash.SingleInstance", out bool createdNew);
                 _singleInstanceCreatedNew = createdNew;
                 return m;
             }
@@ -32,7 +32,7 @@ namespace CleanC.UI
                 LogCrash("App.MutexGlobalFallback", globalEx);
                 try
                 {
-                    var m = new Mutex(true, @"Local\CleanC.SingleInstance", out bool createdNew);
+                    var m = new Mutex(true, @"Local\WinyWash.SingleInstance", out bool createdNew);
                     _singleInstanceCreatedNew = createdNew;
                     return m;
                 }
@@ -41,7 +41,7 @@ namespace CleanC.UI
                     // در بدترین حالت هم از اجرای دوباره مطلع می شویم و اجازه می دهیم ادامه یابد
                     LogCrash("App.MutexCreate", localEx);
                     _singleInstanceCreatedNew = true;
-                    return new Mutex(true, "CleanC.SingleInstance.ProcessOnly", out _);
+                    return new Mutex(true, "WinyWash.SingleInstance.ProcessOnly", out _);
                 }
             }
         }

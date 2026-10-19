@@ -201,11 +201,11 @@ namespace CleanC.Core.Services
             => DeleteCore(path, mode ?? DefaultMode, isDirectory: true);
 
         /// <summary>حذف دسته ای فایل شخصی؛ خلاصه ی آماری برای گزارش UI.</summary>
-        public static SafeDeleteBatchResult DeleteFiles(IEnumerable<string> paths, SafeDeleteMode? mode = null)
-            => DeleteMany(paths, mode, isDirectory: false);
+        public static SafeDeleteBatchResult DeleteFiles(IEnumerable<string> paths, SafeDeleteMode? mode = null, Action<int, int>? progress = null)
+            => DeleteMany(paths, mode, isDirectory: false, progress);
 
-        public static SafeDeleteBatchResult DeleteDirectories(IEnumerable<string> paths, SafeDeleteMode? mode = null)
-            => DeleteMany(paths, mode, isDirectory: true);
+        public static SafeDeleteBatchResult DeleteDirectories(IEnumerable<string> paths, SafeDeleteMode? mode = null, Action<int, int>? progress = null)
+            => DeleteMany(paths, mode, isDirectory: true, progress);
 
         /// <summary>
         /// حذف زباله/کش — همیشه قطعی، مستقل از <see cref="DefaultMode"/>.
@@ -217,12 +217,16 @@ namespace CleanC.Core.Services
         public static SafeDeleteResult DeleteJunkDirectory(string path)
             => DeleteCore(path, SafeDeleteMode.Permanent, isDirectory: true);
 
-        private static SafeDeleteBatchResult DeleteMany(IEnumerable<string> paths, SafeDeleteMode? mode, bool isDirectory)
+        private static SafeDeleteBatchResult DeleteMany(IEnumerable<string> paths, SafeDeleteMode? mode, bool isDirectory, Action<int, int>? progress = null)
         {
             var batch = new SafeDeleteBatchResult();
             if (paths == null) return batch;
 
-            foreach (string path in paths)
+            var list = paths as IList<string> ?? paths.ToList();
+            int total = list.Count;
+            int done = 0;
+
+            foreach (string path in list)
             {
                 batch.Total++;
                 var result = isDirectory ? DeleteDirectory(path, mode) : DeleteFile(path, mode);
@@ -249,6 +253,9 @@ namespace CleanC.Core.Services
                         if (!string.IsNullOrWhiteSpace(result.Error)) batch.Errors.Add($"{path}: {result.Error}");
                         break;
                 }
+
+                done++;
+                progress?.Invoke(done, total);
             }
 
             return batch;

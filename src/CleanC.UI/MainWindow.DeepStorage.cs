@@ -35,6 +35,10 @@ namespace CleanC.UI
 
         private async Task LoadDeepStoragePageAsync()
         {
+            // XAML فقط وضعیت اولیه را نشان می‌دهد؛ اینجا هر دو گروه تب و مرتب‌سازی
+            // با همان رنگ/متن سفید واقعی همگام می‌شوند تا در تم روشن هم متن سیاه نشود.
+            SyncDeepStorageTabVisuals();
+
             if (_deepScanResult == null)
             {
                 await RunDeepStorageScanAsync();
@@ -43,6 +47,18 @@ namespace CleanC.UI
             {
                 RenderDeepStorageItems();
             }
+        }
+
+        private void SyncDeepStorageTabVisuals()
+        {
+            SetTabActive(DeepStorageTabDuplicates, _deepStorageActiveTab == "duplicates");
+            SetTabActive(DeepStorageTabEmptyFolders, _deepStorageActiveTab == "empty_folders");
+            SetTabActive(DeepStorageTabMess, _deepStorageActiveTab == "mess");
+            SetTabActive(DeepStorageTabLargeFiles, _deepStorageActiveTab == "large_files");
+
+            SetTabActive(DeepStorageSortSizeBtn, _deepStorageSortMode == "size");
+            SetTabActive(DeepStorageSortDateBtn, _deepStorageSortMode == "date");
+            SetTabActive(DeepStorageSortNameBtn, _deepStorageSortMode == "name");
         }
 
         private void DeepStorageScanBtn_Click(object sender, RoutedEventArgs e)
@@ -74,24 +90,7 @@ namespace CleanC.UI
                     });
                 });
 
-                if (DeepStorageDuplicatesCountText != null)
-                    DeepStorageDuplicatesCountText.Text = string.Format(LocalizationService.Get("{0} گروه تکراری"), _deepScanResult.Duplicates.Count);
-                if (DeepStorageDuplicatesSizeText != null)
-                    DeepStorageDuplicatesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalDuplicatesWastedBytes));
-
-                if (DeepStorageEmptyFoldersCountText != null)
-                    DeepStorageEmptyFoldersCountText.Text = string.Format(LocalizationService.Get("{0} پوشه خالی"), _deepScanResult.EmptyFolders.Count);
-
-                if (DeepStorageMessCountText != null)
-                    DeepStorageMessCountText.Text = string.Format(LocalizationService.Get("{0} فایل زائد و نامرتب"), _deepScanResult.MessItems.Count);
-                if (DeepStorageMessSizeText != null)
-                    DeepStorageMessSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalMessBytes));
-
-                if (DeepStorageLargeFilesCountText != null)
-                    DeepStorageLargeFilesCountText.Text = string.Format(LocalizationService.Get("{0} فایل حجیم"), _deepScanResult.LargeFiles.Count);
-                if (DeepStorageLargeFilesSizeText != null)
-                    DeepStorageLargeFilesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalLargeFilesBytes));
-
+                UpdateDeepStorageSummaryTexts();
                 RenderDeepStorageItems();
             }
             catch (Exception ex)
@@ -102,6 +101,61 @@ namespace CleanC.UI
             {
                 if (DeepStorageLoadingPanel != null) DeepStorageLoadingPanel.Visibility = Visibility.Collapsed;
                 if (DeepStorageScanBtn != null) DeepStorageScanBtn.IsEnabled = true;
+            }
+        }
+
+        /// <summary>متن‌های خلاصه ی هر چهار تب را از نتیجه ی فعلی اسکن تازه می کند.</summary>
+        private void UpdateDeepStorageSummaryTexts()
+        {
+            if (_deepScanResult == null) return;
+
+            if (DeepStorageDuplicatesCountText != null)
+                DeepStorageDuplicatesCountText.Text = string.Format(LocalizationService.Get("{0} گروه تکراری"), _deepScanResult.Duplicates.Count);
+            if (DeepStorageDuplicatesSizeText != null)
+                DeepStorageDuplicatesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalDuplicatesWastedBytes));
+
+            if (DeepStorageEmptyFoldersCountText != null)
+                DeepStorageEmptyFoldersCountText.Text = string.Format(LocalizationService.Get("{0} پوشه خالی"), _deepScanResult.EmptyFolders.Count);
+
+            if (DeepStorageMessCountText != null)
+                DeepStorageMessCountText.Text = string.Format(LocalizationService.Get("{0} فایل زائد و نامرتب"), _deepScanResult.MessItems.Count);
+            if (DeepStorageMessSizeText != null)
+                DeepStorageMessSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalMessBytes));
+
+            if (DeepStorageLargeFilesCountText != null)
+                DeepStorageLargeFilesCountText.Text = string.Format(LocalizationService.Get("{0} فایل حجیم"), _deepScanResult.LargeFiles.Count);
+            if (DeepStorageLargeFilesSizeText != null)
+                DeepStorageLargeFilesSizeText.Text = string.Format(LocalizationService.Get("{0} فضا"), SystemStats.FormatBytes(_deepScanResult.TotalLargeFilesBytes));
+        }
+
+        /// <summary>
+        /// موارد حذف‌شده را از نتیجه ی در حافظه حذف می کند تا بعد از پاک‌سازی لازم نباشد
+        /// دوباره کل دیسک اسکن شود؛ اسکن کامل فقط با دکمه ی «اسکن مجدد» اجرا می شود.
+        /// </summary>
+        private void RemoveDeletedItemsFromResult(ICollection<string> deletedPaths, string tab)
+        {
+            if (_deepScanResult == null || deletedPaths.Count == 0) return;
+
+            if (tab == "duplicates")
+            {
+                foreach (var group in _deepScanResult.DuplicateGroups)
+                    group.Files.RemoveAll(f => deletedPaths.Contains(f.FilePath));
+                _deepScanResult.DuplicateGroups.RemoveAll(g => g.Files.Count < 2);
+                _deepScanResult.TotalDuplicateWastedBytes = _deepScanResult.DuplicateGroups.Sum(g => g.WastedSizeBytes);
+            }
+            else if (tab == "empty_folders")
+            {
+                _deepScanResult.EmptyFolders.RemoveAll(f => deletedPaths.Contains(f.FolderPath));
+            }
+            else if (tab == "mess")
+            {
+                _deepScanResult.MessItems.RemoveAll(m => deletedPaths.Contains(m.FilePath));
+                _deepScanResult.TotalMessSizeBytes = _deepScanResult.MessItems.Sum(m => m.SizeBytes);
+            }
+            else if (tab == "large_files")
+            {
+                _deepScanResult.MessItems.RemoveAll(m => deletedPaths.Contains(m.FilePath));
+                _deepScanResult.TotalMessSizeBytes = _deepScanResult.MessItems.Sum(m => m.SizeBytes);
             }
         }
 
@@ -137,17 +191,58 @@ namespace CleanC.UI
         private void SetTabActive(Button? btn, bool isActive)
         {
             if (btn == null) return;
+
             if (isActive)
             {
-                btn.Style = (Style)Application.Current.Resources["AccentButtonStyle"];
-                btn.Background = null;
-                btn.BorderBrush = null;
+                // پس‌زمینه ی برند سبز + متن سفید: برخلاف AccentButtonStyle، در هر دو
+                // تم روشن/تیره کنتراست تضمین‌شده دارد و متن تب هرگز محو نمی شود.
+                var accent = new SolidColorBrush(Microsoft.UI.ColorHelper.FromArgb(255, 31, 169, 113));
+                btn.Style = null;
+                btn.Background = accent;
+                btn.BorderBrush = accent;
+                btn.Foreground = new SolidColorBrush(Microsoft.UI.Colors.White);
             }
             else
             {
                 btn.Style = null;
                 btn.Background = GetThemeBrush("AppCardSecondaryBrush");
                 btn.BorderBrush = GetThemeBrush("AppCardBorderBrush");
+                btn.Foreground = GetThemeBrush("TextFillColorPrimaryBrush");
+            }
+
+            // TextBlock و FontIcon داخل محتوای دکمه، Brush پیش‌فرض خودشان را دارند و
+            // رنگ دکمه را به ارث نمی برند؛ پس صریح همگام می شوند.
+            SyncTabContentForeground(btn, btn.Foreground);
+        }
+
+        private static void SyncTabContentForeground(Button btn, Brush? brush)
+        {
+            if (brush == null || btn.Content is not DependencyObject content) return;
+            ApplyTabContentForeground(content, brush);
+        }
+
+        private static void ApplyTabContentForeground(DependencyObject node, Brush brush)
+        {
+            switch (node)
+            {
+                case TextBlock text:
+                    text.Foreground = brush;
+                    break;
+                case FontIcon icon:
+                    icon.Foreground = brush;
+                    break;
+                case Panel panel:
+                    foreach (var child in panel.Children)
+                    {
+                        if (child is DependencyObject childNode) ApplyTabContentForeground(childNode, brush);
+                    }
+                    break;
+                case Border border when border.Child is DependencyObject borderChild:
+                    ApplyTabContentForeground(borderChild, brush);
+                    break;
+                case ContentControl contentControl when contentControl.Content is DependencyObject contentChild:
+                    ApplyTabContentForeground(contentChild, brush);
+                    break;
             }
         }
 
@@ -646,11 +741,11 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// تأیید حذف گروهی پیش از انتقال انتخاب ها به سطل بازیافت.
-        /// تعداد و حجم موارد انتخاب شده را نشان می دهد؛ اگر چیزی انتخاب نشده باشد
-        /// همان پیام قبلی InfoBar را نمایش می دهد و بدون باز کردن دیالوگ برمی گردد.
+        /// تأیید حذف گروهی. پیش‌فرض «حذف قطعی» است تا فضا واقعاً آزاد شود؛ کاربر
+        /// می‌تواند با تیک صریح، انتقال به سطل بازیافت را انتخاب کند. اگر چیزی
+        /// انتخاب نشده باشد پیام InfoBar نمایش داده می شود و دیالوگ باز نمی شود.
         /// </summary>
-        private async Task<bool> ConfirmDeepStorageBatchDeleteAsync()
+        private async Task<(bool Confirmed, SafeDeleteMode Mode)> ConfirmDeepStorageBatchDeleteAsync()
         {
             // C6: تعداد/حجم از منبع حقیقت مشترک؛ فقط عنوان مخصوص هر تب اینجا می ماند
             var summary = DeepStorageSelection.Summarize(_deepScanResult, _deepStorageActiveTab);
@@ -670,30 +765,51 @@ namespace CleanC.UI
             {
                 if (title.Length > 0)
                     ShowInfoBar(title, LocalizationService.Get("هیچ موردی انتخاب نشده است."), InfoBarSeverity.Informational);
-                return false;
+                return (false, SafeDeleteMode.Permanent);
             }
 
             string sizeInfo = bytes > 0 ? string.Format(LocalizationService.Get(" مجموع حجم: {0}،"), SystemStats.FormatBytes(bytes)) : "";
-            // دیالوگ دقیقاً همان رفتاری را وعده می دهد که واقعاً رخ می دهد
-            string modeNote = SafeDeleteService.DescribeMode(SafeDeleteService.DefaultMode);
+
+            var recycleCheck = new CheckBox
+            {
+                Content = LocalizationService.Get("DeepStorageRecycleOptIn"),
+                FontSize = 12.5,
+                IsChecked = false,
+                Margin = new Thickness(0, 4, 0, 0)
+            };
+
+            var content = new StackPanel { Spacing = 10 };
+            content.Children.Add(new TextBlock
+            {
+                Text = string.Format(LocalizationService.Get("{0} مورد انتخاب شده{1}. ادامه می دهید؟"), count, sizeInfo),
+                FontSize = 13,
+                TextWrapping = TextWrapping.Wrap,
+                LineHeight = 20
+            });
+            content.Children.Add(new TextBlock
+            {
+                Text = LocalizationService.Get("DeepStoragePermanentNote"),
+                FontSize = 12,
+                TextWrapping = TextWrapping.Wrap,
+                LineHeight = 18,
+                Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+            });
+            content.Children.Add(recycleCheck);
+
             var dialog = new ContentDialog
             {
                 Title = LocalizationService.Get("تأیید حذف گروهی"),
-                Content = new TextBlock
-                {
-                    Text = string.Format(LocalizationService.Get("{0} مورد انتخاب شده{1} {2}. ادامه می دهید؟"), count, sizeInfo, modeNote),
-                    FontSize = 13,
-                    TextWrapping = TextWrapping.Wrap,
-                    LineHeight = 20
-                },
+                Content = content,
                 PrimaryButtonText = LocalizationService.Get("بله، حذف شود"),
                 CloseButtonText = LocalizationService.Get("انصراف"),
                 DefaultButton = ContentDialogButton.Close,
                 XamlRoot = this.Content.XamlRoot,
-                FlowDirection = FlowDirection.RightToLeft
+                FlowDirection = LocalizationService.IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight
             };
 
-            return await dialog.ShowAsync() == ContentDialogResult.Primary;
+            bool confirmed = await dialog.ShowAsync() == ContentDialogResult.Primary;
+            var mode = recycleCheck.IsChecked == true ? SafeDeleteMode.RecycleBin : SafeDeleteMode.Permanent;
+            return (confirmed, mode);
         }
 
         private void DeepStorageBatchDeleteBtn_Click(object sender, RoutedEventArgs e)
@@ -702,11 +818,15 @@ namespace CleanC.UI
         private async Task DeepStorageBatchDeleteBtn_ClickAsync(object sender, RoutedEventArgs e)
         {
             if (_deepScanResult == null) return;
-            if (!await ConfirmDeepStorageBatchDeleteAsync()) return;
+
+            var confirmation = await ConfirmDeepStorageBatchDeleteAsync();
+            if (!confirmation.Confirmed) return;
+            var deleteMode = confirmation.Mode;
 
             long freedBytes = 0;
             int deletedCount = 0;
             SafeDeleteBatchResult? batch = null;
+            var selectedPaths = new List<string>();
 
             try
             {
@@ -719,6 +839,17 @@ namespace CleanC.UI
                 if (DeepStorageBatchDeleteIcon != null) DeepStorageBatchDeleteIcon.Visibility = Visibility.Collapsed;
                 if (DeepStorageBatchDeleteBtnText != null) DeepStorageBatchDeleteBtnText.Text = LocalizationService.Get("در حال حذف ایمن...");
 
+                // به‌روزرسانی متن دکمه حین حذف؛ برای جلوگیری از سیل پیام‌ها هر ۲۵ مورد یک‌بار
+                Action<int, int> reportProgress = (done, total) =>
+                {
+                    if (done != total && (done % 25) != 0) return;
+                    DispatcherQueue.TryEnqueue(() =>
+                    {
+                        if (DeepStorageBatchDeleteBtnText != null)
+                            DeepStorageBatchDeleteBtnText.Text = string.Format(LocalizationService.Get("DeepStorageDeletingProgress"), done, total);
+                    });
+                };
+
                 switch (_deepStorageActiveTab)
                 {
                     case "duplicates":
@@ -727,7 +858,8 @@ namespace CleanC.UI
                             .Where(f => f.IsSelectedForDeletion)
                             .Select(f => f.FilePath)
                             .ToList();
-                        batch = await DeepStorageCleanService.DeleteDuplicateFilesAsync(dupFiles);
+                        selectedPaths.AddRange(dupFiles);
+                        batch = await DeepStorageCleanService.DeleteDuplicateFilesAsync(dupFiles, deleteMode, reportProgress);
                         break;
 
                     case "empty_folders":
@@ -735,7 +867,8 @@ namespace CleanC.UI
                             .Where(f => f.IsSelected)
                             .Select(f => f.FolderPath)
                             .ToList();
-                        batch = await DeepStorageCleanService.DeleteEmptyFoldersAsync(folders);
+                        selectedPaths.AddRange(folders);
+                        batch = await DeepStorageCleanService.DeleteEmptyFoldersAsync(folders, deleteMode, reportProgress);
                         break;
 
                     case "mess":
@@ -743,7 +876,8 @@ namespace CleanC.UI
                             .Where(m => m.IsSelected)
                             .Select(m => m.FilePath)
                             .ToList();
-                        batch = await DeepStorageCleanService.DeleteMessItemsAsync(messFiles);
+                        selectedPaths.AddRange(messFiles);
+                        batch = await DeepStorageCleanService.DeleteMessItemsAsync(messFiles, deleteMode, reportProgress);
                         break;
 
                     case "large_files":
@@ -751,7 +885,8 @@ namespace CleanC.UI
                             .Where(l => l.IsSelected)
                             .Select(l => l.FilePath)
                             .ToList();
-                        batch = await DeepStorageCleanService.DeleteLargeFilesAsync(largeFiles);
+                        selectedPaths.AddRange(largeFiles);
+                        batch = await DeepStorageCleanService.DeleteLargeFilesAsync(largeFiles, deleteMode, reportProgress);
                         break;
                 }
 
@@ -803,9 +938,14 @@ namespace CleanC.UI
                         DeepStorageBatchDeleteBtn.Foreground = new SolidColorBrush(Microsoft.UI.Colors.White);
                     }
 
-                    await Task.Delay(2500);
-
-                    await RunDeepStorageScanAsync();
+                    // بدون اسکن کامل مجدد (که دقیقه‌ها طول می کشد) فقط مواردِ واقعاً
+                    // حذف شده را از نتیجه ی در حافظه برمی داریم تا UI بلافاصله تازه شود.
+                    var gone = selectedPaths
+                        .Where(p => !File.Exists(p) && !Directory.Exists(p))
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    RemoveDeletedItemsFromResult(gone, _deepStorageActiveTab);
+                    UpdateDeepStorageSummaryTexts();
+                    RenderDeepStorageItems();
                 }
                 else if (batch.FailedCount > 0)
                 {

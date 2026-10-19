@@ -1,0 +1,441 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>اکسپدیشن وینی</title>
+<style>
+@font-face{font-family:V;src:url('../Fonts/Vazirmatn-Regular.ttf');font-weight:400}
+@font-face{font-family:V;src:url('../Fonts/Vazirmatn-Bold.ttf');font-weight:700}
+:root{--ac:#1fa971;--fg:#f2f4f8;--mu:#9aa3b2;--gl:rgba(14,16,22,.62)}
+*{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden;background:#07080b;color:var(--fg);font:400 14px V,system-ui,sans-serif;user-select:none}
+#wall{position:fixed;inset:0;background:radial-gradient(80% 60% at 70% 20%,#1d2a3a,#07080b 70%) center/cover;transform:scale(1.06);filter:saturate(.8) brightness(.55)}
+#veil{position:fixed;inset:0;background:radial-gradient(70% 70% at 50% 45%,transparent,rgba(3,4,8,.82)),linear-gradient(#05060a99,#05060acc)}
+#beam{position:fixed;top:-20%;left:50%;width:70vmin;height:140%;margin-left:-35vmin;background:linear-gradient(var(--ac),transparent 70%);opacity:.07;transform:rotate(14deg);filter:blur(30px);animation:sw 9s ease-in-out infinite alternate}
+@keyframes sw{to{transform:rotate(-14deg);opacity:.11}}
+#hud{position:fixed;top:0;inset-inline:0;height:56px;display:flex;align-items:center;gap:18px;padding:0 22px;z-index:5}
+.pill{background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:999px;padding:7px 14px;display:flex;gap:8px;align-items:center;font-size:12.5px}
+.pill b{font-variant-numeric:tabular-nums}.xpb{width:110px;height:4px;border-radius:4px;background:#ffffff1c;overflow:hidden}.xpb i{display:block;height:100%;width:0;background:var(--ac);transition:width .5s}
+#combo{color:var(--ac);font-weight:700;opacity:0;transition:.3s}#combo.on{opacity:1}
+.sp{flex:1}.ib{width:34px;height:34px;border-radius:50%;border:1px solid #ffffff14;background:var(--gl);color:var(--fg);cursor:pointer;display:grid;place-items:center}.ib:hover{border-color:var(--ac)}
+#stage{position:fixed;inset:104px 0 0;display:grid;grid-template-columns:minmax(220px,1fr) minmax(300px,420px) minmax(220px,1fr);align-items:center;padding:0 3vw;gap:2vw}
+#wn{position:relative;justify-self:center;width:260px}#wc{width:260px;height:190px;display:block}
+#bub{position:absolute;top:-6px;inset-inline-start:100%;width:210px;background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff1a;border-radius:16px 16px 4px 16px;padding:10px 13px;font-size:13px;line-height:1.8;transition:.25s}
+#deck{position:relative;height:500px;perspective:900px}
+.card{position:absolute;inset:0;border-radius:24px;background:linear-gradient(160deg,#1a1e28ee,#0d0f15ee);border:1px solid #ffffff1c;box-shadow:0 30px 80px #000a,0 0 0 1px #0004;padding:18px;display:flex;flex-direction:column;gap:12px;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .35s}
+.card.b1{transform:translateY(14px) scale(.96);opacity:.55;pointer-events:none}.card.b2{transform:translateY(28px) scale(.92);opacity:.28;pointer-events:none}
+.card.top{animation:in .5s cubic-bezier(.2,.9,.2,1)}@keyframes in{from{transform:translateY(40px) scale(.94);opacity:0}}
+.rar{height:3px;border-radius:3px}.th{height:190px;border-radius:16px;background:#0006;display:grid;place-items:center;overflow:hidden;position:relative}
+.th img{width:100%;height:100%;object-fit:cover}.ext{font:700 40px/1 ui-monospace,monospace;color:var(--ac);letter-spacing:-2px;direction:ltr}
+.tag{position:absolute;top:10px;inset-inline-end:10px;font-size:11px;padding:3px 10px;border-radius:999px;background:#000a;border:1px solid #fff2}
+.nm{direction:ltr;text-align:left;font:600 15px ui-monospace,monospace;word-break:break-all;line-height:1.4}.meta{display:flex;justify-content:space-between;color:var(--mu);font-size:12.5px}
+.ev{display:flex;flex-wrap:wrap;gap:6px}.ev span{font-size:12px;padding:4px 10px;border-radius:999px;background:#ffffff0d;border:1px solid #ffffff12;animation:ch .4s both}@keyframes ch{from{opacity:0;transform:translateY(6px)}}
+.cf{display:flex;gap:4px;align-items:center;font-size:12px;color:var(--mu)}.cf i{width:22px;height:5px;border-radius:3px;background:#ffffff1f}.cf i.o{background:var(--ac)}
+#acts{position:absolute;inset-inline:0;bottom:-74px;display:flex;gap:10px;justify-content:center}
+.b{font:inherit;font-weight:700;height:48px;padding:0 20px;border-radius:14px;border:1px solid #ffffff1c;background:var(--gl);backdrop-filter:blur(12px);color:var(--fg);cursor:pointer;transition:.18s;display:flex;gap:8px;align-items:center}
+.b:hover{transform:translateY(-2px)}.b.c{background:var(--ac);border-color:transparent;color:#04110b}.b kbd{font:11px ui-monospace;opacity:.6;border:1px solid currentColor;border-radius:5px;padding:0 5px}
+#side{justify-self:center;width:240px;display:flex;flex-direction:column;gap:12px}
+.pk{background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:18px;padding:14px}.pk h4{font-size:12px;color:var(--mu);margin-bottom:6px;font-weight:400}.big{font:700 28px ui-monospace,monospace;direction:ltr;text-align:right}
+.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;max-height:110px;overflow:hidden}.chips i{font:11px ui-monospace;font-style:normal;padding:2px 7px;border-radius:6px;background:#ffffff10;direction:ltr;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov{position:fixed;inset:0;background:#02030699;backdrop-filter:blur(10px);display:none;place-items:center;z-index:9}.ov.on{display:grid}
+.sh{width:min(560px,92vw);max-height:84vh;overflow:auto;background:#12151dee;border:1px solid #ffffff1c;border-radius:24px;padding:24px;animation:in .45s}
+.sh h2{font-size:22px;margin-bottom:6px}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #ffffff0d;font-size:13px}.row s{text-decoration:none;direction:ltr;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#tot{font:700 40px ui-monospace;color:var(--ac);margin:14px 0;direction:ltr;text-align:center}
+#lv{position:fixed;top:30%;inset-inline:0;text-align:center;font:700 44px V;letter-spacing:-.02em;opacity:0;pointer-events:none;z-index:8;text-shadow:0 0 40px var(--ac)}#lv.on{animation:lv 2.4s ease}@keyframes lv{20%,70%{opacity:1;transform:scale(1)}0%{transform:scale(.8)}100%{opacity:0;transform:scale(1.06)}}
+#fx{position:fixed;inset:0;pointer-events:none;z-index:7}
+#empty{display:none;text-align:center;color:var(--mu);line-height:2}
+@media(max-width:900px){#stage{grid-template-columns:1fr;overflow:auto;padding-top:10px}#side,#wn{display:none}}
+
+#tabs{position:fixed;top:56px;inset-inline:0;height:44px;display:flex;gap:8px;justify-content:center;z-index:5}
+.tb{font:inherit;font-size:12.5px;color:var(--mu);background:none;border:1px solid transparent;border-radius:999px;padding:6px 15px;cursor:pointer;display:flex;gap:7px;align-items:center;transition:.2s}
+.tb.on{color:var(--fg);background:var(--gl);border-color:#ffffff1c;backdrop-filter:blur(12px)}.tb i{font:700 10px ui-monospace;font-style:normal;background:var(--ac);color:#04110b;border-radius:999px;padding:1px 6px}
+.card{overflow:auto}.card::-webkit-scrollbar{width:0}.th video,.th iframe{width:100%;height:100%;border:0;background:#000}.th pre{font:11px/1.6 ui-monospace;direction:ltr;text-align:left;padding:12px;white-space:pre-wrap;align-self:start;color:#cbd5e1;width:100%}
+.th audio{position:absolute;bottom:8px;inset-inline:8px;width:calc(100% - 16px)}
+.tools{display:flex;gap:8px}.tools .b{height:36px;font-size:12.5px;padding:0 14px;border-radius:11px}
+.inq{border-top:1px solid #ffffff12;padding-top:10px;font-size:12.5px;line-height:1.9;color:var(--mu);animation:ch .4s}.inq b{color:var(--fg);direction:ltr;unicode-bidi:embed}
+.inq ul{list-style:none;padding:0;margin-top:6px;max-height:120px;overflow:auto;direction:ltr;text-align:left;font:11.5px/1.7 ui-monospace}.inq li{display:flex;justify-content:space-between;gap:10px}
+.gg{display:grid;gap:9px}.gg div{display:grid;grid-template-columns:34px 1fr 38px;align-items:center;gap:8px;font:11px ui-monospace;color:var(--mu)}.gg u{height:5px;border-radius:5px;background:#ffffff18;overflow:hidden}.gg u i{display:block;height:100%;width:50%;background:var(--ac);transition:width 1.2s,background .4s}
+.dl{font-size:10.5px;color:#ffd166;border:1px solid #ffd16655;border-radius:999px;padding:2px 9px;align-self:flex-start}
+#stage.shk{animation:shk .4s}@keyframes shk{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,2px)}}
+.qr{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-top:8px}.qr.ok{color:var(--ac)}.qb{height:3px;border-radius:3px;background:#ffffff18;margin-top:3px;overflow:hidden}.qb i{display:block;height:100%;background:var(--ac);transition:width .6s}
+#ts{position:fixed;top:78px;left:50%;transform:translate(-50%,-20px);background:var(--gl);backdrop-filter:blur(14px);border:1px solid var(--ac);border-radius:999px;padding:9px 18px;font-size:13px;opacity:0;z-index:10;pointer-events:none}#ts.on{animation:tt 3s}@keyframes tt{10%,85%{opacity:1;transform:translate(-50%,0)}}
+.th{transition:height .3s}.th.zoom{height:330px}.th img{cursor:zoom-in}.card.top{cursor:grab;touch-action:pan-y}
+.hv{height:6px;border-radius:6px;background:#ffffff18;overflow:hidden}.hv i{display:block;height:100%;border-radius:6px}
+.zp{margin-top:8px;padding:10px;border-radius:12px;background:#ffffff0a;font-size:12px;line-height:1.9;color:var(--fg)}.zp em{font-style:normal;padding:1px 9px;border-radius:999px;background:#ffffff12;margin-inline-end:4px;display:inline-block}.zp .w{color:#ffd166}.zp .g{color:var(--ac)}
+.fk{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(120deg,#3a2a6a,#0f5e6e,#6a2a4a);background-size:300% 300%;animation:fk 6s linear infinite;font-size:34px}@keyframes fk{50%{background-position:100% 50%}}
+.pg{background:#f5f5f0;color:#222;width:58%;height:92%;border-radius:4px;padding:12px;font:10px/1.8 V;display:flex;flex-direction:column;gap:6px;align-self:center}.pg i{height:5px;background:#bbb;border-radius:3px}
+.fl{position:fixed;font:700 20px ui-monospace,V;pointer-events:none;z-index:9;animation:fl .9s ease-out forwards;text-shadow:0 2px 8px #000;transform:translateX(-50%)}@keyframes fl{to{transform:translate(-50%,-70px);opacity:0}}
+#cbar{position:fixed;top:50px;left:50%;width:160px;margin-left:-80px;height:3px;background:#ffffff14;border-radius:3px;z-index:6;opacity:0;transition:.3s}#cbar.on{opacity:1}#cbar i{display:block;height:100%;background:var(--ac)}
+#rt b{font-variant-numeric:tabular-nums;color:#ffd166}
+/* پیش‌نمایش بزرگ — مودال اختصاصی رسانه */
+#ovp .pv-stage{width:min(860px,94vw);height:min(560px,72vh);background:#05060acc;border:1px solid #ffffff1c;border-radius:24px;display:grid;place-items:center;overflow:hidden;position:relative}
+#ovp .pv-stage img{max-width:100%;max-height:100%;object-fit:contain}
+#ovp .pv-stage video{max-width:100%;max-height:100%}
+#ovp .pv-stage iframe{width:100%;height:100%;border:0;background:#fff}
+#ovp .pv-stage pre{font:12px/1.7 ui-monospace;direction:ltr;text-align:left;padding:18px;white-space:pre-wrap;color:#cbd5e1;width:100%;overflow:auto}
+#ovp .pv-title{position:absolute;top:14px;inset-inline-start:18px;font:600 13px V;direction:ltr;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#0009;padding:5px 12px;border-radius:999px;border:1px solid #ffffff14}
+#ovp .pv-note{position:absolute;bottom:12px;inset-inline:0;text-align:center;font-size:11.5px;color:var(--mu)}
+#ovp audio{width:min(520px,80vw)}
+.ib svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.pill svg{width:13px;height:13px;fill:currentColor}
+/* دستاوردها */
+#ova .ach{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff0d;font-size:13px}
+#ova .ach .ok{color:var(--ac);font-weight:700}
+#ova .ach .lk{color:#5a6274;font-size:12px}
+#ova .ach small{display:block;color:var(--mu);font-size:11px;margin-top:2px}
+#tb{position:relative}#tb i{position:absolute;top:-3px;inset-inline-end:-3px;font:700 9px ui-monospace;font-style:normal;background:var(--ac);color:#04110b;border-radius:999px;padding:0 4px;display:none}#tb i.on{display:block}
+.b svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+/* ── شهر: نقشه‌ی محله‌ها ── */
+#ovm{overflow:auto;padding:26px}
+#ovm .city{width:min(940px,94vw);display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-content:center;margin:auto}
+.vpill{font-size:10px;color:#9aa3ad;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px 8px;height:28px;display:flex;align-items:center;user-select:none}
+@media(max-width:900px){#ovm .city{grid-template-columns:repeat(2,1fr)}}
+.bld{position:relative;background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:18px;padding:14px;cursor:pointer;transition:.2s;text-align:right;min-height:120px}
+.bld:hover{transform:translateY(-3px);border-color:var(--ac)}
+.bld .gn{font-weight:700;font-size:14px}
+.bld .gsub{color:var(--mu);font-size:11px;margin-top:2px}
+.bld .pol{height:5px;border-radius:5px;background:#ffffff18;margin-top:10px;overflow:hidden}
+.bld .pol i{display:block;height:100%;border-radius:5px;transition:width .6s}
+.bld .bmeta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--mu);align-items:center}
+.bld .st{color:#ffd166;letter-spacing:1px;font-size:12px}
+.bld.lk{opacity:.45;filter:grayscale(.6)}
+.bld .lkx{position:absolute;top:10px;inset-inline-end:10px;font:700 10px ui-monospace;font-style:normal;background:#0009;border:1px solid #ffffff22;border-radius:999px;padding:2px 8px;color:var(--mu)}
+#ovm .citytitle{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+#ovm .citytitle small{color:var(--mu);font-size:11.5px}
+#ovm .citytitle h2{font-size:20px}
+/* ── انبار ── */
+#invRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+#invRow button{font:inherit;font-size:11px;padding:5px 10px;border-radius:9px;border:1px solid #ffffff18;background:#ffffff0d;color:var(--fg);cursor:pointer;transition:.15s}
+#invRow button:hover{border-color:var(--ac)}
+#invRow button:disabled{opacity:.35;cursor:default}
+#invRow b{color:var(--ac)}
+</style></head><body>
+<div id="wall"></div><div id="beam"></div><div id="veil"></div><canvas id="fx"></canvas>
+<div id="hud"><div class="pill" id="stk" title="روزهای پیاپی">روز <b id="sk">1</b></div><div class="pill"><span id="rk">کارآموز</span><div class="xpb"><i id="xb"></i></div><b id="xv">0</b></div><div class="pill" id="combo">x1</div><div class="pill"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><text x="12" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#04110b" stroke="none">C</text></svg> <b id="cn">0</b></div><div class="pill" id="rt" style="display:none"></div><span class="sp"></span>
+<button class="ib" id="hm" title="شهر وینی"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg></button><span class="vpill" id="vp">v23 · شهر وینی</span><button class="ib" id="rb" title="رِیس ۳۰ثانیه‌ای"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></button><button class="ib" id="sb" title="فروشگاه"><svg viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15zM9 7a3 3 0 0 1 6 0"/></svg></button><button class="ib" id="tb" title="دستاوردها"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/></svg><i id="tbn">0</i></button><button class="ib" id="mu" title="صدا"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm10-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg></button><button class="ib" id="fin" title="پرونده‌ی نهایی"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button><button class="ib" id="cl" title="خروج"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+<div id="tabs"></div><div id="stage"><div id="wn"><canvas id="wc" width="520" height="380"></canvas><div id="bub"></div></div>
+<div id="deck"><div id="empty">محله ساکت است.<br>همه‌ی مظنون‌ها داوری شدند.</div><div id="acts">
+<button class="b" id="bk"><kbd>→</kbd>برگشت</button><button class="b" id="tr"><kbd>↓</kbd>اعتماد</button><button class="b c" id="ct"><kbd>←</kbd>دستگیر</button></div></div>
+<div id="side"><div class="pk"><h4>جیب وینی</h4><div class="big" id="pn">0</div><div class="meta"><span id="pb">0 B</span><span id="left"></span></div><div class="chips" id="pc"></div></div>
+<div class="pk"><h4>نبض سیستم</h4><div class="gg" id="gg"></div></div><div class="pk"><h4>پرونده‌ی کل</h4><div class="meta"><span>تاکنون گرفته‌ای</span><b id="allb">0 B</b></div></div><div class="pk"><h4>مأموریت‌های امروز</h4><div id="qs"></div></div><div class="pk"><h4>انبار وینی</h4><div id="invRow"></div></div></div></div>
+<div class="ov" id="ovf"><div class="sh"><h2>پرونده‌ی نهایی</h2><div style="color:var(--mu);font-size:12.5px;line-height:1.9">فقط این موارد به سطل بازیافت می‌روند و از مرکز بازیابی قابل بازگشت‌اند.</div><div id="fl"></div><div id="tot"></div>
+<div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="run">اجرا</button><button class="b" id="no">ادامه‌ی گشت</button></div></div></div>
+<div class="ov" id="ovd"><div class="sh" style="text-align:center"><h2 id="dt">گشت بسته شد</h2><div id="tot2"></div><div id="ds" style="color:var(--mu)"></div><br><button class="b c" id="db" style="margin:auto">بازگشت وینی</button></div></div>
+<div class="ov" id="ovp"><div class="pv-stage" id="pvStage"><div id="pvNote" class="pv-note"></div></div></div>
+<div class="ov" id="ova"><div class="sh"><h2>نشان‌ها</h2><div id="achList"></div><br><button class="b c" id="ax" style="margin:auto">بستن</button></div></div>
+<div class="ov" id="ovm"><div class="city" id="cityGrid"></div></div>
+<div id="lv"></div>
+<script>
+'use strict';
+const $=i=>document.getElementById(i),post=o=>{try{window.chrome.webview.postMessage(o)}catch(e){}},HB=!!(window.chrome&&window.chrome.webview);
+let _id=1;const _p=new Map();
+function rpc(api,pl){if(!HB)return Promise.resolve(demo(api,pl||{}));return new Promise((res,rej)=>{const id=_id++;_p.set(id,{res,rej});post({type:'rpc',id,api,state:pl||{}});setTimeout(()=>{if(_p.has(id)){_p.delete(id);rej(new Error('rpc timeout'))}},25000)})}
+if(HB)window.chrome.webview.addEventListener('message',e=>{const d=e&&e.data;if(!d)return;if(d.type==='rpc'&&_p.has(d.id)){const p=_p.get(d.id);_p.delete(d.id);d.ok?p.res(d.result):p.rej(new Error(d.error))}else if(d.type==='hydrate')hydrate(d.pay)});
+post({type:'ready'});
+/* ---- demo ---- */
+const DAY=864e5,N=Date.now(),D='C:\\Users\\Demo\\Downloads\\';
+const mk=(n,s,d,b,c,ev,img)=>({path:D+n,name:n,sizeBytes:s,lastWrite:new Date(N-d*DAY).toISOString(),bucket:b,confidence:c,evidence:ev,isImage:!!img});
+const DEMO={zoneId:'downloads_dehleez',dir:D,scannedCount:96,cases:[
+mk('report_final (1).pdf',2.1e6,40,3,3,['کپی نام‌دار «(1)»','همتای اصلی موجود است','هم‌حجم تقریباً یکسان']),
+mk('setup_nvidia_552.exe',8.5e8,128,2,2,['نصاب ۸۱۲ مگابایتی','۱۲۸ روز بدون استفاده','نسخه‌ی جدیدتر روی سیستم']),
+mk('movie_part.mkv.crdownload',4.2e8,9,0,3,['دانلود ناتمام','۹ روز بی‌حرکت']),
+mk('tmp_8a3f.tmp',3.1e4,21,1,3,['فایل موقت','۲۱ روز قدیمی']),
+mk('IMG_2291 (1).jpg',3.4e6,60,3,3,['کپی نام‌دار','همتای اصلی موجود'],1),
+mk('backup_2021.zip',1.3e9,400,4,1,['۱.۲ گیگابایت','۴۰۰ روز قدیمی','احتمالاً بایگانی شخصی است']),mk('podcast_ep12.mp3',3.1e7,150,4,1,['حجم ۳۰ مگابایت','۱۵۰ روز بدون پخش']),mk('invoice_scan.pdf',4e5,180,1,1,['سند اسکن‌شده','شاید مهم باشد']),mk('notes_old.txt',9e3,210,1,2,['یادداشت قدیمی']),
+mk('chromesetup.exe',1.2e8,95,2,2,['نصاب مرورگر','۹۵ روز قدیمی']),
+mk('empty.txt',0,70,1,3,['فایل خالی قدیمی']),
+mk('thesis_draft_v2.docx',9.8e5,200,3,2,['نام شبیه نسخه‌ی دیگر','قدیمی‌تر از همتا']),
+mk('vlc-3.0.exe',4.0e7,300,2,2,['نصاب ۳۸ مگابایتی','۳۰۰ روز قدیمی']),
+mk('lecture.part',6e7,3,0,2,['دانلود ناتمام','فعال به‌نظر می‌رسد'])]};
+
+const mz=(k,n,sz,d,b,c,ev,detail,metric)=>({kind:k,path:k+':'+n,name:n,sizeBytes:sz,lastWrite:new Date(N-d*DAY).toISOString(),bucket:b,confidence:c,evidence:ev,detail,metric});
+const DZ={startup:[mz('startup','Adobe Updater Startup Utility',0,210,5,3,['راه‌انداز در هر بوت','۲۱۰ روز بدون استفاده از Adobe'],'C:\\Program Files (x86)\\Adobe\\Updater\\AdobeUpdater.exe /startup','تأخیر بوت ۴۱۰ms'),mz('startup','Spotify Web Helper',0,90,5,2,['مرورگر مرتبط حذف شده','فقط منابع می‌خورد'],'%APPDATA%\\Spotify\\SpotifyWebHelper.exe','تأخیر بوت ۱۸۰ms'),mz('startup','OneDrive',0,2,5,1,['ممکنه به همگام‌سازی نیاز داشته باشی'],'C:\\Users\\Demo\\AppData\\Local\\Microsoft\\OneDrive\\OneDrive.exe /background','تأخیر بوت ۶۲۰ms')],
+registry:[mz('registry','HKCU\\Software\\OldPlayer',0,500,6,3,['برنامه‌ای با این نام نصب نیست','آخرین نوشتن ۵۰۰ روز پیش'],'HKEY_CURRENT_USER\\Software\\OldPlayer\\Settings','۱۴ مقدار یتیم'),mz('registry','Uninstall\\{3F2A-91C0}',0,320,6,2,['مسیر نصب وجود ندارد','ورودی حذف‌نصب شکسته'],'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{3F2A-91C0}','۱ کلید'),mz('registry','Classes\\.xyz',0,40,6,1,['پسوند بدون برنامه‌ی مرتبط'],'HKCR\\.xyz','۳ مقدار')],
+tasks:[mz('tasks','GoogleUpdateTaskMachineUA',0,130,7,2,['هر ساعت اجرا می‌شود','Chrome مدت‌هاست خودش آپدیت می‌شود'],'\\GoogleUpdateTaskMachineUA · هر ۱ ساعت','۲۴ اجرا در روز'),mz('tasks','AdobeGCInvoker-1.0',0,260,7,3,['نرم‌افزار والد پیدا نشد'],'\\AdobeGCInvoker-1.0 · روزانه','۱ اجرا در روز')],
+procs:[mz('procs','chrome.exe ×14',1.8e9,0,8,2,['۱۴ تب بی‌حرکت','بیشترین رم سیستم'],'PID 9120 + 13 زیرپراسس','RAM ۱.۸ GB'),mz('procs','OneDrive.exe',2.4e8,0,8,1,['CPU ۱۲٪ بدون فعالیت دیده‌شده'],'PID 4412','CPU ۱۲٪ · RAM ۲۴۰ MB'),mz('procs','Teams.exe ×6',9.1e8,0,8,2,['بسته‌ی شده ولی هنوز زنده'],'PID 7788 + 5 زیرپراسس','RAM ۹۱۰ MB')]};
+DZ.folders=[mz('folders','Old Projects',3.1e9,310,9,2,['۴٬۲۰۰ فایل','۳۱۰ روز دست‌نخورده'],'C:\\Users\\Demo\\Downloads\\Old Projects','۳.۱ GB · ۴۲۰۰ فایل'),mz('folders','node_modules (قدیمی)',1.4e9,200,9,3,['قابل بازسازی','۲۰۰ روز بدون استفاده'],'D:\\dev\\old-site\\node_modules','۱.۴ GB · ۱۸٬۰۰۰ فایل'),mz('folders','Empty Folder',0,90,9,3,['کاملاً خالی'],'C:\\Users\\Demo\\Documents\\New folder','۰ فایل')];
+DZ.settings=[mz('settings','hiberfil.sys (هیبرنیت)',6e9,0,10,2,['هم‌اندازه‌ی بخشی از رم','اگر هیبرنیت نمی‌کنی بی‌مصرف است'],'powercfg /hibernate off','آزادسازی ≈ ۶ GB'),mz('settings','جلوه‌های بصری و شفافیت',0,0,10,1,['مصرف GPU/رم','سلیقه‌ای است'],'System ▸ Visual effects','CPU +۳٪'),mz('settings','ایندکس جستجوی ویندوز',0,0,10,2,['دیسک را مدام می‌خواند'],'services.msc ▸ WSearch','دیسک ۸٪ در پس‌زمینه')];
+const ORG=['github.com/releases/download','dl.google.com','download.videolan.org','mega.nz/file','cdn.discordapp.com/attachments'];
+function demo(api,p){
+if(api==='sys.stat')return{cpu:20+Math.random()*50|0,ram:55+Math.random()*25|0,disk:62};
+if(api==='file.inspect'){const z=/\.(zip|rar|7z)$/i.test(p.path),h=p.path.length%5;return{host:ORG[h],referrer:'https://'+ORG[h].split('/')[0]+'/',created:new Date(N-70*DAY).toISOString(),entries:z?[{n:'setup/installer.msi',s:4.1e7},{n:'docs/readme.txt',s:3e3},{n:'bin/app.dll',s:8.2e6},{n:'assets/video_intro.mp4',s:6.4e7},{n:'license.txt',s:1e3}]:[]}}
+if(api==='zone.scan'&&p.zoneId&&p.zoneId!=='downloads')return{zoneId:p.zoneId,cases:DZ[p.zoneId]||[]};
+if(api==='zone.scan')return DEMO;if(api==='zone.execute')return{performed:p.paths.length,failed:0,freed:p.paths.reduce((a,x)=>a+(SZ[x]||0),0),moved:p.paths.length,mode:'RecycleBin'};
+if(api==='state.get'){try{return JSON.parse(localStorage.getItem('winy.exp'))}catch(e){return null}}
+if(api==='state.save'){try{localStorage.setItem('winy.exp',JSON.stringify(p))}catch(e){}return{saved:true}}}
+/* ---- state ---- */
+const RK=['کارآموز','گشت','کارآگاه','بازرس','سروان','کمیسر','افسانه'],TH=[0,60,160,320,560,900,1400];
+let S={v:1,xp:0,level:0,totalCaught:0,totalCaughtBytes:0,casesDone:0,sessions:0,streak:1,last:'',trusted:{},caught:[]},Q=[],pocket=[],SZ={},combo=0,mute=false,HOST={},sv;
+const fmt=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':b>=1e6?(b/1e6).toFixed(1)+' MB':b>=1e3?(b/1e3).toFixed(0)+' KB':b+' B';
+const age=l=>{const d=Math.round((N-new Date(l))/DAY);return d>=365?Math.round(d/365)+' سال پیش':d+' روز پیش'};
+function save(){clearTimeout(sv);sv=setTimeout(()=>rpc('state.save',Object.assign({},S,{caught:pocket.map(c=>({path:c.path,name:c.name,size:c.sizeBytes,z:c.z}))})),600)}
+/* ---- sound ---- */
+let AC;function tone(f,d,t='sine',v=.07,s=0){if(mute)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain(),a=AC.currentTime+s;o.type=t;o.frequency.setValueAtTime(f,a);o.frequency.exponentialRampToValueAtTime(f*(s?1:1.5),a+d);g.gain.setValueAtTime(v,a);g.gain.exponentialRampToValueAtTime(.0001,a+d);o.connect(g).connect(AC.destination);o.start(a);o.stop(a+d)}catch(e){}}
+const SFX={catch:()=>{tone(220,.12,'square',.05);tone(440+combo*40,.18,'triangle',.08,.07)},trust:()=>{tone(523,.2);tone(784,.3,'sine',.06,.1)},back:()=>tone(200,.25,'sawtooth',.04),lvl:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.4,'triangle',.08,i*.1)),done:()=>[392,523,659,784,1046].forEach((f,i)=>tone(f,.5,'sine',.08,i*.12))};
+/* ---- Winy ---- */
+const wc=$('wc'),x=wc.getContext('2d');let mood='idle',mt=0,E={ex:0,ey:0,lt:0,bl:1},tgt=[0,0],pk=0,hex='#7fd8ff';
+const MOODS={idle:{c:'#7fd8ff',lt:0},scan:{c:'#8b9bff',lt:.2},happy:{c:'#5af2c0',lt:0},sad:{c:'#8f9bc4',lt:.4},cele:{c:'#7dffbf',lt:0},wait:{c:'#ffd166',lt:.1},empty:{c:'#9db4c4',lt:.3},angry:{c:'#ff4d5e',lt:0},win:{c:'#ffd166',lt:0},lose:{c:'#7a869e',lt:0},surp:{c:'#ffe28a',lt:0},sleep:{c:'#6f7fb0',lt:.75},love:{c:'#ff7ac8',lt:0}};
+function setMood(m,s=1.6){mood=m;mt=performance.now()+s*1e3}
+addEventListener('pointermove',e=>{const r=wc.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,d=Math.hypot(dx,dy)||1,k=Math.min(d/300,1)/d;tgt=[dx*k,dy*k]});
+let blk=0,nb=2;
+function drawW(t){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,260,190);if(mood!=='idle'&&mood!=='wait'&&mood!=='empty'&&performance.now()>mt)mood=$('deck').querySelector('.card')?'scan':'empty';
+const M=MOODS[mood],c=M.c;hex=c;E.ex+=(tgt[0]-E.ex)*.1;E.ey+=(tgt[1]-E.ey)*.1;E.lt+=(M.lt-E.lt)*.15;pk*=.9;
+const bob=Math.sin(t*.0017)*3-(mood==='lose'?-5:0)-(mood==='angry'?Math.sin(t*.06)*1.5:0)-(mood==='cele'||mood==='win'?Math.abs(Math.sin(t*.012))*14:0);x.translate(130,95+bob);
+const g=x.createRadialGradient(0,0,20,0,0,110);g.addColorStop(0,c+'33');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(-130,-95,260,190);
+x.fillStyle='#0006';x.beginPath();x.ellipse(0,72-bob*.4,44,4,0,0,7);x.fill();
+const gr=x.createLinearGradient(-70,-55,70,55);gr.addColorStop(0,'#575d6b');gr.addColorStop(.5,'#2a2e38');gr.addColorStop(1,'#16181e');x.fillStyle=gr;x.beginPath();x.roundRect(-70,-55,140,110,36);x.fill();
+x.strokeStyle='#fff5';x.lineWidth=1;x.stroke();x.fillStyle='#03050a';x.beginPath();x.roundRect(-64,-49,128,98,30);x.fill();
+x.save();x.clip();x.translate(E.ex*5,E.ey*3);const sc=mood==='scan'?-1:0;
+if(blk>0)blk-=.08;else if(t/1e3>nb){blk=1;nb=t/1e3+2+Math.random()*3}
+const oc=blk>0?Math.abs(Math.cos(Math.PI*(1-blk))):1,sad=mood==='sad'||mood==='lose',ch=['happy','cele','win'].includes(mood);
+[-1,1].forEach(s=>{x.save();x.translate(s*25+E.ex*5,-6);x.scale(1,Math.max(.06,oc));const w=mood==='surp'?22:17,h=sad?22:mood==='surp'?38:mood==='angry'?24:29;x.shadowColor=c;x.shadowBlur=18;x.fillStyle=c;x.beginPath();x.roundRect(-w/2,-h/2,w,h,w/2);x.fill();x.shadowBlur=0;x.fillStyle='#03050a';
+if(E.lt>.02){x.save();x.rotate(-s*.25);x.fillRect(-20,-30,40,30*E.lt*1.4);x.restore()}
+if(ch){x.beginPath();x.arc(0,h/2+8,w*.7,0,7);x.fill()}x.restore()});
+ov(t,c);x.strokeStyle=c;x.lineWidth=3;x.lineCap='round';x.shadowColor=c;x.shadowBlur=10;x.beginPath();
+if(mood==='surp')x.arc(0,26,7,0,7);else if(mood==='angry')x.arc(0,34,10,Math.PI*1.15,Math.PI*1.85);else if(mood==='lose'){x.moveTo(-10,30);for(let i=1;i<=4;i++)x.lineTo(-10+i*5,30+(i%2?-3:3))}else if(mood==='sleep')x.arc(0,24,4,0,7);else if(mood==='love')x.arc(0,14,13,.1*Math.PI,.9*Math.PI);else if(mood==='wait'||mood==='empty')x.moveTo(-8,22),x.lineTo(8,22);else if(sad)x.arc(0,32,10,Math.PI*1.15,Math.PI*1.85);else x.arc(0,16,ch?12:8,.15*Math.PI,.85*Math.PI);x.stroke();x.restore();
+extras(t,c);if(mood==='scan'||pk>.2){x.strokeStyle='#e8eefc';x.lineWidth=3;x.shadowBlur=0;const a=Math.sin(t*.003)*8;x.beginPath();x.arc(88+a,10,14,0,7);x.moveTo(98+a,20);x.lineTo(110+a,34);x.stroke()}
+requestAnimationFrame(drawW)}
+function ov(t,c){if(!['lose','love','sleep','angry'].includes(mood))return;x.save();x.translate(E.ex*5,0);x.lineCap='round';
+[-1,1].forEach(s=>{const ex=s*25,ey=-6;
+if(mood==='angry'){x.shadowBlur=0;x.fillStyle='#03050a';x.beginPath();x.moveTo(s*12,-9);x.lineTo(s*42,-24);x.lineTo(s*42,-40);x.lineTo(s*12,-40);x.fill();x.strokeStyle=c;x.lineWidth=4;x.beginPath();x.moveTo(s*10,-11);x.lineTo(s*40,-27);x.stroke();return}
+x.shadowBlur=0;x.fillStyle='#03050a';x.fillRect(ex-16,ey-20,32,40);x.strokeStyle=c;x.fillStyle=c;x.lineWidth=4;x.shadowColor=c;x.shadowBlur=12;x.beginPath();
+if(mood==='lose'){x.moveTo(ex-8,ey-8);x.lineTo(ex+8,ey+8);x.moveTo(ex+8,ey-8);x.lineTo(ex-8,ey+8);x.stroke()}
+else if(mood==='sleep'){x.moveTo(ex-9,ey);x.quadraticCurveTo(ex,ey+9,ex+9,ey);x.stroke()}
+else{const p=1+Math.sin(t*.012)*.12;x.save();x.translate(ex,ey+2);x.scale(p,p);x.moveTo(0,10);x.bezierCurveTo(-18,-2,-10,-16,0,-6);x.bezierCurveTo(10,-16,18,-2,0,10);x.fill();x.restore()}});x.restore();x.shadowBlur=0}
+function extras(t,c){hat();x.shadowBlur=0;x.lineCap='round';
+if(mood==='win'){x.fillStyle='#ffd166';x.beginPath();x.moveTo(-26,-60);x.lineTo(-26,-84);x.lineTo(-13,-70);x.lineTo(0,-90);x.lineTo(13,-70);x.lineTo(26,-84);x.lineTo(26,-60);x.closePath();x.fill();for(let i=0;i<5;i++){const a=t*.004+i*1.26;x.fillStyle='#fff8d0';x.fillRect(Math.cos(a)*92-2,Math.sin(a)*52-2,4,4)}}
+else if(mood==='lose'){const y=((t*.03)%40);x.fillStyle='#7fd8ff';x.beginPath();x.arc(-33,14+y,3.5,0,7);x.fill();x.strokeStyle='#e8eefc';x.lineWidth=2;x.beginPath();x.moveTo(84,60);x.lineTo(84,6);x.stroke();x.fillStyle='#e8eefc';x.fillRect(84,6,24,16)}
+else if(mood==='angry'){for(let i=0;i<3;i++){const k=((t*.002+i/3)%1);x.globalAlpha=1-k;x.fillStyle='#ff4d5e';x.beginPath();x.arc(-58+i*58,-62-k*30,4+k*7,0,7);x.fill()}x.globalAlpha=1}
+else if(mood==='sleep'){x.fillStyle=c;for(let i=0;i<3;i++){const k=((t*.0006+i/3)%1);x.globalAlpha=1-k;x.font='700 '+(12+i*5)+'px sans-serif';x.fillText('Z',62+k*26,-40-k*34)}x.globalAlpha=1}
+else if(mood==='love'){x.fillStyle=c;for(let i=0;i<3;i++){const k=((t*.001+i/3)%1);x.globalAlpha=1-k;x.font='16px sans-serif';x.fillText('♥',-70+i*70+Math.sin(k*6)*8,-50-k*40)}x.globalAlpha=1}
+else if(mood==='surp'){x.fillStyle=c;x.font='700 34px sans-serif';x.fillText('!',-8,-66+Math.sin(t*.03)*3)}}
+const MS=[['happy','خوشحالم!'],['sad','ناراحتم...'],['angry','عصبانی‌ام!'],['scan','دارم بررسی می‌کنم...'],['win','بردم!'],['lose','باختم...'],['surp','وای! چی شد؟'],['sleep','خوابم میاد...'],['love','عاشق این پرونده‌ام!']];let mi=0,lastA=Date.now();
+wc.style.cursor='pointer';wc.onclick=()=>{const m=MS[mi++%MS.length];setMood(m[0],3);say(m[1])};
+['pointerdown','keydown'].forEach(e=>addEventListener(e,()=>{lastA=Date.now();MUS.start();if(mood==='sleep'){setMood('surp',1.2);say('هان؟ بیدارم!')}}));
+setInterval(()=>{if(Date.now()-lastA>45000&&mood!=='sleep'&&!document.querySelector('.ov.on')){setMood('sleep',999);say('خوابم برد...')}},5000);
+requestAnimationFrame(drawW);
+const LINES={catch:['گرفتمت.','یکی کم شد.','مدرک قطعی بود.','پرونده بسته.'],trust:['باشه، تو آزادی.','دیگه سراغت نمیام.','این یکی خودیه.'],back:['بعداً برمی‌گردم سراغش.','هنوز مطمئن نیستم...'],open:['مظنون بعدی.','این یکی مشکوک به‌نظر می‌رسه.','بیا ببینیم چی قایم کرده.','نگاهش کن، چی می‌بینی؟'],combo:['زنجیره‌ایه!','وای، دست‌گرم شدیم!','نگهش دار، نگهش دار!']};
+/* واکنش وینی به نوع مدرک (bucket داهلیز + زون‌های دیگر) */
+const CLBH={0:['نیمه‌کاره ول شده وسط خیابون.','دانلودی که هیچ‌وقت تمام نشد.'],1:['زباله‌ی خالص؛ همین.','کسی واقعاً اینم می‌خواست؟'],2:['نصاب‌های کهنه؛ یادگاری‌های بی‌فایده.','نصبش تموم شده؛ خودش بی‌کار شده.'],3:['دوقلوها نباید با هم برن.','کپیِ بی‌دلیل؛ اصیلش همینه.'],4:['غولِ محله. با احتیاط دستگیرش کن.'],5:['از لیست راه‌اندازی حذفش می‌کنم؛ بوت سبک‌تر می‌شه.'],6:['کلید بی‌صاحب؛ جاش گورستان رجیستریه.'],7:['دیگه هر ساعت بیدارت نمی‌کنم.'],9:['جعبه‌های سنگین محله؛ می‌رن سطل بازیافت.']};
+const pick=a=>a[Math.random()*a.length|0];
+function say(t){const b=$('bub');b.style.opacity=0;setTimeout(()=>{b.innerHTML=t;b.style.opacity=1},120)}
+/* ---- particles ---- */
+const fx=$('fx'),f=fx.getContext('2d');let PT=[];function rs(){fx.width=innerWidth;fx.height=innerHeight}rs();addEventListener('resize',rs);
+function burst(px,py,n,col){for(let i=0;i<n;i++)PT.push({x:px,y:py,vx:(Math.random()-.5)*10,vy:(Math.random()-.8)*10,l:1,c:col})}
+(function lp(){f.clearRect(0,0,fx.width,fx.height);PT=PT.filter(p=>p.l>0);PT.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.3;p.l-=.02;f.globalAlpha=Math.max(0,p.l);f.fillStyle=p.c;f.fillRect(p.x,p.y,4,4)});requestAnimationFrame(lp)})();
+/* ---- game ---- */
+const ZN=[['downloads','دانلودها'],['startup','استارتاپ'],['registry','رجیستری'],['tasks','تسک‌ها'],['procs','رم و CPU'],['folders','پوشه‌ها'],['settings','تنظیمات']],QS={},EXT={img:/\.(jpe?g|png|gif|webp|bmp|svg)$/i,vid:/\.(mp4|webm|mov|m4v)$/i,aud:/\.(mp3|wav|ogg|m4a|flac|aac)$/i,pdf:/\.pdf$/i,txt:/\.(txt|log|md|csv|json|ini|nfo|srt)$/i,zip:/\.(zip|rar|7z|tar|gz|tgz)$/i},GL={startup:'RUN',registry:'REG',tasks:'TSK',procs:'CPU',folders:'DIR',settings:'CFG'},SEEN=new Set(),esc=t=>String(t).replace(/</g,'&lt;');
+let Z='downloads';const Qc=()=>QS[Z]||[];
+const ty=c=>{if(c.kind&&c.kind!=='file')return c.kind;for(const k in EXT)if(EXT[k].test(c.name))return k;return'file'};
+const url=c=>(HOST.downloads||'https://cleanc.dl/')+encodeURIComponent(c.name);
+/* آیا فایل مستقیم از میزبان cleanc.dl سرو می‌شود؟ (فقط ریشه‌ی Downloads) */
+const inDlRoot=p=>{const d=HOST.downloadsDir;if(!d||!p)return false;const s=p.startsWith(d+'\\')?p.slice(d.length+1):null;return!!s&&!s.includes('\\')};
+const BK=['دانلود ناتمام','زباله‌ی موقت','نصاب قدیمی','دوقلوی کپی','حجیم فراموش‌شده','استارتاپ اضافی','کلید یتیم','تسک زمان‌بندی','پراسس سنگین','پوشه‌ی سنگین','تنظیم سنگین'];
+const KL={startup:'راه‌انداز خودکار',registry:'کلید یتیم رجیستری',tasks:'تسک زمان‌بندی',procs:'ساکن سنگین',folders:'پوشه‌ی محله',settings:'تنظیم سیستم'};
+const OBSERVE=kind=>kind==='procs'||kind==='settings';
+/* مدرک‌ها از داده‌ی خام سرویس ساخته می‌شوند — Core فارسی نمی‌فرستد */
+function buildEvidence(c){
+ if(Array.isArray(c.evidence)&&c.evidence.length)return c.evidence;
+ const d=c.data||{},ev=[];
+ if(c.kind==='startup'){ev.push(d.targetMissing?'برنامه‌اش دیگر روی دیسک نیست':'در هر بوت اجرا می‌شود');if(d.impactMs)ev.push('تأخیر بوت: '+d.impactMs+' میلی‌ثانیه');if(d.scheduled)ev.push('از طریق تسک زمان‌بندی');if(c.detail)ev.push(c.detail)}
+ else if(c.kind==='registry'){ev.push('بدون دستور حذف‌نصب');ev.push('مسیر نصب گم شده: '+c.detail);if(d.regPath)ev.push(d.regPath)}
+ else if(c.kind==='tasks'){ev.push(d.targetMissing?'برنامه‌ی هدفش پاک شده':'زمان‌بندی فعال');if(d.nextRun)ev.push('اجرای بعدی: '+d.nextRun);if(c.detail)ev.push(c.detail)}
+ else if(c.kind==='procs'){ev.push('رم: '+fmt(c.sizeBytes||0));ev.push(d.critical?'پروسس سیستمی — فقط مشاهده':'ساکن حجیم حافظه');ev.push('PID '+d.pid)}
+ else if(c.kind==='folders'){ev.push((d.files||0)+' فایل'+(d.approx?' (تقریبی)':''));ev.push((d.days||0)+' روز دست‌نخورده');ev.push('حذف به سطل بازیافت')}
+ else if(c.kind==='settings'){const M={hibernate:['هم‌اندازه‌ی بخشی از رم است','با خاموشی هیبرنیت آزاد می‌شود'],wsearch:['سرویس جستجوی ویندوز','دیسک را مدام می‌خواند'],sysmain:['پیش‌بارگذاری پیش‌دستانه','فشار مداوم روی دیسک'],transparency:['جلوه‌ی شفافیت پنجره‌ها','مصرف GPU و رم دارد']};(M[c.path.split(':')[1]]||['تنظیم سنگین سیستم']).forEach(t=>ev.push(t))}
+ return ev}
+const ZL=Object.fromEntries(ZN);
+function rarity(c){const s=c.sizeBytes;return s>=5e8?['افسانه‌ای','#ffb454']:s>=1e8?['نادر','#c07bff']:c.confidence===3?['قطعی','#5af2c0']:['معمولی','#8f9bc4']}
+function tabs(){$('tabs').innerHTML=ZN.map(([k,n])=>`<button class="tb ${k===Z?'on':''}" data-z="${k}">${n}${rankOK(k)?(QS[k]?`<i>${QS[k].length}</i>`:''):`<i style="background:#5a6274">${UNLOCK[k]}</i>`}</button>`).join('');$('tabs').querySelectorAll('.tb').forEach(b=>b.onclick=()=>{if(rankOK(b.dataset.z))enter(b.dataset.z);else openMap()})}
+async function enter(z){if(!S.citySeen){S.citySeen=1;save();setTimeout(()=>{if(!rushMode)openMap()},600)}if(!rankOK(z)){toast('محله‌ی «'+(ZL[z]||z)+'» هنوز قفله — به درجه‌ی '+RK[UNLOCK[z]]+' نیاز داری');openMap();return}Z=z;setMood('scan',99);quest('z',z);S.visited=S.visited||{};if(!S.visited[z]){S.visited[z]=1;save();chkAch()}if(!QS[z]){say('در حال گشت‌زنی در '+ZL[z]+'...');tabs();let r;try{r=await rpc('zone.scan',{zoneId:z})}catch(e){r={cases:[]}}
+QS[z]=(r.cases||[]).filter(c=>!S.trusted[c.path]&&!pocket.some(k=>k.path===c.path)).sort((a,b)=>b.confidence-a.confidence||b.sizeBytes-a.sizeBytes);if(z==='downloads'&&QS[z].length)QS[z][new Date().getDate()%QS[z].length].daily=1}
+render()}
+function render(){tabs();const Q=Qc(),dk=$('deck');dk.querySelectorAll('.card').forEach(e=>e.remove());const em=!Q.length;$('empty').style.display=em?'block':'none';$('acts').style.display=em?'none':'flex';
+if(em){setMood('empty',99);say(pocket.length?'این منطقه تمیزه. بریم منطقه‌ی بعد یا پرونده‌ی نهایی؟':'همه آزادن.')}
+Q.slice(0,3).reverse().forEach((c,i,a)=>{const d=a.length-1-i,[rn,rc]=rarity(c),e=document.createElement('div');e.className='card '+(d?'b'+d:'top');
+if(!d){const t=ty(c),file=!c.kind||c.kind==='file',im=t==='img'?`<img src="${url(c)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ext',textContent:'IMG'}))">`:`<div class="ext">${file?'.'+(c.name.split('.').pop()||'?').slice(0,5):GL[c.kind]}</div>`;
+const obs=OBSERVE(c.kind);
+e.innerHTML=`<div class="rar" style="background:${rc}"></div><div class="th">${im}<span class="tag" style="color:${rc}">${rn}</span></div>${c.daily?'<span class="dl">پرونده‌ی ویژه‌ی روز · XP دو برابر</span>':''}<div class="nm">${esc(c.name)}</div>
+<div class="meta"><span>${c.kind?KL[c.kind]||c.kind:BK[c.bucket]||'مشکوک'}</span><span>${c.metric||fmt(c.sizeBytes)+' · '+age(c.lastWrite)}</span></div>
+<div class="cf">اطمینان <i class="${c.confidence>0?'o':''}"></i><i class="${c.confidence>1?'o':''}"></i><i class="${c.confidence>2?'o':''}"></i></div>
+${c.kind==='procs'?'<div class="hv"><i style="width:'+Math.min(100,Math.max(12,c.sizeBytes/2e7))+'%;background:'+(c.sizeBytes>1e9?'#ff4d5e':'#ffb454')+'"></i></div>':''}${c.sizeBytes>=5e8?'<div class="hv" id="hp"><i style="width:'+(c.hp||5)*20+'%;background:#ffb454"></i></div>':''}<div class="ev">${buildEvidence(c).map((t,k)=>`<span style="animation-delay:${k*.12}s">${t}</span>`).join('')}</div>
+<div class="tools">${['img','vid','aud','pdf','txt'].includes(t)?'<button class="b" id="pv">پیش‌نمایش</button>':''}<button class="b" id="iq">بازجویی</button></div><div id="iqo"></div>`;
+setTimeout(()=>{const p=$('pv');if(p)p.onclick=()=>preview(c,t);$('iq').onclick=()=>inspect(c,t)})}else e.innerHTML='';dk.insertBefore(e,dk.firstChild)});
+if(Q.length){setMood('scan',2);pk=1;say(ZS[Z]&&!ZSEEN[Z]?(ZSEEN[Z]=1,ZS[Z]):pick(LINES.open))}
+const tc=Q[0];if(tc&&OBSERVE(tc.kind)){$('tr').innerHTML='<kbd>↓</kbd>ثبت مشاهده';$('ct').style.display='none'}else{$('tr').innerHTML='<kbd>↓</kbd>اعتماد';$('ct').style.display=''}
+$('left').textContent=Q.length+' مانده';hud()}
+function disc(c,n,m){if(SEEN.has(c.path+m))return;SEEN.add(c.path+m);quest(m);xp(n);setMood('surp',1.4);say('کشف تازه! +'+n+' XP');burst(innerWidth/2,innerHeight/2,16,'#ffd166')}
+/* ── پیش‌نمایش بزرگ: فایل‌های ریشه‌ی Downloads مستقیم از cleanc.dl؛ بقیه با file.stage کپی و از cleanc.wall ── */
+async function srcFor(c){
+ if(inDlRoot(c.path))return url(c);
+ try{const r=await rpc('file.stage',{path:c.path,sizeBytes:c.sizeBytes||0});
+  if(r&&r.url)return r.url;
+  if(r&&r.tooBig)return{err:'این فایل برای پیش‌نمایش خیلی بزرگ است (سقف ۸۰۰ مگابایت)'};
+  return{err:'پیش‌نمایش این فایل ممکن نشد'}}catch(e){return{err:'پیش‌نمایش این فایل ممکن نشد'}}}
+async function preview(c,t){
+ const st=$('pvStage'),note=$('pvNote');$('ovp').classList.add('on');setMood('scan',2);say('بذار نگاه کنیم، چی تو شه؟');disc(c,4,'pv');
+ st.querySelectorAll('img,video,audio,iframe,pre,.ext,.pg,.fk,.pv-title').forEach(e=>e.remove());
+ const title=document.createElement('div');title.className='pv-title';title.textContent=c.name;st.appendChild(title);
+ if(!HB){st.insertAdjacentHTML('beforeend',demoPrev(c,t));note.textContent='پیش‌نمایش نمونه — داخل برنامه خودِ فایل نمایش داده می‌شود';return}
+ note.textContent='در حال باز کردن…';
+ const s=await srcFor(c);
+ if(typeof s!=='string'){note.textContent=s.err;return}
+ if(t==='img'){st.insertAdjacentHTML('beforeend','<img>');const im=st.querySelector('img');im.onload=()=>note.textContent='';im.onerror=()=>{im.remove();note.textContent='پیش‌نمایش این تصویر ممکن نشد'};im.src=s}
+ else if(t==='vid'){st.insertAdjacentHTML('beforeend','<video controls autoplay src="'+s+'"></video>');const v=st.querySelector('video');v.onerror=()=>{v.remove();note.textContent='این فرمت ویدئو در پیش‌نمایش پشتیبانی نمی‌شود'};note.textContent=''}
+ else if(t==='aud'){st.insertAdjacentHTML('beforeend','<div class="ext">♪</div><audio controls autoplay src="'+s+'"></audio>');const a=st.querySelector('audio');a.onerror=()=>{a.remove();note.textContent='این فرمت صوتی پشتیبانی نمی‌شود'};note.textContent=''}
+ else if(t==='pdf'){st.insertAdjacentHTML('beforeend','<iframe src="'+s+'#toolbar=0&navpanes=0"></iframe>');note.textContent='برای بستن: ESC یا کلیک بیرون کادر'}
+ else if(t==='txt'){try{const r=await rpc('file.inspect',{path:c.path});st.insertAdjacentHTML('beforeend','<pre>'+esc((r&&r.text)||'— خالی یا خوانا نیست —')+'</pre>')}catch(e){st.insertAdjacentHTML('beforeend','<pre>—</pre>')}note.textContent=''}}
+$('ovp').addEventListener('click',e=>{if(e.target.id==='ovp'){$('ovp').classList.remove('on');$('pvStage').querySelectorAll('img,video,audio,iframe').forEach(x=>x.remove())}});
+async function inspect(c,t){const o=$('iqo');setMood('scan',2);
+if(c.kind&&c.kind!=='file'){o.innerHTML=`<div class="inq">محل دقیق: <b>${esc(c.detail||'—')}</b></div>`;say('مدرک دقیق رو پیدا کردم.');disc(c,6,'iq');return}
+let r;try{r=await rpc('file.inspect',{path:c.path})}catch(e){r=null}if(!r){o.innerHTML='<div class="inq">اطلاعات بیشتری پیدا نشد.</div>';return}
+if(r.archiveUnsupported){o.innerHTML=`<div class="inq">${r.host?'دانلود از: <b>'+esc(r.host)+'</b><br>':''}این قالب آرشیو (7z/rar) بدون کتابخانه‌ی خارجی باز نمی‌شود؛ فقط داده‌ی منبع نشان داده شد.</div>`;say('قفل این جعبه با ابزار فعلی باز نشد.');disc(c,6,'iq');return}
+const en=(r.entries||[]);
+o.innerHTML=`<div class="inq">${r.host?`دانلود از: <b>${esc(r.host)}</b><br>`:'<span>منشأ ثبت نشده است (کپی داخلی یا ویندوز رد نگرفته).</span><br>'}${r.referrer?`صفحه‌ی مرجع: <b>${esc(r.referrer)}</b><br>`:''}${r.downloaded?`زمان دانلود: <b>${age(r.downloaded)}</b><br>`:''}${r.created?`ایجاد فایل: <b>${age(r.created)}</b>`:''}${r.text?`<ul><li style="white-space:pre-wrap;direction:inherit;font:11.5px/1.8 V;color:#cbd5e1;max-height:120px;overflow:auto">${esc(r.text.slice(0,900))}</li></ul>`:''}${en.length?`<ul>${en.map(x=>`<li><span>${fmt(x.s)}</span><span>${esc(x.n)}</span></li>`).join('')}</ul>${zipStory(en,r,c,t)}`:''}</div>`;
+say(en.length?'داخلش رو دیدم. فقط خودت تصمیم بگیر.':(r.text?'همین چند خطش پیدا شد — خودت قضاوت کن.':'ردش رو زدم؛ ردی از اینترنت نبود.'));disc(c,10,'iq')}
+function hud(){const l=S.level;$('rk').textContent=RK[l];$('sk').textContent=S.streak||1;const a=TH[l],b=TH[l+1]||a+1;$('xb').style.width=Math.min(100,(S.xp-a)/(b-a)*100)+'%';$('xv').textContent=S.xp;
+$('pn').textContent=pocket.length;const pb=pocket.reduce((a,c)=>a+c.sizeBytes,0);$('pb').textContent=fmt(pb);$('allb').textContent=fmt(S.totalCaughtBytes+pb);
+$('pc').innerHTML=pocket.slice(-8).map(c=>`<i>${esc(c.name)}</i>`).join('');const cb=$('combo');cb.textContent='زنجیره x'+combo;cb.classList.toggle('on',combo>1);rq();renderInv()}
+function xp(n){S.xp+=n;fl(innerWidth/2+(Math.random()-.5)*160,innerHeight/2-90,'+'+n+' XP','#5af2c0');while(S.level<6&&S.xp>=TH[S.level+1]){S.level++;SFX.lvl();const v=$('lv');v.textContent='درجه‌ی تازه: '+RK[S.level];v.classList.remove('on');void v.offsetWidth;v.classList.add('on');setMood('cele',2.6);say('ارتقا گرفتم! دیگه '+RK[S.level]+'ام.');burst(innerWidth/2,innerHeight/3,60,'#ffd166');
+ const un=ZN.filter(([z])=>z!=='downloads'&&S.level===UNLOCK[z]).map(([,nm])=>nm);if(un.length)setTimeout(()=>{toast('محله‌ی تازه باز شد: '+un.join('، '));burst(innerWidth/2,innerHeight*.18,50,'#7dffbf')},1500)}chkAch()}
+function act(k){const Q=Qc(),c=Q[0];if(!c||document.querySelector('.ov.on'))return;const t=$('deck').querySelector('.top');if(!t)return;if(OBSERVE(c.kind)&&(k==='catch'||k==='trust'))k='note';if(k==='catch'&&c.sizeBytes>=5e8&&(c.hp=c.hp||5)>1){boss(c,t);return}const r=t.getBoundingClientRect(),px=r.left+r.width/2,py=r.top+r.height/2;
+t.style.transform=k==='catch'?'translate(-120%,20px) rotate(-14deg) scale(.8)':k==='trust'?'translateY(120%) scale(.8)':'translate(120%,-10px) rotate(14deg) scale(.8)';t.style.opacity=0;
+if(k==='back'){setMood(combo>2?'angry':'sad',1.6);combo=0;Q.push(Q.shift());say(pick(LINES.back));SFX.back()}
+else{if(k==='note'){t.style.transform='translateY(-130%) scale(.85)';t.style.opacity=0;Q.shift();xp(4);fl(px,py,'+4 XP','#5af2c0');S.cleanCount[Z]=(S.cleanCount[Z]||0)+1;toast('ثبت شد — وارد دفترچه‌ی وینی شد');S.casesDone++;quest('c');save();setTimeout(render,280);return}const ok=k==='catch'?(c.revealed||c.confidence>=2):c.confidence<2;if(ok)combo++;else{combo=0;SFX.back();toast('ریسکی بود! زنجیره شکست')}lastC=Date.now();Q.shift();const base=[0,6,12,20][c.confidence]||6,g=Math.round(base*(1+Math.min(combo,8)*.15)*(c.daily?2:1)*(c.revealed?1.4:1));
+if(k==='catch'){pocket.push(Object.assign({z:Z},c));SZ[c.path]=c.sizeBytes;S.cleanCount[Z]=(S.cleanCount[Z]||0)+1;if(c.hp===1)S.bossDown=1;setMood('happy',1.4);say(combo>2&&combo%3===0?pick(LINES.combo):(CLBH[c.bucket]?pick(CLBH[c.bucket]):pick(LINES.catch)));SFX.catch();burst(px,py,30,rarity(c)[1]);quest('c');crit(g)}
+else{S.trusted[c.path]=Date.now();S.trustCount=(S.trustCount||0)+1;setMood('love',1.4);say(pick(LINES.trust));SFX.trust();burst(px,py,18,'#7fd8ff');xp(Math.round(g/2))}S.casesDone++;reward(k,c,ok,px,py)}
+save();setTimeout(render,300)}
+function final(){if(!pocket.length){say('جیبم خالیه. اول چند نفر رو دستگیر کن.');return}
+$('fl').innerHTML=pocket.map(c=>`<div class="row"><span>${c.kind&&c.kind!=='file'?KL[c.kind]||ZL[c.z]:fmt(c.sizeBytes)}</span><s>${esc(c.name)}</s></div>`).join('');$('tot').textContent=fmt(pocket.filter(c=>!c.kind||c.kind==='file'||c.kind==='folders').reduce((a,c)=>a+c.sizeBytes,0));$('ovf').classList.add('on');setMood('wait',99);say('آخرین تصمیم با خودته.')}
+async function run(){$('run').disabled=true;let R={performed:0,failed:0,freed:0};
+const zs=[...new Set(pocket.map(c=>c.z||'downloads'))];
+for(const z of zs){const paths=pocket.filter(c=>(c.z||'downloads')===z).map(c=>c.path);try{const r=await rpc('zone.execute',{zoneId:z,paths});R.performed+=r.performed;R.failed+=r.failed;R.freed+=r.freed}catch(e){R.failed+=paths.length}}
+$('run').disabled=false;$('ovf').classList.remove('on');S.totalCaught+=R.performed;S.totalCaughtBytes+=R.freed;S.sessions++;xp(40+R.performed*4);pocket=[];combo=0;
+if(S.inv.magnet>0){S.inv.magnet--;S.coins=(S.coins||0)+40;toast('آهنربای سکه: +۴۰ سکه')}
+save();
+$('tot2').textContent=fmt(R.freed);$('tot2').style.cssText='font:700 48px ui-monospace;color:var(--ac);margin:12px 0;direction:ltr';
+$('ds').innerHTML=R.performed+' مورد اجرا شد'+(R.failed?' · '+R.failed+' ناموفق':'')+' — همه در سطل بازیافت، قابل بازگشت<br>'+zs.map(z=>starsOf(z)?ZL[z]+' <span style="color:#ffd166">'+'★'.repeat(starsOf(z))+'</span>':'').filter(Boolean).join(' · ');
+$('ovd').classList.add('on');setMood(R.performed?'win':'lose',9);say(R.performed?'پرونده بسته شد. شهر نفس کشید.':'نشد... چیزی اجرا نشد.');SFX.done();burst(innerWidth/2,innerHeight/2,120,'#7dffbf');hud()}
+$('ct').onclick=()=>act('catch');$('tr').onclick=()=>act('trust');$('bk').onclick=()=>act('back');$('fin').onclick=final;$('no').onclick=()=>{$('ovf').classList.remove('on');render()};$('run').onclick=run;
+$('db').onclick=()=>{$('ovd').classList.remove('on');render()};let sndMode=0,musicOn=true;
+$('mu').onclick=()=>{sndMode=(sndMode+1)%3;mute=sndMode===2;musicOn=sndMode===0;if(musicOn)MUS.start();else MUS.stop();$('mu').style.opacity=sndMode===2?.4:1;toast(['موسیقی + افکت صدا','فقط افکت‌ها','بی‌صدا'][sndMode])};
+function exit(){const ovn=document.querySelector('.ov.on');if(ovn){ovn.classList.remove('on');if(ovn.id==='ovp')$('pvStage').querySelectorAll('img,video,audio,iframe').forEach(x=>x.remove());return}if(pocket.length){final();return}post({type:'exit'})}$('cl').onclick=exit;
+addEventListener('keydown',e=>{if(e.key==='Escape')exit();else if(e.key==='ArrowLeft')act('catch');else if(e.key==='ArrowDown')act('trust');else if(e.key==='ArrowRight')act('back')});
+const GA=[['CPU','cpu'],['RAM','ram'],['DSK','disk']];$('gg').innerHTML=GA.map(([n,k])=>`<div><span>${n}</span><u><i id="g_${k}"></i></u><b id="v_${k}">-</b></div>`).join('');
+async function sys(){try{const r=await rpc('sys.stat');GA.forEach(([n,k])=>{const v=r[k]||0;$('g_'+k).style.width=v+'%';$('g_'+k).style.background=v>80?'#ff4d5e':v>60?'#ffb454':'';$('v_'+k).textContent=v+'%'})}catch(e){}}
+setInterval(sys,4000);sys();
+async function hydrate(p){p=p||{};HOST=p.host||{};if(p.theme&&p.theme.accent)document.documentElement.style.setProperty('--ac',p.theme.accent);
+if(p.wallpaper&&p.wallpaper.ok)$('wall').style.backgroundImage=`url(${HOST.wall||'https://cleanc.wall/wallpaper.img'})`;
+const sv=p.saved||await rpc('state.get');if(sv&&sv.v===1)Object.assign(S,sv);if(Array.isArray(sv&&sv.caught))pocket=sv.caught.map(c=>({path:c.path,name:c.name,sizeBytes:c.size,confidence:2,bucket:1,lastWrite:new Date(),evidence:[],z:c.z||'downloads'}));pocket.forEach(c=>SZ[c.path]=c.sizeBytes);
+const dy=new Date().toDateString();if(S.last!==dy){S.streak=S.last===new Date(Date.now()-DAY).toDateString()?(S.streak||0)+1:1;S.last=dy;save()}
+chkAch();enter('downloads')}
+if(!HB)setTimeout(()=>hydrate({theme:{accent:'#3ddc97'},wallpaper:{ok:false},host:{}}),80);
+/* ---- v2 ---- */
+const ZS={downloads:'شروع شهر: محله‌ی دانلودها پر از مهمان‌های قدیمیه.',startup:'ایستگاه راه‌اندازی. هرچی اینجاست هر بوت تو رو معطل می‌کنه.',registry:'آرشیو زیرزمینی رجیستری. کلیدهای یتیم اینجا خاک می‌خورن.',tasks:'ساعت‌شهر: کارهای زمان‌بندی‌شده بی‌صدا هر ساعت بیدار می‌شن.',procs:'نیروگاه! رم و CPU اینجا می‌سوزن. حواست به نوار قرمز باشه.',folders:'خیابان پوشه‌ها: انبارهای حجیم و کوچه‌های خالی.',settings:'اتاق فرمان: تنظیمات سنگین رو یکی‌یکی بسنج.'},ZSEEN={};
+const QL=[['c','دستگیری ۵ مظنون',5],['pv','پیش‌نمایش ۲ فایل',2],['iq','بازجویی ۲ مورد',2],['z','سر زدن به ۴ منطقه',4]];
+function qd(){const d=new Date().toDateString();if(!S.q||S.q.d!==d)S.q={d,c:0,pv:0,iq:0,z:[],done:{}};return S.q}
+function quest(k,z){const q=qd();if(k==='z'){if(!q.z.includes(z))q.z.push(z)}else if(q[k]!==undefined)q[k]++;
+QL.forEach(([id,n,t])=>{const v=id==='z'?q.z.length:q[id];if(v>=t&&!q.done[id]){q.done[id]=1;xp(30);toast('مأموریت کامل شد: '+n+' · +30 XP');SFX.lvl();burst(innerWidth/2,90,40,'#ffd166')}});save();rq()}
+function rq(){const q=qd(),e=$('qs');$('cn').textContent=S.coins||0;if(e)e.innerHTML=QL.map(([id,n,t])=>{const v=Math.min(t,id==='z'?q.z.length:q[id]);return `<div class="qr${v>=t?' ok':''}"><span>${n}</span><b>${v}/${t}</b></div><div class="qb"><i style="width:${v/t*100}%"></i></div>`}).join('')}
+function toast(t){let e=$('ts');if(!e){e=document.createElement('div');e.id='ts';document.body.appendChild(e)}e.textContent=t;e.classList.remove('on');void e.offsetWidth;e.classList.add('on')}
+function crit(g){if(Math.random()<.14){const s=$('stage');s.classList.remove('shk');void s.offsetWidth;s.classList.add('shk');toast('ضربه‌ی بحرانی! XP ×۳');say('وای! ضربه‌ی بحرانی!');burst(innerWidth/2,innerHeight/2,70,'#ff8a4a');xp(g*3)}else xp(g)}
+let dg=null;$('deck').addEventListener('pointerdown',e=>{const t=e.target.closest('.card.top');if(!t||e.target.closest('button,iframe,video,audio,ul'))return;dg={t,x:e.clientX,y:e.clientY,dx:0,dy:0};t.style.transition='none'});
+addEventListener('pointermove',e=>{if(!dg)return;dg.dx=e.clientX-dg.x;dg.dy=e.clientY-dg.y;dg.t.style.transform=`translate(${dg.dx}px,${Math.max(0,dg.dy)}px) rotate(${dg.dx/18}deg)`;dg.t.style.borderColor=dg.dx<-60?'#5af2c0':dg.dx>60?'#8f9bc4':dg.dy>60?'#7fd8ff':''});
+addEventListener('pointerup',()=>{if(!dg)return;const{t,dx,dy}=dg;dg=null;t.style.transition='';t.style.borderColor='';t.style.transform='';if(dx<-110)act('catch');else if(dx>110)act('back');else if(dy>110)act('trust')});
+$('deck').addEventListener('click',e=>{const i=e.target.closest('.th img');if(i)i.parentNode.classList.toggle('zoom')});
+function wav(){const n=16000,b=new DataView(new ArrayBuffer(44+n*2)),w=(o,s)=>[...s].forEach((c,i)=>b.setUint8(o+i,c.charCodeAt(0)));w(0,'RIFF');b.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');b.setUint32(16,16,true);b.setUint16(20,1,true);b.setUint16(22,1,true);b.setUint32(24,8000,true);b.setUint32(28,16000,true);b.setUint16(32,2,true);b.setUint16(34,16,true);w(36,'data');b.setUint32(40,n*2,true);const F=[262,330,392,523];for(let i=0;i<n;i++)b.setInt16(44+i*2,Math.sin(i*2*Math.PI*F[(i/4000|0)%4]/8000)*3000*(1-(i%4000)/4000),true);let s='';new Uint8Array(b.buffer).forEach(v=>s+=String.fromCharCode(v));return'data:audio/wav;base64,'+btoa(s)}
+function demoPrev(c,t){const grd='<img style="width:100%;height:100%;object-fit:cover" src="data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"><defs><linearGradient id="g"><stop offset="0" stop-color="#ff8a4a"/><stop offset="1" stop-color="#6a5cff"/></linearGradient></defs><rect width="4" height="3" fill="url(#g)"/></svg>')+'">';
+return t==='img'?grd:t==='aud'?`<div class="ext">♪</div><audio controls autoplay src="${wav()}"></audio>`:t==='vid'?'<div class="fk">▶</div>':t==='pdf'?'<div class="pg"><b>'+esc(c.name)+'</b><i></i><i></i><i style="width:70%"></i><i></i><i style="width:50%"></i></div>':'<pre>'+esc('نمونه‌ی متن فایل\n'+c.name+'\n...')+'</pre>'}
+const OFF=/github\.com|google\.com|videolan\.org|microsoft\.com|mozilla\.org|nvidia\.com/i,KT=[['برنامه',/\.(exe|msi|bat|cmd|dll|ps1)$/i],['مدیا',/\.(mp4|mkv|mp3|wav|flac|mov)$/i],['تصویر',/\.(jpe?g|png|gif|webp|svg)$/i],['سند',/\.(pdf|docx?|txt|md|xlsx?)$/i]];
+function zipStory(en,r,c,t){if(!en.length)return'';const g={},sum=r.uncompressed!=null?r.uncompressed:en.reduce((a,x)=>a+x.s,0);en.forEach(x=>{const k=(KT.find(k=>k[1].test(x.n))||['سایر'])[0];g[k]=(g[k]||0)+1});
+const ex=r.exeCount!=null?r.exeCount:g['برنامه']||0,ok=r.host&&OFF.test(r.host),o=Math.round((N-new Date(r.created||N))/DAY),count=r.entryCount||en.length;
+return `<div class="zp"><b>${t==='zip'?'پرونده‌ی آرشیو':'محتوا'}</b> · ${count} فایل داخلش<br>${Object.entries(g).map(([k,v])=>`<em>${k} ${v}</em>`).join('')}<br>حجم بازشده: <b>${fmt(sum)}</b> · حجم فشرده: ${fmt(c.sizeBytes)}<br>${r.created?'ایجاد آرشیو: <b>'+new Date(r.created).toLocaleDateString('fa-IR')+'</b> ('+age(r.created)+')<br>':''}${r.host?'منبع: <b>'+esc(r.host)+'</b> — <span class="'+(ok?'g':'w')+'">'+(ok?'منبع شناخته‌شده':'منبع ناشناس')+'</span>':'<span class="w">آدرس دانلود ثبت نشده (ویندوز ردی نگذاشته).</span>'}${ex?'<br><span class="w">دارای '+ex+' فایل اجرایی؛ بدون اطمینان از منبع اجرا نکن.</span>':''}${o>365&&!ex?'<br>بیش از یک سال بدون استفاده؛ کاندید مرور و حذف.':''}</div>`}
+/* ---- v3: game loop ---- */
+let lastC=0,RU=null;
+const fl=(px,py,t,c)=>{const e=document.createElement('div');e.className='fl';e.textContent=t;e.style.cssText=`left:${px}px;top:${py}px;color:${c}`;document.body.appendChild(e);setTimeout(()=>e.remove(),900)};
+const shk=()=>{const g=$('stage');g.classList.remove('shk');void g.offsetWidth;g.classList.add('shk')};
+const big=t=>{const v=$('lv');v.textContent=t;v.classList.remove('on');void v.offsetWidth;v.classList.add('on')};
+function boss(c,t){c.hp--;const b=$('hp');if(b)b.firstChild.style.width=c.hp*20+'%';shk();SFX.catch();setMood('angry',.8);say(c.hp>1?'باس سرسخته! '+(c.hp-1)+' ضربه‌ی دیگه...':'ضربه‌ی آخر! بزن!');const r=t.getBoundingClientRect();fl(r.left+r.width/2,r.top+70,'-1 HP','#ff4d5e');burst(r.left+r.width/2,r.top+90,14,'#ff4d5e');t.animate([{transform:'scale(1.04)'},{transform:'scale(1)'}],160)}
+function reward(k,c,ok,px,py){const co=k==='catch'?(c.sizeBytes>=5e8?15:c.sizeBytes>=1e8?8:c.confidence===3?4:2):1;S.coins=(S.coins||0)+co;fl(px,py-20,'+'+co+' سکه','#ffd166');
+if(RU){if(ok){RU.score+=Math.round(10*(1+Math.min(combo,10)*.3));RU.end+=1000;fl(px,py-50,'+1s','#5af2c0')}else{RU.end-=3000;shk()}}
+if(k==='catch'&&(S.chest=(S.chest||0)+1)%5===0)chest()}
+function chest(){const R=[['۴۰ سکه',()=>S.coins+=40],['۶۰ XP',()=>xp(60)],['۲۵ سکه',()=>S.coins+=25],['۱۰۰ XP + ۲۰ سکه',()=>{xp(100);S.coins+=20}]],r=R[Math.random()*4|0];setTimeout(()=>{big('صندوق گنج: '+r[0]);r[1]();SFX.lvl();burst(innerWidth/2,innerHeight/3,60,'#ffd166');setMood('happy',2);hud()},350)}
+function rush(){if(RU||!Qc().length)return;RU={end:Date.now()+30000,score:0};combo=0;toast('رِیس ۳۰ثانیه‌ای! قضاوت درست = +۱ ثانیه · غلط = −۳ ثانیه');setMood('scan',60);say('بزن بریم! شواهد رو سریع بخون.')}
+function endRush(){const r=RU;RU=null;$('rt').style.display='none';const nb=r.score>(S.best||0);if(nb)S.best=r.score;const co=Math.round(r.score/8);S.coins=(S.coins||0)+co;xp(Math.round(r.score/4));big(nb?'رکورد تازه: '+r.score:'امتیاز رِیس: '+r.score);setMood(nb?'win':'happy',4);say('رِیس تموم شد! +'+co+' سکه'+(S.best?' · بهترین: '+S.best:''));SFX.done();burst(innerWidth/2,innerHeight/2,80,'#ffd166');save();hud()}
+const cbd=document.createElement('div');cbd.id='cbar';cbd.innerHTML='<i></i>';document.body.appendChild(cbd);
+setInterval(()=>{const n=Date.now(),d=Math.max(0,1-(n-lastC)/6000);cbd.classList.toggle('on',combo>1);cbd.firstChild.style.width=d*100+'%';if(combo>0&&d<=0){combo=0;hud()}
+if(RU){const l=RU.end-n,e=$('rt');e.style.display='flex';e.innerHTML='<b>'+Math.max(0,l/1000).toFixed(1)+'</b> ثانیه · امتیاز <b>'+RU.score+'</b>';if(l<=0)endRush()}},100);
+const HATS=[['none','بدون لوازم',0],['cap','کلاه کپ',30],['ant','آنتن',50],['glass','عینک دودی',80],['head','هدفون',120],['crown','تاج',300]];
+function shop(){let o=$('ovs');if(!o){o=document.createElement('div');o.id='ovs';o.className='ov';document.body.appendChild(o)}S.own=S.own||['none'];
+o.innerHTML='<div class="sh"><h2>فروشگاه وینی</h2><div style="color:var(--mu);margin-bottom:8px">سکه: '+(S.coins||0)+'</div>'+HATS.map(([k,n,p])=>`<div class="row"><span>${n}</span><button class="b" data-k="${k}" style="height:32px;padding:0 14px">${S.skin===k?'پوشیده ✓':S.own.includes(k)?'بپوش':p+' سکه'}</button></div>`).join('')
++'<div style="margin:12px 0 4px;color:var(--mu);font-size:11px">ابزار مصرفی</div>'+SHOPIT.map(([k,n,p])=>`<div class="row"><span>${n}${S.inv[k]?' <small style="color:var(--ac)">×'+S.inv[k]+'</small>':''}</span><button class="b" data-buy="${k}" style="height:32px;padding:0 14px">${p} سکه</button></div>`).join('')
++'<br><button class="b c" id="sx" style="margin:auto">بستن</button></div>';
+o.classList.add('on');o.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k,h=HATS.find(z=>z[0]===k);if(!S.own.includes(k)){if((S.coins||0)<h[2]){toast('سکه‌ات کمه!');return}S.coins-=h[2];S.own.push(k);SFX.lvl();chkAch()}S.skin=k;setMood('happy',2);say('چه بهم میاد!');save();hud();shop()});
+o.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const k=b.dataset.buy,it=SHOPIT.find(x=>x[0]===k);if((S.coins||0)<it[2]){toast('سکه‌ات کمه!');return}S.coins-=it[2];S.inv[k]=(S.inv[k]||0)+1;toast('خرید شد: '+it[1]);SFX.lvl();save();hud();shop()});$('sx').onclick=()=>o.classList.remove('on')}
+function hat(){const k=S.skin;if(!k||k==='none')return;x.shadowBlur=0;x.lineCap='round';
+if(k==='cap'){x.fillStyle='#e0455a';x.beginPath();x.roundRect(-40,-76,80,28,[28,28,4,4]);x.fill();x.fillRect(-4,-52,66,6)}
+else if(k==='ant'){x.strokeStyle='#aab';x.lineWidth=3;x.beginPath();x.moveTo(0,-55);x.lineTo(0,-82);x.stroke();x.fillStyle=hex;x.beginPath();x.arc(0,-86,6+Math.sin(performance.now()*.01)*1.5,0,7);x.fill()}
+else if(k==='glass'){x.fillStyle='#000d';x.strokeStyle='#fff6';x.lineWidth=2;[-1,1].forEach(z=>{x.beginPath();x.roundRect(z*25-18,-22,36,24,8);x.fill();x.stroke()});x.fillRect(-8,-14,16,3)}
+else if(k==='head'){x.strokeStyle='#cfd5e2';x.lineWidth=7;x.beginPath();x.arc(0,-8,76,Math.PI*1.1,Math.PI*1.9);x.stroke();x.fillStyle='#3b4252';[-1,1].forEach(z=>x.fillRect(z*76-6,-22,12,30))}
+else if(k==='crown'&&mood!=='win'){x.fillStyle='#ffd166';x.beginPath();x.moveTo(-26,-60);x.lineTo(-26,-84);x.lineTo(-13,-70);x.lineTo(0,-90);x.lineTo(13,-70);x.lineTo(26,-84);x.lineTo(26,-60);x.closePath();x.fill()}}
+$('rb').onclick=rush;$('sb').onclick=shop;
+/* ---- نشان‌ها (achievements) ---- */
+const ACH=[['a1','اولین دستگیری','اولین مظنون رو به جیب انداختی',()=>S.casesDone>=1],
+['a10','ده داوری','ده پرونده بستی یا آزاد کردی',()=>S.casesDone>=10],
+['a50','پنجاه داوری','نیم‌قرن داوری!',()=>S.casesDone>=50],
+['c5','زنجیره‌ی ۵تایی','پنج دستگیری پیاپی',()=>combo>=5],
+['boss','شکارچی باس','یک غول ۵۰۰+ مگابایتی رو انداختی',()=>!!S.bossDown],
+['g1','گیگ‌کن','مجموع یک گیگابایت آزاد کردی',()=>S.totalCaughtBytes>=1e9],
+['z7','جهانگرد','به هر ۷ منطقه سر زدی',()=>ZN.every(z=>S.visited&&S.visited[z[0]])],
+['r20','رِیس‌باز','۲۰ امتیاز در یک رِیس',()=>(S.best||0)>=20],
+['star3','سه‌ستاره','یک محله رو سه‌ستاره کردی',()=>ZN.some(([z])=>starsOf(z)>=3)],
+['mag','چشم تیز','اولین ذره‌بین رو استفاده کردی',()=>S.magUsed===1],
+['buy','خریدار','اولین خرید از فروشگاه وینی',()=>(S.own||[]).length>1],
+['t10','ده اعتماد','ده مظنون رو تبرئه کردی',()=>(S.trustCount||0)>=10]];
+function chkAch(){S.ach=S.ach||{};let n=0;ACH.forEach(([id,nm])=>{if(!S.ach[id]&&ACH.find(a=>a[0]===id)[3]()){S.ach[id]=Date.now();n++;toast('نشان تازه: '+nm);burst(innerWidth/2,innerHeight*.2,36,'#ffd166');SFX.lvl()}});if(n)save();const c=Object.keys(S.ach).length,b=$('tbn');b.textContent=c;b.className=c?'on':''}
+$('tb').onclick=()=>{const l=$('achList');l.innerHTML=ACH.map(([id,nm,ds])=>{const on=!!(S.ach&&S.ach[id]);return `<div class="ach"><span>${nm}<small>${ds}</small></span><b class="${on?'ok':'lk'}">${on?'باز شد':'قفل'}</b></div>`}).join('');$('ova').classList.add('on')};
+$('ax').onclick=()=>$('ova').classList.remove('on');
+/* ---- شهر: نقشه‌ی محله‌ها + درجه‌بندی باز شدن + ستاره ---- */
+const UNLOCK={downloads:0,startup:1,folders:2,procs:2,registry:3,tasks:3,settings:4};
+const DINFO={downloads:['داهلیز دانلودها','محله‌ی مهمان‌های قدیمی'],startup:['ایستگاه راه‌اندازی','هرچی اینجاست هر بوت معطلت می‌کنه'],registry:['آرشیو زیرزمینی','کلیدهای بی‌صاحب خاک می‌خورن'],tasks:['برج ساعت','کارهای بی‌صدای زمان‌بندی‌شده'],procs:['نیروگاه','ساکنان سنگین رم و CPU'],folders:['خیابان پوشه‌ها','انبارهای حجیم، کوچه‌های خالی'],settings:['اتاق فرمان','تنظیمات سنگین سیستم']};
+S.cleanCount=S.cleanCount||{};S.inv=S.inv||{mag:0,box:0,magnet:0};
+const rankOK=z=>S.level>=(UNLOCK[z]||0);
+const starsOf=z=>{const n=S.cleanCount[z]||0;return n>=30?3:n>=12?2:n>=4?1:0};
+const pollution=z=>{const n=(QS[z]||[]).length;return Math.min(100,n*10+(n?8:0))};
+function openMap(){const g=$('cityGrid');const act=ZN.filter(([z])=>rankOK(z)).length;
+ g.innerHTML=`<div class="citytitle"><h2>شهر وینی</h2><small>${act}/${ZN.length} محله فعال · مجموع آزادشده: ${fmt(S.totalCaughtBytes)} · لرزش داهلیز را حس می‌کنی؟</small></div>`;
+ ZN.forEach(([z,nm])=>{
+  const lk=!rankOK(z),pol=pollution(z),st=starsOf(z);
+  const d=document.createElement('div');d.className='bld'+(lk?' lk':'');
+  d.innerHTML=`<div class="gn">${nm}</div><div class="gsub">${DINFO[z][1]}</div>
+  <div class="pol"><i style="width:${pol}%;background:${pol>60?'#ff4d5e':pol>30?'#ffb454':'#5af2c0'}"></i></div>
+  <div class="bmeta"><span class="st">${st?'★'.repeat(st):'—'}</span><span>${lk?'درجه '+RK[UNLOCK[z]]+': قفل':((QS[z]||[]).length+' مظنون')}</span></div>
+  ${lk?'':(QS[z]||[]).some(c=>c.daily)?'<span class="dl">پرونده‌ی ویژه‌ی امروز</span>':''}`;
+  if(!lk)d.onclick=()=>{$('ovm').classList.remove('on');enter(z)};
+  else d.onclick=()=>toast('به درجه‌ی «'+RK[UNLOCK[z]]+'» نیاز داری — گشت بده تا باز شه');
+  g.appendChild(d)});
+ $('ovm').classList.add('on');
+ if(!$('ovm')._cl){$('ovm')._cl=1;$('ovm').addEventListener('click',e=>{if(e.target.id==='ovm')$('ovm').classList.remove('on')})}}
+$('hm').onclick=openMap;
+/* ---- انبار: ابزار مصرفی ---- */
+const SHOPIT=[['mag','ذره‌بین بازجویی',60],['box','صندوق فوری گنج',80],['magnet','آهنربای سکه',100]];
+function useMag(){const c=Qc()[0];if(!c){toast('پرونده‌ای جلوت نیست');return}
+ if(!S.inv.mag){toast('ذره‌بینی نداری — از فروشگاه بخر');return}
+ S.inv.mag--;c.revealed=1;S.magUsed=1;toast('ذره‌بین: مدرک تأیید شد — دستگیری این یکی امنه و XP کاراته');
+ SFX.trust();setMood('scan',1.5);say('با ذره‌بین خطا نمی‌شه — بزن بریم.');save();renderInv()}
+function useBox(){if(!S.inv.box){toast('صندوقی ذخیره نداری');return}S.inv.box--;chest();renderInv();save()}
+function renderInv(){const r=$('invRow');if(!r)return;
+ r.innerHTML='';
+ const mk=(label,val,fn,dis)=>{const b=document.createElement('button');b.innerHTML=label+(val?' <b>×'+val+'</b>':'');b.disabled=!!dis;b.onclick=fn;r.appendChild(b)};
+ mk('ذره‌بین',S.inv.mag||0,useMag,!S.inv.mag);
+ mk('صندوق فوری',S.inv.box||0,useBox,!S.inv.box);
+ mk('آهنربای سکه',S.inv.magnet||0,()=>toast('در پایان گشتِ بعدی خودکار مصرف می‌شود'),!S.inv.magnet)}
+/* ---- موسیقی محیطی procedural (نوآر آرام) ---- */
+const MUS={step:0,timer:null,
+ start(){if(!musicOn||mute)return;try{AC=AC||new AudioContext()}catch(e){return}if(MUS.timer)return;MUS.timer=setInterval(MUS.tick,350)},
+ stop(){clearInterval(MUS.timer);MUS.timer=null},
+ tick(){const s=(MUS.step++)%16;
+  const bass=[55,55,65.4,55,49,49,58.3,65.4];
+  if(s%4===0)tone(bass[(s/4)|0],.3,'triangle',.035);
+  if(s===8||s===12)tone(220,.06,'sine',.02);
+  if(s%2===1)tone(2800+Math.random()*500,.02,'square',.005);
+  if(s===0&&MUS.bar===undefined)MUS.bar=0;
+  if(s===0&&(++MUS.bar%8===0))tone(58.3,.6,'sine',.02)}};
+/* قرارداد پل بدون تغییر. افزوده‌های اختیاری و فقط-افزایشی: zone.scan{zoneId}، zone.execute{zoneId}، file.inspect{path}، sys.stat، و کلیدهای last/streak در state. */
+</script></body></html>

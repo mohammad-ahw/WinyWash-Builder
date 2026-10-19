@@ -28,7 +28,7 @@ namespace CleanC.UI
     public sealed class WindowsNotificationService : IDisposable
     {
         /// <summary>AUMID ثبت شده در HKCU برای اپ های unpackaged.</summary>
-        public const string AumId = "CleanC.App";
+        public const string AumId = "WinyWash.App";
 
         private readonly string _iconUri;
         private bool _toastAvailable;
@@ -73,7 +73,7 @@ namespace CleanC.UI
             try
             {
                 var builder = new AppNotificationBuilder()
-                    .AddText(string.IsNullOrWhiteSpace(title) ? "CleanC" : title)
+                    .AddText(string.IsNullOrWhiteSpace(title) ? "WinyWash" : title)
                     .AddText(message);
 
                 AppNotificationManager.Default.Show(builder.BuildNotification());
@@ -130,7 +130,7 @@ namespace CleanC.UI
             using var key = Registry.CurrentUser.CreateSubKey(
                 $@"Software\Classes\AppUserModelId\{AumId}");
 
-            key.SetValue("DisplayName", "CleanC", RegistryValueKind.String);
+            key.SetValue("DisplayName", "WinyWash", RegistryValueKind.String);
             if (!string.IsNullOrWhiteSpace(_iconUri))
                 key.SetValue("IconUri", _iconUri, RegistryValueKind.String);
         }

@@ -88,7 +88,7 @@ namespace CleanC.UI.ViewModels
 
         /// <summary>اسم خود کاراکتر (پیش فرض خود HTML).</summary>
         [ObservableProperty]
-        public partial string CharacterName { get; set; } = "";
+        public partial string CharacterName { get; set; } = "Winy";
 
         /// <summary>شهر ماژول آب و هوا؛ خالی یعنی تشخیص خودکار.</summary>
         [ObservableProperty]
@@ -160,7 +160,7 @@ namespace CleanC.UI.ViewModels
 
                 CharacterTone = s.CharacterTone ?? "joke";
                 CharacterUserName = s.CharacterUserName ?? "";
-                CharacterName = s.CharacterName ?? "";
+                CharacterName = string.IsNullOrWhiteSpace(s.CharacterName) ? "Winy" : s.CharacterName;
                 CharacterCity = s.CharacterCity ?? "";
                 CharacterCalm = s.CharacterCalm ?? false;
                 CharacterFast = s.CharacterFast ?? false;

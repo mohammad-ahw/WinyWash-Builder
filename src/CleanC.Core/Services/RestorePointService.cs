@@ -35,7 +35,7 @@ namespace CleanC.Core.Services
             }
         }
 
-        public static async Task<(bool Success, string Message)> CreateRestorePointAsync(string description = "CleanC Optimization Point")
+        public static async Task<(bool Success, string Message)> CreateRestorePointAsync(string description = "WinyWash Optimization Point")
         {
             return await Task.Run(() =>
             {

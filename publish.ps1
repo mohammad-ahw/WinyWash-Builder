@@ -50,7 +50,7 @@ if (-not (Test-Path -LiteralPath $proj)) {
     throw "پروژه پیدا نشد: $proj"
 }
 
-Write-Host "==> CleanC publish" -ForegroundColor Cyan
+Write-Host "==> WinyWash publish" -ForegroundColor Cyan
 Write-Host "    Configuration : $Configuration"
 Write-Host "    Runtime       : $Runtime"
 Write-Host "    SelfContained : $SelfContained"
@@ -133,10 +133,10 @@ Write-Host "==> publish کامل شد" -ForegroundColor Green
 Write-Host ("    فایل ها : {0}" -f $files.Count)
 $sizeMbStr = $sizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "    حجم    : $sizeMbStr MB"
-Write-Host ("    اجرا    : {0}" -f (Join-Path $outDir 'CleanC.UI.exe')) -ForegroundColor Green
+Write-Host ("    اجرا    : {0}" -f (Join-Path $outDir 'WinyWash.exe')) -ForegroundColor Green
 
 # ایجاد آرشیو فشرده ZIP برای تحویل
-$zipPath = Join-Path $root "CleanC-Release-win-x64.zip"
+$zipPath = Join-Path $root "WinyWash-Release-win-x64.zip"
 Write-Host "==> فشرده سازی خروجی به $zipPath ..." -ForegroundColor Cyan
 if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
 Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force

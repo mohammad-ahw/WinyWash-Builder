@@ -11,7 +11,15 @@ namespace CleanC.UI.Hero
     internal static class HeroLooks
     {
         /// <summary>(کد، برچسب) — ترتیب باید با آرایهٔ ACC در HTML یکی بماند.</summary>
-        internal static readonly (string Id, string Name)[] All =
+        internal static (string Id, string Name)[] All { get; private set; } = BuildAll();
+
+        /// <summary>
+        /// فهرست را با زبان فعلی می سازد. بعد از تغییر زبان دوباره صدا زده می شود
+        /// تا برچسب های کش شده در کمبوباکس ها قدیمی نمانند.
+        /// </summary>
+        internal static void RefreshLocalizedNames() => All = BuildAll();
+
+        private static (string Id, string Name)[] BuildAll() => new[]
         {
             ("none",    LocalizationService.Get("بدون اکسسوری")),
             ("tech",    LocalizationService.Get("تکنسین")),

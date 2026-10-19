@@ -79,6 +79,7 @@ namespace CleanC.UI
                 var running = _heroScanInFlight;
                 if (running != null && !running.IsCompleted) return running;
 
+                _heroScanLanguageVersion = _uiLanguageVersion;
                 var next = SystemScanService.ScanAsync();
                 _heroScanInFlight = next;
                 return next;
@@ -90,14 +91,14 @@ namespace CleanC.UI
         /// کنترل‌های وابسته را تازه می‌کند و state هیرو را می‌فرستد.
         /// فقط روی UI thread صدا زده شود.
         /// </summary>
-        internal void ApplyHeroScanResult(ScanResult? scan)
+        internal void ApplyHeroScanResult(ScanResult? scan, bool renderAdvanced = true)
         {
             if (scan == null || _isExiting) return;
 
             _cachedScanResult = scan;
             _heroScanSeen = true;
             ApplyPersistedJunkSelections(scan);
-            RenderAdvancedGroups(scan);
+            if (renderAdvanced) RenderAdvancedGroups(scan);
             AdvancedCleanTotalText.Text =
                 $"{LocalizationService.Get("TotalDetected", "مجموع شناسایی شده")}: {scan.FormattedTotal}";
             UpdateHeroCleanable(scan.TotalBytes);
@@ -180,7 +181,7 @@ namespace CleanC.UI
         /// رنگ Accent ویندوز را از UISettings می‌گیرد. اگر سیستم رنگ خاموشی (مونو) داشته باشد
         /// یا دسترسی نباشد، رنگ پیش‌فرض برنامه برمی‌گردد تا هیرو همیشه یک هالهٔ معتبر بگیرد.
         /// </summary>
-        private string GetWindowsAccentHex()
+        internal string GetWindowsAccentHex()
         {
             try
             {
@@ -213,7 +214,8 @@ namespace CleanC.UI
                 Look = s.CharacterLook,
                 OccLook = s.CharacterOccLook,
                 Size = s.CharacterSize,
-                Lun = s.CharacterLun
+                Lun = s.CharacterLun,
+                Lang = LocalizationService.CurrentLanguage.Code
             }));
         }
 
@@ -1091,6 +1093,8 @@ namespace CleanC.UI
             }
 
             _isBusy = false;
+            // اگر زبان در طول پاکسازی عوض شده باشد، پنل پیشرفته باید با کاتالوگ جدید تازه شود.
+            if (_advancedRelocalizePending) RelocalizeAdvancedGroupsAfterLanguageChange();
             _heroSession = null;
             PushHeroState(force: true);
         }
@@ -1193,6 +1197,7 @@ namespace CleanC.UI
         {
             _heroSession = null;
             _isBusy = false;
+            if (_advancedRelocalizePending) RelocalizeAdvancedGroupsAfterLanguageChange();
             if (LiveCleanupCard != null) LiveCleanupCard.Visibility = Visibility.Collapsed;
             _activeCleaningItems.Clear();
         }

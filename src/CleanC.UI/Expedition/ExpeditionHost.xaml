@@ -1,0 +1,32 @@
+<UserControl
+    x:Class="CleanC.UI.Expedition.ExpeditionHost"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <!--
+      میزبان تمام‌صفحه‌ی «اکسپدیشن وینی». روی‌هم‌پوش (overlay) پسرِ ریشه داخل
+      MainWindow.xaml است؛ این UserControl فقط WebView2 را می‌کشد.
+    -->
+    <Grid x:Name="RootGrid" Background="Black">
+        <WebView2 x:Name="WebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <!--
+          سقوط نرم: اگر WebView2 Runtime نباشد بازی به یک پیام کوتاهِ صادقانه سقوط می‌کند
+          و برنامه با همان هیروکارت متنی از قبل کار می‌کند. (الگوی HeroHost.xaml)
+        -->
+        <Border x:Name="FallbackPanel" Background="Transparent" Visibility="Collapsed" Padding="40">
+            <StackPanel Spacing="10" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="520">
+                <TextBlock x:Name="FallbackTitle" Text="اکسپدیشن وینی در دسترس نیست" FontWeight="SemiBold" FontSize="20" TextAlignment="Center" />
+                <TextBlock x:Name="FallbackSubtitle"
+                           Text="برای اجرای گرافیکی بازی، «Microsoft WebView2 Runtime» باید روی دستگاه نصب باشد؛ بقیه‌ی برنامه بدون تغییر کار می‌کند."
+                           FontSize="13" Opacity="0.8" TextWrapping="Wrap" TextAlignment="Center" />
+                <Button x:Name="FallbackCloseBtn" Click="FallbackCloseBtn_Click"
+                        HorizontalAlignment="Center" Padding="18,8" CornerRadius="8">
+                    <TextBlock Text="بازگشت به برنامه" />
+                </Button>
+            </StackPanel>
+        </Border>
+    </Grid>
+</UserControl>

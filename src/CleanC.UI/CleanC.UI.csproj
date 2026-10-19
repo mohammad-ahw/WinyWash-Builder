@@ -7,6 +7,7 @@
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <Platforms>x64</Platforms>
     <RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+    <AssemblyName>WinyWash</AssemblyName>
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <WindowsPackageType>None</WindowsPackageType>
@@ -15,9 +16,9 @@
     <LangVersion>latest</LangVersion>
     <ApplicationIcon>Assets\app.ico</ApplicationIcon>
     <Version>1.1.0</Version>
-    <AssemblyTitle>CleanC PC Manager</AssemblyTitle>
-    <Product>CleanC PC Manager</Product>
-    <Company>CleanC</Company>
+    <AssemblyTitle>WinyWash PC Manager</AssemblyTitle>
+    <Product>WinyWash PC Manager</Product>
+    <Company>WinyWash</Company>
     <!-- خروجی publish: فقط runtime مربوط به همین سیستم (جلوگیری از کپی runtimes لینوکس/مک) -->
     <PublishReadyToRun>true</PublishReadyToRun>
     <PublishSingleFile>false</PublishSingleFile>

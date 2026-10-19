@@ -2581,7 +2581,7 @@ namespace CleanC.UI
                 });
                 titleRow.Children.Add(new TextBlock
                 {
-                    Text = $"({d.PublishedName})",
+                    Text = $"({(d.HasError ? LocalizationService.Get("سخت افزار معیوب") : d.PublishedName)})",
                     FontSize = 11,
                     Foreground = GetThemeBrush("TextFillColorSecondaryBrush"),
                     VerticalAlignment = VerticalAlignment.Center

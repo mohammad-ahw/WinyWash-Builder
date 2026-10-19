@@ -5,8 +5,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:Hero="using:CleanC.UI.Hero"
+    xmlns:Expedition="using:CleanC.UI.Expedition"
     mc:Ignorable="d"
-    Title="CleanC">
+    Title="WinyWash">
 
     <Grid RowDefinitions="Auto,*" Background="{ThemeResource WindowCanvasBrush}">
         <Grid.Resources>
@@ -42,7 +43,7 @@
                     </Grid>
 
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Spacing="6">
-                        <TextBlock x:Name="AppTitleText" Text="CleanC" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
+                        <TextBlock x:Name="AppTitleText" Text="WinyWash" FontSize="14" FontWeight="SemiBold" VerticalAlignment="Center" />
                         <Ellipse Width="6" Height="6" Fill="{ThemeResource SystemFillColorSuccessBrush}" Margin="2,0,0,0" VerticalAlignment="Center" />
                         <Border x:Name="AdminBadge" 
                                 Visibility="Collapsed" 
@@ -207,6 +208,38 @@
                                                HorizontalAlignment="Stretch"
                                                VerticalAlignment="Stretch" />
                             </Border>
+
+                            <!-- ================================================================= -->
+                            <!-- EXPEDITION CTA — کارت ورود به «اکسپدیشن وینی»                      -->
+                            <!-- ================================================================= -->
+                            <Button x:Name="ExpeditionEntryBtn"
+                                    Click="ExpeditionEntryBtn_Click"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Stretch"
+                                    Padding="0"
+                                    CornerRadius="14"
+                                    Background="{ThemeResource AppCardBackgroundBrush}"
+                                    BorderBrush="{ThemeResource AppCardBorderBrush}"
+                                    BorderThickness="1"
+                                    Translation="0,0,16"
+                                    Shadow="{StaticResource SharedCardShadow}">
+                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="18,14" ColumnSpacing="14">
+                                    <Border Grid.Column="0" Width="30" Height="30" CornerRadius="9"
+                                            Background="{ThemeResource AccentFillColorDefaultBrush}" Opacity="0.14">
+                                        <FontIcon Glyph="&#xE7EF;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}"
+                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                    </Border>
+                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+                                        <TextBlock Text="اکسپدیشن وینی" FontSize="13.5" FontWeight="SemiBold" />
+                                        <TextBlock Text="گشتی در Downloads خودت — پرونده‌های زائد را پیدا کن، دست بگیر، و یک‌جا اجراش کن"
+                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                   TextWrapping="Wrap" />
+                                    </StackPanel>
+                                    <FontIcon Grid.Column="2" Glyph="&#xE76C;" FontSize="14"
+                                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                              VerticalAlignment="Center" />
+                                </Grid>
+                            </Button>
 
                             <!-- ================================================================= -->
                             <!-- LIVE CLEANUP CARD & REPORT CARD (Preserved with exact contracts)  -->
@@ -1539,10 +1572,10 @@
                                         <!-- Row 0: Filter Segmented Tabs & Sorting Controls -->
                                         <Grid Grid.Row="0" ColumnDefinitions="*,Auto" VerticalAlignment="Center">
                                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                                                <Button x:Name="DeepStorageTabDuplicates" Click="DeepStorageTab_Click" Tag="duplicates" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Style="{ThemeResource AccentButtonStyle}">
+                                                <Button x:Name="DeepStorageTabDuplicates" Click="DeepStorageTab_Click" Tag="duplicates" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" FontWeight="SemiBold" Background="#1FA971" BorderBrush="#1FA971" Foreground="White">
                                                     <StackPanel Orientation="Horizontal" Spacing="5">
-                                                        <FontIcon Glyph="&#xE8C8;" FontSize="11" />
-                                                        <TextBlock x:Name="DeepStorageTabDuplicatesText" Text="فایل های تکراری" />
+                                                        <FontIcon Glyph="&#xE8C8;" FontSize="11" Foreground="White" />
+                                                        <TextBlock x:Name="DeepStorageTabDuplicatesText" Text="فایل های تکراری" Foreground="White" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeepStorageTabEmptyFolders" Click="DeepStorageTab_Click" Tag="empty_folders" Height="30" Padding="12,0" CornerRadius="6" FontSize="11" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
@@ -1570,10 +1603,10 @@
                                                 <TextBlock x:Name="DeepStorageSortLabel" Text="مرتب سازی:" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" Margin="0,0,4,0" />
                                                 <!-- ایموجی به آیکن برداری Segoe MDL2 تغییر کرد: در فونت‌ها/ضخامت‌های
                                                      درست با متن هم‌راستا می شود و در High Contrast هم رنگ می گیرد -->
-                                                <Button x:Name="DeepStorageSortSizeBtn" Click="DeepStorageSort_Click" Tag="size" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Style="{ThemeResource AccentButtonStyle}">
+                                                <Button x:Name="DeepStorageSortSizeBtn" Click="DeepStorageSort_Click" Tag="size" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Background="#1FA971" BorderBrush="#1FA971" Foreground="White">
                                                     <StackPanel Orientation="Horizontal" Spacing="5">
-                                                        <TextBlock x:Name="DeepStorageSortSizeBtnText" Text="حجم" />
-                                                        <FontIcon Glyph="&#xE70D;" FontSize="9" Margin="0,2,0,0" />
+                                                        <TextBlock x:Name="DeepStorageSortSizeBtnText" Text="حجم" Foreground="White" />
+                                                        <FontIcon Glyph="&#xE70D;" FontSize="9" Margin="0,2,0,0" Foreground="White" />
                                                     </StackPanel>
                                                 </Button>
                                                 <Button x:Name="DeepStorageSortDateBtn" Click="DeepStorageSort_Click" Tag="date" Height="28" Padding="8,0" CornerRadius="6" FontSize="10.5" Background="{ThemeResource AppCardSecondaryBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}">
@@ -1844,7 +1877,7 @@
                                 <!-- اسم کاراکتر / اسم کاربر / شهر -->
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                     <TextBlock x:Name="CharNameText" Text="اسم کاراکتر" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                    <TextBox x:Name="CharNameBox" Grid.Column="1" Width="190" MaxLength="24" Text="{x:Bind SettingsVm.CharacterName, Mode=TwoWay}" PlaceholderText="مثلاً سی‌سی" VerticalAlignment="Center" />
+                                    <TextBox x:Name="CharNameBox" Grid.Column="1" Width="190" MaxLength="24" Text="{x:Bind SettingsVm.CharacterName, Mode=TwoWay}" PlaceholderText="Winy" VerticalAlignment="Center" />
                                 </Grid>
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
@@ -1854,7 +1887,14 @@
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                     <TextBlock x:Name="CharCityText" Text="شهر (ماژول آب و هوا)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                    <TextBox x:Name="CharCityBox" Grid.Column="1" Width="190" MaxLength="40" Text="{x:Bind SettingsVm.CharacterCity, Mode=TwoWay}" VerticalAlignment="Center" />
+                                    <AutoSuggestBox x:Name="CharCityBox" Grid.Column="1" Width="190" MaxWidth="190"
+                                                    VerticalAlignment="Center"
+                                                    Text="{x:Bind SettingsVm.CharacterCity, Mode=OneWay}"
+                                                    TextMemberPath="DisplayName"
+                                                    TextChanged="CharCityBox_TextChanged"
+                                                    SuggestionChosen="CharCityBox_SuggestionChosen"
+                                                    QuerySubmitted="CharCityBox_QuerySubmitted"
+                                                    LostFocus="CharCityBox_LostFocus" />
                                 </Grid>
 
                                 <!-- شدت انیمیشن -->
@@ -1954,7 +1994,7 @@
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                 <StackPanel VerticalAlignment="Center" Spacing="4">
                                     <TextBlock x:Name="SettingsAutoStartTitle" Text="شروع همراه با ویندوز" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                    <TextBlock x:Name="SettingsAutoStartDesc" Text="با ورود به حساب کاربری، CleanC به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" MaxWidth="520" />
+                                    <TextBlock x:Name="SettingsAutoStartDesc" Text="با ورود به حساب کاربری، WinyWash به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" MaxWidth="520" />
                                 </StackPanel>
                                 <ToggleSwitch x:Name="AutoStartToggle" Grid.Column="1" IsOn="False" Toggled="AutoStartToggle_Toggled" VerticalAlignment="Center" />
                             </Grid>
@@ -1968,7 +2008,7 @@
                                     <TextBlock x:Name="SettingsDeleteModeDesc" Text="برای حذف تکراری ها، فایل های حجیم و سازماندهی دانلودها/دسکتاپ. کش و زباله ها همیشه قطعی حذف می شوند تا فضا واقعاً آزاد شود." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
                                 <RadioButton x:Name="DeleteModeRecycleRadio" Content="انتقال به سطل بازیافت (پیش فرض)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Checked="DeleteModeRadio_Checked" IsChecked="{x:Bind SettingsVm.IsDeleteRecycle, Mode=OneWay}" />
-                                <RadioButton x:Name="DeleteModeQuarantineRadio" Content="قرنطینه ی CleanC — نگهداری در پوشه ی برنامه و قابل بازگردانی از مرکز بازیابی" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Checked="DeleteModeRadio_Checked" IsChecked="{x:Bind SettingsVm.IsDeleteQuarantine, Mode=OneWay}" />
+                                <RadioButton x:Name="DeleteModeQuarantineRadio" Content="قرنطینه ی WinyWash — نگهداری در پوشه ی برنامه و قابل بازگردانی از مرکز بازیابی" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Checked="DeleteModeRadio_Checked" IsChecked="{x:Bind SettingsVm.IsDeleteQuarantine, Mode=OneWay}" />
                                 <RadioButton x:Name="DeleteModePermanentRadio" Content="حذف قطعی — فوراً آزاد می شود اما قابل بازگردانی نیست" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" Checked="DeleteModeRadio_Checked" IsChecked="{x:Bind SettingsVm.IsDeletePermanent, Mode=OneWay}" />
                             </StackPanel>
                         </Border>
@@ -2052,7 +2092,7 @@
                         <Border CornerRadius="12" Background="{ThemeResource AppCardBackgroundBrush}" BorderBrush="{ThemeResource AppCardBorderBrush}" BorderThickness="1" Padding="18" HorizontalAlignment="Stretch">
                             <StackPanel Spacing="12">
                                 <StackPanel Spacing="4">
-                                    <TextBlock x:Name="SettingsAboutTitle" Text="درباره CleanC" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
+                                    <TextBlock x:Name="SettingsAboutTitle" Text="درباره WinyWash" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
                                     <TextBlock x:Name="SettingsAboutDesc" Text="برای گزارش باگ، اطلاعات عیب یابی را کپی و همراه با مشکل ارسال کنید." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
 
@@ -2084,6 +2124,14 @@
                     </StackPanel>
                     </Grid>
                 </ScrollViewer>
+            </Grid>
+
+            <!-- =============================================================== -->
+            <!-- EXPEDITION OVERLAY — لایه‌ی تمام‌صفحه‌ی «اکسپدیشن وینی»            -->
+            <!-- سطر ۱ ریشه؛ عنوان‌بار بالای آن دیده می‌ماند (کشیدن/خاموشی پنجره)   -->
+            <!-- =============================================================== -->
+            <Grid x:Name="ExpeditionOverlay" Grid.Row="1" Visibility="Collapsed">
+                <Expedition:ExpeditionHost x:Name="ExpeditionHostXaml" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
             </Grid>
         </Grid>
     </Grid>

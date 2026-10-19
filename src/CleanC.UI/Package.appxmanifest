@@ -6,14 +6,14 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="CleanC.PCManager"
-    Publisher="CN=CleanCDev"
+    Name="WinyWash.PCManager"
+    Publisher="CN=WinyWashDev"
     Version="1.0.0.0"
     ProcessorArchitecture="x64" />
 
   <Properties>
-    <DisplayName>CleanC - بهینه‌ساز ویندوز ۱۱</DisplayName>
-    <PublisherDisplayName>CleanC</PublisherDisplayName>
+    <DisplayName>WinyWash - بهینه‌ساز ویندوز ۱۱</DisplayName>
+    <PublisherDisplayName>WinyWash</PublisherDisplayName>
     <Logo>Assets\app-icon.png</Logo>
   </Properties>
 
@@ -28,15 +28,15 @@
 
   <Applications>
     <Application Id="App"
-      Executable="$targetnametargetfolder$\CleanC.UI.exe"
+      Executable="$targetnametargetfolder$\WinyWash.exe"
       EntryPoint="$targetentrypoint$">
       <uap:VisualElements
-        DisplayName="CleanC"
-        Description="CleanC - مدیریت و بهینه‌سازی بومی ویندوز ۱۱"
+        DisplayName="WinyWash"
+        Description="WinyWash - مدیریت و بهینه‌سازی بومی ویندوز ۱۱"
         BackgroundColor="transparent"
         Square150x150Logo="Assets\app-icon.png"
         Square44x44Logo="Assets\app-icon.png">
-        <uap:DefaultTile ShortName="CleanC">
+        <uap:DefaultTile ShortName="WinyWash">
           <uap:ShowNameOnTiles>
             <uap:ShowOn Tile="square150x150Logo"/>
           </uap:ShowNameOnTiles>

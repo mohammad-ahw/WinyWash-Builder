@@ -102,7 +102,7 @@ namespace CleanC.Core.Tests
         {
             string text = ReportExportService.BuildDiagnosticsText();
 
-            Assert.StartsWith("=== CleanC", text);
+            Assert.StartsWith("=== WinyWash", text);
             Assert.Contains("App Version", text);
             Assert.Contains("Framework", text);
             Assert.Contains("Settings File", text);

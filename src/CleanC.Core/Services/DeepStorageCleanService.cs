@@ -51,6 +51,15 @@ namespace CleanC.Core.Services
 
                 var now = DateTime.Now;
 
+                // بودجه‌ی هش: خواندن کامل فایل‌های چند گیگابایتی (ISO/ستاپ/بکاپ) دیسک را
+                // دقیقه‌ها مشغول می‌کند و سیستم کاربر را کند می‌کند. پس هش کامل فقط تا
+                // سقف مشخصی انجام می‌شود؛ فایل بزرگ‌تر از سقف اصلاً کاندید تکراری نمی‌شود.
+                const long HashBudgetBytes = 1200L * 1024 * 1024;      // ۱.۲ گیگابایت
+                const long MaxHashableFileBytes = 1024L * 1024 * 1024; // ۱ گیگابایت
+                const int MaxEnumeratedFiles = 150_000;
+                long hashBudgetUsed = 0;
+                int enumeratedFiles = 0;
+
                 // D05: نام محصولات نصب شده برای تطبیق فازی با نصب کننده ها — فقط در صورت
                 // نیاز لود می شود (lazy) تا هزینه ی خواندن رجیستری بیهوده پرداخت نشود.
                 List<string>? installedProducts = null;
@@ -62,6 +71,12 @@ namespace CleanC.Core.Services
                     try
                     {
                         var dirInfo = new DirectoryInfo(dir);
+
+                        // فایل‌های پوشه‌های موقت ویندوز/برنامه‌ها فقط برای زباله (TempJunk)
+                        // و پوشه‌های خالی بررسی می‌شوند؛ هیچ‌وقت کاندید «تکراری» یا «فایل حجیم»
+                        // نمی‌شوند و در هش کامل هزینه‌ی بی‌جا ایجاد نمی‌کنند.
+                        bool isTempDir = dir.Contains("Temp", StringComparison.OrdinalIgnoreCase) ||
+                                         dir.Contains("CrashDumps", StringComparison.OrdinalIgnoreCase);
 
                         // Empty folders check (D09 — فقط در پوشه های کاربری/موقت، هرگز در پروژه/سیستم)
                         try
@@ -133,13 +148,15 @@ namespace CleanC.Core.Services
                                 // قفل کاربر: فایل های قفل شده (یا داخل پوشه ی قفل شده) پیشنهاد نمی شوند
                                 if (LockRegistryService.IsUserLockedPath(file.FullName)) continue;
 
+                                if (++enumeratedFiles > MaxEnumeratedFiles) break;
+
                                 long size = file.Length;
                                 string ext = file.Extension;
                                 string name = file.Name;
                                 string lowerName = name.ToLowerInvariant();
 
-                                // Group potential duplicates (> 500 KB)
-                                if (size >= 500 * 1024)
+                                // Group potential duplicates (> 500 KB) — فقط در پوشه‌های کاربری
+                                if (!isTempDir && size >= 500 * 1024)
                                 {
                                     if (!filesBySize.TryGetValue(size, out var list))
                                     {
@@ -321,8 +338,8 @@ namespace CleanC.Core.Services
                                     }
                                 }
 
-                                // Large files > 200MB
-                                if (size >= 200L * 1024 * 1024)
+                                // Large files > 200MB — فقط فایل‌های کاربر (نه Temp ویندوز/برنامه‌ها)
+                                if (!isTempDir && size >= 200L * 1024 * 1024)
                                 {
                                     if (!messItems.Any(m => m.FilePath.Equals(file.FullName, StringComparison.OrdinalIgnoreCase)))
                                     {
@@ -467,8 +484,16 @@ namespace CleanC.Core.Services
 
                 using var md5 = MD5.Create();
 
+                int processedSizeGroups = 0;
                 foreach (var candidate in duplicateCandidates)
                 {
+                    processedSizeGroups++;
+                    if ((processedSizeGroups % 10) == 0)
+                    {
+                        progress?.Invoke(LocalizationService.Get("در حال تحلیل و مقایسه فایل های یکسان...") +
+                                         $" ({processedSizeGroups}/{duplicateCandidates.Count})");
+                    }
+
                     var filesByHash = new Dictionary<string, List<FileInfo>>();
 
                     foreach (var file in candidate.Value)
@@ -494,6 +519,16 @@ namespace CleanC.Core.Services
 
                     foreach (var hashGroup in filesByHash.Where(kvp => kvp.Value.Count > 1))
                     {
+                        // سقف هش: فایل غول‌پیکر یا عبور از بودجه‌ی کل، اسکن را قفل می‌کند.
+                        // چنین گروهی تأیید نمی‌شود (پیشنهاد حذف نمی‌گیرد) تا داده‌ی
+                        // کاربر هرگز بر اساس هش ناقص/حدسی حذف نشود.
+                        long groupBytes = hashGroup.Value.Sum(f => f.Length);
+                        if (groupBytes > MaxHashableFileBytes || hashBudgetUsed + groupBytes > HashBudgetBytes)
+                        {
+                            continue;
+                        }
+                        hashBudgetUsed += groupBytes;
+
                         // مرحله دوم — هش کامل فایل: هش ۶۴ کیلوبایتی نخست فقط «نامزدِ»
                         // یکی بودن را پیدا می کند؛ فایل هایی که فقط ۶۴ کیلوبایت اولشان
                         // یکسان است ولی ادامه شان متفاوت (ایزو، ستاپ، آتلاس تصویری)
@@ -1182,15 +1217,22 @@ namespace CleanC.Core.Services
             return fullPath.StartsWith(prefix, StringComparison.OrdinalIgnoreCase);
         }
 
-        // همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند تا
-        // واقعاً به سطل بازیافت (یا قرنطینه) برسند و امکان بازگردانی داشته باشند.
+        // همه ی حذف های فایلِ شخصی از اینجا به SafeDeleteService می روند. در Deep
+        // Clean پیش‌فرض «حذف قطعی» است تا فضا واقعاً آزاد شود؛ سطل بازیافت فقط با
+        // تیک صریح کاربر در دیالوگ تأیید انتخاب می شود.
 
-        public static async Task<SafeDeleteBatchResult> DeleteDuplicateFilesAsync(IEnumerable<string> filePaths)
+        public static async Task<SafeDeleteBatchResult> DeleteDuplicateFilesAsync(
+            IEnumerable<string> filePaths,
+            SafeDeleteMode? mode = null,
+            Action<int, int>? progress = null)
         {
-            return await Task.Run(() => SafeDeleteService.DeleteFiles(filePaths));
+            return await Task.Run(() => SafeDeleteService.DeleteFiles(filePaths, mode, progress));
         }
 
-        public static async Task<SafeDeleteBatchResult> DeleteEmptyFoldersAsync(IEnumerable<string> folderPaths)
+        public static async Task<SafeDeleteBatchResult> DeleteEmptyFoldersAsync(
+            IEnumerable<string> folderPaths,
+            SafeDeleteMode? mode = null,
+            Action<int, int>? progress = null)
         {
             return await Task.Run(() =>
             {
@@ -1199,43 +1241,133 @@ namespace CleanC.Core.Services
                     .Where(p => Directory.Exists(p) && !Directory.EnumerateFileSystemEntries(p).Any())
                     .ToList();
 
-                return SafeDeleteService.DeleteDirectories(empty);
+                // پوشه ی خالی هیچ داده ای برای بازگردانی ندارد؛ سطل فقط شلوغی می آورد
+                return SafeDeleteService.DeleteDirectories(empty, mode ?? SafeDeleteMode.Permanent, progress);
             });
         }
 
-        public static async Task<SafeDeleteBatchResult> DeleteMessItemsAsync(IEnumerable<string> paths)
+        public static async Task<SafeDeleteBatchResult> DeleteMessItemsAsync(
+            IEnumerable<string> paths,
+            SafeDeleteMode? mode = null,
+            Action<int, int>? progress = null)
         {
             return await Task.Run(() =>
             {
-                var files = new List<string>();
-                var dirs = new List<string>();
+                var junkFiles = new List<string>();
+                var junkDirs = new List<string>();
+                var userFiles = new List<string>();
+                var userDirs = new List<string>();
+
                 foreach (var p in paths)
                 {
-                    if (Directory.Exists(p)) dirs.Add(p);
-                    else if (File.Exists(p)) files.Add(p);
+                    bool junk = IsJunkPath(p);
+                    if (Directory.Exists(p))
+                    {
+                        if (junk) junkDirs.Add(p); else userDirs.Add(p);
+                    }
+                    else if (File.Exists(p))
+                    {
+                        if (junk) junkFiles.Add(p); else userFiles.Add(p);
+                    }
                 }
 
-                var res = SafeDeleteService.DeleteFiles(files);
-                if (dirs.Count > 0)
+                var result = new SafeDeleteBatchResult();
+                int total = junkFiles.Count + junkDirs.Count + userFiles.Count + userDirs.Count;
+                int start = 0;
+
+                Action<int, int>? Sub(int count)
                 {
-                    var dirRes = SafeDeleteService.DeleteDirectories(dirs);
-                    res.Total += dirRes.Total;
-                    res.RecycledCount += dirRes.RecycledCount;
-                    res.QuarantinedCount += dirRes.QuarantinedCount;
-                    res.PermanentCount += dirRes.PermanentCount;
-                    res.FailedCount += dirRes.FailedCount;
-                    res.NotFoundCount += dirRes.NotFoundCount;
-                    res.FreedBytes += dirRes.FreedBytes;
-                    res.MovedBytes += dirRes.MovedBytes;
-                    res.Errors.AddRange(dirRes.Errors);
+                    if (progress == null) return null;
+                    int offset = start;
+                    start += count;
+                    return (done, _) => progress(offset + done, total);
                 }
-                return res;
+
+                // کش/تمپ همیشه قطعی؛ سطل بازیافت برای این‌ها فقط فضا را معطل می کند
+                MergeBatch(result, SafeDeleteService.DeleteFiles(junkFiles, SafeDeleteMode.Permanent, Sub(junkFiles.Count)));
+                MergeBatch(result, SafeDeleteService.DeleteDirectories(junkDirs, SafeDeleteMode.Permanent, Sub(junkDirs.Count)));
+                MergeBatch(result, SafeDeleteService.DeleteFiles(userFiles, mode ?? SafeDeleteMode.Permanent, Sub(userFiles.Count)));
+                MergeBatch(result, SafeDeleteService.DeleteDirectories(userDirs, mode ?? SafeDeleteMode.Permanent, Sub(userDirs.Count)));
+                return result;
             });
         }
 
-        public static async Task<SafeDeleteBatchResult> DeleteLargeFilesAsync(IEnumerable<string> filePaths)
+        public static async Task<SafeDeleteBatchResult> DeleteLargeFilesAsync(
+            IEnumerable<string> filePaths,
+            SafeDeleteMode? mode = null,
+            Action<int, int>? progress = null)
         {
-            return await DeleteDuplicateFilesAsync(filePaths);
+            return await DeleteDuplicateFilesAsync(filePaths, mode, progress);
+        }
+
+        private static void MergeBatch(SafeDeleteBatchResult target, SafeDeleteBatchResult source)
+        {
+            target.Total += source.Total;
+            target.RecycledCount += source.RecycledCount;
+            target.QuarantinedCount += source.QuarantinedCount;
+            target.PermanentCount += source.PermanentCount;
+            target.FailedCount += source.FailedCount;
+            target.NotFoundCount += source.NotFoundCount;
+            target.FreedBytes += source.FreedBytes;
+            target.MovedBytes += source.MovedBytes;
+            target.Errors.AddRange(source.Errors);
+        }
+
+        private static readonly string[] s_junkRoots = BuildJunkRoots();
+
+        private static string[] BuildJunkRoots()
+        {
+            string user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+
+            return new[]
+            {
+                Path.Combine(local, "Temp"),
+                Path.Combine(windows, "Temp"),
+                Path.Combine(local, "CrashDumps"),
+                Path.Combine(local, "npm-cache"),
+                Path.Combine(roaming, "npm-cache"),
+                Path.Combine(user, ".nuget", "packages"),
+                Path.Combine(local, "NuGet", "v3-cache"),
+                Path.Combine(local, "pip", "cache"),
+                Path.Combine(user, ".bun", "install", "cache"),
+                Path.Combine(user, ".gradle", "caches"),
+                Path.Combine(user, ".cargo", "registry", "cache"),
+                Path.Combine(user, ".android", "build-cache"),
+                Path.Combine(roaming, "Code", "Cache"),
+                Path.Combine(roaming, "Code", "CachedData"),
+                Path.Combine(user, ".docker"),
+                Path.Combine(user, ".ollama", "models"),
+                Path.Combine(user, ".cache", "huggingface", "hub")
+            };
+        }
+
+        /// <summary>
+        /// آیا مسیر داخل کش/تمپ است؟ این مسیرها داده‌ی شخصی نیستند و حذفشان
+        /// همیشه قطعی است (سطل بازیافت فقط شلوغی و مصرف دیسک اضافه می‌کند).
+        /// </summary>
+        private static bool IsJunkPath(string path)
+        {
+            try
+            {
+                string full = Path.GetFullPath(path);
+                foreach (string root in s_junkRoots)
+                {
+                    string trimmed = root.TrimEnd(Path.DirectorySeparatorChar);
+                    if (full.Equals(trimmed, StringComparison.OrdinalIgnoreCase) ||
+                        full.StartsWith(trimmed + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return false;
         }
 
         // ====================================================================

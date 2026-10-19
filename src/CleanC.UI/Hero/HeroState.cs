@@ -138,6 +138,10 @@ namespace CleanC.UI.Hero
 
         [JsonPropertyName("lun")]
         public int? Lun { get; set; }
+
+        /// <summary>کد زبان فعال رابط (fa-IR، en-US، ar-SA، …) برای لایهٔ i18n هیرو.</summary>
+        [JsonPropertyName("lang")]
+        public string? Lang { get; set; }
     }
 
     /// <summary>پیام تم — رنگ Accent ویندوز به هالهٔ دور کاراکتر می‌رود.</summary>

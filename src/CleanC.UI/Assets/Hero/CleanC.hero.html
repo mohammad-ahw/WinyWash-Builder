@@ -1,6 +1,6 @@
 <!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>CleanC</title>
+<title>WinyWash</title>
 <style>
 /* فونت محلی — بدون وابستگی به اینترنت (مسیر نسبت به Assets/Hero/) */
 @font-face{font-family:'Vazirmatn';src:url('../Fonts/Vazirmatn-Regular.ttf') format('truetype');font-weight:400;font-display:swap}
@@ -45,11 +45,13 @@ h1{margin:6px 0 10px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weig
 <div class="viz"><canvas id="c"></canvas><div class="bub" id="bub"></div></div>
 <div class="act"><button class="btn" id="go"><svg viewBox="0 0 24 24" id="gi"></svg><span id="gl"></span></button><div class="lnks"><button class="lnk" id="go2" hidden></button><button class="lnk" id="sn" hidden>بعداً یادآوری کن</button></div></div></section>
 </div>
+<script src="CleanC.hero.i18n.js"></script>
 <script>
 /* گزارش خطاهای زمانِ اجرای اسکریپت هیرو به میزبان (Hero.JSError در لاگ) —
    اگر کاراکتر «لود نشود/هنگ کند»، علتِ واقعی همین‌جا ثبت می‌شود؛ سقف ۸ مورد */
 let __ec=0;const __rep=o=>{try{window.chrome&&window.chrome.webview&&window.chrome.webview.postMessage(o)}catch(e){}};
 window.onerror=function(m,s,l,c){if(__ec++<8)__rep({type:'js.error',data:{m:String(m),s:String(s||''),l:l||0,c:c||0}})};
+const T18=s=>window.CC_I18N?window.CC_I18N.translate(s):s;
 window.addEventListener('unhandledrejection',function(e){if(__ec++<8){var r=e&&e.reason;__rep({type:'js.error',data:{m:'REJ:'+String((r&&(r.message||r.stack))||r)}})}});
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,$=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d'),PI=Math.PI,K=3,U=.95*K;cv.width=290*K;cv.height=195*K;
 /* ناحیهٔ نزدیک کاراکتر: کلیک/لمس/کورسور فقط تا شعاع ~۱۰۰px از مرکز کاراکتر
@@ -486,7 +488,128 @@ stale2:['یه هفته شد! کجایی؟|فایل‌ها دارن عروسی م
 stale3:['دو هفته؟! تار عنکبوت بستم!|فراموشم کردی {u}؟|درایو C داره دفن میشه!|دو هفته‌ست رنگ نظافت ندیدم!|قهر نمی‌کنم، ولی تمیزم کن!|رکورد بی‌توجهی رو شکستی!|۱۴ روز گذشت! باستان‌شناس بیارم برای هارد؟|فایل‌های موقت صاحبخونه شدن دیگه!|رفیق، دو هفته شدها!|سیستم داره زیر خروارها کش له میشه!|دلِت میاد دو هفته به من نرسی؟|یه پاکسازی بزن، قول میدم غر نزنم!','بیش از ۱۴ روز از آخرین پاکسازی می‌گذرد.|بهینه‌سازی ضروری است.','سیستم منتظر یه بررسی تازه و آزادسازی فضاست.'],
 sameDay:['وسواس گرفتی؟ تمیزه که!|دوباره؟ هنوز برق می‌زنه!|سیستم از تمیزی جیرجیر می‌کنه!|یه بایت اضافه هم نداریم!|پوستِ هارد کنده شد، بس کن!|تمیزتر از این نمیشه به خدا!|می‌خوای وایتکس هم بزنم رو رم؟|آینه شده دسکتاپ، خودتو توش ببین!|حتی یه ذره گرد و خاک هم نمونده!|بازرسی بدنیه مگه؟ تمیزه دیگه!|به جونِ خودم همه‌جا رو جارو کردم!|کش‌ها فرار کردن از دستت!|سیستم اینقدر تمیزه که سر می‌خوری!|دستمال کشیدم خشک شد، ولش کن!|رکورد تمیزکاری روزانه رو زدی!','پاکسازی تکراری است.|امروز قبلاً بهینه شده.|مورد جدیدی وجود ندارد.|سیستم کاملاً تمیز است.|عملیات غیرضروری؛ وضعیت بهینه است.|حافظه در پاک‌ترین حالت قرار دارد.','امروز یه بار تمیز شده.|همه‌چیز مثل دستهٔ گله.|نیازی به تکرار نیست.|خیالت راحت، کاملاً تمیزه.|سیستم در پاکیزگی و آرامش کامله.|زحمت نکش، همه‌چیز مرتبه.']};
 
+/* English dialogue pools: same keys/tones as L. Persian stays the source of truth;
+   non-Persian locales use these lines so the character never answers in Persian. */
+const L_EN={
+any:['Hey, easy with the clicks!|I am not a stress ball, you know.|That tickles!|Click much?|I am right here. No need to poke me.|Careful, my pixels are fragile!|You found me. Now what?|Do not wear out the mouse!|I am awake. Very awake.|Was that necessary?|One more click and I start charging rent.|My fans are spinning for a reason.|Nice click. What else can I do for you?|I am a cleaner, not a button.|Okay, okay. I am listening.|You seem bored. Want a cleanup?|That was my favorite pixel.|I am not going anywhere. Relax.|Careful. I just got polished.|Clicking me will not fix bugs.','Ready when you are.|How can I help?|I am listening.|Standing by.|Everything is under control.','I am here, friend.|No rush. Take your time.|All calm on my side.'],
+jump:['Hop!|Boing!|Look, I can fly!','Jump logged.|Movement detected.','A little hop. Feeling lighter.'],
+laugh:['Ha ha ha!|Okay, that was funny.|Stop, my sides hurt!','Laughter logged.|Mood improved.','A quiet laugh. Good.'],
+heart:['A heart for you!|You just made my day.|I love a clean system.','Thank you.|Kindness received.','A small heart, just for you.'],
+wink:['Wink!|Just between us.|Did you see that?','Wink delivered.|Noted.','A tiny, quiet wink.'],
+stretch:['Oh, my back!|Time to stretch.|Everything cracked.','Short stretch.|Relaxing.','That was a good stretch.'],
+blush:['I am blushing!|Do not say that.|Oh, stop it.','Thank you.|That is very kind.','A little warmer now.'],
+starry:['My eyes are sparkling!|Wow, shiny!','Sparkle.|Stars.','My eyes are glowing.'],
+spin:['Wheee!|Round and round!|Everything is spinning.','Full rotation.|Three hundred sixty degrees.','A slow, easy spin.'],
+hiccup:['Hic! Excuse me.|I have hiccups.|Hic! Water, please.','Hiccup.|Excuse me.','The hiccups are fading.'],
+puff:['Puffed up!|I am a balloon now.|Careful, do not pop me.','Puff.|Temporary volume.','One deep breath.'],
+static:['Static! Fix the signal.|The signal dropped.|Not the antenna again.','Static.|Weak signal.','The signal blinked for a moment.'],
+balloon:['A balloon for you!|Are we celebrating?|My balloon floated away.','Balloon.|Released.','The balloon drifts up slowly.'],
+tickle:['Hey, that tickles!|Ha ha, stop!|Tickle, tickle.','Ticklish.|High sensitivity.','I am a little ticklish.'],
+dizzy:['My head is spinning.|Everything is going around.|I became a washing machine.','Dizzy.|Too much movement.','Hold on. Let the world stop for a second.'],
+disco:['Disco time!|Let us dance!|Who is the DJ?','Disco mode.|Dancing.','A short dance.'],
+angry:['That is enough!|I am getting annoyed!|Look what you did.','Warning: too many clicks.|Please stop.','A little frustrated now.'],
+forgive:['Fine, I forgive you.|I am not upset.|Friends again.','Forgiven.|Moving on.','All good. Calm again.'],
+charge:['Charging up…|Gathering energy.|Almost full.','Charging.|Energy rising.','Filling up slowly.'],
+release:['Boom!|Energy wave!','Released.|Wave.','Everything is loose now.'],
+selfie:['Cheese!|Selfie! Did I look good?','Photo taken.|Flash.','A little memory.'],
+drag:['Hey, do not shove me!|I am being dragged!|I feel like jelly.','Dragged.|Returning.','Easy, I will come back.'],
+cross:['What is that? My eyes crossed.|I can see your cursor.|Focusing on the pointer.','Close.','I am watching.'],
+search:['Where did you go?|Mouse, come back!|Lost?','Pointer left.|Searching.','I will wait for you.'],
+startle:['Whoa! You scared me.|What happened?!|Easy!','Fast movement.|Detected.','That came out of nowhere.'],
+yawnM:['Yaaawn. I am sleepy.|Big yawn.','Yawn.|Tired.','A quiet little yawn.'],
+hum:['La la la…|I have a song stuck in my head.','Humming.|Music.','Just humming.'],
+dance:['I am dancing!|Shake it!|A tiny dance.','Short dance.|Movement.','A pleasant little groove.'],
+mirror:['Mirror, mirror, who is healthier?|Checking my numbers.','Checking resources.|System status.','A quick look at resources.'],
+sneeze:['Achoo! Excuse me.|It was just dust.','Sneeze.|Dust.','Achoo… better now.'],
+plane:['Paper plane!|Free flight.','Flight.|Plane.','A paper plane flew by.'],
+butterfly:['A butterfly! Let me catch it.|So pretty.','Butterfly.|Following it.','A butterfly passed by.'],
+cloud:['Cloudy, cloudy, rain.|Where is the umbrella?','Rain.|Clouds.','A light rain is falling.'],
+bubbles:['Bubbles! Do not pop them.|Pop, pop, pop.','Bubbles.|Puff.','Light, floating bubbles.'],
+draw:['I drew something.|I am an artist.','Drawing.|Sketch.','Making a little drawing.'],
+glasses:['Reading a book.|Good night, scientist.','Reading.|Glasses.','A quiet book.'],
+yoyo:['Yo-yo time!|Up, down, up.','Yo-yo.|Motion.','A slow yo-yo.'],
+comet:['A comet! Make a wish.|Wish made.','Comet.|A wish.','A quiet wish.'],
+ufo:['A UFO! They took my dust.|The aliens are here.','Unknown object.|Saucer.','A space visitor passed by.'],
+matrix:['I entered the Matrix.|Red pill or blue pill?','Matrix.|Code.','A stream of code.'],
+pong:['Ping pong!|Want to play?','Pong.|Ball.','A quick little game.'],
+cat:['Meow! A cat ran by.|A pixel cat!','Cat.|Passed by.','A cat went past.'],
+monster:['What was that?!|Is someone there?','Unknown creature.|Edge.','Something peeked out.'],
+golden:['Golden eyes! One in two hundred.|I am legendary!','Rare: one in two hundred.|Golden.','A golden moment.'],
+plug:['Enjoy your charge!|Power, finally.|I was hungry.','Charger connected.|Charging.','Charging started.'],
+unplug:['Oh, the charger is out.|Did you pull it?','Charger disconnected.|Battery.','You took the charger.'],
+batt20:['Battery at twenty percent. Where is the charger?|I am hungry!','Battery at twenty percent.|Charge needed.','Battery is getting low.'],
+batt10:['Ten percent left! Help!|Watch the battery.','Battery at ten percent.|Plug in now.','Battery is very low.'],
+batt5:['Five percent! Last breaths.|Battery at five percent.|Urgent.','Easy, plug it in now.','Plug it in. I am almost out.'],
+batt100:['One hundred percent! Full to the brim.|I cannot eat another bite.','Battery full.|You can unplug now.','Battery is full.'],
+ramspike:['Whoa! What did you open?|RAM is screaming.','RAM spike.|High usage.','Memory usage jumped suddenly.'],
+dlspike:['Packets are arriving!|Full speed!','Fast download.|High speed.','The download is running smoothly.'],
+bigcopy:['A big copy? The disk is sweating.|Let it breathe.','Heavy copy.|Disk busy.','A large copy is in progress.'],
+welcome:['{u}! I missed you.|You are back! Welcome!|The system was lonely without you.|There you are!|Welcome back, friend.|I was talking to the caches.|You made the desktop light up!|Where have you been?|The boss is back!|Welcome back. Tea or cleanup?|Everything is better with you here.|A fresh start with your energy!','Welcome, {u}.|You are active again.|Session started.|Ready to continue.|The system is yours.|Your return was recorded.','Welcome back, {u}.|Good to see you.|I missed you.|So glad you are here.|Your presence brings the system to life.|Welcome to your quiet space.|Ready to work with you.|Hello again, friend.'],
+late:['Night shift is the best!|Stay up and build something?|The quiet night is ours.|Owls are awake!|Late-night focus hits different.|I am with you until morning, {u}.|Coffee, or should I give you energy?|The world sleeps. We build.|Night owl mode looks good on you.|The internet flies at this hour.|Creativity blooms at night.|The system is warmed up now.|Let us finish the work tonight.|No distractions. Just us.|Respect for the night grind.|The stars are awake. So are we.|Golden hours for code and work.|Empty RAM, big night ideas.|Do not burn out, hero.|Night workers raise the flag.','Night watch is active.|The system is stable on the night shift.|Full processing power is available.|Quiet environment for deep focus.|Optimal performance after midnight.|No background interference.|Ready for heavy overnight work.|With you through the late hours.','The night is quiet and focused.|I am here as long as you are.|Enjoy the calm of early morning.|Take your time.|A beautiful, empty night.|The system follows you silently.|What a good feeling this quiet brings.|Keep your mind calm and creative.|Have a productive, peaceful night.|I am awake. Rest easy.'],
+sat:['It is Saturday! Keep your promises.|Start now, not next Saturday.|Diet and exercise from today?|Wake up, the week started!|The promised Saturday is here.|Do not worry, Friday is only five days away.|I threw out the Saturday excuses.|At least clean the desktop today.|Saturday is no match for us.|Did you have your double coffee?|Start the week in fifth gear.|The system is not afraid of Saturday. Neither should you.|New week, new adventures.|Surprise Saturday.|First-day energy: one hundred percent!','Saturday. The week begins.|A new work week starts.|Weekly planning is active.|Ready for the week ahead.|Stable at the start of the week.|The system is ready to work.','Happy new week.|Have a good Saturday.|Slow and steady wins.|A fresh, stress-free start.|Step by step through the new week.|Calm at the start of the week.'],
+fri:['It is Friday. Leave the system alone!|We are officially off today.|Put the mouse down and rest.|Friday and work? Do not joke.|Go get some barbecue. The system is fine.|I am lazy today too.|Enjoy Friday evening with us.|Put on a movie. Work is closed.|The fans are resting today too.|Friday is for doing nothing.|Do not forget the afternoon nap.|Even the bugs went on vacation.|Clean desktop, ready for fun.|Working on Friday should be illegal.|Recharge yourself today.','Friday. End of the week.|Official day off.|Stable end-of-week status.|Time to rest and recover.|Minimum resource use on a day off.|Automatic weekend monitoring.','Have a calm Friday.|Today is for rest.|Enjoy your time off.|Take it easy. It is Friday.|A cozy, worry-free day.|Recharge in peace.'],
+stale1:['Three days without a visit!|Time for a little dusting?|We have not seen each other in days!|How about a quick cleanup?|Dust is settling on my RAM!|I miss the broom.|It has been three days. Give me a hand.|The caches are growing!|Ready for a three-day checkup?|Do not let temp files move in.|Three days of silence? Do not be a stranger.|The system needs a fresh breath.','It has been several days since the last cleanup.','A light cleanup would make the system feel better.'],
+stale2:['A whole week! Where have you been?|The files are throwing a party!|Your system misses cleanup.|Seven days without a clean!|I am about to call you.|A week of silence?|The caches are rebelling. Help!|Seven days. Time for a little housekeeping.|RAM is coughing from the dust.|You cleaned me last week, remember?|Do not let the system get heavy, friend.|The cleanup button is winking at you.','More than seven days since the last cleanup.|Optimization is recommended.','When you have time, a light cleanup is great.'],
+stale3:['Two weeks?! I have cobwebs.|Did you forget me, {u}?|Drive C is getting buried!|Two weeks without a shine!|I am not angry, but clean me.|You broke the neglect record!|Fourteen days! Should I call an archaeologist?|Temp files have become tenants.|Friend, it has been two weeks!|The system is buried under caches.|Can you really leave me for two weeks?|One cleanup and I promise not to complain.','More than fourteen days since the last cleanup.|Optimization is necessary.','The system is waiting for a fresh check and some free space.'],
+sameDay:['Obsessed much? It is clean!|Again? It is still shining!|The system squeaks from cleanliness!|We do not have one extra byte!|You scrubbed the disk bare. Enough!|It cannot get cleaner than this!|Should I bleach the RAM too?|The desktop is a mirror. Look at yourself!|Not a speck of dust remains!|Is this a body search? It is clean!|I swept everything, I swear!|The caches ran away from you!|The system is so clean you could slip!|I wiped it dry. Let it go!|You broke the daily cleaning record!','Cleanup already ran today.|No new items were found.|The system is completely clean.|This operation is unnecessary.','It has been cleaned once today.|Everything is spotless.|No need to repeat it.|Relax. It is completely clean.|The system is at peace and perfectly clean.|Do not bother. Everything is in order.']};
+
+/* صحنه‌های محیطی، مناسبت‌ها و بازی‌ها هم پوشش کامل انگلیسی دارند؛
+   کلیدهای هم‌معنی به یک گروه وصل می‌شوند تا فایل بی‌دلیل تکرار نشود. */
+Object.assign(L_EN, {
+ wRain:['The sky is putting on a little show.|The weather has opinions today.|Free atmosphere, courtesy of the window.|Looks like the sky refreshed itself.|The forecast brought drama.','Environmental change detected.|Natural phenomenon observed.|Weather conditions updated.','A quiet moment from the sky.|The weather is breathing softly.|A gentle change outside.'],
+ gBird:['A visitor stopped by!|Did you see that?|We have company!','Visitor detected.|Environmental guest observed.|Garden activity logged.','A quiet visitor passed through.|A small guest said hello.|A gentle visitor came by.'],
+ sTrain:['Something just rolled through.|Short adventure.|A tiny journey passed by.','Scene detected.|Motion logged.|Environmental event observed.','A quiet scene.|A small moment passed by.|A calm view.'],
+ gs1:['The story continues...|Remember me? I am back.|Back for another round.','Previous event resumed.|Continuation logged.|Previous scene restored.','The adventure goes on.|We are still on this journey.|More to come.'],
+ tCoffee:['A small scene passed by.|A quiet little moment.|Look, a tiny bit of life.','Short scene detected.|Environmental motion logged.|A small event completed.','A calm moment.|A gentle little scene.|All quiet and cozy.'],
+ gmStar:['A tiny game! Click to play.|Catch them!|Want to play?','Optional mini-game available.|Mini-game ready.|Game session logged.','A little game, no pressure.|Play if you feel like it.|A calm little challenge.'],
+ eyeR:['Ow, my eye!|Not the lens!|That pixel was brand new.|I need safety goggles.|My autofocus just panicked.|Please do not poke the sensor.|I see four of you now.|That is going straight in the bug report.|My digital tears are real.|The lens cleaner is over there.','Optical sensor activated.|Visual response logged.|Lens calibration: stable.|Image processing active.|Focus restored.|Visual monitoring online.','Just blinking.|I have my eye on things.|Everything looks clear.|A friendly look.|All quiet in my field of view.'],
+ sc1:['The result is ready.|Here you go.','The scan result is ready.|Analysis complete.','The result is ready.|Take a look when you are ready.'],
+ ramdrop:['RAM took a breath!|We feel lighter!|RAM is lighter. I feel faster!','RAM usage decreased.','RAM settled down.|Memory is calm now.|More breathing room.'],
+ netdown:['The internet went for coffee.|Connection dropped. Rude.','Internet connection lost.','The connection is down right now.|The network is taking a break.'],
+ netup:['It is back!|We are online again!|Connection restored. Updates can resume.','Internet connection restored.','We are connected again.|The network is calm and back.'],
+ oNowruz:['Happy Nowruz, {u}!|New year, new Windows!|My gift is a cleanup!|Spring arrived and the system bloomed!|Keep the holiday nuts away from the keyboard!','Nowruz and the arrival of spring are here. Happy new year.','Happy new year, {u}. May it be calm and full of good things.'],
+ oSizdah:['Nature Day. Go outside!|Tie the grass, not the cables!|Leave the unlucky thirteen in RAM!|Let the PC rest. Go touch some grass!','April 2, Nature Day. Enjoy the outdoors.','Happy Nature Day. Take a deep breath outside.'],
+ oYalda:['Happy Yalda! Do not drop watermelon on the keyboard!|We get one more minute together!|The cards say a clean system is in your future!|You seed the pomegranate. I will clear the cache!','Yalda, the longest night of the year, is here.','Happy Yalda, {u}. May your longest night be warm and full of family.'],
+ oMehregan:['Happy ancient festival!|The system is glowing for our ancestors!|Happy Mehregan. Our love for this PC is eternal!','The ancient Mehregan festival is here.','May love, friendship, and light be with you on Mehregan.'],
+ oStudent:['Happy Student Day!|Do not submit the project at midnight!|Which folder did your notes hide in?|Here is to all-nighters!','Student Day is here.','Happy Student Day. Keep shining as you learn.'],
+ oEng:['Happy Engineer Day!|Reverse-engineering unnecessary files!|Every part was cleaned with a ruler and set square!|Builder of tomorrow, happy your day!','Engineer Day is here.','Happy Engineer Day. Keep creating and building.'],
+ oNY:['Happy New Year!|New year, new timezone, clean system!|January is here and RAM is still full of energy!','The new calendar year has begun.','Happy New Year. A fresh start for good days.'],
+ oEarth:['Happy Earth Day! A cleaner PC and a cleaner planet.|Green habits, clean cache.|The Earth does not need your temporary files.','Earth Day is here.','A cleaner digital life is a kinder planet.'],
+ oHalloween:['Happy Halloween! Nothing scarier than a blue screen!|Give me chocolate or I reboot!|The ghosts of deleted files are back... just kidding!','October 31, Halloween night.','Have a fun and spooky Halloween.'],
+ oXmas:['Merry Christmas! Santa brought you extra RAM!|No Christmas tree, but your desktop is glowing!|Ho ho ho! The cache is gone!','Christmas is here.','Merry Christmas. May your nights be warm and bright.'],
+ oCatDay:['Happy Cat Day! No real paws on the keyboard.|The cat owns the desk. I own the cache.|Purr-fect day for a cleanup.','Cat Day is here.','A gentle day for you and your feline friends.'],
+ oCoffee:['Happy Coffee Day! Keep it away from the keyboard.|Caffeine for you, cache cleanup for me.|Today runs on coffee and clean RAM.','Coffee Day is here.','Enjoy the aroma and take a calm break.'],
+ oProg:['Happy Programmer Day! May your build have no bugs!|Happy_Day != false|Keep the coffee off the code!|A day without compiler errors!','International Programmer Day.','Happy Programmer Day. May your mind and code stay clear.'],
+ oChahar:['Fireworks in the Recycle Bin!|Your red glow for me, my speed for you!|Keep the firecrackers away from the case!','Chaharshanbe Suri. Please celebrate safely.','Have a warm, joyful, and safe Chaharshanbe Suri.'],
+ oCyrus:['Cyrus Day! An empire of speed and order!|The system health charter is signed!','Cyrus the Great Day is observed today.','May the legacy of good thought live on.'],
+ oPoets:['I worked hard for these thirty years; the system is clean in verse!|Windows code flowing like a Hafez ghazal!|Life is a passing caravan. Clear the cache!','Persian Poetry and Literature Day.','Honoring the great voices of Persian literature.'],
+ oFather:['Happy Father Day! Did you buy new socks?|Dad, the pillar of the house, steady as a CPU!|Happy day, quiet hero!|Today the system works tirelessly for all the men.','Father Day is here. We celebrate fathers and men.','Happy Father Day. May that kind shadow always remain.'],
+ oMother:['Happy Mother Day! An angel who notices everything before I do!|Happy Women Day. The world without you is Windows without drivers!|Kiss Mom hands. Do not forget the gift, {u}!','Mother Day and Women Day are here.','Happy Mother and Women Day. The source of love and calm.'],
+ oGirl:['Happy Girls Day! Girls rule!|The system is colorful and happy today!|Sweetest one in the house, happy your day!','Girls Day is here.','Happy Girls Day. May smiles and joy always be with you.'],
+ oTeacher:['Happy Teacher Day! The system learns from you every day!|Stand up for every passionate teacher!|Today homework: one clean cleanup!','Teacher Day is here. Honoring teachers.','Happy Teacher Day. Thank you for lighting the way.'],
+ oDoctor:['Happy Doctor Day! You treat people; I treat the PC!|Today prescription: zero junk megabytes!|I checked the system pulse. Strong and steady, Doc!','Doctor Day is here. Honoring physicians.','Happy Doctor Day. Good health to you and your loved ones.'],
+ oNurse:['Happy Nurse Day! I am the 24/7 nurse of Windows!|Happy day, angels in white!','Nurse Day is here. Honoring nurses.','Happy Nurse Day. Thank you for endless patience and kindness.'],
+ oAccountant:['Happy Accountant Day! RAM and disk are perfectly balanced!|Not one byte off!|May your abacus always run smoothly!','Accountant Day is here.','Happy Accountant Day. May your accounts be full of blessings.'],
+ oWorker:['Happy your day, pillar of the company!|Well done, hero. The system works beside you!|I am taking an extra shift in your honor!','Honoring workers and builders today.','Thank you, {u}. Your hard work does not go unnoticed.'],
+ oGhadir:['Happy Ghadir! Sweets for everyone today!|Big celebration. Do not forget the candy!','Eid al-Ghadir is here.','Happy Ghadir. May your heart be bright and your days blessed.'],
+ oEids:['Happy Eid, {u}!|A day of celebration! The system is lit up!|Do not forget the sweets, and keep them away from the keyboard!','We wish you a blessed Eid.','Happy Eid. May joy and calm visit your heart.'],
+ oRamadan:['Ramadan Mubarak, {u}! The PC does not fast; I am fully energized!|I will stay up with you for suhoor!','The blessed month of Ramadan is here.','May this month bring blessings, prayer, and peace.'],
+ oAnniv:['Happy birthday to us, {u}!|One year older together!|Thanks for keeping the PC dust-free for a year!|The digital birthday cake is ready!','Happy anniversary with our software.','Happy anniversary, {u}. Glad to be here with you.']
+});
+['wSnow','wFog','wSun','wWind','wAutumn','wPetal','wMeteor','wMoon','wRainbow','wFly','wAurora','wStorm','wStars'].forEach(k=>L_EN[k]=L_EN.wRain);
+['gSnail','gFrog','gBee','gLady','gLizard','gOwl','gBat','gFish','gJelly','gOcto','gDino','gGhost','gBot','gDragon'].forEach(k=>L_EN[k]=L_EN.gBird);
+['sBalloon','sBoat','sSub','sRocket','sShadow'].forEach(k=>L_EN[k]=L_EN.sTrain);
+['gs2','gs3','st1','st2','st3','bx1','bx2','bx3'].forEach(k=>L_EN[k]=L_EN.gs1);
+['tClock','tLamp','tTorch','tThree','tCal','wnCity','wnMount','wnFish','wnLab','wnBook','wnTrain','wnSpace','wnGarden'].forEach(k=>L_EN[k]=L_EN.tCoffee);
+['gmBub','gmSeek','gmBall','gmRps'].forEach(k=>L_EN[k]=L_EN.gmStar);
+L_EN.eyeL=L_EN.eyeR;
+['sc2','sc3','sc4'].forEach(k=>L_EN[k]=L_EN.sc1);
+['oSade'].forEach(k=>L_EN[k]=L_EN.oMehregan);
+['oKhayyam','oMolana','oFerd','oSaadi','oHafez'].forEach(k=>L_EN[k]=L_EN.oPoets);
+['oShaban','oMabath','oAdha','oFitr'].forEach(k=>L_EN[k]=L_EN.oEids);
+
 /* weather lines by bucket: [joke, serious, calm]; {t}=temp {city} */
+
 const WL={
 storm:['رعدوبرقه؛ محافظ برق وصله؟|بیرون اکشنه، اینجا امنه!|طوفانه؛ دوشاخه رو نکشیا!|هوا انقلابی، ویندوز پایدار|رعدوبرق زد، رم نترسید!','طوفان در {city}؛ مراقب برق باشید.|هشدار رعدوبرق در {city}.|هوای طوفانی؛ نوسان برق محتمل است.','بیرون طوفانیه، اینجا آرومیم.|صدای رعد میاد، جات امنه.|طوفان بیرون و آرامش درون.'],
 snow:['برف میاد! چایی بریز|{city} سفید شد، دسکتاپم سفیده!|حیف رباتم، آدم‌برفی می‌ساختم|برف و سیستمِ گرم و نرم!|{t}°؛ قندیل نبندی {u}!','بارش برف در {city}، {t}°.|هوای برفی در {city}.|کاهش دما و برف در {city}.','برف آروم می‌باره، چایی بخور.|سکوت برفی و آرامش سیستم.|منظرهٔ سفید و ذهن آروم.'],
@@ -513,6 +636,31 @@ friday:{j:["جمعه‌ست؛ سیستم هم لم داده!", "جمعه و سی
 satmorn:{j:["همون «شنبه‌ای» که می‌گفتی رسید!", "از این شنبه دیگه واقعاً شروع می‌کنیم!", "قول‌های «از شنبه» چی شد پس؟", "رژیم رو ول کن، سیستم رو تمیز کن!", "شنبه شد! سیستم آماده‌ست، تو چطور؟", "شنبه بخیر! هفته خودش شروع نمیشه", "بیا حداقل دسکتاپ رو از شنبه مرتب کنیم", "هفتهٔ جدید، بهانهٔ جدید، سیستم تمیز!", "شنبه با سیستم روان ترسناک نیست", "اول هفته‌ست؛ رم پرانرژیه، تو چی؟", "خمیازه نکش، شنبه شروع شد!", "سیستم از شنبه نترسید، تو هم نترس", "پاشو که شنبه‌ست و کلی کار داریم!", "شنبهٔ موعود همینه؛ بزن بریم!", "فایل‌های زائد از شنبه رژیم گرفتن!", "اول هفته رو طوفانی شروع کنیم؟", "شنبه بخیر {u}؛ قهوهٔ دوبل لازمی!", "ویندوز آمادهٔ نبرد با شنبه‌ست", "شنبه؛ روز جهانی شروع‌های دوباره!", "غصه نخور، ۵ روز دیگه باز جمعه‌ست!", "استارت هفته با یه رمِ برق‌افتاده", "شنبه اومد و سیستم مثل بنز کار می‌کنه", "بهانه‌های شنبه رو ریختم سطل زباله!", "انرژی اول هفته: فول شارژ!", "شنبه‌ست؛ لبخند بزن تا باگ‌ها بترسن"],c:["هفتهٔ تازه مبارک", "شنبهٔ آرومی داشته باشی", "شروع نرم و بی‌استرس هفته", "همه‌چیز آمادهٔ یه هفتهٔ خوبه", "آرامش اول هفته؛ سیستم همراهته", "قدم‌به‌قدم هفته رو بساز", "شنبه بخیر، همه‌چیز مرتبه", "شروعی تازه با ذهنی آروم", "هفتهٔ خوبی در پیش داری {u}", "سیستم پایدار و آمادهٔ هفته‌ست", "اول هفته رو با آرامش شروع کن", "تعادل و نظم در شروع هفته"]}};
 const SER=["سیستم در بهترین وضعیت است", "همه‌چیز روان کار می‌کند", "وضعیت کلی سیستم عالی است", "هیچ خطایی یافت نشد", "سیستم آمادهٔ پردازش است", "عملکرد سیستم کاملاً پایدار است", "بررسی خودکار بدون خطا انجام شد", "مصرف منابع در محدودهٔ عادی است", "حافظه و پردازنده بهینه هستند", "پایش سلامت سیستم تکمیل شد", "تمامی سرویس‌ها فعال و پایدارند", "نیاز به هیچ اقدام اصلاحی نیست", "پایداری سیستم در سطح مطلوب است", "فضای دیسک و رم متعادل است", "سیستم در وضعیت استاندارد قرار دارد"];
 const SUBS=["همه‌چیز روان، سریع و پایدار کار می‌کنه", "هیچ موردی نیاز به توجه نداره؛ خیالت راحت", "سیستم در بهترین شرایط کاری قرار داره", "رم و دیسک در سلامت و تعادل کاملن", "نگران نباش، همه‌چیز چهارچشمی زیر نظره", "حتی ۵۰ تا تبِ کروم هم ما رو نمی‌ترسونه!", "هر وقت خواستی آمادهٔ یه بررسی تازه‌ام", "همهٔ سرویس‌ها آماده‌ان و عملکرد پایداره", "آخرین بررسی سلامت سیستم ۱۰۰٪ موفق بود", "رم، دیسک و استارتاپ کاملاً تحت کنترلن", "فعلاً نیازی به اقدام یا پاکسازی نیست", "اگه چیزی عوض بشه، سریع خبرت می‌کنم", "فن‌ها آروم می‌چرخن و فایل مزاحمی نیست", "فضای ذخیره‌سازی نفس می‌کشه و سرعت عالیه", "نه لگی، نه باگی؛ همه‌چیز مثل ساعت دقیق", "برنامه‌های پس‌زمینه رام و آروم هستن", "سی‌پی‌یو خنکه و رم فضای خالی زیاد داره", "امن و امان؛ هیچ پردازش مشکوکی نداریم", "سرعت بوت و اجرای برنامه‌ها در بهترین حالته", "کش‌ها تمیز شدن و سیستم سبکباله", "مادربورد و قطعات در هماهنگی کاملن", "بدون ترافیک دیتا؛ مسیر پردازش کاملاً بازه", "یه روز خوب دیگه بدون صفحهٔ آبی ویندوز!", "همه‌چیز اونقدر تمیزه که می‌تونی توش خودتو ببینی", "سیستم روپا و قبراق، منتظر دستور توئه"];
+const HL_EN={
+morning:{j:["Morning! The system woke up before you.","Coffee first, then we take on the day.","Fresh day, clean files, zero clutter.","Windows is up. The ball is in your court.","Good morning. Ready to make today count?"],c:["A calm morning, everything in place.","Take it slow. The system is ready.","Quiet start, steady pace."]},
+noon:{j:["Noon already. Lunch and a short break?","Half the day gone, the system is still sharp.","Eat something. I will keep watch.","Lunch break. Even the CPU is yawning.","Midday check: RAM is clear, lunch is due."],c:["Calm noon, stable system.","Take a short break. Everything is fine.","Halfway through the day, all steady."]},
+afternoon:{j:["Good afternoon. Second half, same energy.","Post-lunch dip? The CPU missed it.","Tea time and a tidy system.","The afternoon is yours; the speed is mine.","Still clear, still fast, still with you."],c:["A quiet afternoon, everything running smooth.","No rush. Finish the day at your pace.","Steady afternoon, stable system."]},
+evening:{j:["Evening. Work done, or just getting started?","Dinner time. The caches have been cleared.","Movie or game tonight? I am ready.","Sunset outside, clean desktop inside.","Good evening. The system is ready."],c:["A calm evening. You made it through.","Let the day go. Everything is stable.","Quiet evening, smooth system."]},
+night:{j:["Late night? The system is staying up with you.","The house is quiet. The fans are quieter.","Owls are awake, and so are we.","One last cleanup before bed?","Night shift. Let us build something."],c:["Calm night, stable system.","Everything is quiet. Get some rest.","The system is safe. Sleep well."]},
+late:{j:["Golden hours. Deep focus, zero noise.","The world is asleep. We are building.","No notifications, no bugs. Just us.","This late? This is where real work happens.","Still up? I am right here."],c:["Quiet hours, deep focus.","I am awake for as long as you are.","Calm night, clear mind, stable system."]},
+friday:{j:["It is Friday. Even the system is lounging.","Friday and still working? Go rest.","The viruses took the day off too.","Weekend mode: movies, tea, no tickets.","Friday. Close the laptop for a while."],c:["Calm Friday. Take the day off.","No rush today. Recharge.","A quiet weekend starts now."]},
+satmorn:{j:["The Saturday you kept talking about is here.","This Saturday, we actually start.","New week, new excuses, clean system.","Saturday morning. Coffee, then momentum.","Good morning. Let us start the week right."],c:["A fresh week begins.","Easy start to the week.","One step at a time. I am with you."]}};
+const SER_EN=["The system is in excellent shape.","Everything is running smoothly.","No errors found.","Resources are within normal range.","Memory and CPU are optimized.","All services are up and stable.","No action is needed right now.","The system is operating at its best."];
+const SUBS_EN=["Everything is fast, smooth, and stable.","Nothing needs your attention right now.","RAM, disk, and startup are all under control.","No cleanup is needed at the moment.","The system is quiet and healthy.","All background processes are behaving.","No lag, no bugs. Just a clean machine.","Storage has room to breathe and speed to spare.","Startup and apps are in great shape.","I will let you know if anything changes."];
+const WL_EN={
+storm:["Thunder outside. Surge protector on?","Storm in {city}, {t}°. Stay safe.","Stormy outside, calm in here."],
+snow:["Snow! Time for tea.","Snow in {city}, {t}°.","Quiet snow, warm system."],
+rain:["Rain outside. Perfect movie weather.","Rain in {city}, {t}°.","Rainy day, calm mood."],
+fog:["Foggy. The outside graphics are on Low.","Fog in {city}. Visibility is low.","Foggy outside, clear inside."],
+hot:["{t}° outside. The CPU is sweating.","High heat in {city}: {t}°.","Hot day. Keep the system ventilated."],
+freeze:["{t}°. Even the bits are frozen.","Freezing in {city}: {t}°.","Below zero. Stay warm."],
+cold:["{t}° and falling. Hoodie weather.","Cold in {city}: {t}°.","Cold outside, warm inside."],
+wind:["Windy. Hold on to your files.","Strong wind in {city}, {t}°.","Windy outside, quiet inside."],
+clearD:["Sunny ({t}°). Go outside for a bit.","Clear skies in {city}, {t}°.","Bright day, clear system."],
+clearN:["Clear night. The stars are up.","Clear night in {city}, {t}°.","Quiet night, bright stars."],
+cloud:["Cloudy. Real cloud computing.","Cloudy in {city}, {t}°.","Soft gray sky, calm system."],
+mild:["{t}°. Perfect temperature for work.","Mild weather in {city}, {t}°.","Comfortable outside, smooth inside."]};
+
 /* ===== Phase 2: surprise engine ===== */
 const LS={g:(k,d)=>{try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},s:(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const rnd=(a,b)=>a+Math.random()*(b-a),sn=Math.sin,ease=a=>a<.5?2*a*a:1-Math.pow(-2*a+2,2)/2,tri=a=>Math.abs(((a%2)+2)%2-1)*2-1;
@@ -524,7 +672,7 @@ let pdn=null,chg=0,lastClick=0,shakes=[],lastDx=0,pvs=0,pmt=T(),nearSince=0,cool
 let rxO={rot:0,s:1,hide:0,wink:0,cross:0,col:null,look:null,sq:0,dy:0},RX=null;
 
 /* ---- settings ---- */
-const SET=LS.g('cc_set',{});Object.assign(ST,{tone:SET.tone||'joke',uName:SET.uName||'',cName:SET.cName||'سی‌سی',city:SET.city||'',calm:SET.calm??RM,fast:!!SET.fast,dl:0,copy:false,daysSince:null});
+const SET=LS.g('cc_set',{});Object.assign(ST,{tone:SET.tone||'joke',uName:SET.uName||'',cName:SET.cName||'Winy',city:SET.city||'',calm:SET.calm??RM,fast:!!SET.fast,dl:0,copy:false,daysSince:null});
 const saveSet=()=>LS.s('cc_set',{tone:ST.tone,uName:ST.uName,cName:ST.cName,city:ST.city,calm:ST.calm,fast:ST.fast});
 /* تنظیمات بخش «کاراکتر» از نرم‌افزار (Settings) می‌آید؛ تا پایان بارگذاری در صف می‌ماند */
 let _setQ=[],_setReady=false;
@@ -550,6 +698,7 @@ function applySettingsNow(s){
  if(ST.calm){RX=null;Pt.length=0}
  if(hl)newHL();
  render(true);
+ if(s.lang&&window.CC_I18N)window.CC_I18N.applyLanguage(s.lang);
 }
 function applySettings(s){if(!_setReady){_setQ.push(s);return}applySettingsNow(s)}
 /* تم و رنگ Accent ویندوز از میزبان می‌آید؛ --halo رنگ هاله دور کاراکتر است */
@@ -563,30 +712,54 @@ function applyTheme(t){
 
 /* ---- weather: Open-Meteo (no key). Location = city typed in settings, else IP lookup ---- */
 const W={ok:0,t:0,code:0,day:1,wind:0,city:''};
-async function getLoc(){const nm=ST.city,c=LS.g('cc_loc',null);if(c&&c.q==nm)return c;let r;
- if(nm){const j=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=fa&name='+encodeURIComponent(nm))).json(),g=j.results&&j.results[0];if(!g)throw 0;r={q:nm,lat:g.latitude,lon:g.longitude,name:g.name||nm}}
+async function getLoc(){const nm=ST.city,c=LS.g('cc_loc2',null);if(c&&c.q==nm)return c;let r;
+ if(nm){const j=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&name='+encodeURIComponent(nm))).json(),g=j.results&&j.results[0];if(!g)throw 0;r={q:nm,lat:g.latitude,lon:g.longitude,name:g.name||nm}}
  else{const j=await(await fetch('https://ipwho.is/')).json();if(!j.success)throw 0;r={q:'',lat:j.latitude,lon:j.longitude,name:j.city}}
- LS.s('cc_loc',r);return r}
+ LS.s('cc_loc2',r);return r}
 async function loadWeather(){if(ST.offline)return;try{const c=LS.g('cc_w',null);if(c&&Date.now()-c.at<18e5&&c.q==ST.city){Object.assign(W,c.w,{ok:1});newHL();return}
  const l=await getLoc(),j=await(await fetch('https://api.open-meteo.com/v1/forecast?latitude='+l.lat+'&longitude='+l.lon+'&current=temperature_2m,weather_code,is_day,wind_speed_10m')).json(),k=j.current;
  const w={t:Math.round(k.temperature_2m),code:k.weather_code,day:k.is_day,wind:k.wind_speed_10m,city:l.name};Object.assign(W,w,{ok:1});LS.s('cc_w',{at:Date.now(),q:ST.city,w});newHL()}catch(e){}}
 function wBucket(){const c=W.code,t=W.t;if(c>=95)return'storm';if((c>=71&&c<=77)||c==85||c==86)return'snow';if((c>=51&&c<=67)||(c>=80&&c<=82))return'rain';if(c==45||c==48)return'fog';if(t>=35)return'hot';if(t<=0)return'freeze';if(W.wind>=40)return'wind';if(t<=8)return'cold';if(c<=1)return W.day?'clearD':'clearN';if(c>=2)return'cloud';return'mild'}
 
 /* ---- speech bubble: 3 tones, no line repeats within the last 30 ---- */
-const TI=()=>({joke:0,serious:1,calm:2})[ST.tone]??0,used=[];let bubT=0,lastSayAt=0;
-const fill=s=>s.replace(/\{u\}/g,ST.uName||'رفیق').replace(/\{c\}/g,ST.cName||'سی‌سی').replace(/\{t\}/g,W.t).replace(/\{city\}/g,W.city||'اینجا');
+const TI=()=>({joke:0,serious:1,calm:2})[ST.tone]??0,used=[];let bubT=0,lastSayAt=0,sayBusy=false,sayCurrent='',sayQ=[];
+const isEnglish=()=>!!(window.CC_I18N&&!CC_I18N.isFa());
+const fill=s=>s.replace(/\{u\}/g,ST.uName||(isEnglish()?'friend':'رفیق')).replace(/\{c\}/g,ST.cName||'Winy').replace(/\{t\}/g,W.t).replace(/\{city\}/g,W.city||(isEnglish()?'here':'اینجا'));
 function pickLine(pool){if(!pool)return null;const all=(pool[TI()]||'').split('|').map(fill).filter(Boolean);if(!all.length)return null;let c=all.filter(s=>!used.includes(s));if(!c.length)c=all;const s=c[Math.random()*c.length|0];used.push(s);if(used.length>60)used.shift();return s}
-function bubble(t){lastSayAt=T();const b=$('bub');b.textContent=t;b.classList.add('on');clearTimeout(bubT);bubT=setTimeout(()=>b.classList.remove('on'),2400+t.length*60)}
-function say(id,o){if(run)return;if(ST.calm&&!(o&&o.data))return;const t=T();if(!o?.urgent&&t-lastSayAt<1.8&&$('bub').classList.contains('on'))return;const s=pickLine(L[id])||pickLine(L.any);if(s)bubble(s)}
+/* صف دیالوگ: کلیک‌های سریع نباید جملهٔ در حال نمایش را قطع یا گم کنند. */
+function bubble(t,o){if(!t)return;if(isEnglish()&&window.CC_I18N)t=CC_I18N.translate(t);queueBubble(t,!!(o&&o.urgent))}
+function queueBubble(t,urgent){
+ if(!t||t===sayCurrent||sayQ.some(q=>q.t===t))return;
+ if(urgent)sayQ.unshift({t,urgent:true});else sayQ.push({t,urgent:false});
+ // جمله‌های فوری (مثل سلفی) هنگام سرریز صف حذف نمی‌شوند.
+ while(sayQ.length>4){
+  let i=sayQ.findIndex(q=>!q.urgent);
+  if(i<0)i=sayQ.length-1;
+  sayQ.splice(i,1);
+ }
+ pumpBubble();
+}
+function pumpBubble(){
+ if(sayBusy)return;
+ const item=sayQ.shift();if(!item)return;
+ const t=item.t;
+ sayBusy=true;sayCurrent=t;lastSayAt=T();
+ const b=$('bub');b.textContent=t;b.classList.add('on');clearTimeout(bubT);
+ // اگر صف شلوغ است، جملهٔ فعلی کوتاه‌تر نمایش داده می‌شود تا نوبت بقیه زود برسد.
+ const dur=sayQ.length?Math.min(2600,Math.max(1500,1200+t.length*35)):Math.min(3800,Math.max(1700,1400+t.length*42));
+ bubT=setTimeout(()=>{b.classList.remove('on');sayBusy=false;sayCurrent='';setTimeout(pumpBubble,180)},dur);
+}
+function say(id,o){if(run)return;if(ST.calm&&!(o&&o.data))return;const fa=!window.CC_I18N||CC_I18N.isFa();const s=(fa?pickLine(L[id]):pickLine(L_EN[id]||L_EN.any))||pickLine(fa?L.any:L_EN.any);if(s)bubble(s,{urgent:!!(o&&o.urgent)})}
 
 /* ---- varied healthy-state headline: new pick on every open, avoids the last 10 shown ---- */
-let hl={head:SER[0],sub:SUBS[0],mood:'excellent'};
+let hl={head:(!window.CC_I18N||CC_I18N.isFa())?SER[0]:SER_EN[0],sub:(!window.CC_I18N||CC_I18N.isFa())?SUBS[0]:SUBS_EN[0],mood:'excellent'};
 function slot(){if(ST.forceSlot)return ST.forceSlot;if(ST.forceRelax)return'night';const d=new Date(),h=d.getHours(),w=d.getDay();if(h>=1&&h<5)return'late';if(h>=22||h<1)return'night';if(w==5)return'friday';if(w==6&&h<14)return'satmorn';return h<11?'morning':h<14?'noon':h<18?'afternoon':'evening'}
 function newHL(wf){const sl=slot(),rec=LS.g('cc_hl',[]);let head=null;
- if(W.ok&&!MR()&&(wf||Math.random()<.25))head=pickLine(WL[wBucket()]);
- if(!head){const pool=(ST.tone=='serious'||MR())?SER:HL[sl][ST.tone=='calm'?'c':'j'];let c=pool.filter(s=>!rec.includes(s));if(!c.length)c=pool;head=c[Math.random()*c.length|0]}
+ const fa=!window.CC_I18N||CC_I18N.isFa();
+ if(W.ok&&!MR()&&(wf||Math.random()<.25))head=pickLine((fa?WL:WL_EN)[wBucket()]);
+ if(!head){const pool=(ST.tone=='serious'||MR())?(fa?SER:SER_EN):(fa?HL:HL_EN)[sl][ST.tone=='calm'?'c':'j'];let c=pool.filter(s=>!rec.includes(s));if(!c.length)c=pool;head=c[Math.random()*c.length|0]}
  rec.push(head);if(rec.length>20)rec.shift();LS.s('cc_hl',rec);
- const sc=SUBS.filter(s=>s!==hl.sub);hl={head,sub:sc[Math.random()*sc.length|0],mood:(sl=='night'||sl=='late'||sl=='friday')?'relaxed':'excellent'}}
+ const sc=(fa?SUBS:SUBS_EN).filter(s=>s!==hl.sub);hl={head,sub:sc[Math.random()*sc.length|0],mood:(sl=='night'||sl=='late'||sl=='friday')?'relaxed':'excellent'}}
 
 /* ---- reactions ---- */
 const hrt=()=>add({t:'h',x:rnd(-30,30),y:-50,vy:-34,vx:rnd(-6,6),c:[255,120,170],d:.55,r:5});
@@ -665,7 +838,7 @@ function pickR(g){const pool=R.filter(r=>r.g==g),w={0:70,1:25,2:4,3:1},av=[...ne
 const rxOK=()=>!run&&!(cur&&(cur.fast||cur.crit)),calmTier=()=>cur&&!cur.fast&&!cur.warn&&!cur.crit&&cur.id!='sleep'&&cur.id!='drowsy'&&!MR();
 function start(r,o){o=o||{};if(typeof r=='string')r=RI[r];if(!r||run)return;if(ST.calm&&r.g!='data'&&!o.force)return;
  RX=Object.assign({},r,{t0:T(),ei:0,u:0,v:Math.random()<.5});recent.push(r.id);if(recent.length>3)recent.shift();found(r.id);
- if(o.say||r.g=='data'||Math.random()<(r.sy??.5))say(o.sayId||r.id,{data:r.g=='data'||o.force})}
+ if(o.say||r.g=='data'||Math.random()<(r.sy??.5))say(o.sayId||r.id,{data:r.g=='data'||o.force,urgent:!!o.urgent})}
 /* hooks called from the frame loop */
 function RXstep(k,pose){rxO={rot:0,s:1,hide:0,wink:0,cross:0,col:null,look:null,sq:0,dy:0};
  if(pdn&&pdn.moved)stch-=Math.min(.09,Math.hypot(sp.dx.v,sp.dy.v)/300);
@@ -690,12 +863,12 @@ addEventListener('pointerup',()=>{if(!pdn)return;const p=pdn,c0=chg,t=T();pdn=nu
  if(p.moved){sp.dx.t=0;sp.dy.t=0;found('drag');if(!ST.calm&&rxOK())say('drag');return}
  if(c0>.12){release(c0);return}
  if(t-p.t<.35&&p.z)clickR()});
-cv.addEventListener('dblclick',e=>{if(!ST.calm&&rxOK()&&dz(e))start('selfie',{say:1})});
+cv.addEventListener('dblclick',e=>{if(!ST.calm&&rxOK()&&dz(e))start('selfie',{say:1,urgent:1})});
 document.documentElement.addEventListener('mouseleave',()=>{if(!ST.calm&&rxOK()&&calmTier()&&!RX)start('search')});
 function release(c){found('charge');sp.sq.w-=4*c;const n=1+Math.floor(c*3);for(let i=0;i<n;i++)add({t:'rg',x:0,y:0,d:.5-i*.06,c:i%2?hx('#ffffff'):col});if(!ST.calm)say('release')}
 function clickR(){const t=T();if(ckt.length&&t-ckt[ckt.length-1]>.9)ckt=[];ckt.push(t);lastClick=t;const n=ckt.length;
  if(ST.calm||!rxOK())return;
- if(n==10){ckt=[];start('angry',{say:1})}else if(n==7)start('disco',{say:1});else if(n==5)start('dizzy',{say:1});else if(n==4){const gm=['gmStar','gmBub','gmSeek','gmRps','gmBall'];start(gm[Math.random()*gm.length|0],{say:1,force:1});}else if(n==3)start('tickle',{say:1});
+ if(n==10){ckt=[];start('angry',{say:1,urgent:1})}else if(n==7)start('disco',{say:1});else if(n==5)start('dizzy',{say:1});else if(n==4){const gm=['gmStar','gmBub','gmSeek','gmRps','gmBall'];start(gm[Math.random()*gm.length|0],{say:1,force:1});}else if(n==3)start('tickle',{say:1});
  else if(Math.random()<1/200)start('golden',{say:1});else start(pickR('click'))}
 function mouseWatch(){pvs*=.5;if(ST.calm||RX||!rxOK()||!calmTier())return;const r=cv.getBoundingClientRect(),d=Math.hypot(mx-(r.left+r.width/2),my-(r.top+r.height/2)),t=T();
  if(d<150){if(!nearSince)nearSince=t}else nearSince=0;
@@ -706,7 +879,7 @@ function mouseWatch(){pvs*=.5;if(ST.calm||RX||!rxOK()||!calmTier())return;const 
 /* idle micro-reactions every 8-15 s; rare ones are 4% of picks; weather line now and then */
 function sched(){const t=T();if(t<nextIdle)return;nextIdle=t+8+Math.random()*7;
  if(ST.calm||RX||!rxOK()||!calmTier()||t-lastClick<3||pdn)return;
- if(W.ok&&t-lastWx>480&&Math.random()<.1){lastWx=t;const s=pickLine(WL[wBucket()]);if(s)bubble(s);return}
+ if(W.ok&&t-lastWx>480&&Math.random()<.1){lastWx=t;const s=pickLine((!window.CC_I18N||CC_I18N.isFa())?WL[wBucket()]:WL_EN[wBucket()]);if(s)bubble(s);return}
  start(pickR('idle'))}
 /* real-data events */
 function daily(k){const d=new Date().toDateString();if(LS.g('cc_d_'+k,'')==d)return false;LS.s('cc_d_'+k,d);return true}
@@ -734,7 +907,7 @@ setInterval(loadWeather,18e5);
 
 /* ---- preview: pick any reaction / data event / headline slot / weather ---- */
 const FIRE=[...R.map(r=>[r.id,r.n+(r.g=='data'?' (رویداد)':'')]),['charge','شارژ آئورا (نگه‌داشتن)'],['drag','کشیدن'],['stale1','بی‌پاکسازی ۳ روز'],['stale2','بی‌پاکسازی ۷ روز'],['stale3','بی‌پاکسازی ۱۴ روز'],['sameDay','پاکسازی همون روز'],['fri','جمعه (حباب)'],['wx:rain','هوا: باران'],['wx:hot','هوا: گرم'],['wx:cold','هوا: سرد'],['wx:snow','هوا: برف'],['wx:clear','هوا: آفتابی'],...['morning','noon','afternoon','evening','night','late','friday','satmorn'].map(s=>['slot:'+s,'تیتر: '+({morning:'صبح',noon:'ظهر',afternoon:'عصر',evening:'غروب',night:'شب',late:'بامداد',friday:'جمعه',satmorn:'شنبه'})[s]])];
-function fire(id){if(id.startsWith('wx:')){const m={rain:[61,14,1],hot:[0,38,1],cold:[3,4,1],snow:[73,-2,1],clear:[0,24,1]}[id.slice(3)];Object.assign(W,{ok:1,code:m[0],t:m[1],day:m[2],city:W.city||'تهران'});newHL(true);const s=pickLine(WL[wBucket()]);if(s)bubble(s);return}
+function fire(id){if(id.startsWith('wx:')){const m={rain:[61,14,1],hot:[0,38,1],cold:[3,4,1],snow:[73,-2,1],clear:[0,24,1]}[id.slice(3)];const fa=!window.CC_I18N||CC_I18N.isFa();Object.assign(W,{ok:1,code:m[0],t:m[1],day:m[2],city:W.city||(fa?'تهران':'Tehran')});newHL(true);const s=pickLine((fa?WL:WL_EN)[wBucket()]);if(s)bubble(s);return}
  if(id.startsWith('slot:')){ST.forceSlot=id.slice(5);newHL();return}
  if(id=='charge'){release(1);return}
  if(id=='drag'){sp.dx.t=24;sp.dy.t=-14;found('drag');say('drag',{data:1});setTimeout(()=>{sp.dx.t=0;sp.dy.t=0},500);return}
@@ -937,11 +1110,11 @@ const hint=r=>r.ul>AGE()?'حدود '+Math.ceil(r.ul-AGE())+' روز دیگر':r.
 function codexModel(){
  const all=R.filter(r=>r.col!==false),A={run1:'اولین اسکن کامل',run3:'بررسی در ۳ روز مختلف',game:'قهرمان بازی‌های کوچک'};
  return {
-  mood:MOOD[0],days:VD,found:FOUND.size,total:all.length+2,
-  weekRuns:RUNS.filter(t=>Date.now()-t<6048e5).length,
-  ach:Object.keys(A).map(k=>({title:A[k],done:!!ACH[k]})),
-  pers:{en:+PERS.en.toFixed(2),cur:+PERS.cur.toFixed(2),pla:+PERS.pla.toFixed(2),soc:+PERS.soc.toFixed(2),con:+PERS.con.toFixed(2)},
-  groups:Object.keys(KIND).map(k=>({name:KIND[k],items:all.filter(r=>r.g==k).map(r=>({found:FOUND.has(r.id),name:r.n,tier:TIER[r.r||0],hint:hint(r)}))}))
+  mood:T18(MOOD[0]),days:VD,found:FOUND.size,total:all.length+2,
+   weekRuns:RUNS.filter(t=>Date.now()-t<6048e5).length,
+   ach:Object.keys(A).map(k=>({title:T18(A[k]),done:!!ACH[k]})),
+   pers:{en:+PERS.en.toFixed(2),cur:+PERS.cur.toFixed(2),pla:+PERS.pla.toFixed(2),soc:+PERS.soc.toFixed(2),con:+PERS.con.toFixed(2)},
+   groups:Object.keys(KIND).map(k=>({name:T18(KIND[k]),items:all.filter(r=>r.g==k).map(r=>({found:FOUND.has(r.id),name:T18(r.n),tier:T18(TIER[r.r||0]),hint:T18(hint(r))}))}))
  };
 }
 const sv=()=>LS.s('cc_opt',OPT);
@@ -961,7 +1134,7 @@ const _ar2=afterRun;afterRun=function(){_ar2();bump('con',.05)};
 /* mini-games (optional, click on the canvas): falling stars, rising bubbles, hidden glint */
 let GM=null;const wcd=e=>{const b=cv.getBoundingClientRect();return[(e.clientX-b.left)/b.width*300-150,(e.clientY-b.top)/b.height*220-110]};
 const gmStart=k=>{GM={kind:k,it:[],hit:0,tot:0,lt:T(),sp:0}};
-const gmEnd=()=>{if(!GM)return;const g=GM;GM=null;bump('pla',.05);setTimeout(()=>bubble(g.kind=='seek'?(g.hit?'پیداش کردی! 🎯':'پیداش نکردی'):'گرفتی '+g.hit+' از '+g.tot),300);if(g.hit>=3)ach('game','قهرمان بازی‌های کوچک')};
+const gmEnd=()=>{if(!GM)return;const g=GM;GM=null;bump('pla',.05);const en=isEnglish();const msg=g.kind=='seek'?(g.hit?(en?'Found it! Nice shot.':'پیداش کردی! 🎯'):(en?'Not this time.':'پیداش نکردی')):(en?`Caught ${g.hit} of ${g.tot}`:'گرفتی '+g.hit+' از '+g.tot);setTimeout(()=>bubble(msg),300);if(g.hit>=3)ach('game','قهرمان بازی‌های کوچک')};
 function gmDraw(u){const g=GM;if(!g)return;const t=T(),dt=Math.min(.1,t-g.lt);g.lt=t;g.sp-=dt;x.shadowBlur=0;
  if(g.kind=='seek'){if(!g.it.length&&g.tot<2&&u>.1&&u<.8){g.it.push({x:rnd(-120,120),y:rnd(-60,80),b:t,life:2.6});g.tot++}}
  else if(g.sp<=0&&u<.85){g.sp=g.kind=='star'?.9:.8;g.tot++;g.it.push(g.kind=='star'?{x:rnd(-110,110),y:-105,vy:55}:{x:rnd(-110,110),y:105,vy:-42})}
@@ -1049,7 +1222,7 @@ I('wnGarden','پنجره: باغچه',1,6,WF(()=>{for(let i=0;i<5;i++){x.beginPa
 /* more mini-games */
 const rp=document.createElement('div');rp.id='rps';rp.style.cssText='position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:none;gap:8px;z-index:9';rp.innerHTML=['سنگ','کاغذ','قیچی'].map((t,i)=>'<button class="ch" data-i="'+i+'">'+t+'</button>').join('');document.querySelector('.viz').appendChild(rp);
 let rpOn=0;const rpHide=()=>{rp.style.display='none';rpOn=0};
-rp.onclick=e=>{const i=e.target.dataset.i;if(i==null||!rpOn)return;const c=Math.random()*3|0,r=(+i-c+3)%3;bubble(['سنگ','کاغذ','قیچی'][c]+'! '+(r==0?'مساوی':r==1?'بردی 🎉':'باختی'));bump('pla',.05);rpHide()};
+rp.onclick=e=>{const i=e.target.dataset.i;if(i==null||!rpOn)return;const c=Math.random()*3|0,r=(+i-c+3)%3,en=isEnglish();const choice=(en?['Rock','Paper','Scissors']:['سنگ','کاغذ','قیچی'])[c];const outcome=r==0?(en?'Tie':'مساوی'):r==1?(en?'You win! 🎉':'بردی 🎉'):(en?'You lose':'باختی');bubble(choice+'! '+outcome);bump('pla',.05);rpHide()};
 I('gmRps','بازی: سنگ‌کاغذ‌قیچی',1,7,()=>{},{ev:[[0,()=>{rp.style.display='flex';rpOn=1}],[.97,rpHide]],sy:.9});
 const _gd=gmDraw;
 gmDraw=function(u){const g=GM;if(g&&g.kind=='ball'){if(g.p===undefined){g.p=0;g.v=rnd(-25,25);g.s=0}const t=T(),dt=Math.min(.1,t-g.lt);g.lt=t;const b=cv.getBoundingClientRect(),bar=Math.max(-120,Math.min(120,((typeof mx=='number'?mx:b.left+b.width/2)-b.left)/b.width*300-150));g.v+=(g.p-bar)*2.2*dt;g.v*=.995;g.p+=g.v*dt;if(Math.abs(g.p-bar)<30&&Math.abs(g.p)<125)g.s+=dt;g.hit=Math.floor(g.s);g.tot=6;x.shadowBlur=0;x.beginPath();x.moveTo(bar-26,72);x.lineTo(bar+26,72);x.stroke();dot(g.p,64,6);return}_gd(u)};
@@ -1122,6 +1295,7 @@ const _fm=fire;fire=function(id){if(id=='mourn:on'||id=='mourn:off'){ST.forceMou
 // Core headlines and subtitles populated from master lists
 L.any[0]+='|اینجام، همه‌چیز زیر نظره|آمارها رو چک کردم، خوبن';L.any[2]+='|بررسی خودکار فعاله|فعلاً چیزی نیاز به اقدام نداره';
 L.ramdrop[0]+='|رم سبک‌تر شد، حس می‌کنم فرزترم';L.netup[0]+='|اتصال برگشت، به‌روزرسانی‌ها از سر گرفته می‌شن';
+window.CC_I18N_ON_LANG=function(){newHL();render(true)};
 newHL();loadWeather();live();render(true);
 
 /* ===== اتصال به میزبان: دریافت تنظیمات/تم، پاسخ RPC و اعلام آمادگی ===== */

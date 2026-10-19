@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>以管理员身份运行</value></data>
@@ -66,8 +66,16 @@
   <data name="RamTitle" xml:space="preserve"><value>运行内存 (RAM)</value></data>
   <data name="CpuTitle" xml:space="preserve"><value>中央处理器 (CPU)</value></data>
   <data name="NetworkTitle" xml:space="preserve"><value>网络实时流量监控</value></data>
+  <data name="NetworkTrafficTitle" xml:space="preserve"><value>网络</value></data>
   <data name="CleanupHistoryTitle" xml:space="preserve"><value>近期清理记录</value></data>
   <data name="DiskBreakdownTitle" xml:space="preserve"><value>磁盘存储空间细分</value></data>
+  <data name="DiskUsed" xml:space="preserve"><value>已用</value></data>
+  <data name="DiskCleanable" xml:space="preserve"><value>可清理</value></data>
+  <data name="DiskFree" xml:space="preserve"><value>可用</value></data>
+  <data name="ItemsSelected" xml:space="preserve"><value>项已选择</value></data>
+  <data name="TotalDetected" xml:space="preserve"><value>检测总数</value></data>
+  <data name="Scanning" xml:space="preserve"><value>正在扫描...</value></data>
+  <data name="RefreshedAfterClean" xml:space="preserve"><value>清理后已优化</value></data>
   <data name="ToolSpecsTitle" xml:space="preserve"><value>全面硬件与系统规格</value></data>
   <data name="ToolBatteryTitle" xml:space="preserve"><value>电池健康度与电源</value></data>
   <data name="ToolUninstallerTitle" xml:space="preserve"><value>应用程序与臃肿软件卸载</value></data>
@@ -80,14 +88,6 @@
   <data name="ToolDnsTitle" xml:space="preserve"><value>DNS 服务器配置</value></data>
   <data name="ToolContextMenuTitle" xml:space="preserve"><value>右键菜单管理</value></data>
   <data name="ToolDeepStorageTitle" xml:space="preserve"><value>深度存储空间清理</value></data>
-  <data name="NetworkTrafficTitle" xml:space="preserve"><value>网络</value></data>
-  <data name="DiskUsed" xml:space="preserve"><value>已用</value></data>
-  <data name="DiskCleanable" xml:space="preserve"><value>可清理</value></data>
-  <data name="DiskFree" xml:space="preserve"><value>可用</value></data>
-  <data name="ItemsSelected" xml:space="preserve"><value>项已选择</value></data>
-  <data name="TotalDetected" xml:space="preserve"><value>检测总数</value></data>
-  <data name="Scanning" xml:space="preserve"><value>正在扫描...</value></data>
-  <data name="RefreshedAfterClean" xml:space="preserve"><value>清理后已优化</value></data>
   <data name="CharacterTitle" xml:space="preserve"><value>主角形象</value></data>
   <data name="CharacterSub" xml:space="preserve"><value>仪表板卡片上角色的外观、语气和行为。更改会立即生效。</value></data>
   <data name="CharacterTone" xml:space="preserve"><value>说话语气</value></data>
@@ -111,4 +111,1330 @@
   <data name="CharacterFast" xml:space="preserve"><value>快速反应（动画更短）</value></data>
   <data name="CharacterCalm" xml:space="preserve"><value>平静模式（减少动画，适合较慢的电脑）</value></data>
   <data name="CharacterLun" xml:space="preserve"><value>节日农历校正（±1天）</value></data>
+  <data name="در حال ارزیابی فایل های موقت و موارد توصیه شده..." xml:space="preserve"><value>正在评估临时文件和推荐项目...</value></data>
+  <data name="موارد پیشنهادی (Recommended items)" xml:space="preserve"><value>推荐项目</value></data>
+  <data name="فایل های زائد و موقتی که پاکسازی آنها ۱۰۰٪ ایمن است" xml:space="preserve"><value>100%安全清理的垃圾和临时文件</value></data>
+  <data name="فایل های موقت سیستم و کاربر" xml:space="preserve"><value>系统和用户临时文件</value></data>
+  <data name="فایل های موقت، کش برنامه ها و پردازه ها در مسیرهای Temp" xml:space="preserve"><value>Temp 位置中的临时文件、应用程序和进程缓存</value></data>
+  <data name="سطل بازیافت (Recycle Bin)" xml:space="preserve"><value>回收站</value></data>
+  <data name="فایل های حذف شده موجود در سطل بازیافت تمام درایوها" xml:space="preserve"><value>各个驱动器回收站中的已删除文件</value></data>
+  <data name="گزارش های خطا و کرش دامپ ها" xml:space="preserve"><value>错误报告和崩溃转储</value></data>
+  <data name="حافظه کش مایکروسافت اج (Microsoft Edge)" xml:space="preserve"><value>Microsoft Edge 缓存</value></data>
+  <data name="کش صفحات وب، تصاویر و کدهای ذخیره شده مرورگر اج" xml:space="preserve"><value>Microsoft Edge 存储的网页缓存、图像和脚本</value></data>
+  <data name="حافظه کش گوگل کروم (Google Chrome)" xml:space="preserve"><value>Google Chrome 缓存</value></data>
+  <data name="کش صفحات وب، تصاویر و کدهای کامپایل شده مرورگر کروم" xml:space="preserve"><value>Google Chrome 存储的网页缓存、图像和已编译脚本</value></data>
+  <data name="کش نصبی آپدیت های ویندوز" xml:space="preserve"><value>Windows 更新下载缓存</value></data>
+  <data name="فایل های بسته های نصب شده Windows Update" xml:space="preserve"><value>已安装的 Windows 更新包文件</value></data>
+  <data name="کش توزیع دانلود ویندوز (Delivery Optimization)" xml:space="preserve"><value>下载 Windows 传递优化的缓存</value></data>
+  <data name="فایل های موقت بسته های دانلود آپدیت ها و استور مایکروسافت" xml:space="preserve"><value>更新和 Microsoft Store 包下载的临时文件</value></data>
+  <data name="حافظه کش بندانگشتی ها (Thumbnail Cache)" xml:space="preserve"><value>缩略图缓存</value></data>
+  <data name="پیش نمایش ذخیره شده فایل ها و تصاویر در فایل اکسپلورر" xml:space="preserve"><value>文件资源管理器中的文件和图像的缓存预览</value></data>
+  <data name="پوشه‌های خالی رهاشده (Empty Folders)" xml:space="preserve"><value>空文件夹</value></data>
+  <data name="{0} پوشه کاملاً خالی در Downloads و Desktop" xml:space="preserve"><value>{0} 完全清空下载和桌面中的文件夹</value></data>
+  <data name="پوشه خالی در پوشه‌های کاربری یافت نشد (سیستم مرتب است)" xml:space="preserve"><value>在用户文件夹中未找到空文件夹（系统很整洁）</value></data>
+  <data name="در حال ارزیابی شیدرهای گرافیکی و حافظه های سیستمی..." xml:space="preserve"><value>正在评估图形着色器和系统内存...</value></data>
+  <data name="سایر موارد سیستمی (Other system items)" xml:space="preserve"><value>其他系统项目</value></data>
+  <data name="شیدرهای گرافیکی دایرکت ایکس و گزارش های سیستمی" xml:space="preserve"><value>DirectX 图形着色器和系统报告</value></data>
+  <data name="کش شیدرهای گرافیکی (DirectX Shader Cache)" xml:space="preserve"><value>DirectX 着色器缓存</value></data>
+  <data name="شیدرهای رندر گرافیکی ذخیره شده بازی ها و کارت گرافیک" xml:space="preserve"><value>游戏和GPU的缓存图形着色器</value></data>
+  <data name="ویجت های ویندوز (Windows Widgets)" xml:space="preserve"><value>Windows 小组件</value></data>
+  <data name="داده های آفلاین و کش ویجت های ویندوز ۱۱" xml:space="preserve"><value>Windows 11 小部件的离线数据和缓存</value></data>
+  <data name="کش گواهی ها و شبکه ویندوز" xml:space="preserve"><value>Windows 证书和网络缓存</value></data>
+  <data name="فایل های موقت ارتباطی شبکه و ابزارهای سیستم" xml:space="preserve"><value>临时网络和系统工具文件</value></data>
+  <data name="مسیرها و کلیدهای نامعتبر رجیستری (Orphaned Registry)" xml:space="preserve"><value>无效的注册表路径和键（孤立注册表）</value></data>
+  <data name="{0} مسیر نامعتبر از برنامه های حذف شده در MuiCache رجیستری" xml:space="preserve"><value>{0} 注册表 MuiCache 中已移除程序的无效路径</value></data>
+  <data name="در حال پویش نرم افزارهای نصب شده کاربر..." xml:space="preserve"><value>扫描用户已安装的软件...</value></data>
+  <data name="سایر موارد برنامه ها (Other application items)" xml:space="preserve"><value>其他应用程序项目</value></data>
+  <data name="کش و لاگ های نرم افزارهای کشف شده در سیستم" xml:space="preserve"><value>系统中发现的软件缓存和日志</value></data>
+  <data name="کش پکیج های Node.js (npm)" xml:space="preserve"><value>Node.js 包缓存（npm）</value></data>
+  <data name="بسته های موقت دانلودشده npm در سیستم" xml:space="preserve"><value>下载到系统的临时 npm 包</value></data>
+  <data name="کش درایور و شیدرهای انویدیا (NVIDIA)" xml:space="preserve"><value>NVIDIA 驱动和着色器缓存</value></data>
+  <data name="فایل های موقت و شیدرهای رندر کارت گرافیک انویدیا" xml:space="preserve"><value>NVIDIA 显卡的临时文件和渲染着色器</value></data>
+  <data name="لاگ ها و گزارش های OneDrive" xml:space="preserve"><value>OneDrive 日志和报告</value></data>
+  <data name="فایل های عیب یابی و لاگ های هماهنگ سازی وان درایو" xml:space="preserve"><value>OneDrive 同步日志和诊断文件</value></data>
+  <data name="کش پکیج های پایتون (Pip)" xml:space="preserve"><value>Python 包缓存（Pip）</value></data>
+  <data name="بسته های دانلودشده مخزن پایتون" xml:space="preserve"><value>从 Python 仓库下载的包</value></data>
+  <data name="کش محیط برنامه نویسی VS Code" xml:space="preserve"><value>VS Code 缓存</value></data>
+  <data name="فایل های کش و داده های موقت ویرایشگر کد" xml:space="preserve"><value>代码编辑器的缓存和临时数据文件</value></data>
+  <data name="کش پیام رسان دیسکورد (Discord)" xml:space="preserve"><value>Discord 缓存</value></data>
+  <data name="تصاویر و رسانه های موقت دانلودشده در دیسکورد" xml:space="preserve"><value>Discord 下载的临时图片和媒体</value></data>
+  <data name="دیتای پیام رسان تلگرام (Telegram Desktop)" xml:space="preserve"><value>Telegram 桌面端数据</value></data>
+  <data name="پروفایل و رسانه های کش شده تلگرام؛ حاوی نشست ورود حساب شماست - پاکسازی خودکار عمداً غیرفعال است و فقط با تیک دستی انجام می شود" xml:space="preserve"><value>缓存的 Telegram 资料和媒体；包含你的账户登录会话 - 自动清理被故意禁用，仅在手动选择时运行</value></data>
+  <data name="کش نرم افزار اسپاتیفای (Spotify)" xml:space="preserve"><value>Spotify 缓存</value></data>
+  <data name="فایل های موقت موسیقی و کاور آلبوم ها" xml:space="preserve"><value>临时音乐和专辑封面文件</value></data>
+  <data name="مدل ها و کش ابزارهای هوش مصنوعی (AI &amp; LLMs)" xml:space="preserve"><value>AI 工具模型和缓存（AI 与 LLMs）</value></data>
+  <data name="مدل های دانلودشده Ollama و کش HuggingFace" xml:space="preserve"><value>下载的 Ollama 模型和 HuggingFace 缓存</value></data>
+  <data name="بکاپ‌های قدیمی گوشی و تبلت (Apple، سامسونگ، هواوی)" xml:space="preserve"><value>旧手机和平板备份（苹果、三星、华为）</value></data>
+  <data name="نسخه‌های پشتیبان حجیم دستگاه‌های موبایل؛ این تنها نسخه پشتیبان شماست - حذف خودکار عمداً غیرفعال است و فقط بعد از تیک دستی و مرور مسیر انجام می شود" xml:space="preserve"><value>移动设备的大型备份副本；这是您唯一的备份——自动删除被故意禁用，仅在手动选择和路径检查后运行</value></data>
+  <data name="هیچ بکاپ قدیمی از گوشی یا تبلت در کامپیوتر یافت نشد" xml:space="preserve"><value>在此电脑上未发现旧手机或平板备份</value></data>
+  <data name="افزونه‌های زائد و دیتابیس‌های منسوخ مرورگرها (Chrome / Edge)" xml:space="preserve"><value>过时的浏览器扩展和旧版数据库（Chrome / Edge）</value></data>
+  <data name="{0} افزونه منسوخ یا دیتابیس رهاشده با حفظ ۱۰۰٪ اطلاعات سایت‌ها" xml:space="preserve"><value>{0} 在保留 100% 网站数据的同时删除过时的扩展或孤立数据库</value></data>
+  <data name="افزونه منسوخ یا دیتابیس زائد مرورگر یافت نشد (مرورگرها مرتب هستند)" xml:space="preserve"><value>未发现过时的扩展或垃圾浏览器数据库（浏览器整洁）</value></data>
+  <data name="در حال بررسی تاریخچه و ردپای استفاده از سیستم..." xml:space="preserve"><value>正在查看系统使用历史记录和痕迹...</value></data>
+  <data name="ردپای استفاده از کامپیوتر (Usage Traces)" xml:space="preserve"><value>使用痕迹</value></data>
+  <data name="لیست فایل های اخیر، پرش سریع و تاریخچه های سیستم" xml:space="preserve"><value>最近文件列表、跳转列表和系统历史记录</value></data>
+  <data name="تاریخچه فایل های اخیر (Recent Items)" xml:space="preserve"><value>最近项目</value></data>
+  <data name="شورتکات های ثبت شده فایل های اخیراً باز شده در ویندوز" xml:space="preserve"><value>Windows 中记录的最近打开文件的快捷方式</value></data>
+  <data name="لیست های پرش اکسپلورر (Jump Lists)" xml:space="preserve"><value>跳转列表</value></data>
+  <data name="میانبرهای برنامه های اخیر در تسک بار ویندوز" xml:space="preserve"><value>Windows 任务栏中最近应用的快捷方式</value></data>
+  <data name="در حال ارزیابی دانلود منیجرها و فایل های ناقص..." xml:space="preserve"><value>正在评估下载管理器和未完成的文件...</value></data>
+  <data name="دانلود منیجرها و فایل های ناتمام (Download Managers)" xml:space="preserve"><value>下载管理器</value></data>
+  <data name="چانک های موقت، تکه های دانلود ناقص و فایل های رهاشده" xml:space="preserve"><value>临时片段、未完成的下载部分以及被放弃的文件</value></data>
+  <data name="فایل های موقت و چانک های ناتمام IDM" xml:space="preserve"><value>IDM 临时文件和未完成的片段</value></data>
+  <data name="قطعات موقت دانلودهای متوقف شده، لغوشده و رهاشده در اینترنت دانلود منیجر" xml:space="preserve"><value>Internet Download Manager 中暂停、取消和被放弃下载的临时部分</value></data>
+  <data name="فایل های موقت Free Download Manager (FDM)" xml:space="preserve"><value>Free Download Manager (FDM) 临时文件</value></data>
+  <data name="کش و قطعات موقت دانلودهای ناتمام FDM" xml:space="preserve"><value>FDM 缓存和未完成下载的临时部分</value></data>
+  <data name="دانلودهای ناتمام و ناقص قدیمی مرورگرها" xml:space="preserve"><value>旧的未完成浏览器下载</value></data>
+  <data name="{0} فایل ناقص رهاشده در پوشه Downloads (.crdownload / .part)" xml:space="preserve"><value>{0} 下载文件夹中被放弃的未完成文件 (.crdownload / .part)</value></data>
+  <data name="فایل‌های نصبی و اینستالرهای قدیمی (.exe / .iso)" xml:space="preserve"><value>旧的安装程序和安装文件 (.exe / .iso)</value></data>
+  <data name="{0} فایل نصبی با بیش از ۱۴ روز عدم استفاده در Downloads" xml:space="preserve"><value>{0} 下载文件夹中超过 14 天未使用的安装程序文件</value></data>
+  <data name="اینستالر یا ستاپ قدیمی با بیش از ۱۴ روز قدمت یافت نشد" xml:space="preserve"><value>未找到超过 14 天的安装程序或设置文件</value></data>
+  <data name="فایل‌های بسیار حجیم قدیمی (بالای ۲۰۰ مگابایت)" xml:space="preserve"><value>非常大的旧文件（超过200 MB）</value></data>
+  <data name="{0} فایل حجیم با بیش از ۲۱ روز عدم تغییر در پوشه Downloads" xml:space="preserve"><value>{0} 大文件在下载文件夹中超过 21 天未更改</value></data>
+  <data name="فایل حجیم قدیمی بالای ۲۰۰ مگابایت در Downloads یافت نشد" xml:space="preserve"><value>在下载中未找到超过200 MB的旧文件</value></data>
+  <data name="در حال پویش پوشه های باقیمانده نرم افزارهای حذف شده..." xml:space="preserve"><value>正在扫描已卸载软件的剩余文件夹...</value></data>
+  <data name="پوشه های باقیمانده نرم افزارهای حذف شده (Leftovers)" xml:space="preserve"><value>已删除软件的剩余文件夹（残留文件）</value></data>
+  <data name="پوشه های حجیم برنامه هایی که از سیستم حذف شده اند ولی داده هایشان باقی مانده است" xml:space="preserve"><value>已从系统中删除但其数据仍然存在的大型程序文件夹</value></data>
+  <data name="پوشه رهاشده: {0} ({1})" xml:space="preserve"><value>剩余文件夹：{0} ({1})</value></data>
+  <data name="مسیر: {0}" xml:space="preserve"><value>路径: {0}</value></data>
+  <data name="در حال ارزیابی گزینه های بهینه سازی زنده و پایداری..." xml:space="preserve"><value>正在评估实时优化和稳定性选项...</value></data>
+  <data name="بهینه سازی زنده و پایداری سیستم (Performance &amp; Boost)" xml:space="preserve"><value>实时优化和系统稳定性（性能与加速）</value></data>
+  <data name="آزادسازی رم، کش شبکه، پروسس های اضافی، استارتاپ، Debloat و پلن انرژی" xml:space="preserve"><value>释放 RAM、网络缓存、多余进程、启动项、精简系统和电源计划</value></data>
+  <data name="آزادسازی حافظه فعال رم (RAM Working Set)" xml:space="preserve"><value>释放活动内存 (RAM 工作集)</value></data>
+  <data name="تخلیه Working Set پردازه ها و آزادسازی فوری حافظه اشغال شده بدون بستن برنامه ها" xml:space="preserve"><value>修剪进程工作集并即时释放已分配内存，无需关闭应用程序</value></data>
+  <data name="تخلیه کش DNS و نوسازی ارتباطات شبکه" xml:space="preserve"><value>刷新 DNS 缓存并更新网络连接</value></data>
+  <data name="پاکسازی رکوردهای نامعتبر دامنه از کش ویندوز و رفع کندی ارتباطات اینترنتی" xml:space="preserve"><value>清理 Windows 缓存中的无效域记录并修复网络连接缓慢问题</value></data>
+  <data name="بستن پردازه ها و کمک کننده های اضافی در پس زمینه" xml:space="preserve"><value>关闭额外的后台进程和辅助程序</value></data>
+  <data name="توقف سرویس های جانبی، پروسه های گزارش گیری و آپدیترهای مقیم در پس زمینه" xml:space="preserve"><value>停止后台服务、遥测进程和常驻更新程序</value></data>
+  <data name="خاموش سازی تسک های پس زمینه مرورگرها (Edge / Chrome)" xml:space="preserve"><value>禁用浏览器的后台任务 (Edge / Chrome)</value></data>
+  <data name="غیرفعال سازی Startup Boost و توقف فعالیت پنهان مرورگرها پس از بسته شدن" xml:space="preserve"><value>禁用启动加速并停止浏览器在关闭后进行隐藏活动</value></data>
+  <data name="بهینه سازی استارتاپ ویندوز" xml:space="preserve"><value>优化 Windows 启动</value></data>
+  <data name="غیرفعال سازی برنامه ها و لانچرهای سنگین شروع خودکار جهت افزایش سرعت بوت سیستم" xml:space="preserve"><value>禁用占用资源的自动启动应用和启动器，加快系统启动</value></data>
+  <data name="حذف برنامه ها و بازی های تبلیغاتی پیش فرض (Debloat)" xml:space="preserve"><value>移除默认推广应用和游戏 (去臃肿)</value></data>
+  <data name="حذف نرم افزارها و بازی های تبلیغاتی پیش فرض و بررسی برنامه های کم استفاده" xml:space="preserve"><value>移除默认的促销软件和游戏，并检查很少使用的应用程序</value></data>
+  <data name="کوتاه کردن زمان خاموش شدن سیستم (Fast Startup)" xml:space="preserve"><value>加快系统关机时间（快速启动）</value></data>
+  <data name="فعال سازی خاموش سازی و راه اندازی فوق سریع ویندوز" xml:space="preserve"><value>启用超快速 Windows 关机和启动</value></data>
+  <data name="تخصیص هوشمند کارت گرافیک مجزا" xml:space="preserve"><value>智能独立 GPU 分配</value></data>
+  <data name="هدایت بازی ها و برنامه های سنگین به پردازنده گرافیکی قدرتمند اصلی" xml:space="preserve"><value>将游戏和大型应用程序路由到主要高性能 GPU</value></data>
+  <data name="بهینه سازی تنظیمات عملکرد و حریم خصوصی ویندوز" xml:space="preserve"><value>优化 Windows 性能和隐私设置</value></data>
+  <data name="غیرفعال سازی تله متری، سرویس DiagTrack، تبلیغات منوی استارت و سرچ ویندوز" xml:space="preserve"><value>禁用遥测、DiagTrack 服务、开始菜单广告和 Windows 搜索</value></data>
+  <data name="بازبینی نرم‌افزارهای حجیم و کم‌استفاده (&gt; 500MB با بیش از ۳۰ روز عدم اجرا)" xml:space="preserve"><value>检查大型且很少使用的软件（&gt;500MB 且超过 30 天未使用）</value></data>
+  <data name="مکث تعاملی جهت نمایش لیست برنامه‌های سنگین بلااستفاده و تایید اختیاری کاربر برای حذف" xml:space="preserve"><value>交互式暂停以显示大型未使用应用程序列表，并允许用户选择是否批准移除</value></data>
+  <data name="اشتراکی (Shared)" xml:space="preserve"><value>共享</value></data>
+  <data name="سالم (Healthy)" xml:space="preserve"><value>健康</value></data>
+  <data name="در دسترس نیست" xml:space="preserve"><value>不可用</value></data>
+  <data name="نامشخص" xml:space="preserve"><value>未知</value></data>
+  <data name="{0} روز و " xml:space="preserve"><value>{0} 天和 </value></data>
+  <data name="{0}{1} ساعت و {2} دقیقه (روشن شده در {3:HH:mm})" xml:space="preserve"><value>{0}{1} 小时和 {2} 分钟（自 {3:HH:mm} 起）</value></data>
+  <data name="درایو محلی ({0})" xml:space="preserve"><value>本地磁盘 ({0})</value></data>
+  <data name="{0} ({1} آزاد)" xml:space="preserve"><value>{0} ({1} 可用)</value></data>
+  <data name="سالم و فعال" xml:space="preserve"><value>健康且正常运行</value></data>
+  <data name="فعال شده با لایسنس معتبر (Licensed)" xml:space="preserve"><value>已使用有效许可证激活（已许可）</value></data>
+  <data name="دوره آزمایشی اولیه (OOB Grace)" xml:space="preserve"><value>初始宽限期（开箱宽限期）</value></data>
+  <data name="دوره مهلت تمدید (OOT Grace)" xml:space="preserve"><value>延长宽限期（OOT 宽限期）</value></data>
+  <data name="لایسنس غیرمعتبر یا جعلی (Non-Genuine)" xml:space="preserve"><value>许可证无效或伪造（非正版）</value></data>
+  <data name="فعال نشده / نیازمند فعال سازی (Notification)" xml:space="preserve"><value>未激活 / 需要激活（通知）</value></data>
+  <data name="مهلت فعال سازی تمدید شده (Extended Grace)" xml:space="preserve"><value>延长激活宽限期（延长期宽限）</value></data>
+  <data name="لایسنس نامعتبر یا غیرفعال" xml:space="preserve"><value>许可证无效或未激活</value></data>
+  <data name="اطلاعات لایسنس در دسترس نیست" xml:space="preserve"><value>无法获取许可证信息</value></data>
+  <data name="دیسک فیزیکی" xml:space="preserve"><value>物理磁盘</value></data>
+  <data name="حافظه" xml:space="preserve"><value>存储</value></data>
+  <data name="هشدار (Warning)" xml:space="preserve"><value>警告</value></data>
+  <data name="نامطلوب" xml:space="preserve"><value>差</value></data>
+  <data name="{0}% سلامت" xml:space="preserve"><value>{0}% 健康</value></data>
+  <data name="{0:N0} ساعت" xml:space="preserve"><value>{0:N0} 小时</value></data>
+  <data name="         گزارش مشخصات سیستم و سخت افزار (CleanC)     " xml:space="preserve"><value>         系统与硬件报告 (CleanC)     </value></data>
+  <data name="تاریخ گزارش: {0:yyyy.MM.dd HH:mm:ss}" xml:space="preserve"><value>报告日期: {0:yyyy.MM.dd HH:mm:ss}</value></data>
+  <data name="[پردازنده مرکزی - CPU]" xml:space="preserve"><value>[中央处理器 - CPU]</value></data>
+  <data name="  مدل: {0}" xml:space="preserve"><value>  型号: {0}</value></data>
+  <data name="  مشخصات: {0} هسته فیزیکی | {1} رشته منطقی" xml:space="preserve"><value>  规格: {0} 个物理核心 | {1} 个逻辑线程</value></data>
+  <data name="  فرکانس: {0} MHz" xml:space="preserve"><value>  主频: {0} MHz</value></data>
+  <data name="  حافظه کش L3: {0} KB" xml:space="preserve"><value>  L3 缓存: {0} KB</value></data>
+  <data name="[حافظه رم - RAM]" xml:space="preserve"><value>[内存 - RAM]</value></data>
+  <data name="  ظرفیت کل: {0} ({1})" xml:space="preserve"><value>  总容量: {0} ({1})</value></data>
+  <data name="  اسلات های فعال: {0}" xml:space="preserve"><value>  活动插槽: {0}</value></data>
+  <data name="  سرعت باس: {0} MHz" xml:space="preserve"><value>  总线速度: {0} MHz</value></data>
+  <data name="  سازنده: {0}" xml:space="preserve"><value>  制造商: {0}</value></data>
+  <data name="[مادربرد و بایوس]" xml:space="preserve"><value>[主板与 BIOS]</value></data>
+  <data name="  سازنده مادربرد: {0}" xml:space="preserve"><value>  主板制造商: {0}</value></data>
+  <data name="  مدل مادربرد: {0}" xml:space="preserve"><value>  主板型号: {0}</value></data>
+  <data name="  نسخه بایوس: {0}" xml:space="preserve"><value>  BIOS 版本: {0}</value></data>
+  <data name="  تاریخ بایوس: {0}" xml:space="preserve"><value>  BIOS 日期: {0}</value></data>
+  <data name="[کارت های گرافیک - GPU]" xml:space="preserve"><value>[显卡 - GPU]</value></data>
+  <data name="    حافظه اختصاصی VRAM: {0}" xml:space="preserve"><value>    独立显存: {0}</value></data>
+  <data name="    نسخه درایور: {0}" xml:space="preserve"><value>    驱动版本：{0}</value></data>
+  <data name="[حافظه های ذخیره سازی]" xml:space="preserve"><value>[存储驱动器]</value></data>
+  <data name="    وضعیت: {0} | دما: {1} | کارکرد: {2}" xml:space="preserve"><value>    状态：{0} | 温度：{1} | 开机时间：{2}</value></data>
+  <data name="[باتری لپ تاپ]" xml:space="preserve"><value>[笔记本电池]</value></data>
+  <data name="  سلامت باتری: {0}%" xml:space="preserve"><value>  电池健康：{0}%</value></data>
+  <data name="  ظرفیت اولیه کارخانه: {0} mWh" xml:space="preserve"><value>  出厂设计容量：{0} mWh</value></data>
+  <data name="  ظرفیت شارژ فعلی: {0} mWh" xml:space="preserve"><value>  当前满电容量：{0} mWh</value></data>
+  <data name="  تعداد دفعات شارژ (سیکل): {0}" xml:space="preserve"><value>  充电循环次数：{0}</value></data>
+  <data name="[سیستم عامل و پایداری]" xml:space="preserve"><value>[操作系统与稳定性]</value></data>
+  <data name="  ویندوز: {0} ({1})" xml:space="preserve"><value>  Windows：{0} ({1})</value></data>
+  <data name="  شماره ساخت: Build {0}" xml:space="preserve"><value>  内部版本号：Build {0}</value></data>
+  <data name="  تاریخ نصب: {0}" xml:space="preserve"><value>  安装日期：{0}</value></data>
+  <data name="  مدت زمان روشن بودن سیستم: {0}" xml:space="preserve"><value>  系统运行时间：{0}</value></data>
+  <data name="سخت افزار" xml:space="preserve"><value>硬件</value></data>
+  <data name="اعمال تغییر" xml:space="preserve"><value>应用更改</value></data>
+  <data name="{0} برنامه غیرضروری، تبلیغاتی یا کم استفاده شناسایی شد" xml:space="preserve"><value>检测到{0} 个不必要、促销或很少使用的应用</value></data>
+  <data name="برنامه های تبلیغاتی و بلااستفاده پیش فرض که حدود {0} از فضای دیسک و منابع سیستم را درگیر کرده اند." xml:space="preserve"><value>默认的促销和未使用的应用占用了大约 {0} 的磁盘空间和系统资源。</value></data>
+  <data name="مدیریت نرم افزارها" xml:space="preserve"><value>软件管理</value></data>
+  <data name="بررسی و حذف" xml:space="preserve"><value>查看并删除</value></data>
+  <data name="کاهش بحرانی فضای درایو ویندوز ({0} GB معادل {1:0}% آزاد)" xml:space="preserve"><value>Windows 驱动器空间严重不足（{0} GB，{1:0}% 可用）</value></data>
+  <data name="پر بودن بیش از ۸۵٪ درایو SSD موجب افت ۵۰ درصدی سرعت و استهلاک زودهنگام سلول های فلش می شود. توصیه می شود پاکسازی و دستور TRIM انجام شود." xml:space="preserve"><value>SSD 填充超过 85% 会导致速度下降最多 50% 且闪存单元过早磨损。建议清理并运行 TRIM。</value></data>
+  <data name="حافظه و دیسک" xml:space="preserve"><value>内存与磁盘</value></data>
+  <data name="بهینه سازی TRIM دیسک" xml:space="preserve"><value>优化磁盘 TRIM</value></data>
+  <data name="شتاب دهنده سخت افزاری گرافیک (HAGS) فعال نیست" xml:space="preserve"><value>未启用硬件加速 GPU 调度（HAGS）</value></data>
+  <data name="با فعال سازی Hardware Accelerated GPU Scheduling، پردازش زمان بندی رندرینگ مستقیماً به کارت گرافیک سپرده شده و تاخیر فریم ها کاهش می یابد." xml:space="preserve"><value>启用硬件加速 GPU 调度可将渲染调度直接交给 GPU，减少帧延迟。</value></data>
+  <data name="کارت گرافیک و گیمینگ" xml:space="preserve"><value>GPU 与游戏</value></data>
+  <data name="فعال سازی HAGS" xml:space="preserve"><value>启用 HAGS</value></data>
+  <data name="تداخل پراکسی سیستم و قطعی اینترنت ({0})" xml:space="preserve"><value>系统代理冲突导致的网络中断（{0}]）</value></data>
+  <data name="شبکه و ارتباطات" xml:space="preserve"><value>网络与连接</value></data>
+  <data name="رفع قطعی و حذف پراکسی" xml:space="preserve"><value>修复中断并移除代理</value></data>
+  <data name="{0} سرویس یتیم در ویندوز شناسایی شد" xml:space="preserve"><value>在 Windows 中检测到 {0} 个孤立服务</value></data>
+  <data name="سرویس‌هایی که فایل اجرایی آن‌ها از روی دیسک پاک شده اما ورودی آن‌ها در ویندوز مانده و باعث کندی استارتاپ سیستم می‌شوند." xml:space="preserve"><value>其可执行文件已从磁盘中删除，但其条目仍保留在 Windows 中，从而减慢系统启动速度的服务。</value></data>
+  <data name="سرویس‌ها و بوت" xml:space="preserve"><value>服务和启动</value></data>
+  <data name="غیرفعال‌سازی سرویس‌ها" xml:space="preserve"><value>禁用服务</value></data>
+  <data name="فشرده‌سازی دیسک‌های مجازی WSL و داکر ({0})" xml:space="preserve"><value>压缩 WSL 和 Docker 虚拟磁盘 ({0})</value></data>
+  <data name="دیسک‌های مجازی پس از حذف فایل‌ها و کانتینرها حجم خود را پس نمی‌دهند. فشرده‌سازی VHDX می‌تواند گیگابایت‌ها فضا را آزاد کند." xml:space="preserve"><value>删除文件和容器后，虚拟磁盘不会缩小。压缩 VHDX 可以释放数 GB 的空间。</value></data>
+  <data name="مجازی‌سازی و دیسک" xml:space="preserve"><value>虚拟化和磁盘</value></data>
+  <data name="فشرده‌سازی دیسک‌ها" xml:space="preserve"><value>光盘</value></data>
+  <data name="ارتقای نرخ نوسازی مانیتور از {0}Hz به {1}Hz" xml:space="preserve"><value>将显示器刷新率从 {0}Hz 提高到 {1}Hz</value></data>
+  <data name="مانیتور شما با رزولوشن {0}×{1} از فرکانس بالاتر {2}Hz پشتیبانی می کند که روانی و سرعت تصویر را ۲ برابر خواهد کرد." xml:space="preserve"><value>你在 {0}×{1} 的显示器支持更高的 {2}Hz 刷新率，这使得动作大约流畅两倍。</value></data>
+  <data name="نمایشگر و مانیتور" xml:space="preserve"><value>显示与监控</value></data>
+  <data name="ارتقا به {0}Hz" xml:space="preserve"><value>升级到 {0}Hz</value></data>
+  <data name="نرم افزار نقاشی پیش فرض ویندوز" xml:space="preserve"><value>Windows 默认画图应用</value></data>
+  <data name="برنامه اصلی ایکس باکس و بازی های ویندوز" xml:space="preserve"><value>主要的 Xbox 应用和 Windows 游戏</value></data>
+  <data name="نوار ابزار و ضبط ویدیوی بازی" xml:space="preserve"><value>游戏内覆盖工具栏和视频录制</value></data>
+  <data name="پوشش درون بازی ایکس باکس" xml:space="preserve"><value>Xbox 游戏内覆盖</value></data>
+  <data name="سرویس ورود به اکانت مایکروسافت در بازی ها" xml:space="preserve"><value>游戏的 Microsoft 账户登录服务</value></data>
+  <data name="ابزار تبدیل گفتار به نوشتار ایکس باکس" xml:space="preserve"><value>Xbox 语音转文字工具</value></data>
+  <data name="برنامه اتصال و همگام سازی گوشی با ویندوز" xml:space="preserve"><value>手机与 Windows 连接和同步应用</value></data>
+  <data name="ابزار اتوماسیون کارهای تکراری مایکروسافت (RPA) — اگر استفاده نمی کنید لازم نیست" xml:space="preserve"><value>微软 RPA 工具用于自动化重复任务 — 如果不使用则无需安装</value></data>
+  <data name="برای همگام سازی آیفون با iTunes قدیمی — اگر آیفون وصل نمی کنید لازم نیست" xml:space="preserve"><value>用于将 iPhone 与旧版 iTunes 同步 — 如果不连接 iPhone 则无需安装</value></data>
+  <data name="سرویس کشف شبکه ی اپل — فقط برای iTunes و چاپگرهای اپل لازم است" xml:space="preserve"><value>Apple 网络发现服务 — 仅在使用 iTunes 和 Apple 打印机时需要</value></data>
+  <data name="کلاینت VPN بدون استفاده" xml:space="preserve"><value>未使用的 VPN 客户端</value></data>
+  <data name="نسخه ی منسوخ جاوا (JDK 8) — اگر پروژه ی قدیمی ندارید لازم نیست" xml:space="preserve"><value>已弃用的 Java 版本 (JDK 8) — 除非维护旧项目，否则不需要</value></data>
+  <data name="ابزار منسوخ بررسی سلامت ویندوز — مایکروسافت بازنشسته اش کرده؛ جایگزین: PC Manager" xml:space="preserve"><value>已弃用的 Windows 健康检查工具 — 已被微软退休；由 PC 管理器取代</value></data>
+  <data name="درایور ADB قدیمی و عمومی — برای گوشی های جدید، درایور رسمی گوگل یا سازنده بهتر است" xml:space="preserve"><value>旧版通用ADB驱动 — 对于较新手机，官方的Google或厂商驱动更好</value></data>
+  <data name="بازی تبلیغاتی پیش فرض ویندوز" xml:space="preserve"><value>Windows预装促销游戏</value></data>
+  <data name="برنامه تبلیغاتی تیک تاک" xml:space="preserve"><value>TikTok促销应用</value></data>
+  <data name="برنامه اشتراک دیزنی پلاس" xml:space="preserve"><value>Disney+流媒体应用</value></data>
+  <data name="برنامه فیس بوک" xml:space="preserve"><value>Facebook应用</value></data>
+  <data name="برنامه اینستاگرام" xml:space="preserve"><value>Instagram应用</value></data>
+  <data name="برنامه تبلیغاتی آمازون پرایم" xml:space="preserve"><value>Amazon Prime视频促销应用</value></data>
+  <data name="برنامه پخش فیلم نتفلیکس" xml:space="preserve"><value>Netflix流媒体应用</value></data>
+  <data name="نسخه استور از پیش نصب شده اسپاتیفای" xml:space="preserve"><value>预装的Spotify商店版本</value></data>
+  <data name="بازی تبلیغاتی پیش فرض" xml:space="preserve"><value>预装促销游戏</value></data>
+  <data name="اپ قدیمی توییتر از پیش نصب شده — سرویس آن سال ها پیش تعطیل شده است" xml:space="preserve"><value>预装旧版Twitter应用 — 该服务已在数年前关闭</value></data>
+  <data name="دستیار صوتی قدیمی و غیرفعال مایکروسافت" xml:space="preserve"><value>微软已停用的旧版语音助手</value></data>
+  <data name="فید اخبار و مقالات مایکروسافت" xml:space="preserve"><value>微软新闻订阅和文章</value></data>
+  <data name="برنامه هواشناسی پیش فرض ویندوز" xml:space="preserve"><value>Windows默认天气应用</value></data>
+  <data name="برنامه راهنما و پیشنهادات ویندوز" xml:space="preserve"><value>Windows提示和建议应用</value></data>
+  <data name="ابزار پشتیبانی و راهنمایی مایکروسافت" xml:space="preserve"><value>微软支持与帮助工具</value></data>
+  <data name="ویرایشگر ویدیوی پیش فرض مایکروسافت" xml:space="preserve"><value>微软默认视频编辑器</value></data>
+  <data name="بازی های ورق پیش فرض ویندوز" xml:space="preserve"><value>Windows 默认纸牌游戏</value></data>
+  <data name="مرکز ارسال بازخورد و باگ به مایکروسافت" xml:space="preserve"><value>用于向微软发送反馈和错误报告的中心</value></data>
+  <data name="پورتال واقعیت ترکیبی ویندوز" xml:space="preserve"><value>Windows 混合现实门户</value></data>
+  <data name="نمایشگر فایل های سه بعدی ویندوز" xml:space="preserve"><value>Windows 3D 文件查看器</value></data>
+  <data name="برنامه مخاطبین قدیمی ویندوز" xml:space="preserve"><value>传统的 Windows 联系人应用</value></data>
+  <data name="برنامه اخبار ورزشی مایکروسافت" xml:space="preserve"><value>微软体育新闻应用</value></data>
+  <data name="برنامه اخبار مالی مایکروسافت" xml:space="preserve"><value>微软财经新闻应用</value></data>
+  <data name="تبلیغاتی / پیش فرض" xml:space="preserve"><value>推广 / 默认</value></data>
+  <data name="ویندوز (غیرضروری)" xml:space="preserve"><value>Windows（非必要）</value></data>
+  <data name="نرم افزار لپ تاپ / تریال" xml:space="preserve"><value>笔记本软件 / 试用版</value></data>
+  <data name="نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم" xml:space="preserve"><value>OEM 推广或试用软件</value></data>
+  <data name="برنامه حجیم" xml:space="preserve"><value>大型应用</value></data>
+  <data name="بیش از ۳۰ روز است اجرا نشده (آخرین اجرا: {0:yyyy.MM.dd})" xml:space="preserve"><value>超过 30 天未运行（上次运行：{0:yyyy.MM.dd})</value></data>
+  <data name="نصب شده در تاریخ {0:yyyy.MM.dd} ولی ثبت استفاده ای از آن نشده است" xml:space="preserve"><value>安装于 {0:yyyy.MM.dd} 且无使用记录</value></data>
+  <data name="حجیم و کم استفاده" xml:space="preserve"><value>大型且很少使用</value></data>
+  <data name="اختیاری / در صورت عدم نیاز" xml:space="preserve"><value>可选 / 如果不需要</value></data>
+  <data name="حذف {0} ناموفق بود: {1}" xml:space="preserve"><value>删除 {0} 失败： {1}</value></data>
+  <data name="در حال بررسی پوشه: {0}..." xml:space="preserve"><value>扫描文件夹：{0}...</value></data>
+  <data name="در حال بررسی حافظه های موقت توسعه دهندگان و کانتینرها..." xml:space="preserve"><value>扫描开发者缓存和容器垃圾...</value></data>
+  <data name="کش پکیج های npm" xml:space="preserve"><value>npm 包缓存</value></data>
+  <data name="کش پکیج های npm (Roaming)" xml:space="preserve"><value>npm 包缓存（漫游）</value></data>
+  <data name="کش پکیج های NuGet" xml:space="preserve"><value>NuGet 包缓存</value></data>
+  <data name="کش HTTP پکیج های NuGet" xml:space="preserve"><value>NuGet HTTP 包缓存</value></data>
+  <data name="کش پکیج های Python pip" xml:space="preserve"><value>Python pip 包缓存</value></data>
+  <data name="کش پکیج های Bun" xml:space="preserve"><value>Bun 包缓存</value></data>
+  <data name="کش بیلد و ابزارهای Gradle" xml:space="preserve"><value>Gradle 构建及工具缓存</value></data>
+  <data name="کش پکیج های Rust Cargo" xml:space="preserve"><value>Rust Cargo 包缓存</value></data>
+  <data name="کش کامپایل Android Studio" xml:space="preserve"><value>Android Studio 构建缓存</value></data>
+  <data name="کش ادیتور VS Code" xml:space="preserve"><value>VS Code 编辑器缓存</value></data>
+  <data name="داده های کش شده VS Code" xml:space="preserve"><value>VS Code 缓存数据</value></data>
+  <data name="کش و لاگ های Docker" xml:space="preserve"><value>Docker 缓存和日志</value></data>
+  <data name="مدل های هوش مصنوعی Ollama (.gguf)" xml:space="preserve"><value>Ollama AI 模型 (.gguf)</value></data>
+  <data name="کش مدل های HuggingFace" xml:space="preserve"><value>HuggingFace 模型缓存</value></data>
+  <data name="بکاپ های آیفون (Apple MobileSync)" xml:space="preserve"><value>iPhone 备份（Apple MobileSync）</value></data>
+  <data name="بکاپ های آیفون (iTunes)" xml:space="preserve"><value>iPhone 备份（iTunes）</value></data>
+  <data name="در حال تحلیل و مقایسه فایل های یکسان..." xml:space="preserve"><value>正在分析和比较相同的文件...</value></data>
+  <data name="سرویس Docker روی سیستم نصب یا فعال نیست." xml:space="preserve"><value>Docker 服务未安装或未运行。</value></data>
+  <data name="کش داکر، ایمیج های بی استفاده و کانتینرهای متوقف شده با موفقیت پاکسازی شدند." xml:space="preserve"><value>Docker 缓存、未使用的镜像和已停止的容器已成功清理。</value></data>
+  <data name="خطا در پاکسازی کش Docker." xml:space="preserve"><value>清理 Docker 缓存失败。</value></data>
+  <data name="سرویس Docker در دسترس نیست." xml:space="preserve"><value>Docker 服务不可用。</value></data>
+  <data name="کش های محیط های برنامه نویسی (npm, pip, NuGet, Gradle, VS Code) پاکسازی شدند. ({0} آزاد شد)" xml:space="preserve"><value>开发者环境缓存（npm、pip、NuGet、Gradle、VS Code）已清理。（释放了 {0}）</value></data>
+  <data name="سرویس WSL2 خاموش و حافظه رم آزاد شد. فایل دیسک مجازی vhdx مجزا یافت نشد." xml:space="preserve"><value>WSL2 服务已关闭，RAM 已释放。未找到单独的 vhdx 虚拟磁盘文件。</value></data>
+  <data name="تعداد {0} دیسک مجازی WSL2 متراکم شد؛ {1} مورد کامل نشد (دیسک حجم غالب می تواند کامل نشود)." xml:space="preserve"><value>已压缩 {0} 个 WSL2 虚拟磁盘；{1} 未完成（主卷磁盘可能未完全压缩）。</value></data>
+  <data name="تعداد {0} دیسک مجازی WSL2 با موفقیت بهینه سازی و متراکم شد." xml:space="preserve"><value>已成功优化并压缩 {0} 个 WSL2 虚拟磁盘。</value></data>
+  <data name="خطا در متراکم سازی دیسک WSL2." xml:space="preserve"><value>压缩 WSL2 磁盘失败。</value></data>
+  <data name="امکان اجرای ابزار DISM وجود ندارد." xml:space="preserve"><value>无法运行 DISM 工具。</value></data>
+  <data name="فروشگاه قطعات ویندوز (WinSxS / DISM) با موفقیت پاکسازی و بسته های قدیمی حذف شدند." xml:space="preserve"><value>Windows 组件存储（WinSxS / DISM）已清理，旧的包已成功移除。</value></data>
+  <data name="عملیات DISM با خطا، تایم اوت یا نیاز به دسترسی Administrator پایان یافت." xml:space="preserve"><value>DISM 操作因错误、超时或需要管理员权限而结束。</value></data>
+  <data name="خطا در اجرای ابزار پاکسازی DISM." xml:space="preserve"><value>无法运行 DISM 清理工具。</value></data>
+  <data name="تحریم شکن شکن (Shecan)" xml:space="preserve"><value>Shecan 反制制裁 DNS</value></data>
+  <data name="عبور مطمئن از تحریم های توسعه دهندگان، داکر، انویدیا، اوراکل و ادوبی" xml:space="preserve"><value>可靠访问开发者服务、Docker、NVIDIA、Oracle 和 Adobe 的制裁绕过</value></data>
+  <data name="تحریم شکن الکترو (Electro)" xml:space="preserve"><value>Electro 反制制裁 DNS</value></data>
+  <data name="مخصوص عبور از تحریم های گیمینگ، دیسکورد، اپیک گیمز و دانلود سریع" xml:space="preserve"><value>专为绕过游戏制裁、Discord、Epic Games 及高速下载设计</value></data>
+  <data name="تحریم شکن ۴۰۳ آنلاین" xml:space="preserve"><value>403 在线反制制裁 DNS</value></data>
+  <data name="سرویس رفع تحریم سرویس های خارجی برای کاربران، استارتاپ ها و توسعه دهندگان" xml:space="preserve"><value>面向国外服务的制裁缓解服务，适用于用户、初创公司和开发者</value></data>
+  <data name="رادار بازی (Radar Game)" xml:space="preserve"><value>雷达游戏</value></data>
+  <data name="کاهش پینگ و رفع اختلال اتصال به سرور بازی های آنلاین" xml:space="preserve"><value>降低延迟并修复在线游戏服务器的连接问题</value></data>
+  <data name="گیمینگ و پینگ" xml:space="preserve"><value>游戏与延迟</value></data>
+  <data name="کلودفلر (Cloudflare 1.1.1.1)" xml:space="preserve"><value>Cloudflare (1.1.1.1)</value></data>
+  <data name="سریع ترین و امن ترین دی ان اس عمومی جهان با حداقل تاخیر" xml:space="preserve"><value>全球最快且最安全的公共 DNS，延迟极低</value></data>
+  <data name="بین المللی" xml:space="preserve"><value>国际</value></data>
+  <data name="گوگل (Google Public DNS)" xml:space="preserve"><value>Google 公共 DNS</value></data>
+  <data name="پایدارترین دی ان اس جهانی با کش گسترده سرورها در سراسر دنیا" xml:space="preserve"><value>全球最可靠的 DNS，在全球范围内拥有广泛的服务器缓存</value></data>
+  <data name="ادگارد ضد تبلیغات (AdGuard DNS)" xml:space="preserve"><value>AdGuard DNS（广告拦截）</value></data>
+  <data name="مسدودسازی تبلیغات وب، ترکرها و پاپ آپ های مزاحم اینترنتی" xml:space="preserve"><value>阻止网页广告、追踪器和侵入性网络弹出窗口</value></data>
+  <data name="امنیت و حریم خصوصی" xml:space="preserve"><value>安全与隐私</value></data>
+  <data name="خودکار شبکه (DHCP پیش فرض)" xml:space="preserve"><value>网络自动（默认 DHCP）</value></data>
+  <data name="تنظیم دریافت خودکار آدرس DNS از مودم یا ارائه دهنده اینترنت" xml:space="preserve"><value>自动从路由器或 ISP 获取 DNS 地址</value></data>
+  <data name="پیش فرض سیستم" xml:space="preserve"><value>系统默认</value></data>
+  <data name="هیچ کارت شبکه فعال متصل به اینترنت یافت نشد." xml:space="preserve"><value>未找到任何活动的已连接互联网的网络适配器。</value></data>
+  <data name="تنظیمات DNS با موفقیت به {0} اعمال و کش شبکه نوسازی شد." xml:space="preserve"><value>DNS 设置已应用到 {0} 并已清除 DNS 缓存。</value></data>
+  <data name="DNSِ {0} کارت از {1} کارت تنظیم شد. " xml:space="preserve"><value>已在 {1} 个适配器的 {0} 上配置 DNS。 </value></data>
+  <data name="؛ " xml:space="preserve"><value>; </value></data>
+  <data name="تنظیم DNS ناموفق بود — " xml:space="preserve"><value>DNS 配置失败 — </value></data>
+  <data name="خطا در تنظیم DNS: {0}" xml:space="preserve"><value>设置 DNS 出错: {0}</value></data>
+  <data name="تنظیمات DNS تمامی کارت های شبکه به حالت خودکار (DHCP) بازگردانده شد." xml:space="preserve"><value>所有网络适配器的 DNS 设置已恢复为自动 (DHCP)。</value></data>
+  <data name="DNSِ {0} کارت از {1} کارت به حالت خودکار برگشت. " xml:space="preserve"><value>已将 {1} 个适配器的 {0} 上的 DNS 恢复为自动。 </value></data>
+  <data name="بازگرداندن DNS به حالت خودکار ناموفق بود — " xml:space="preserve"><value>恢复 DNS 到自动失败 — </value></data>
+  <data name="خطا در ریست DNS: {0}" xml:space="preserve"><value>重置 DNS 出错: {0}</value></data>
+  <data name="کد خطای WMI: {0}" xml:space="preserve"><value>WMI 错误代码: {0}</value></data>
+  <data name="کارت شبکه در WMI پیدا نشد" xml:space="preserve"><value>在 WMI 中未找到网络适配器</value></data>
+  <data name="سفارشی / مودم" xml:space="preserve"><value>自定义 / 路由器</value></data>
+  <data name="خودکار (DHCP)" xml:space="preserve"><value>自动 (DHCP)</value></data>
+  <data name="آماده و سالم" xml:space="preserve"><value>准备就绪且健康</value></data>
+  <data name="نسخه قدیمی DriverStore (تکراری)" xml:space="preserve"><value>旧 DriverStore 版本 (重复)</value></data>
+  <data name="دستگاه نامشخص" xml:space="preserve"><value>未知设备</value></data>
+  <data name="دستگاه معیوب '{0}' با موفقیت از سیستم حذف و جدا شد." xml:space="preserve"><value>故障设备 '{0}' 已成功从系统中移除并分离。</value></data>
+  <data name="عدم توانایی در اجرای ابزار جداسازی سخت افزار." xml:space="preserve"><value>无法运行硬件移除工具。</value></data>
+  <data name="عدم توانایی در اجرای ابزار pnputil." xml:space="preserve"><value>无法运行 pnputil 工具。</value></data>
+  <data name="بسته درایور {0} با موفقیت از مخزن درایورها حذف شد." xml:space="preserve"><value>驱动程序包 {0} 已成功从驱动程序存储中移除。</value></data>
+  <data name="بسته درایور {0} در حال استفاده توسط سخت‌افزار فعال سیستم است و جهت حفظ پایداری حذف نشد." xml:space="preserve"><value>驱动程序包 {0} 正在被活动系统硬件使用，为保持稳定性未被移除。</value></data>
+  <data name="بسته درایور {0} از طریق سرویس DISM با موفقیت حذف شد." xml:space="preserve"><value>驱动程序包 {0} 已通过 DISM 服务成功移除。</value></data>
+  <data name="امکان حذف درایور {0} وجود ندارد زیرا توسط هسته سیستم در حال استفاده فعال است." xml:space="preserve"><value>驱动程序 {0} 无法移除，因为它正在被系统内核使用。</value></data>
+  <data name="عدم موفقیت در حذف درایور: {0}" xml:space="preserve"><value>移除驱动程序失败：{0}</value></data>
+  <data name="خطا در فرآیند حذف: {0}" xml:space="preserve"><value>移除期间出错：{0}</value></data>
+  <data name="آپدیت درایور" xml:space="preserve"><value>驱动程序更新</value></data>
+  <data name="دستگاه به درستی پیکربندی نشده است (Code 1)" xml:space="preserve"><value>设备配置不正确（代码 1）</value></data>
+  <data name="دستگاه امکان راه اندازی ندارد (Code 10)" xml:space="preserve"><value>设备无法启动（代码 10）</value></data>
+  <data name="سیستم برای استفاده نیازمند ریستارت است (Code 14)" xml:space="preserve"><value>使用前需要重启系统（错误代码 14）</value></data>
+  <data name="دستگاه توسط ویندوز غیرفعال شده است (Code 22)" xml:space="preserve"><value>设备已被 Windows 禁用（错误代码 22）</value></data>
+  <data name="درایور این سخت افزار نصب نشده است (Code 28)" xml:space="preserve"><value>此硬件的驱动程序未安装（错误代码 28）</value></data>
+  <data name="ویندوز نمی تواند درایور را بارگذاری کند (Code 31)" xml:space="preserve"><value>Windows 无法加载驱动程序（错误代码 31）</value></data>
+  <data name="درایور آسیب دیده یا مفقود شده است (Code 39)" xml:space="preserve"><value>驱动程序已损坏或丢失（错误代码 39）</value></data>
+  <data name="سخت افزار به دلیل گزارش خطا متوقف شده است (Code 43)" xml:space="preserve"><value>硬件因为报告问题而已停止（错误代码 43）</value></data>
+  <data name="کد خطای سخت افزاری ({0})" xml:space="preserve"><value>硬件错误代码（{0}]）</value></data>
+  <data name="شناسه (PID): {0}" xml:space="preserve"><value>PID: {0}</value></data>
+  <data name="متصل به برق" xml:space="preserve"><value>已插入</value></data>
+  <data name="0 بایت" xml:space="preserve"><value>0 字节</value></data>
+  <data name="بایت" xml:space="preserve"><value>字节</value></data>
+  <data name="کیلوبایت" xml:space="preserve"><value>KB</value></data>
+  <data name="مگابایت" xml:space="preserve"><value>MB</value></data>
+  <data name="گیگابایت" xml:space="preserve"><value>GB</value></data>
+  <data name="ترابایت" xml:space="preserve"><value>TB</value></data>
+  <data name="بهینه سازی پیشرفته شبکه و پاسخ دهی سیستم (Advanced Tweaks)" xml:space="preserve"><value>高级网络与响应优化（高级调整）</value></data>
+  <data name="حذف محدودیت عمدی ویندوز برای پکت های شبکه، غیرفعال سازی GameDVR و افزایش اولویت پردازشی برنامه ها." xml:space="preserve"><value>移除 Windows 有意的网络包限速，禁用 GameDVR，并提升应用的处理优先级。</value></data>
+  <data name="شبکه و کارایی" xml:space="preserve"><value>网络与性能</value></data>
+  <data name="اعمال بهینه سازی ها" xml:space="preserve"><value>应用优化</value></data>
+  <data name="زیاد" xml:space="preserve"><value>高</value></data>
+  <data name="متوسط" xml:space="preserve"><value>中</value></data>
+  <data name="کم" xml:space="preserve"><value>低</value></data>
+  <data name="پسماند تنظیمات افزونه ({0})" xml:space="preserve"><value>扩展设置遗留 ({0})</value></data>
+  <data name="دایرکتوری باقیمانده از افزونه حذف‌شده (Orphaned Remnant)" xml:space="preserve"><value>已移除扩展的残余目录（孤立残留）</value></data>
+  <data name="افزونه دارای خطای داخلی یا مسدود شده توسط استور (Corrupted/Policy)" xml:space="preserve"><value>扩展内部错误或被商店阻止（损坏/策略）</value></data>
+  <data name="افزونه کلیدی و حفاظت‌شده (دانلود منیجر، مترجم، AI RTL)" xml:space="preserve"><value>受保护的必要扩展（下载管理器、翻译器、AI RTL）</value></data>
+  <data name="افزونه منسوخ‌شده، غیرفعال یا جایگزین‌شده (Safe to Clean)" xml:space="preserve"><value>已弃用、已禁用或被替代的扩展（可安全清理）</value></data>
+  <data name="حجم بسیار بالا (&gt; 50MB) با احتمال مصرف سنگین رم" xml:space="preserve"><value>体积非常大（&gt;50MB），可能占用大量内存</value></data>
+  <data name="تزریق اسکریپت به تمام صفحات (&lt;all_urls&gt;) - پایش دائمی DOM" xml:space="preserve"><value>向所有页面注入脚本 (&lt;all_urls&gt;) - 持续 DOM 监控</value></data>
+  <data name="افزونه غیرفعال توسط کاربر" xml:space="preserve"><value>用户禁用的扩展</value></data>
+  <data name="افزونه فعال استاندارد" xml:space="preserve"><value>标准活动扩展</value></data>
+  <data name="در حال پاک سازی: {0}..." xml:space="preserve"><value>正在清理：{0}...</value></data>
+  <data name="بهینه سازی حافظه و رفرش شبکه..." xml:space="preserve"><value>正在优化内存并刷新网络...</value></data>
+  <data name="تغییر حرف درایو سیستم عامل ویندوز (C:) به دلایل امنیتی و پایداری سیستم مجاز نیست." xml:space="preserve"><value>出于安全性和系统稳定性原因，不允许更改 Windows 系统驱动器字母 (C:)。</value></data>
+  <data name="حرف انتخابی با حرف فعلی درایو یکسان است." xml:space="preserve"><value>所选字母与驱动器当前的字母相同。</value></data>
+  <data name="حرف درایو {0}: در حال حاضر توسط درایو دیگری در سیستم در حال استفاده است." xml:space="preserve"><value>驱动器字母 {0}: 当前已被系统上的另一个驱动器使用。</value></data>
+  <data name="عدم توانایی در فراخوانی ابزار مدیریت پارتیشن." xml:space="preserve"><value>无法调用分区管理工具。</value></data>
+  <data name="حرف درایو با موفقیت از {0}: به {1}: تغییر یافت." xml:space="preserve"><value>驱动器字母已成功从 {0}: 更改为 {1}:。</value></data>
+  <data name="تغییر حرف درایو انجام نشد — احتمالاً پارتیشن در حال استفاده یا رزرو شده است." xml:space="preserve"><value>驱动器字母更改失败——分区可能正在使用或已保留。</value></data>
+  <data name="خطای سیستمی: {0}" xml:space="preserve"><value>系统错误：{0}</value></data>
+  <data name="درایو محلی" xml:space="preserve"><value>本地磁盘</value></data>
+  <data name="۰ بایت (حذف شده)" xml:space="preserve"><value>0 字节（已删除）</value></data>
+  <data name="عالی" xml:space="preserve"><value>优秀</value></data>
+  <data name="خوب" xml:space="preserve"><value>良好</value></data>
+  <data name="عالی (بدون لگ)" xml:space="preserve"><value>优秀（无延迟）</value></data>
+  <data name="بسیار خوب" xml:space="preserve"><value>非常好</value></data>
+  <data name="قابل قبول" xml:space="preserve"><value>可接受</value></data>
+  <data name="دارای تاخیر" xml:space="preserve"><value>高延迟</value></data>
+  <data name="کیفیت عالی (HD)" xml:space="preserve"><value>优秀质量（高清）</value></data>
+  <data name="کیفیت مطلوب" xml:space="preserve"><value>良好质量</value></data>
+  <data name="کیفیت پایه" xml:space="preserve"><value>基础质量</value></data>
+  <data name="شبکه اینترنت" xml:space="preserve"><value>网络服务</value></data>
+  <data name="جهانی" xml:space="preserve"><value>全球</value></data>
+  <data name="اتصال فعال" xml:space="preserve"><value>活动连接</value></data>
+  <data name="تست توسط کاربر لغو گردید." xml:space="preserve"><value>测试已被用户取消。</value></data>
+  <data name="خطا در اتصال به سرور دانلود اینترنت." xml:space="preserve"><value>无法连接到互联网测速服务器。</value></data>
+  <data name="در حال اسکن پوشه: {0}..." xml:space="preserve"><value>正在扫描文件夹：{0}...</value></data>
+  <data name="C:\Users (پروفایل کاربر)" xml:space="preserve"><value>C:\Users（用户配置文件）</value></data>
+  <data name="ریشه ی سیستمی ویندوز — هرگز حذف نمی شود" xml:space="preserve"><value>Windows 系统根目录 — 永远不要删除</value></data>
+  <data name="لیست حفاظت پیش فرض CleanC" xml:space="preserve"><value>CleanC 默认保护列表</value></data>
+  <data name="پراکسی سیستم روی پورت {0} فعال مانده در حالی که کلاینت VPN بسته شده است و اینترنت ترمینال و ویندوز قطع می باشد." xml:space="preserve"><value>当 VPN 客户端关闭时，系统代理仍在端口 {0} 上活动，导致终端和 Windows 网络连接中断。</value></data>
+  <data name="پایدار" xml:space="preserve"><value>稳定</value></data>
+  <data name="لپ تاپ شما به شارژر متصل است" xml:space="preserve"><value>您的笔记本已连接到充电器</value></data>
+  <data name="سیستم دسکتاپ شما با برق مستقیم کار می کند" xml:space="preserve"><value>您的台式系统使用直流电源运行</value></data>
+  <data name="فعال سازی پلن مصرف انرژی با حداکثر کارایی (High Performance)" xml:space="preserve"><value>启用最高性能电源计划（高性能）</value></data>
+  <data name="{0}. برای حذف تأخیر کلاک پردازنده و پایدار ماندن حداکثر توان پردازشی، پلن High Performance فعال شود؟" xml:space="preserve"><value>{0}. 为了消除CPU时钟延迟并保持最大处理性能稳定，是否应启用高性能计划？</value></data>
+  <data name="انرژی و پردازنده" xml:space="preserve"><value>能源与处理器</value></data>
+  <data name="فعال سازی High Performance" xml:space="preserve"><value>启用高性能</value></data>
+  <data name="شیء انتخاب نشده است." xml:space="preserve"><value>未选择任何项目。</value></data>
+  <data name="داده ی شیء دیگر در سطل موجود نیست." xml:space="preserve"><value>该项目的数据在回收站中不再存在。</value></data>
+  <data name="مسیر مقصد نامعتبر است." xml:space="preserve"><value>目标路径无效。</value></data>
+  <data name="نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند)." xml:space="preserve"><value>Windows还原点创建成功（旧的还原点已自动修剪）。</value></data>
+  <data name="ویندوز ساخت نقطه بازگردانی را رد کرد (کد {0}) — محافظت از سیستم (System Protection) را فعال کنید." xml:space="preserve"><value>Windows拒绝创建还原点（代码 {0}）— 启用系统保护。</value></data>
+  <data name="ساخت نقطه بازگردانی ناموفق بود: " xml:space="preserve"><value>创建还原点失败： </value></data>
+  <data name="در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)" xml:space="preserve"><value>将存储在 CleanC 隔离区（可从恢复中心恢复）</value></data>
+  <data name="برای همیشه حذف خواهد شد (قابل بازگردانی نیست)" xml:space="preserve"><value>将被永久删除（无法恢复）</value></data>
+  <data name="به سطل بازیافت منتقل خواهد شد" xml:space="preserve"><value>将被移至回收站</value></data>
+  <data name="هیچ موردی حذف نشد." xml:space="preserve"><value>未删除任何项目。</value></data>
+  <data name="{0} مورد به سطل بازیافت منتقل شد" xml:space="preserve"><value>{0} 个项目已移至回收站</value></data>
+  <data name="{0} مورد در قرنطینه ذخیره شد" xml:space="preserve"><value>{0} 个项目已保存到隔离区</value></data>
+  <data name="{0} مورد حذف قطعی شد" xml:space="preserve"><value>{0} 个项目已被永久删除</value></data>
+  <data name="، " xml:space="preserve"><value>, </value></data>
+  <data name="هیچ موردی حذف نشد" xml:space="preserve"><value>未删除任何项目</value></data>
+  <data name="؛ {0} مورد از قبل وجود نداشت" xml:space="preserve"><value>; {0} 个项目不存在</value></data>
+  <data name="؛ {0} مورد ناموفق" xml:space="preserve"><value>; {0} 个项目失败</value></data>
+  <data name=" — {0} فضا آزاد گردید" xml:space="preserve"><value> — {0} 已释放</value></data>
+  <data name=" — {0} جابه جا شد (تا خالی کردن سطل آزاد نمی شود)" xml:space="preserve"><value> — {0} 已移动（回收站清空前未释放）</value></data>
+  <data name="دسترسی کافی نیست" xml:space="preserve"><value>权限不足</value></data>
+  <data name="مسیر پیدا نشد" xml:space="preserve"><value>未找到路径</value></data>
+  <data name="فایل پیدا نشد" xml:space="preserve"><value>未找到文件</value></data>
+  <data name="سطل بازیافت در دسترس نیست" xml:space="preserve"><value>回收站不可用</value></data>
+  <data name="فایل توسط برنامه ی دیگری قفل است" xml:space="preserve"><value>文件被其他程序锁定</value></data>
+  <data name="نشست قرنطینه پیدا نشد." xml:space="preserve"><value>未找到隔离会话。</value></data>
+  <data name="برنامه کاربردی (اختیاری)" xml:space="preserve"><value>通用应用（可选）</value></data>
+  <data name="درایو محلی ویندوز" xml:space="preserve"><value>Windows 本地磁盘</value></data>
+  <data name="متصل به شارژر" xml:space="preserve"><value>正在充电</value></data>
+  <data name="{0}% باتری" xml:space="preserve"><value>{0}% 电量</value></data>
+  <data name="نیازمند بررسی" xml:space="preserve"><value>需要注意</value></data>
+  <data name="حجم متغیر / آنلاین" xml:space="preserve"><value>可变大小 / 联网</value></data>
+  <data name="آپدیت کیفی و امنیتی" xml:space="preserve"><value>质量与安全更新</value></data>
+  <data name="درحال اجرا" xml:space="preserve"><value>运行中</value></data>
+  <data name="غیرفعال (Disabled)" xml:space="preserve"><value>已禁用</value></data>
+  <data name="آماده به کار (فعال)" xml:space="preserve"><value>就绪（已启用）</value></data>
+  <data name="آپدیت ویندوز" xml:space="preserve"><value>Windows 更新</value></data>
+  <data name="ارتقای نسل سیستم عامل" xml:space="preserve"><value>操作系统世代升级</value></data>
+  <data name="آپدیت اختیاری ویندوز" xml:space="preserve"><value>可选的 Windows 更新</value></data>
+  <data name="ارتقای نسل جدید (اختیاری)" xml:space="preserve"><value>新世代升级（可选）</value></data>
+  <data name="درایور سخت افزار (اختیاری)" xml:space="preserve"><value>硬件驱动（可选）</value></data>
+  <data name="بروزرسانی نسل جدید ویندوز ۱۱ (بیلد {0})" xml:space="preserve"><value>新世代 Windows 11 更新（版本 {0})</value></data>
+  <data name="ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {0} - بیلد {1}) شامل قابلیت های هوش مصنوعی و بهینه سازی های عمیق هسته سیستم عامل" xml:space="preserve"><value>正式升级到新世代 Windows 11 版本（{0} - 构建 {1})，具有 AI 功能和深度操作系统内核优化</value></data>
+  <data name="ارتقای رسمی به نسخه جدید ویندوز ۱۱ ({0})" xml:space="preserve"><value>正式升级到新 Windows 11 版本（{0})</value></data>
+  <data name="نسل بعد ({0})" xml:space="preserve"><value>下一代（{0}]）</value></data>
+  <data name="نسل جدید اختیاری" xml:space="preserve"><value>可选新一代</value></data>
+  <data name="ارتقای نسل سیستم عامل (Next-Gen OS Upgrade)" xml:space="preserve"><value>操作系统升级（下一代操作系统升级）</value></data>
+  <data name="کش آپدیت با موفقیت تخلیه گردید و سرویس ها نوسازی شدند. ({0} آزاد شد)" xml:space="preserve"><value>缓存更新已成功清除，服务已重启。({0} 已释放)</value></data>
+  <data name="خطا در پاکسازی: {0}" xml:space="preserve"><value>清理错误：{0}</value></data>
+  <data name="خطا در خواندن مشخصات سیستم: {0}" xml:space="preserve"><value>读取系统规格时出错：{0}</value></data>
+  <data name="{0} رشته" xml:space="preserve"><value>{0} 线程</value></data>
+  <data name="{0} هسته" xml:space="preserve"><value>{0} 核心</value></data>
+  <data name="پردازنده" xml:space="preserve"><value>处理器</value></data>
+  <data name="{0} اسلات" xml:space="preserve"><value>{0} 插槽</value></data>
+  <data name="حافظه رم" xml:space="preserve"><value>内存</value></data>
+  <data name="درایور: {0}" xml:space="preserve"><value>司机：{0}</value></data>
+  <data name="گرافیک" xml:space="preserve"><value>图形</value></data>
+  <data name="رندرینگ گرافیکی" xml:space="preserve"><value>图形渲染</value></data>
+  <data name="مادربرد" xml:space="preserve"><value>主板</value></data>
+  <data name="روشن: {0}" xml:space="preserve"><value>正常运行时间：{0}</value></data>
+  <data name="سیستم عامل" xml:space="preserve"><value>操作系统</value></data>
+  <data name="لایسنس ویندوز" xml:space="preserve"><value>Windows 许可证</value></data>
+  <data name="سیکل: {0}" xml:space="preserve"><value>周期：{0}</value></data>
+  <data name="{0}% سلامت باتری" xml:space="preserve"><value>{0}% 电池健康</value></data>
+  <data name="باتری و برق" xml:space="preserve"><value>电池与电源</value></data>
+  <data name="مشخصات جامع سیستم با فرمت استاندارد در کلیپ بورد کپی شد." xml:space="preserve"><value>已将完整的系统规格以标准格式复制到剪贴板。</value></data>
+  <data name="کپی گزارش مشخصات" xml:space="preserve"><value>复制规格报告</value></data>
+  <data name="مشخصات سخت افزار و سنسورهای سیستم بروزرسانی شدند." xml:space="preserve"><value>硬件和系统传感器信息已刷新。</value></data>
+  <data name="بروزرسانی مشخصات" xml:space="preserve"><value>刷新规格</value></data>
+  <data name="مدیریت درایوهای سیستم عامل (This PC Drives)" xml:space="preserve"><value>系统驱动器管理（此电脑驱动器）</value></data>
+  <data name="مشاهده ظرفیت، تغییر نام برچسب درایوها و تغییر حرف درایو (Drive Letter) با ایمنی کامل" xml:space="preserve"><value>查看容量、重命名驱动器标签，并安全地更改驱动器字母</value></data>
+  <data name="تغییر نام" xml:space="preserve"><value>重命名</value></data>
+  <data name="تغییر حرف" xml:space="preserve"><value>更改字母</value></data>
+  <data name="امکان تغییر حرف درایو ویندوز (C:) به دلیل حفظ پایداری سیستم وجود ندارد." xml:space="preserve"><value>为了保持系统稳定性，Windows 驱动器字母（C:）无法更改。</value></data>
+  <data name="طرح مصرف انرژی ویندوز (Power Plan)" xml:space="preserve"><value>Windows 电源计划</value></data>
+  <data name="اعمال آنی powercfg بدون نیاز به ریستارت | پلن فعلی: {0}" xml:space="preserve"><value>无需重启即可即时调整 powercfg | 当前计划: {0}</value></data>
+  <data name="حداکثر کارایی" xml:space="preserve"><value>最大性能</value></data>
+  <data name="کارایی بالا" xml:space="preserve"><value>高性能</value></data>
+  <data name="متعادل" xml:space="preserve"><value>平衡</value></data>
+  <data name="ذخیره انرژی" xml:space="preserve"><value>省电</value></data>
+  <data name="پلن انرژی ویندوز با موفقیت به «{0}» تغییر یافت." xml:space="preserve"><value>Windows 电源计划已成功更改为“{0}”。</value></data>
+  <data name="تغییر پلن انرژی" xml:space="preserve"><value>电源计划已更改</value></data>
+  <data name="امکان تغییر پلن انرژی وجود ندارد (نیازمند دسترسی Administrator)." xml:space="preserve"><value>无法更改电源计划（需要管理员权限）。</value></data>
+  <data name="خطا در تغییر پلن" xml:space="preserve"><value>电源计划更改失败</value></data>
+  <data name="تغییر نام درایو {0}" xml:space="preserve"><value>重命名驱动器 {0}</value></data>
+  <data name="ذخیره نام جدید" xml:space="preserve"><value>保存新名称</value></data>
+  <data name="انصراف" xml:space="preserve"><value>取消</value></data>
+  <data name="نام یا برچسب (Volume Label) جدید را وارد نمایید:" xml:space="preserve"><value>输入新名称或卷标：</value></data>
+  <data name="مثال: Data, Games, Works" xml:space="preserve"><value>示例：数据，游戏，工作</value></data>
+  <data name="نام درایو {0} با موفقیت به '{1}' تغییر یافت." xml:space="preserve"><value>驱动器 {0} 已成功重命名为 '{1}‘。</value></data>
+  <data name="تغییر نام درایو" xml:space="preserve"><value>重命名驱动器</value></data>
+  <data name="عدم موفقیت در تغییر نام درایو {0}." xml:space="preserve"><value>重命名驱动器 {0} 失败。</value></data>
+  <data name="خطا" xml:space="preserve"><value>错误</value></data>
+  <data name="تغییر حرف درایو {0}" xml:space="preserve"><value>更改驱动器字母 {0}</value></data>
+  <data name="تغییر و اعمال" xml:space="preserve"><value>更改并应用</value></data>
+  <data name="توجه: تغییر حرف درایو {0} ممکن است دسترسی میانبرهایی که به این درایو اشاره دارند را موقتاً تحت تاثیر قرار دهد." xml:space="preserve"><value>注意：更改驱动器字母 {0} 可能会暂时影响指向此驱动器的快捷方式。</value></data>
+  <data name="حرف جدید مورد نظر را انتخاب کنید:" xml:space="preserve"><value>选择新的驱动器字母：</value></data>
+  <data name="تغییر حرف درایو" xml:space="preserve"><value>更改驱动器字母</value></data>
+  <data name="خطا در تغییر حرف درایو" xml:space="preserve"><value>更改驱动器字母失败</value></data>
+  <data name="تعداد کل: {0} نرم افزار  •  حجم کل: {1}" xml:space="preserve"><value>总计: {0} 个应用  •  总大小: {1}</value></data>
+  <data name="خطا در بارگذاری برنامه ها: {0}" xml:space="preserve"><value>加载应用时出错: {0}</value></data>
+  <data name="{0} برنامه{1}" xml:space="preserve"><value>{0} 个应用{1}</value></data>
+  <data name="هیچ نرم افزاری روی سیستم شناسایی نشد." xml:space="preserve"><value>在此系统上未检测到应用。</value></data>
+  <data name="هیچ نرم افزاری مطابق با «{0}» پیدا نشد." xml:space="preserve"><value>未找到匹配 “{0}” 的应用。</value></data>
+  <data name="{0} نرم افزار انتخاب گردیده{1}" xml:space="preserve"><value>已选择 {0} 个应用{1}</value></data>
+  <data name="حذف {0} برنامه انتخاب شده" xml:space="preserve"><value>卸载 {0} 个已选择的应用</value></data>
+  <data name="تأیید حذف گروهی نرم افزارها" xml:space="preserve"><value>确认批量卸载</value></data>
+  <data name="آیا از حذف {0} برنامه انتخاب شده اطمینان دارید؟ به منظور جلوگیری از تداخل فرآیندهای ویندوز، حذف هر برنامه به ترتیب (FIFO) و با باز شدن ایمن آنیستالر انجام خواهد شد." xml:space="preserve"><value>您确定要卸载 {0} 个已选择的应用吗？为避免与 Windows 进程冲突，每个应用将按顺序 (FIFO) 使用其官方卸载程序安全卸载。</value></data>
+  <data name="شروع حذف گروهی" xml:space="preserve"><value>开始批量卸载</value></data>
+  <data name="در حال اجرای آنیستالر {0} ({1} از {2})..." xml:space="preserve"><value>正在运行 {0} 的卸载程序（{1} / {2}]）...</value></data>
+  <data name="فرآیند حذف گروهی" xml:space="preserve"><value>批量卸载</value></data>
+  <data name="تمام برنامه های انتخاب شده ({0} مورد) در صف آنیستال قرار گرفتند." xml:space="preserve"><value>所有已选择的应用 ({0} 个) 已加入卸载队列。</value></data>
+  <data name="پایان عملیات حذف" xml:space="preserve"><value>卸载完成</value></data>
+  <data name="تأیید حذف نرم افزار" xml:space="preserve"><value>确认卸载</value></data>
+  <data name="حذف" xml:space="preserve"><value>卸载</value></data>
+  <data name="آنیستالر رسمی {0} با موفقیت اجرا گردید." xml:space="preserve"><value>{0} 的官方卸载程序已成功启动。</value></data>
+  <data name="حذف نرم افزار" xml:space="preserve"><value>卸载应用</value></data>
+  <data name="امکان اجرای آنیستالر برای {0} وجود ندارد." xml:space="preserve"><value>无法启动 {0} 的卸载程序。</value></data>
+  <data name="خطا در حذف" xml:space="preserve"><value>卸载失败</value></data>
+  <data name="در حال اتصال به سرور..." xml:space="preserve"><value>正在连接服务器...</value></data>
+  <data name="در حال آماده سازی و سنجش تاخیر..." xml:space="preserve"><value>正在准备并测量延迟...</value></data>
+  <data name="ارائه دهنده فعال" xml:space="preserve"><value>活跃提供者</value></data>
+  <data name="سرور ابری جهانی" xml:space="preserve"><value>全球云服务器</value></data>
+  <data name="اطلاعات شبکه دریافت شد. در حال سنجش تاخیر..." xml:space="preserve"><value>已接收网络信息。正在测量延迟...</value></data>
+  <data name="در حال سنجش تاخیر پینگ..." xml:space="preserve"><value>正在测量 Ping 延迟...</value></data>
+  <data name="در حال سنجش سرعت دانلود چندکاناله..." xml:space="preserve"><value>正在测量多通道下载速度...</value></data>
+  <data name="{0} MB/s (پیک: {1} MB/s)" xml:space="preserve"><value>{0} MB/s（峰值：{1} MB/s）</value></data>
+  <data name="در حال ارسال داده (آپلود)..." xml:space="preserve"><value>正在上传数据...</value></data>
+  <data name="تست با موفقیت تکمیل شد" xml:space="preserve"><value>测试已成功完成</value></data>
+  <data name="{0} MB/s (اوج دانلود: {1} MB/s)" xml:space="preserve"><value>{0} MB/s（下载峰值：{1} MB/s）</value></data>
+  <data name="دانلود: {0} Mbps ({1} MB/s)" xml:space="preserve"><value>下载：{0} Mbps（{1} MB/s）</value></data>
+  <data name="تست تکمیل شد: دانلود {0} Mbps ({1} MB/s) | آپلود {2} Mbps | پینگ: {3} ms" xml:space="preserve"><value>测试完成：下载 {0} Mbps（{1} MB/s）| 上传 {2} Mbps | 延迟：{3} ms</value></data>
+  <data name="تست سرعت اینترنت" xml:space="preserve"><value>互联网速度测试</value></data>
+  <data name="خطا در تست" xml:space="preserve"><value>测试失败</value></data>
+  <data name="نتیجه تست" xml:space="preserve"><value>测试结果</value></data>
+  <data name="تست متوقف شد" xml:space="preserve"><value>测试停止</value></data>
+  <data name="تست با خطا مواجه شد." xml:space="preserve"><value>测试遇到错误。</value></data>
+  <data name="فعال سازی افکت شیشه ای در تسک بار، استارت و پنجره های ویندوز" xml:space="preserve"><value>在任务栏、开始菜单和应用窗口启用玻璃效果</value></data>
+  <data name="شفافیت شیشه ای ویندوز (Transparency)" xml:space="preserve"><value>Windows 玻璃透明效果</value></data>
+  <data name="افکت شیشه ای غیرفعال شد." xml:space="preserve"><value>玻璃效果已禁用。</value></data>
+  <data name="افکت شیشه ای فعال شد." xml:space="preserve"><value>玻璃效果已启用。</value></data>
+  <data name="شفافیت ویندوز" xml:space="preserve"><value>Windows 透明效果</value></data>
+  <data name="استخراج و هماهنگ سازی خودکار رنگ اصلی ویندوز از تصویر دسکتاپ" xml:space="preserve"><value>自动从桌面壁纸提取并匹配 Windows 强调色</value></data>
+  <data name="رنگ Accent هوشمند والپیپر" xml:space="preserve"><value>壁纸智能强调色</value></data>
+  <data name="هماهنگی خودکار غیرفعال شد." xml:space="preserve"><value>自动匹配颜色已禁用。</value></data>
+  <data name="هماهنگی خودکار رنگ با والپیپر فعال شد." xml:space="preserve"><value>已启用与壁纸的自动颜色匹配。</value></data>
+  <data name="رنگ ویندوز" xml:space="preserve"><value>Windows 颜色</value></data>
+  <data name="اعمال پوسته تیره روی محیط ویندوز و نرم افزارهای سیستمی" xml:space="preserve"><value>将深色主题应用于 Windows 壳程序和系统应用</value></data>
+  <data name="تم تاریک ویندوز (Dark Mode)" xml:space="preserve"><value>Windows 深色模式</value></data>
+  <data name="حالت روشن فعال شد." xml:space="preserve"><value>已启用浅色模式。</value></data>
+  <data name="حالت تاریک فعال شد." xml:space="preserve"><value>已启用深色模式。</value></data>
+  <data name="تم ویندوز" xml:space="preserve"><value>Windows 主题</value></data>
+  <data name="کاهش انیمیشن های اضافی ویندوز برای افزایش سرعت پاسخ دهی سیستم" xml:space="preserve"><value>减少额外的 Windows 动画以提升系统响应速度</value></data>
+  <data name="حالت عملکرد و چابکی بالا (Best Performance)" xml:space="preserve"><value>高性能模式（最佳性能）</value></data>
+  <data name="تنظیمات روی حالت پیش فرض قرار گرفت." xml:space="preserve"><value>设置已恢复为默认值。</value></data>
+  <data name="تنظیمات روی حداکثر کارایی قرار گرفت." xml:space="preserve"><value>设置已调整为最高性能。</value></data>
+  <data name="افکت های بصری" xml:space="preserve"><value>视觉效果</value></data>
+  <data name="نمایش پسوند نام فایل ها (مانند .exe, .pdf, .docx) در File Explorer" xml:space="preserve"><value>在文件资源管理器中显示文件名扩展名（例如 .exe、.pdf、.docx）</value></data>
+  <data name="نمایش پسوند فایل ها در ویندوز" xml:space="preserve"><value>在 Windows 中显示文件扩展名</value></data>
+  <data name="پسوند فایل ها پنهان شد." xml:space="preserve"><value>文件扩展名已隐藏。</value></data>
+  <data name="نمایش پسوند فایل ها فعال شد." xml:space="preserve"><value>已启用文件扩展名显示。</value></data>
+  <data name="نمایش پسوندها" xml:space="preserve"><value>文件扩展名</value></data>
+  <data name="آشکارسازی فایل ها و پوشه های پنهان سیستمی در فایل اکسپلورر" xml:space="preserve"><value>在文件资源管理器中显示隐藏的系统文件和文件夹</value></data>
+  <data name="نمایش فایل ها و پوشه های مخفی" xml:space="preserve"><value>显示隐藏的文件和文件夹</value></data>
+  <data name="فایل های مخفی پنهان شدند." xml:space="preserve"><value>隐藏的文件现在已隐藏。</value></data>
+  <data name="فایل های مخفی آشکار شدند." xml:space="preserve"><value>隐藏的文件现在已显示。</value></data>
+  <data name="فایل های مخفی" xml:space="preserve"><value>隐藏的文件</value></data>
+  <data name="بازگشت منوی راست کلیک کامل و سنتی بدون نیاز به فشردن Show more options" xml:space="preserve"><value>无需按“显示更多选项”即可恢复完整的经典右键菜单</value></data>
+  <data name="منوی راست کلیک کلاسیک ویندوز ۱۱" xml:space="preserve"><value>Windows 11 经典上下文菜单</value></data>
+  <data name="منوی راست کلیک مدرن ویندوز ۱۱ فعال شد." xml:space="preserve"><value>启用 Windows 11 现代上下文菜单。</value></data>
+  <data name="منوی راست کلیک کلاسیک فعال شد." xml:space="preserve"><value>启用经典上下文菜单。</value></data>
+  <data name="منوی راست کلیک" xml:space="preserve"><value>上下文菜单</value></data>
+  <data name="خاموش سازی حالت هایبرید ویندوز جهت ریست کامل درایورها هنگام خاموشی، پیشگیری از خطای کارت شبکه و کاهش استهلاک SSD" xml:space="preserve"><value>禁用 Windows 混合关机以在关机时完全重置驱动程序，防止网络适配器故障并减少 SSD 磨损</value></data>
+  <data name="بوت سریع ویندوز (Fast Startup / Hiberboot)" xml:space="preserve"><value>Windows 快速启动（休眠启动）</value></data>
+  <data name="قابلیت Fast Startup غیرفعال شد (خاموشی کامل و سالم درایورها)." xml:space="preserve"><value>已禁用快速启动（关机时完全、干净地关闭驱动程序）。</value></data>
+  <data name="قابلیت بوت سریع فعال شد." xml:space="preserve"><value>已启用快速启动。</value></data>
+  <data name="بوت سریع ویندوز" xml:space="preserve"><value>Windows 快速启动</value></data>
+  <data name="جهت تغییر تنظیمات بوت سریع نیاز به اجرای برنامه با دسترسی Administrator است." xml:space="preserve"><value>更改快速启动设置需要以管理员身份运行应用程序。</value></data>
+  <data name="خطای دسترسی" xml:space="preserve"><value>访问错误</value></data>
+  <data name="فعال است (حجم اشغال شده توسط hiberfil.sys: {0}) - غیرفعال سازی فضای عظیمی را روی درایو C آزاد می کند." xml:space="preserve"><value>已启用（hiberfil.sys 占用空间：{0}) - 禁用可释放 C 盘大量空间。</value></data>
+  <data name="غیرفعال است (فایل hiberfil.sys حذف شده و فضای درایو C آزاد است)." xml:space="preserve"><value>已禁用（hiberfil.sys 已被删除，C 盘空间已释放）。</value></data>
+  <data name="خواب زمستانی و پاکسازی hiberfil.sys" xml:space="preserve"><value>休眠与 hiberfil.sys 清理</value></data>
+  <data name="خواب زمستانی غیرفعال و فایل hiberfil.sys از درایو C حذف گردید." xml:space="preserve"><value>休眠已禁用，hiberfil.sys 已从 C 盘移除。</value></data>
+  <data name="خواب زمستانی فعال شد." xml:space="preserve"><value>休眠已启用。</value></data>
+  <data name="هایبرنیشن و دیسک" xml:space="preserve"><value>休眠与磁盘</value></data>
+  <data name="برای تغییر وضعیت هایبرنیشن اجرای برنامه با دسترسی Administrator الزامی است." xml:space="preserve"><value>更改休眠状态需要以管理员身份运行应用程序。</value></data>
+  <data name="تنظیمات امنیت" xml:space="preserve"><value>安全设置</value></data>
+  <data name="دسترسی مستقیم به تنظیمات محافظت بلادرنگ، فایروال و Tamper Protection" xml:space="preserve"><value>直接访问实时防护、防火墙和防篡改设置</value></data>
+  <data name="امنیت و آنتی ویروس ویندوز (Windows Security &amp; Defender)" xml:space="preserve"><value>Windows 安全与 Defender</value></data>
+  <data name="امکان باز کردن مستقیم مرکز امنیت ویندوز فراهم نشد." xml:space="preserve"><value>无法直接打开 Windows 安全中心。</value></data>
+  <data name="امنیت ویندوز" xml:space="preserve"><value>Windows 安全</value></data>
+  <data name="پیکربندی شیشه ای و بلور ویندوز" xml:space="preserve"><value>Windows 玻璃与模糊配置</value></data>
+  <data name="تنظیمات پیشرفته شفافیت پنجره ها، نوار آدرس و حاشیه ها با اعمال بلادرنگ" xml:space="preserve"><value>为窗口背景、地址栏和边框提供高级透明度，并实时应用</value></data>
+  <data name="شفاف سازی کامل نوار آدرس فایل اکسپلورر" xml:space="preserve"><value>文件资源管理器地址栏完全透明</value></data>
+  <data name="شفاف سازی نوار ابزار و تب ها" xml:space="preserve"><value>工具栏和标签页透明</value></data>
+  <data name="شفاف سازی پس زمینه کنترل های مدرن WinUI" xml:space="preserve"><value>现代 WinUI 控件背景透明</value></data>
+  <data name="نمایش حاشیه و خط تفکیک دور پنجره ها" xml:space="preserve"><value>显示窗口边框和分隔线</value></data>
+  <data name="ذخیره و اعمال تنظیمات" xml:space="preserve"><value>保存并应用设置</value></data>
+  <data name="تنظیمات شفافیت با موفقیت ذخیره و در ویندوز اعمال شد." xml:space="preserve"><value>透明度设置已成功保存并应用到 Windows。</value></data>
+  <data name="تنظیمات شیشه ای" xml:space="preserve"><value>玻璃设置</value></data>
+  <data name="بازنشانی به پیش فرض" xml:space="preserve"><value>重置为默认值</value></data>
+  <data name="تنظیمات به مقادیر پیش فرض بازنشانی شد." xml:space="preserve"><value>设置已重置为默认值。</value></data>
+  <data name="بازنشانی تنظیمات" xml:space="preserve"><value>重置设置</value></data>
+  <data name="گالری والپیپرهای CleanC و تصویر پس زمینه ویندوز" xml:space="preserve"><value>CleanC壁纸画廊与窗户背景</value></data>
+  <data name="انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({0} والپیپر گلچین 4K)" xml:space="preserve"><value>你可以选择当前Windows壁纸或CleanC的自定义壁纸画廊（{0}策划的4K壁纸）</value></data>
+  <data name="والپیپر پیش فرض سیستم" xml:space="preserve"><value>系统默认壁纸</value></data>
+  <data name="تصویر فعلی پس زمینه: {0}" xml:space="preserve"><value>当前背景图片：{0}</value></data>
+  <data name="🎲 اعمال والپیپر تصادفی جدید CleanC" xml:space="preserve"><value>🎲 应用新的随机CleanC壁纸</value></data>
+  <data name="تصویر پس زمینه دسکتاپ به «{0}» تغییر یافت." xml:space="preserve"><value>桌面背景改为“{0}”。</value></data>
+  <data name="والپیپر دسکتاپ" xml:space="preserve"><value>桌面壁纸</value></data>
+  <data name="امکان تغییر والپیپر دسکتاپ وجود ندارد." xml:space="preserve"><value>无法更改桌面壁纸。</value></data>
+  <data name="خطا در تغییر والپیپر" xml:space="preserve"><value>更换壁纸失败</value></data>
+  <data name="هیچ فایلی در پوشه والپیپرها یافت نشد." xml:space="preserve"><value>在壁纸文件夹里没有找到任何文件。</value></data>
+  <data name="والپیپر" xml:space="preserve"><value>壁纸</value></data>
+  <data name="باز کردن پوشه والپیپرها" xml:space="preserve"><value>打开壁纸文件夹</value></data>
+  <data name="در حال دریافت فهرست برنامه های استارتاپ..." xml:space="preserve"><value>加载启动应用列表......</value></data>
+  <data name="تعداد کل: {0} برنامه  •  {1} برنامه فعال  •  {2} برنامه غیرفعال" xml:space="preserve"><value>总计：{0} 应用 • {1} 活跃 • {2} 禁用</value></data>
+  <data name="{0} فعال از {1}" xml:space="preserve"><value>{0} 活跃于{1}</value></data>
+  <data name="هیچ برنامه ای در استارتاپ ویندوز یافت نشد." xml:space="preserve"><value>未找到启动应用程序。</value></data>
+  <data name="برنامه های غیرفعال در شروع ویندوز" xml:space="preserve"><value>已禁用的启动应用程序</value></data>
+  <data name="تأثیر {0} ({1})" xml:space="preserve"><value>影响 {0} ({1})</value></data>
+  <data name="تأثیر عادی" xml:space="preserve"><value>正常影响</value></data>
+  <data name="غیرفعال" xml:space="preserve"><value>已禁用</value></data>
+  <data name="تأخیر اندازه گیری شده در بالا آمدن ویندوز: {0} میلی ثانیه" xml:space="preserve"><value>测量的 Windows 启动延迟: {0} 毫秒</value></data>
+  <data name="غیرفعال کردن «{0}» انجام نشد (دسترسی غیرمجاز یا آیتم مربوط به ویندوز است)." xml:space="preserve"><value>无法禁用“{0}”（访问被拒绝或该项属于 Windows）。</value></data>
+  <data name="استارتاپ ویندوز" xml:space="preserve"><value>Windows 启动</value></data>
+  <data name="برنامه {0} غیرفعال شد و از اجرای خودکار آن جلوگیری می شود." xml:space="preserve"><value>应用程序 {0} 已被禁用，将不再自动启动。</value></data>
+  <data name="فعال کردن «{0}» انجام نشد." xml:space="preserve"><value>无法启用“{0}”。</value></data>
+  <data name="برنامه {0} مجدداً فعال شد." xml:space="preserve"><value>应用 {0} 已重新启用。</value></data>
+  <data name="لیست برنامه های استارتاپ بروزرسانی شد." xml:space="preserve"><value>启动应用程序列表已刷新。</value></data>
+  <data name="در حال بررسی..." xml:space="preserve"><value>正在检查...</value></data>
+  <data name="{0} بروزرسانی" xml:space="preserve"><value>{0} 个更新</value></data>
+  <data name="{0} آپدیت در انتظار" xml:space="preserve"><value>{0} 个更新待处理</value></data>
+  <data name="سیستم به روز است ✓" xml:space="preserve"><value>系统已是最新 ✓</value></data>
+  <data name="خطا در بررسی" xml:space="preserve"><value>检查失败</value></data>
+  <data name="خطا در جستجوی آپدیت ها: {0}" xml:space="preserve"><value>搜索更新时出错: {0}</value></data>
+  <data name="بروزرسانی ویندوز" xml:space="preserve"><value>Windows 更新</value></data>
+  <data name="بررسی آپدیت های جدید" xml:space="preserve"><value>检查新更新</value></data>
+  <data name="آپدیت های سیستم عامل تا تاریخ {0} متوقف هستند" xml:space="preserve"><value>操作系统更新已暂停，直到 {0}</value></data>
+  <data name="توقف رسمی ۵ هفته ای فعال است. دریافت هرگونه بسته و آپدیت خودکار تا {0} به تعویق افتاده است." xml:space="preserve"><value>官方的五周暂停已生效。所有软件包下载和自动更新将推迟到 {0}。</value></data>
+  <data name="وضعیت بروزرسانی ها: فعال و استاندارد ویندوز" xml:space="preserve"><value>更新状态：活跃 — 标准 Windows 行为</value></data>
+  <data name="توقف موقت فعال نیست. ویندوز مجاز به بررسی و دانلود دوره ای آپدیت ها است." xml:space="preserve"><value>没有激活暂停。Windows 可以定期检查和下载更新。</value></data>
+  <data name="وضعیت سرویس اصلی (wuauserv): {0}" xml:space="preserve"><value>主要服务状态 (wuauserv)：{0}</value></data>
+  <data name="امنیتی" xml:space="preserve"><value>安全性</value></data>
+  <data name="نصب" xml:space="preserve"><value>安装</value></data>
+  <data name="وضعیت و لیست بروزرسانی‌های سیستم به‌روزرسانی شد." xml:space="preserve"><value>更新状态和列表已刷新。</value></data>
+  <data name="دریافت آپدیت های سیستم عامل به مدت ۵ هفته متوقف شد." xml:space="preserve"><value>操作系统更新下载已暂停五周。</value></data>
+  <data name="توقف آپدیت ها" xml:space="preserve"><value>更新已暂停</value></data>
+  <data name="تغییر تنظیمات توقف نیازمند دسترسی Administrator است." xml:space="preserve"><value>更改暂停设置需要管理员权限。</value></data>
+  <data name="توقف برداشته شد و روند عادی آپدیت ها از سر گرفته شد." xml:space="preserve"><value>暂停已解除，更新已恢复正常。</value></data>
+  <data name="ادامه آپدیت ها" xml:space="preserve"><value>更新已恢复</value></data>
+  <data name="امکان لغو توقف آپدیت ها میسر نشد." xml:space="preserve"><value>无法取消更新暂停。</value></data>
+  <data name="سرویس Windows Update (wuauserv) با موفقیت متوقف و غیرفعال (Disabled) شد." xml:space="preserve"><value>Windows 更新服务 (wuauserv) 已成功停止并禁用。</value></data>
+  <data name="سرویس آپدیت" xml:space="preserve"><value>更新服务</value></data>
+  <data name="تغییر سرویس نیازمند دسترسی Administrator است." xml:space="preserve"><value>更改服务需要管理员权限。</value></data>
+  <data name="سرویس Windows Update به حالت خودکار (Automatic) بازگردانی و شروع به کار کرد." xml:space="preserve"><value>Windows 更新服务已恢复为自动并已启动。</value></data>
+  <data name="رفع مشکل آپدیت" xml:space="preserve"><value>更新修复</value></data>
+  <data name="خطا در رفع مشکل" xml:space="preserve"><value>修复失败</value></data>
+  <data name="{0} بسته" xml:space="preserve"><value>{0} 个软件包</value></data>
+  <data name="{0} خطا" xml:space="preserve"><value>{0} 个错误</value></data>
+  <data name="خطا در واکشی اطلاعات درایورها: {0}" xml:space="preserve"><value>获取驱动程序信息时出错：{0}</value></data>
+  <data name="هیچ درایوری با مشخصات جستجو شده یافت نشد." xml:space="preserve"><value>没有驱动程序匹配您的搜索。</value></data>
+  <data name="حذف بسته" xml:space="preserve"><value>删除软件包</value></data>
+  <data name="{0} درایور انتخاب شده است" xml:space="preserve"><value>已选择 {0} 个驱动程序</value></data>
+  <data name="حذف {0} درایور انتخاب شده" xml:space="preserve"><value>删除 {0} 个已选择的驱动程序</value></data>
+  <data name="حذف دسته جمعی درایورهای انتخاب شده" xml:space="preserve"><value>批量删除已选择的驱动程序</value></data>
+  <data name="حذف درایورها" xml:space="preserve"><value>删除驱动程序</value></data>
+  <data name="{0} بسته درایور حذف شد. ({1} بسته در استفاده فعال سیستم بودند)" xml:space="preserve"><value>已删除 {0} 个驱动程序包（其中 {1} 个软件包正在使用中）</value></data>
+  <data name="نتیجه حذف دسته ای درایورها" xml:space="preserve"><value>批量驱动删除结果</value></data>
+  <data name="حذف ایمن" xml:space="preserve"><value>安全删除</value></data>
+  <data name="حذف درایور" xml:space="preserve"><value>驱动已删除</value></data>
+  <data name="عدم امکان حذف" xml:space="preserve"><value>无法删除</value></data>
+  <data name="هیچ درایور قدیمی یا انتخاب‌شده‌ای برای حذف وجود ندارد." xml:space="preserve"><value>没有可删除的旧驱动或已选驱动。</value></data>
+  <data name="پاکسازی درایورها" xml:space="preserve"><value>驱动清理</value></data>
+  <data name="پاکسازی درایورهای قدیمی DriverStore" xml:space="preserve"><value>清理旧的 DriverStore 驱动</value></data>
+  <data name="پاکسازی درایورهای انتخاب‌شده" xml:space="preserve"><value>清理选定的驱动</value></data>
+  <data name="شروع پاکسازی ایمن" xml:space="preserve"><value>开始安全清理</value></data>
+  <data name="در حال ایجاد Restore Point قبل از پاکسازی درایورها..." xml:space="preserve"><value>在驱动清理前创建还原点...</value></data>
+  <data name="ایجاد نقطه بازیابی" xml:space="preserve"><value>创建还原点</value></data>
+  <data name="قبل از پاکسازی درایورهای DriverStore" xml:space="preserve"><value>DriverStore 清理前</value></data>
+  <data name="پاکسازی تکمیل شد: {0} بسته با موفقیت حذف شد. ({1} بسته در حال استفاده فعال سیستم بودند و حفظ شدند)" xml:space="preserve"><value>清理完成：已成功删除 {0} 个软件包。 ({1} 个软件包正被使用，已保留)</value></data>
+  <data name="نتیجه پاکسازی درایورها" xml:space="preserve"><value>驱动清理结果</value></data>
+  <data name="در حال جستجوی آپدیت های درایور از سرور مایکروسافت..." xml:space="preserve"><value>正在微软服务器上搜索驱动更新...</value></data>
+  <data name="بررسی درایورها" xml:space="preserve"><value>检查驱动</value></data>
+  <data name="تعداد {0} بروزرسانی درایور یافت شد" xml:space="preserve"><value>发现 {0} 个驱动更新</value></data>
+  <data name="متوجه شدم" xml:space="preserve"><value>明白</value></data>
+  <data name="تمامی درایورهای سخت افزاری شما بروز و آپدیت هستند." xml:space="preserve"><value>您的所有硬件驱动程序都是最新的。</value></data>
+  <data name="بروزرسانی درایورها" xml:space="preserve"><value>驱动程序更新</value></data>
+  <data name="لیست درایورها و بسته های سخت افزاری بروزرسانی شد." xml:space="preserve"><value>驱动程序和硬件包列表已刷新。</value></data>
+  <data name="(دریافت خودکار از مودم / DHCP)" xml:space="preserve"><value>（从调制解调器 / DHCP 自动获取）</value></data>
+  <data name="تحریم شکن تخصصی" xml:space="preserve"><value>专用反制裁</value></data>
+  <data name="فعال" xml:space="preserve"><value>激活</value></data>
+  <data name="اعمال" xml:space="preserve"><value>应用</value></data>
+  <data name="تغییر DNS" xml:space="preserve"><value>DNS 已更改</value></data>
+  <data name="خطا در تنظیم DNS" xml:space="preserve"><value>DNS 设置失败</value></data>
+  <data name="بازنشانی DNS" xml:space="preserve"><value>DNS 重置</value></data>
+  <data name="خطا در ریست DNS" xml:space="preserve"><value>DNS 重置失败</value></data>
+  <data name="کش DNS ویندوز با موفقیت تخلیه شد." xml:space="preserve"><value>Windows DNS 缓存已成功刷新。</value></data>
+  <data name="تخلیه کش DNS" xml:space="preserve"><value>刷新 DNS 缓存</value></data>
+  <data name="قطع کامل سرویس تلمتری و گزارش DiagTrack" xml:space="preserve"><value>完全禁用 DiagTrack 遥测服务</value></data>
+  <data name="غیرفعال سازی سرویس Connected User Experiences و توقف ارسال بسته های تشخیصی و لاگ به سرورهای مایکروسافت" xml:space="preserve"><value>禁用连接的用户体验服务并停止向 Microsoft 服务器发送诊断包和日志</value></data>
+  <data name="سرویس تلمتری به حالت پیش فرض ویندوز بازگشت." xml:space="preserve"><value>遥测服务已恢复为 Windows 默认设置。</value></data>
+  <data name="سرویس تلمتری قطع و غیرفعال شد." xml:space="preserve"><value>遥测服务已停止并禁用。</value></data>
+  <data name="تلمتری DiagTrack" xml:space="preserve"><value>DiagTrack 遥测</value></data>
+  <data name="حذف جستجوی وب بینگ از استارت منو (Bing Search)" xml:space="preserve"><value>从开始菜单中移除 Bing 网络搜索</value></data>
+  <data name="جلوگیری از ارسال متن های تایپ شده شما در منوی استارت به وب و افزایش چشمگیر سرعت باز شدن و جستجوی فایل ها" xml:space="preserve"><value>防止将开始菜单的按键发送到网络，并显著加快开始菜单和文件搜索速度</value></data>
+  <data name="جستجوی وب در استارت فعال شد." xml:space="preserve"><value>开始菜单中的网络搜索已启用。</value></data>
+  <data name="سرچ وب بینگ غیرفعال شد (جستجوی محلی فوق سریع)." xml:space="preserve"><value>Bing 网络搜索已禁用（超快速本地搜索）。</value></data>
+  <data name="جستجوی استارت منو" xml:space="preserve"><value>开始菜单搜索</value></data>
+  <data name="غیرفعال سازی شناسه تبلیغاتی ویندوز (Advertising ID)" xml:space="preserve"><value>禁用 Windows 广告 ID</value></data>
+  <data name="جلوگیری از ساخت و ردگیری پروفایل کاربری تبلیغاتی توسط برنامه ها و مایکروسافت استور" xml:space="preserve"><value>防止应用程序和 Microsoft 商店创建和跟踪广告配置文件</value></data>
+  <data name="شناسه تبلیغاتی فعال شد." xml:space="preserve"><value>广告 ID 已启用。</value></data>
+  <data name="شناسه تبلیغاتی ویندوز مسدود گردید." xml:space="preserve"><value>Windows 广告 ID 已阻止。</value></data>
+  <data name="شناسه تبلیغاتی" xml:space="preserve"><value>广告 ID</value></data>
+  <data name="توقف ثبت تاریخچه فعالیت ها و فایل ها (Activity History)" xml:space="preserve"><value>停止记录活动和文件历史记录</value></data>
+  <data name="توقف ذخیره و همگام سازی سوابق باز کردن برنامه ها، اسناد و مرور وب توسط ویندوز" xml:space="preserve"><value>阻止 Windows 保存和同步已打开的应用、文档和网页浏览记录</value></data>
+  <data name="ثبت سوابق فعالیت ها فعال شد." xml:space="preserve"><value>活动历史记录已启用。</value></data>
+  <data name="ثبت فعالیت ها متوقف و غیرفعال شد." xml:space="preserve"><value>活动记录已停止并禁用。</value></data>
+  <data name="تاریخچه فعالیت ها" xml:space="preserve"><value>活动历史</value></data>
+  <data name="قطع نظرسنجی ها و تجربیات شخصی سازی مایکروسافت" xml:space="preserve"><value>阻止 Microsoft 调查和定制化体验</value></data>
+  <data name="جلوگیری از نمایش پاپ آپ های ارزیابی و توقف پایش نحوه استفاده از ابزارهای ویندوز" xml:space="preserve"><value>防止反馈弹出窗口并停止监控您如何使用 Windows 工具</value></data>
+  <data name="پایش تجربیات فعال شد." xml:space="preserve"><value>体验监控已启用。</value></data>
+  <data name="نظرسنجی ها و پایش تجربیات قطع شدند." xml:space="preserve"><value>调查和体验监控已禁用。</value></data>
+  <data name="بازخورد مایکروسافت" xml:space="preserve"><value>Microsoft 反馈</value></data>
+  <data name="تمامی {0} گزینه محافظتی با موفقیت فعال و در ویندوز ذخیره شدند." xml:space="preserve"><value>所有 {0} 保护选项已启用并成功保存在 Windows 中。</value></data>
+  <data name="حریم خصوصی ویندوز ۱۱" xml:space="preserve"><value>Windows 11 隐私</value></data>
+  <data name="تنظیمات به حالت استاندارد و پیش فرض اولیه ویندوز بازگردانی شدند." xml:space="preserve"><value>设置已恢复为 Windows 标准默认值。</value></data>
+  <data name=" (تخمینی)" xml:space="preserve"><value> （估计）</value></data>
+  <data name=" پرمصرف‌ترین: {0}." xml:space="preserve"><value> 主要消费者: {0}。</value></data>
+  <data name="{0} از {1} کشف شده · {2} اجرا در هفته" xml:space="preserve"><value>本周发现 {1} 个 {0} · {2} 次运行</value></data>
+  <data name="{0} برنامه با موفقیت حذف گردید ({1} فضا آزاد شد)." xml:space="preserve"><value>{0} 个应用已成功移除（释放 {1}）。</value></data>
+  <data name="{0} برنامه بهینه سازی شد ✓" xml:space="preserve"><value>{0} 个应用已优化 ✓</value></data>
+  <data name="{0} برنامه حذف شد ✓" xml:space="preserve"><value>{0} 个应用已移除 ✓</value></data>
+  <data name="{0} پردازهٔ سنگین به اولویت پایین منتقل و {1} روندهای پس‌زمینه بسته شد.{2}" xml:space="preserve"><value>{0} 个高占用进程已降级优先级，并关闭 {1} 个后台任务。{2}</value></data>
+  <data name="{0} روندهای پس‌زمینه بسته شد و پردازنده پایش شد.{1}" xml:space="preserve"><value>{0} 个后台任务已关闭，CPU 已被监控。{1}</value></data>
+  <data name="{0} سرفصل دیگر سیستم بررسی شدند و از قبل کاملاً پاکیزه و بهینه بودند." xml:space="preserve"><value>{0} 个系统区域进行了更多检查，已完全清理和优化。</value></data>
+  <data name="{0} سرویس با فایل اجرایی ناموجود غیرفعال شدند تا بوت سیستم روان تر شود." xml:space="preserve"><value>缺少可执行文件的 {0} 个服务已被禁用，使启动更顺畅。</value></data>
+  <data name="{0}، {1:HH:mm}" xml:space="preserve"><value>{0}, {1:HH:mm}</value></data>
+  <data name="+ {0} آزاد شد" xml:space="preserve"><value>+ 释放 {0}</value></data>
+  <data name="+ {0} آزاد شد ✓" xml:space="preserve"><value>+ 释放 {0} ✓</value></data>
+  <data name="+ {0} آزادسازی رم" xml:space="preserve"><value>+ 释放 {0} RAM</value></data>
+  <data name="+ {0} پاکسازی دیسک" xml:space="preserve"><value>+ {0} 磁盘清理</value></data>
+  <data name="+ {0} فضا آزاد شد." xml:space="preserve"><value>+ 释放 {0} 空间。</value></data>
+  <data name="+ 0 بایت آزاد شد" xml:space="preserve"><value>+ 释放 0 字节</value></data>
+  <data name="BoostRamAsync نتیجه‌ای برنگرداند" xml:space="preserve"><value>BoostRamAsync 未返回结果</value></data>
+  <data name="CleanC — سلامت سیستم: {0}%" xml:space="preserve"><value>CleanC — 系统健康状况：{0}%</value></data>
+  <data name="CleanC در تری آیکون" xml:space="preserve"><value>CleanC 在系统托盘中</value></data>
+  <data name="CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود." xml:space="preserve"><value>CleanC 会在 Windows 启动时自动运行。</value></data>
+  <data name="Fast Startup (خاموش شدن سریع ویندوز)" xml:space="preserve"><value>快速启动（Windows 快速启动）</value></data>
+  <data name="ابزار بازیابی سیستم ویندوز (System Restore)" xml:space="preserve"><value>Windows 系统还原工具</value></data>
+  <data name="اجرای خودکار CleanC غیرفعال شد." xml:space="preserve"><value>CleanC 自动启动已被禁用。</value></data>
+  <data name="اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی." xml:space="preserve"><value>运行标准 Windows 恢复向导以恢复到较早日期。</value></data>
+  <data name="ارتقا یافت ✓" xml:space="preserve"><value>已升级 ✓</value></data>
+  <data name="ارزیابی و بهینه‌سازی استارتاپ ویندوز" xml:space="preserve"><value>正在评估并优化 Windows 启动</value></data>
+  <data name="از" xml:space="preserve"><value>的</value></data>
+  <data name="از 100" xml:space="preserve"><value>满分 100</value></data>
+  <data name="از قبل فعال بود ✓" xml:space="preserve"><value>已启用 ✓</value></data>
+  <data name="آزاد از" xml:space="preserve"><value>空闲的</value></data>
+  <data name="آزادسازی حافظه رم (RAM Working Set)" xml:space="preserve"><value>释放 RAM（RAM 工作集）</value></data>
+  <data name="آزادسازی رم" xml:space="preserve"><value>释放 RAM</value></data>
+  <data name="استریم اسپاتیفای" xml:space="preserve"><value>Spotify 流媒体</value></data>
+  <data name="اصلاح اتصال اینترنت" xml:space="preserve"><value>互联网连接修复</value></data>
+  <data name="اطلاعات عیب یابی" xml:space="preserve"><value>诊断信息</value></data>
+  <data name="اطلاعات عیب یابی کپی شد" xml:space="preserve"><value>诊断信息已复制</value></data>
+  <data name="اطلاعات مصرف رم، پردازنده و دیسک به‌روزرسانی شدند." xml:space="preserve"><value>RAM、CPU 和磁盘使用信息已刷新。</value></data>
+  <data name="اعمال شد ✓" xml:space="preserve"><value>已应用 ✓</value></data>
+  <data name="امکان تغییر پلن برق در این لحظه وجود ندارد." xml:space="preserve"><value>目前无法更改电源计划。</value></data>
+  <data name="امکان تغییر تنظیمات پراکسی در این لحظه وجود ندارد." xml:space="preserve"><value>目前无法更改代理设置。</value></data>
+  <data name="امکان تغییر نرخ نوسازی مانیتور در این لحظه وجود ندارد." xml:space="preserve"><value>目前无法更改显示器刷新率。</value></data>
+  <data name="انتخاب همه برنامه ها" xml:space="preserve"><value>选择所有应用程序</value></data>
+  <data name="انجام شد ✓" xml:space="preserve"><value>完成 ✓</value></data>
+  <data name="انجام نشد ✗ — هایبرنیشن خاموش است (فعال سازی آن فایل hiberfil.sys می سازد)" xml:space="preserve"><value>未完成 ✗ — 休眠已关闭（启用它会创建 hiberfil.sys 文件）</value></data>
+  <data name="اندازه ی پنجره بازنشانی شد" xml:space="preserve"><value>窗口大小已重置</value></data>
+  <data name="ایجاد Restore Point" xml:space="preserve"><value>创建还原点</value></data>
+  <data name="ایجاد شد ✓" xml:space="preserve"><value>已创建 ✓</value></data>
+  <data name="ایجاد یک نقطه پشتیبان از ویندوز قبل از اعمال بهینه سازی ها یا تغییرات عمده." xml:space="preserve"><value>在应用优化或重大更改之前创建 Windows 还原点。</value></data>
+  <data name="این برنامه‌ها ممکن است به دردت بخورند؛ هر کدام را خواستی انتخاب کن." xml:space="preserve"><value>这些应用可能仍然有用；请选择您想要的。</value></data>
+  <data name="این مورد نیازمند دسترسی مدیر (Administrator) است." xml:space="preserve"><value>此项目需要管理员权限。</value></data>
+  <data name="با موفقیت نوسازی شد ✓" xml:space="preserve"><value>刷新成功 ✓</value></data>
+  <data name="باز کردن System Restore" xml:space="preserve"><value>打开系统还原</value></data>
+  <data name="باز کردن صفحه ی پروژه ممکن نشد." xml:space="preserve"><value>无法打开项目页面。</value></data>
+  <data name="بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز." xml:space="preserve"><value>将 CleanC 改变的所有注册表键和服务恢复为 Windows 默认设置。</value></data>
+  <data name="بازگردانده شد ✓" xml:space="preserve"><value>已恢复 ✓</value></data>
+  <data name="بازگردانی تغییرات" xml:space="preserve"><value>已撤销更改</value></data>
+  <data name="بازگردانی تنظیمات" xml:space="preserve"><value>恢复设置</value></data>
+  <data name="بازگردانی تنظیمات بهینه شده به حالت اولیه (Undo)" xml:space="preserve"><value>将优化的设置恢复到原始状态（撤销）</value></data>
+  <data name="بدون تغییر" xml:space="preserve"><value>未更改</value></data>
+  <data name="بدون فایل زائد (پاک)" xml:space="preserve"><value>无垃圾文件（已清理）</value></data>
+  <data name="برای بازگرداندن پنجره روی آیکون کنار ساعت کلیک کنید." xml:space="preserve"><value>点击时钟旁边的图标以恢复窗口。</value></data>
+  <data name="بررسی اولویت بارگذاری و غیرفعال‌سازی سرویس‌ها و لانچرهای کندکننده بوت" xml:space="preserve"><value>正在检查加载优先级并禁用减慢启动的服务和启动项</value></data>
+  <data name="بررسی به‌روزرسانی" xml:space="preserve"><value>检查更新</value></data>
+  <data name="بررسی به‌روزرسانی ممکن نشد (اتصال اینترنت یا دسترسی شبکه). نسخهٔ فعلی: {0}" xml:space="preserve"><value>无法检查更新（网络连接或访问受限）。当前版本：{0}</value></data>
+  <data name="بررسی شد ✓" xml:space="preserve"><value>已检查 ✓</value></data>
+  <data name="بررسی متوالی فایل های موقت، کش ها و فضاهای ذخیره سازی" xml:space="preserve"><value>依次检查临时文件、缓存和存储空间</value></data>
+  <data name="بررسی و بازبینی نرم افزارهای کم استفاده و پیش فرض" xml:space="preserve"><value>检查很少使用的和预装的应用</value></data>
+  <data name="برطرف شد ✓" xml:space="preserve"><value>已修复 ✓</value></data>
+  <data name="برنامه ها" xml:space="preserve"><value>应用</value></data>
+  <data name="برنامه های زیر در ویندوز شناسایی شدند که ممکن است به آن ها نیاز داشته باشید (مانند Paint، سرویس های بازی Xbox یا نرم افزارهای حجیم با بیش از ۳۰ روز عدم استفاده). مواردی که مایل به حذف آن ها هستید را علامت بزنید:" xml:space="preserve"><value>在 Windows 上检测到以下您可能仍需要的应用（例如 Paint、Xbox 游戏服务或超过 30 天未使用的大型应用）。请勾选您想要删除的应用：</value></data>
+  <data name="برنامه های زیر می توانند برای آزادسازی منابع سیستم حذف شوند. روی هر سطر کلیک کنید تا انتخاب شود:" xml:space="preserve"><value>以下应用可以删除以释放系统资源。点击任意行以选择：</value></data>
+  <data name="برنامه‌های مرزی پیدا شد" xml:space="preserve"><value>发现边缘应用</value></data>
+  <data name="بستن" xml:space="preserve"><value>关闭</value></data>
+  <data name="بستن Background Tasks مرورگرهای Edge و Chrome و آزادسازی کش افزونه‌ها" xml:space="preserve"><value>关闭 Edge 和 Chrome 浏览器后台任务并释放扩展缓存</value></data>
+  <data name="به‌روز هستی؛ آخرین نسخهٔ منتشرشده {0} است." xml:space="preserve"><value>您已是最新版本；最新发布的版本是 {0}。</value></data>
+  <data name="به‌روزرسانی شد" xml:space="preserve"><value>已刷新</value></data>
+  <data name="بهینه سازی SSD" xml:space="preserve"><value>SSD 优化</value></data>
+  <data name="بهینه سازی استارتاپ ({0} برنامه غیرضروری)" xml:space="preserve"><value>启动优化（{0} 个不必要的应用）</value></data>
+  <data name="بهینه سازی پیشرفته" xml:space="preserve"><value>高级优化</value></data>
+  <data name="بهینه سازی خودکار سیستم با موفقیت به پایان رسید!" xml:space="preserve"><value>自动系统优化已成功完成！</value></data>
+  <data name="بهینه سازی زنده سیستم و پایداری" xml:space="preserve"><value>实时系统优化与稳定性</value></data>
+  <data name="بهینه سازی مرورگر و پاکسازی افزونه ها" xml:space="preserve"><value>浏览器优化及插件清理</value></data>
+  <data name="بهینه سازی مرورگرها و حذف افزونه های زائد" xml:space="preserve"><value>正在优化浏览器并移除未使用的插件</value></data>
+  <data name="بهینه‌سازی استارتاپ و سرعت بوت" xml:space="preserve"><value>启动和开机速度优化</value></data>
+  <data name="بهینه‌سازی عمیق حافظه رم (RAM Working Set)" xml:space="preserve"><value>深度内存优化（RAM 工作集）</value></data>
+  <data name="پاسخ منبع نامعتبر بود. نسخهٔ فعلی: {0}" xml:space="preserve"><value>源响应无效。当前版本：{0}</value></data>
+  <data name="پاکسازی Candy Crush و بازی های پیش فرض و بررسی برنامه های کم استفاده" xml:space="preserve"><value>清理糖果传奇和预装游戏并检查很少使用的应用</value></data>
+  <data name="پاکسازی برنامه های اختیاری تاییدشده ({0} برنامه)" xml:space="preserve"><value>已清理已批准的可选应用（{0} 个应用）</value></data>
+  <data name="پاکسازی شد ✓" xml:space="preserve"><value>已清理 ✓</value></data>
+  <data name="پاکسازی عمیق ({0} کلید نامعتبر رجیستری + {1} پوشه رهاشده)" xml:space="preserve"><value>深度清理（{0} 个无效注册表键 + {1} 个残留文件夹）</value></data>
+  <data name="پاکسازی عمیق بقایای نرم افزارها" xml:space="preserve"><value>深度清理软件残留</value></data>
+  <data name="پاک‌سازی فعال: {0}" xml:space="preserve"><value>正在清理：{0}</value></data>
+  <data name="پاکسازی موارد انتخاب شده" xml:space="preserve"><value>清理所选项目</value></data>
+  <data name="پاکسازی نرم افزارها" xml:space="preserve"><value>软件清理</value></data>
+  <data name="پراکسی معلق غیرفعال شد و اتصال مستقیم اینترنت به ترمینال و ویندوز بازگشت." xml:space="preserve"><value>悬空代理已被禁用，终端和 Windows 的直接互联网访问已恢复。</value></data>
+  <data name="پراکسی نامعتبر ویندوز خاموش شد و تنظیمات شبکه نوسازی گردید." xml:space="preserve"><value>无效的 Windows 代理已关闭，网络设置已刷新。</value></data>
+  <data name="پردازنده پایش شد؛ پردازهٔ قابل مداخله‌ای پیدا نشد.{0}" xml:space="preserve"><value>CPU 已监控；没有进程需要干预。{0}</value></data>
+  <data name="پردازه‌ها و تب‌های پس‌زمینهٔ مرورگر با موفقیت سبک شدند ({0} مگابایت رم آزاد شد)." xml:space="preserve"><value>浏览器后台进程和标签页已成功精简（释放 {0} MB 内存）。</value></data>
+  <data name="پردازه‌ها و وظایف پس‌زمینهٔ مرورگر با موفقیت بهینه‌سازی شدند." xml:space="preserve"><value>浏览器后台进程和任务已成功优化。</value></data>
+  <data name="پلن High Performance با حداکثر توان پردازشی فعال گردید." xml:space="preserve"><value>已启用高性能计划，并提供最大处理能力。</value></data>
+  <data name="پنجره با ابعاد پیش فرض ۱۰۸۰×۸۰۰ در مرکز صفحه قرار گرفت." xml:space="preserve"><value>窗口已以默认 1080×800 尺寸置于屏幕中央。</value></data>
+  <data name="پوشه" xml:space="preserve"><value>文件夹</value></data>
+  <data name="پویش سکتورها و پاک‌سازی فضای شناسایی‌شده · حجم: {0}" xml:space="preserve"><value>扫描扇区并清理检测到的空间 · 大小：{0}</value></data>
+  <data name="پویش عمیق رجیستری و بقایای نرم‌افزارها" xml:space="preserve"><value>深度注册表和软件残留扫描</value></data>
+  <data name="پیام رسان تلگرام" xml:space="preserve"><value>电报信使</value></data>
+  <data name="تأیید حذف؟" xml:space="preserve"><value>确认删除？</value></data>
+  <data name="تخصیص کارت گرافیک مجزا" xml:space="preserve"><value>专用 GPU 分配</value></data>
+  <data name="تخصیص کارت گرافیک مجزا ({0})" xml:space="preserve"><value>专用 GPU 分配（{0}]）</value></data>
+  <data name="تخلیه Resolve Cache، پاک‌سازی جدول ARP و ریست بافرهای Winsock" xml:space="preserve"><value>刷新解析缓存、清除 ARP 表并重置 Winsock 缓冲区</value></data>
+  <data name="تخلیه Working Set پردازه‌ها و بازیابی بلوک‌های غیرفعال حافظه فیزیکی" xml:space="preserve"><value>修剪进程工作集并回收非活动物理内存块</value></data>
+  <data name="تخلیه کش DNS و نوسازی کانکشن ها" xml:space="preserve"><value>刷新 DNS 缓存并重新建立连接</value></data>
+  <data name="تعداد {0} فایل حجیم شناسایی شد (مجموع حجم: {1}):" xml:space="preserve"><value>检测到 {0} 大文件（总大小：{1}]）：</value></data>
+  <data name="تعداد {0} مورد از تنظیمات و توئیک ها به حالت اولیه ویندوز بازگردانده شدند." xml:space="preserve"><value>{0} 的设置和优化已恢复为 Windows 默认值。</value></data>
+  <data name="تلاش مجدد" xml:space="preserve"><value>重试</value></data>
+  <data name="تنظیمات بازنشانی شد" xml:space="preserve"><value>设置已重置</value></data>
+  <data name="تنظیمات مانیتور" xml:space="preserve"><value>显示器设置</value></data>
+  <data name="توقف تسک‌های پس‌زمینهٔ مرورگرها" xml:space="preserve"><value>停止浏览器后台任务</value></data>
+  <data name="توقف تله متری و تنظیمات عملکرد ویندوز" xml:space="preserve"><value>停止遥测和 Windows 性能优化</value></data>
+  <data name="توقف تله‌متری و روان‌سازی پردازشی ویندوز" xml:space="preserve"><value>禁用遥测并优化 Windows 性能</value></data>
+  <data name="توقف تله‌متری و روان‌سازی ویندوز" xml:space="preserve"><value>禁用遥测并优化 Windows</value></data>
+  <data name="توقف تله‌متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز" xml:space="preserve"><value>禁用遥测；加速搜索、资源管理器和 Windows 广告</value></data>
+  <data name="ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست." xml:space="preserve"><value>CleanC 无法注册为自动启动；应用程序的可执行路径不可用。</value></data>
+  <data name="حافظه رم با موفقیت بهینه‌سازی شد ({0} آزاد شد)." xml:space="preserve"><value>内存已成功优化（释放 {0}）。</value></data>
+  <data name="حافظه رم بررسی و تمام کش‌های غیرضروری تخلیه شدند." xml:space="preserve"><value>内存已检查，所有不必要的缓存已清理。</value></data>
+  <data name="حافظه رم بهینه شد ({0} آزاد شد) و {1} روندهای پس‌زمینه بسته شدند." xml:space="preserve"><value>内存已优化（释放 {0}）并关闭了 {1} 个后台任务。</value></data>
+  <data name="حالا می توانی آن را در گزارش باگ جای گذاری کنی." xml:space="preserve"><value>您现在可以将其粘贴到您的错误报告中。</value></data>
+  <data name="حدود" xml:space="preserve"><value>关于</value></data>
+  <data name="حذف {0} برنامه غیرضروری و بلااستفاده" xml:space="preserve"><value>正在删除 {0} 个不必要或未使用的应用程序</value></data>
+  <data name="حذف انتخاب‌شده‌ها" xml:space="preserve"><value>删除选中项</value></data>
+  <data name="حذف برنامه ها و بازی های تبلیغاتی" xml:space="preserve"><value>正在删除臃肿应用程序和游戏</value></data>
+  <data name="حذف خودکار برنامه ها و بازی های تبلیغاتی ({0} برنامه)" xml:space="preserve"><value>自动删除臃肿应用程序和游戏（{0} 个应用程序）</value></data>
+  <data name="حذف فایل" xml:space="preserve"><value>文件已删除</value></data>
+  <data name="حذف قطعی فعال شد" xml:space="preserve"><value>已启用永久删除</value></data>
+  <data name="حذف موارد انتخاب شده" xml:space="preserve"><value>移除选定的项目</value></data>
+  <data name="خالی بود (بدون تغییر)" xml:space="preserve"><value>为空（无更改）</value></data>
+  <data name="خروجی گزارش" xml:space="preserve"><value>导出报告</value></data>
+  <data name="خلاصهٔ اقدامات کلیدی و آزادسازی حافظه، دیسک، استارتاپ و اتصالات شبکه" xml:space="preserve"><value>关键操作摘要：内存、磁盘、启动和网络优化</value></data>
+  <data name="خلق و خو: {0} · {1} روز حضور" xml:space="preserve"><value>心情：{0} · 已出勤 {1} 天</value></data>
+  <data name="دانلود فعال (IDM)" xml:space="preserve"><value>活动下载（IDM）</value></data>
+  <data name="در حال اسکن فایل های بالای ۵۰۰ مگابایت در مسیرهای کاربری..." xml:space="preserve"><value>正在扫描用户文件夹中大于 500 MB 的文件...</value></data>
+  <data name="در حال آماده سازی و ارزیابی سرفصل های سیستم..." xml:space="preserve"><value>正在准备和评估系统区域...</value></data>
+  <data name="در حال ایجاد..." xml:space="preserve"><value>创建中...</value></data>
+  <data name="در حال بازگردانی..." xml:space="preserve"><value>正在恢复...</value></data>
+  <data name="در حال بررسی و اعمال Fast Startup..." xml:space="preserve"><value>检查并应用快速启动...</value></data>
+  <data name="در حال بررسی وضعیت مانیتور و توان سیستم..." xml:space="preserve"><value>检查显示器状态和系统电源...</value></data>
+  <data name="در حال بهینه سازی..." xml:space="preserve"><value>优化中...</value></data>
+  <data name="در حال پردازش سکتورها..." xml:space="preserve"><value>正在处理扇区...</value></data>
+  <data name="در حال پویش سریع سرفصل های سیستم..." xml:space="preserve"><value>快速扫描系统区域...</value></data>
+  <data name="در حال تخصیص هوشمند کارت گرافیک..." xml:space="preserve"><value>智能 GPU 分配进行中...</value></data>
+  <data name="در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)..." xml:space="preserve"><value>正在移除预装应用和游戏（精简）...</value></data>
+  <data name="در حال فشرده سازی..." xml:space="preserve"><value>正在压缩...</value></data>
+  <data name="درباره CleanC" xml:space="preserve"><value>关于 CleanC</value></data>
+  <data name="دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم" xml:space="preserve"><value>系统优化和加速成果</value></data>
+  <data name="دسترسی لازم برای تخلیه Working Set فراهم نشد" xml:space="preserve"><value>修剪工作集所需的访问权限不可用</value></data>
+  <data name="دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه سازی گردیدند." xml:space="preserve"><value>TRIM 命令执行成功，Windows 驱动器扇区已优化。</value></data>
+  <data name="دفترچه کشفیات" xml:space="preserve"><value>发现日志</value></data>
+  <data name="دیسک های مجازی با موفقیت فشرده سازی شدند." xml:space="preserve"><value>虚拟磁盘已成功压缩。</value></data>
+  <data name="ذخیره ی گزارش مشخصات انجام نشد (مسیر در دسترس نیست)." xml:space="preserve"><value>无法保存系统规格报告（路径不可用）。</value></data>
+  <data name="ذخیره ی گزارش هوش مصنوعی انجام نشد." xml:space="preserve"><value>无法保存 AI 报告。</value></data>
+  <data name="رفع تداخل پراکسی" xml:space="preserve"><value>代理冲突已修复</value></data>
+  <data name="ساخت نقطه بازگردانی ویندوز (Restore Point)" xml:space="preserve"><value>创建 Windows 恢复点</value></data>
+  <data name="سبک‌سازی مرورگر" xml:space="preserve"><value>浏览器瘦身</value></data>
+  <data name="سبک‌سازی مرورگر و توقف پردازه‌های مخفی" xml:space="preserve"><value>瘦身浏览器并停止隐藏进程</value></data>
+  <data name="سرفصل {0} از {1} · {2}" xml:space="preserve"><value>区域 {0} 的 {1} · {2}</value></data>
+  <data name="سرویس آپدیت ویندوز" xml:space="preserve"><value>Windows 更新服务</value></data>
+  <data name="سرویس های یتیم" xml:space="preserve"><value>孤立服务</value></data>
+  <data name="سنجش نرخ نوسازی تصویر و پلن مصرف انرژی" xml:space="preserve"><value>测量显示器刷新率和电源计划</value></data>
+  <data name="شبکه آزاد و پایدار" xml:space="preserve"><value>网络空闲且稳定</value></data>
+  <data name="شتاب دهنده گرافیک" xml:space="preserve"><value>图形加速</value></data>
+  <data name="شروع همراه با ویندوز" xml:space="preserve"><value>随 Windows 启动</value></data>
+  <data name="شناسایی ارجاعات مفقود در AppData و حذف کلیدهای نامعتبر رجیستری" xml:space="preserve"><value>检测 AppData 中缺失的引用并删除无效的注册表项</value></data>
+  <data name="شناسایی فایل های زائد و گزینه های قابل بهینه سازی" xml:space="preserve"><value>检测垃圾文件和优化选项</value></data>
+  <data name="شناسایی و پاک‌سازی فایل‌های زائد و کش سرفصل {0}" xml:space="preserve"><value>检测并清理区域 {0} 的垃圾文件和缓存</value></data>
+  <data name="صرف نظر و ادامه بهینه سازی" xml:space="preserve"><value>跳过并继续优化</value></data>
+  <data name="غیرفعال شد ✓" xml:space="preserve"><value>已禁用 ✓</value></data>
+  <data name="غیرفعال‌سازی DiagTrack و اعمال تنظیمات افزایش پاسخ‌دهی سیستم‌عامل" xml:space="preserve"><value>禁用 DiagTrack 并应用可提高操作系统响应速度的设置</value></data>
+  <data name="فایل {0} به سطل بازیافت منتقل شد." xml:space="preserve"><value>文件 {0} 已移动到回收站。</value></data>
+  <data name="فایل های شخصی دیگر به سطل بازیافت نمی روند و قابل بازگردانی نخواهند بود. کش و زباله ها همچنان قطعی حذف می شوند." xml:space="preserve"><value>个人文件不再进入回收站，且无法恢复。缓存和垃圾仍会被永久删除。</value></data>
+  <data name="فشرده سازی VHDX" xml:space="preserve"><value>VHDX 压缩</value></data>
+  <data name="فشرده شد ✓" xml:space="preserve"><value>已压缩 ✓</value></data>
+  <data name="فعال ✓" xml:space="preserve"><value>已启用 ✓</value></data>
+  <data name="فعال شد ✓" xml:space="preserve"><value>已启用 ✓</value></data>
+  <data name="قابلیت HAGS با موفقیت فعال گردید. (جهت اعمال کامل نیاز به ریستارت ویندوز دارد)" xml:space="preserve"><value>HAGS 已成功启用。（需要重新启动 Windows 才能完全生效）</value></data>
+  <data name="قبلاً پاک بود" xml:space="preserve"><value>已是干净状态</value></data>
+  <data name="قبلاً پاک بود ✓" xml:space="preserve"><value>已是干净状态 ✓</value></data>
+  <data name="کپی کردن ممکن نشد." xml:space="preserve"><value>复制失败。</value></data>
+  <data name="کلاینت استیم (Steam)" xml:space="preserve"><value>Steam 客户端</value></data>
+  <data name="کلاینت تورنت (Torrent)" xml:space="preserve"><value>Torrent 客户端</value></data>
+  <data name="کلیدهای نامعتبر پاکسازی شدند ✓" xml:space="preserve"><value>无效密钥已清理 ✓</value></data>
+  <data name="کیلوبیت" xml:space="preserve"><value>Kbps</value></data>
+  <data name="گزارش مشخصات سیستم در «{0}» ذخیره شد." xml:space="preserve"><value>系统规格报告已保存到“{0}”。</value></data>
+  <data name="گزارش هوش مصنوعی (Markdown)" xml:space="preserve"><value>AI 报告（Markdown）</value></data>
+  <data name="گزارش هوش مصنوعی در «{0}» ذخیره شد." xml:space="preserve"><value>AI 报告已保存到“{0}”。</value></data>
+  <data name="مجموعاً {0} آزاد گردید." xml:space="preserve"><value>共释放了 {0}。</value></data>
+  <data name="محدودیت پهنای باند شبکه حذف و اولویت پردازشی سیستم ارتقا یافت." xml:space="preserve"><value>网络带宽限制已取消，系统处理优先级已提高。</value></data>
+  <data name="مدیریت پردازش‌ها" xml:space="preserve"><value>进程管理</value></data>
+  <data name="مدیریت مصرف انرژی" xml:space="preserve"><value>电源管理</value></data>
+  <data name="مدیریت نقاط بازگردانی سیستم عامل و بازگرداندن تغییرات رجیستری و بهینه سازی ها با یک کلیک:" xml:space="preserve"><value>管理操作系统还原点，并通过一次点击恢复注册表和优化更改：</value></data>
+  <data name="مدیریت و حذف برنامه های غیرضروری و کم استفاده" xml:space="preserve"><value>管理并删除不必要和很少使用的应用</value></data>
+  <data name="مرکز بازیابی و بازگشت تغییرات (Restore &amp; Undo Center)" xml:space="preserve"><value>还原与撤销中心</value></data>
+  <data name="مرورگر فایرفاکس" xml:space="preserve"><value>Mozilla Firefox</value></data>
+  <data name="مرورگر گوگل کروم" xml:space="preserve"><value>Google Chrome</value></data>
+  <data name="مرورگر مایکروسافت اج" xml:space="preserve"><value>Microsoft Edge</value></data>
+  <data name="مشخصات سیستم (TXT)" xml:space="preserve"><value>系统规格 (TXT)</value></data>
+  <data name="مگابیت" xml:space="preserve"><value>Mbps</value></data>
+  <data name="ناموفق ✗ — {0}" xml:space="preserve"><value>失败 ✗ — {0}</value></data>
+  <data name="ناموفق ✗ — دسترسی Administrator لازم است" xml:space="preserve"><value>失败 ✗ — 需要管理员权限</value></data>
+  <data name="نتوانستم منبع نسخه‌ها را بخوانم (کد {0}). نسخهٔ فعلی: {1}" xml:space="preserve"><value>无法读取发布源 (代码 {0})。当前版本：{1}</value></data>
+  <data name="نرخ نوسازی با موفقیت به {0}Hz ارتقا یافت." xml:space="preserve"><value>刷新率已成功升级至 {0}Hz。</value></data>
+  <data name="نسخهٔ جدیدتری منتشر شده: {0} (نسخهٔ فعلی: {1})" xml:space="preserve"><value>已发布新版本：{0}（当前版本：{1}）</value></data>
+  <data name="نقطه بازگردانی" xml:space="preserve"><value>还原点</value></data>
+  <data name="نگه داشتن همه" xml:space="preserve"><value>保留全部</value></data>
+  <data name="نوسازی کش DNS و سوکت‌های شبکه" xml:space="preserve"><value>刷新 DNS 缓存和网络套接字</value></data>
+  <data name="هدایت برنامه های سنگین و بازی ها به پردازنده گرافیکی قدرتمند" xml:space="preserve"><value>将大型应用程序和游戏路由到强大的GPU</value></data>
+  <data name="همه ی تنظیمات به حالت پیش فرض برگشت." xml:space="preserve"><value>所有设置已恢复为默认值。</value></data>
+  <data name="هنوز نسخه‌ای منتشر نشده (یا مخزن خصوصی است). نسخهٔ فعلی: {0}" xml:space="preserve"><value>尚未发布任何版本（或仓库是私有的）。当前版本：{0}</value></data>
+  <data name="هیچ برنامه غیرضروری یا کم استفاده ای یافت نشد." xml:space="preserve"><value>未发现不必要或很少使用的应用程序。</value></data>
+  <data name="هیچ فایل حجیمی بالای ۵۰۰ مگابایت در مسیرهای کاربری یافت نشد." xml:space="preserve"><value>在您的用户文件夹中未发现超过500 MB的大文件。</value></data>
+  <data name="هیچ موردی در این بخش شناسایی نشد (کاملاً تمیز است)." xml:space="preserve"><value>此部分未检测到任何项目（完全干净）。</value></data>
+  <data name="یافتن و مدیریت فایل های بسیار حجیم (Large Files Finder)" xml:space="preserve"><value>查找并管理超大文件（大型文件查找器）</value></data>
+  <data name="بدون اکسسوری" xml:space="preserve"><value>无配件</value></data>
+  <data name="تکنسین" xml:space="preserve"><value>技术员</value></data>
+  <data name="گیمر" xml:space="preserve"><value>玩家</value></data>
+  <data name="دانشجو" xml:space="preserve"><value>学生</value></data>
+  <data name="رسمی" xml:space="preserve"><value>正式</value></data>
+  <data name="کارآگاه" xml:space="preserve"><value>侦探</value></data>
+  <data name="جادوگر" xml:space="preserve"><value>巫师</value></data>
+  <data name="فضانورد" xml:space="preserve"><value>宇航员</value></data>
+  <data name="نینجا" xml:space="preserve"><value>忍者</value></data>
+  <data name="دانشمند" xml:space="preserve"><value>科学家</value></data>
+  <data name="ماجراجو" xml:space="preserve"><value>探险家</value></data>
+  <data name="هنرمند" xml:space="preserve"><value>艺术家</value></data>
+  <data name="عکاس" xml:space="preserve"><value>摄影师</value></data>
+  <data name="موسیقی‌دان" xml:space="preserve"><value>音乐家</value></data>
+  <data name="دزد دریایی" xml:space="preserve"><value>海盗</value></data>
+  <data name="طبیعت‌گرا" xml:space="preserve"><value>自然爱好者</value></data>
+  <data name="یخی" xml:space="preserve"><value>冰</value></data>
+  <data name="آتشین" xml:space="preserve"><value>热烈</value></data>
+  <data name="دیسکو" xml:space="preserve"><value>迪斯科</value></data>
+  <data name="کریستالی" xml:space="preserve"><value>水晶</value></data>
+  <data name="شوخ‌طبع" xml:space="preserve"><value>爱玩</value></data>
+  <data name="آرام" xml:space="preserve"><value>冷静</value></data>
+  <data name="جدی" xml:space="preserve"><value>严肃</value></data>
+  <data name="خاموش" xml:space="preserve"><value>关闭</value></data>
+  <data name="بدون" xml:space="preserve"><value>无</value></data>
+  <data name="CleanC - بهینه ساز هوشمند ویندوز" xml:space="preserve"><value>CleanC - 智能Windows优化器</value></data>
+  <data name="CleanC (پردازنده: {0}% • رم: {1}%)" xml:space="preserve"><value>CleanC（CPU：{0}% • 内存：{1}%)</value></data>
+  <data name="🪟 نمایش پنجره اصلی CleanC" xml:space="preserve"><value>🪟 显示 CleanC 主窗口</value></data>
+  <data name="🚀 آزادسازی آنی حافظه رم (RAM Boost)" xml:space="preserve"><value>🚀 立即释放内存（内存加速）</value></data>
+  <data name="🧹 بهینه سازی کامل سیستم (Quick Boost)" xml:space="preserve"><value>🧹 全系统优化（快速加速）</value></data>
+  <data name="🌐 تغییر سریع DNS و تحریم شکن" xml:space="preserve"><value>🌐 快速DNS &amp; 反审查切换</value></data>
+  <data name="❌ خروج از CleanC" xml:space="preserve"><value>❌ 退出 CleanC</value></data>
+  <data name="آزادسازی حافظه رم" xml:space="preserve"><value>内存加速</value></data>
+  <data name="مقدار {0} حافظه رم با موفقیت آزاد شد." xml:space="preserve"><value>{0} 内存已成功释放。</value></data>
+  <data name="اجرای آزادسازی رم با خطا مواجه شد — جزئیات در crash.log ثبت شد." xml:space="preserve"><value>内存加速失败 — 详细信息已写入 crash.log。</value></data>
+  <data name="خطای اسکریپت هیرو: " xml:space="preserve"><value>英雄脚本错误： </value></data>
+  <data name="بدون جزئیات" xml:space="preserve"><value>无详细信息</value></data>
+  <data name="پیام ناشناخته از هیرو: " xml:space="preserve"><value>来自英雄的未知消息： </value></data>
+  <data name="نمایش گرافیکی داروگ روی این دستگاه در دسترس نیست" xml:space="preserve"><value>Daroog 的图形视图在此设备上不可用</value></data>
+  <data name=" (راهنما: نصب «Microsoft WebView2 Runtime»)، ولی بررسی هوشمند و بهینه‌سازی‌ها بدون تغییر کار می‌کنند." xml:space="preserve"><value> （提示：安装 «Microsoft WebView2 Runtime»），但智能扫描和优化保持不变。</value></data>
+  <data name="SettingsStore باید روی UI thread ساخته شود." xml:space="preserve"><value>SettingsStore 必须在 UI 线程上创建。</value></data>
+  <data name="در صف بهینه سازی" xml:space="preserve"><value>已排队进行优化</value></data>
+  <data name="نصب: {0}" xml:space="preserve"><value>已安装：{0}</value></data>
+  <data name="در حال خواندن فهرست سطل بازیافت..." xml:space="preserve"><value>正在加载回收站项目...</value></data>
+  <data name="انتخاب {0}" xml:space="preserve"><value>选择 {0}</value></data>
+  <data name="{0} شیء" xml:space="preserve"><value>{0} 个项目</value></data>
+  <data name="سطل بازیافت" xml:space="preserve"><value>回收站</value></data>
+  <data name="فهرست سطل بازیافت قابل خواندن نیست." xml:space="preserve"><value>无法读取回收站列表。</value></data>
+  <data name="فایل" xml:space="preserve"><value>文件</value></data>
+  <data name="زمان حذف نامشخص" xml:space="preserve"><value>删除时间未知</value></data>
+  <data name="داده موجود نیست" xml:space="preserve"><value>数据不可用</value></data>
+  <data name="بازگردانی" xml:space="preserve"><value>还原</value></data>
+  <data name="بازگردانی {0}" xml:space="preserve"><value>还原 {0}</value></data>
+  <data name="حذف قطعی" xml:space="preserve"><value>永久删除</value></data>
+  <data name="حذف قطعی {0}" xml:space="preserve"><value>永久删除 {0}</value></data>
+  <data name="ابتدا دست کم یک شیء را انتخاب کنید." xml:space="preserve"><value>请先至少选择一项。</value></data>
+  <data name="{0} شیء به مسیر اصلی بازگردانده شد." xml:space="preserve"><value>{0} 项已恢复到原来的位置。</value></data>
+  <data name="{0} شیء بازگردانده شد؛ {1} مورد ناموفق ({2})" xml:space="preserve"><value>{0} 项已恢复； {1} 失败 ({2})</value></data>
+  <data name="حذف قطعی اشیاء انتخاب شده" xml:space="preserve"><value>永久删除选定的项目</value></data>
+  <data name="{0} شیء با حجم {1} برای همیشه حذف می شود.&#xA;این عملیات قابل بازگشت نیست." xml:space="preserve"><value>{0} 项（{1}）将被永久删除。
+此操作无法撤销。</value></data>
+  <data name="{0} شیء برای همیشه حذف شد." xml:space="preserve"><value>{0} 项已永久删除。</value></data>
+  <data name="{0} شیء حذف شد؛ {1} مورد ناموفق ({2})" xml:space="preserve"><value>{0} 项已删除； {1} 失败 ({2})</value></data>
+  <data name="خالی کردن کل سطل بازیافت" xml:space="preserve"><value>清空整个回收站</value></data>
+  <data name="{0} شیء با حجم {1} برای همیشه حذف می شود.&#xA;پس از خالی کردن، هیچ شیء قابل بازگردانی نخواهد بود." xml:space="preserve"><value>{0} 项（{1}）将被永久删除。
+清空后，无法恢复任何内容。</value></data>
+  <data name="خالی کردن" xml:space="preserve"><value>清空</value></data>
+  <data name="سطل خالی شد؛ {0} شیء حذف قطعی گردید." xml:space="preserve"><value>回收站已清空； {0} 项已永久删除。</value></data>
+  <data name="خالی کردن سطل کامل نشد: {0}" xml:space="preserve"><value>清空回收站未完成： {0}</value></data>
+  <data name="چیزی برای حذف وجود نداشت." xml:space="preserve"><value>没有可删除的内容。</value></data>
+  <data name="«{0}» به مسیر اصلی بازگردانده شد." xml:space="preserve"><value>“{0}” 已恢复到原来的位置。</value></data>
+  <data name="بازگردانی انجام نشد." xml:space="preserve"><value>恢复未完成。</value></data>
+  <data name="بازگردانی شیء با خطای غیرمنتظره مواجه شد." xml:space="preserve"><value>恢复该项目时发生意外错误。</value></data>
+  <data name="حذف قطعی شیء" xml:space="preserve"><value>永久删除项目</value></data>
+  <data name="«{0}» ({1}) برای همیشه حذف می شود.&#xA;این عملیات قابل بازگشت نیست." xml:space="preserve"><value>“{0}”（{1}) 将被永久删除。
+此操作无法撤销。</value></data>
+  <data name="«{0}» برای همیشه حذف شد." xml:space="preserve"><value>“{0}” 已被永久删除。</value></data>
+  <data name="حذف انجام نشد." xml:space="preserve"><value>删除未完成。</value></data>
+  <data name="حذف شیء با خطای غیرمنتظره مواجه شد." xml:space="preserve"><value>删除该项目时发生意外错误。</value></data>
+  <data name="{0} گروه تکراری" xml:space="preserve"><value>{0} 重复组</value></data>
+  <data name="{0} فضا" xml:space="preserve"><value>{0} 空间</value></data>
+  <data name="{0} پوشه خالی" xml:space="preserve"><value>{0} 个空文件夹</value></data>
+  <data name="{0} فایل زائد و نامرتب" xml:space="preserve"><value>{0} 个杂乱文件</value></data>
+  <data name="{0} فایل حجیم" xml:space="preserve"><value>{0} 个大文件</value></data>
+  <data name="خطا در پویش عمیق" xml:space="preserve"><value>深度扫描错误</value></data>
+  <data name="هیچ فایل تکراری با محتوا و سایز یکسان در سیستم یافت نشد. دیسک بهینه است!" xml:space="preserve"><value>未找到内容和大小相同的重复文件。您的磁盘已优化！</value></data>
+  <data name="{0} نسخه یکسان · {1}" xml:space="preserve"><value>{0} 个相同副本 · {1}</value></data>
+  <data name="حجم هر فایل: {0} · هش محتوا: {1}" xml:space="preserve"><value>每个文件大小: {0} · 内容哈希: {1}</value></data>
+  <data name="+ {0} قابل آزادسازی" xml:space="preserve"><value>+ {0} 可回收</value></data>
+  <data name="نسخه اصلی (نگه داری)" xml:space="preserve"><value>原件（保留）</value></data>
+  <data name="نسخه کپی (اضافی)" xml:space="preserve"><value>重复副本（多余）</value></data>
+  <data name="هیچ پوشه خالی بلااستفاده ای در دایرکتوری های انتخابی یافت نشد." xml:space="preserve"><value>在选定的目录中未找到未使用的空文件夹。</value></data>
+  <data name="پوشه خالی" xml:space="preserve"><value>空文件夹</value></data>
+  <data name="هیچ فایل زائد، موقت یا نصاب رها شده ای یافت نشد. دیسک کاملاً پاکیزه است." xml:space="preserve"><value>未找到垃圾文件、临时文件或残留安装文件。磁盘完全干净。</value></data>
+  <data name="فایل حجیم تر از ۵۰۰ مگابایت در پوشه های شخصی کاربر یافت نشد." xml:space="preserve"><value>在个人文件夹中未找到超过 500 MB 的文件。</value></data>
+  <data name="پاکسازی فایل های تکراری" xml:space="preserve"><value>清理重复文件</value></data>
+  <data name="پاکسازی پوشه های خالی" xml:space="preserve"><value>清理空文件夹</value></data>
+  <data name="سازماندهی دانلودها و دسکتاپ" xml:space="preserve"><value>整理下载和桌面</value></data>
+  <data name="پاکسازی فایل های حجیم" xml:space="preserve"><value>清理大文件</value></data>
+  <data name="هیچ موردی انتخاب نشده است." xml:space="preserve"><value>未选择任何项目。</value></data>
+  <data name=" مجموع حجم: {0}،" xml:space="preserve"><value> 总大小: {0},</value></data>
+  <data name="تأیید حذف گروهی" xml:space="preserve"><value>确认批量删除</value></data>
+  <data name="{0} مورد انتخاب شده{1} {2}. ادامه می دهید؟" xml:space="preserve"><value>已选择 {0} 个项目{1} {2}。继续？</value></data>
+  <data name="بله، حذف شود" xml:space="preserve"><value>是，删除</value></data>
+  <data name="در حال حذف ایمن..." xml:space="preserve"><value>正在安全删除...</value></data>
+  <data name=" — از «مرکز بازیابی» قابل بازگردانی است." xml:space="preserve"><value> — 可以从恢复中心恢复。</value></data>
+  <data name="پاکسازی عمیق دیسک" xml:space="preserve"><value>深度磁盘清理</value></data>
+  <data name="✓ {0} مورد با موفقیت پاکسازی شد" xml:space="preserve"><value>✓ {0} 项已成功清理</value></data>
+  <data name="خطا در پاکسازی" xml:space="preserve"><value>清理错误</value></data>
+  <data name="حذف ایمن موارد انتخاب شده" xml:space="preserve"><value>安全删除选定的项目</value></data>
+  <data name="قرنطینه خالی است؛ چیزی برای بازگردانی وجود ندارد." xml:space="preserve"><value>隔离区为空；没有可恢复的内容。</value></data>
+  <data name="فایل های قرنطینه شده CleanC" xml:space="preserve"><value>由 CleanC 隔离的文件</value></data>
+  <data name="حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند." xml:space="preserve"><value>这些删除是在隔离模式下进行的；在永久删除之前可以恢复。</value></data>
+  <data name="مسیر نامشخص" xml:space="preserve"><value>未知路径</value></data>
+  <data name="{0} مورد · {1} · {2}" xml:space="preserve"><value>{0} 项 · {1} · {2}</value></data>
+  <data name="از: {0}" xml:space="preserve"><value>来自：{0}</value></data>
+  <data name="بازگردانی همه" xml:space="preserve"><value>恢复全部</value></data>
+  <data name="بازگردانی نشست {0}" xml:space="preserve"><value>恢复会话 {0}</value></data>
+  <data name="حذف قطعی نشست {0}" xml:space="preserve"><value>永久删除会话 {0}</value></data>
+  <data name="حذف شود؟" xml:space="preserve"><value>删除？</value></data>
+  <data name="قرنطینه" xml:space="preserve"><value>隔离</value></data>
+  <data name="{0} مورد به مسیر اصلی خود بازگردانده شد." xml:space="preserve"><value>{0} 项已恢复到原始位置。</value></data>
+  <data name="{0} مورد بازگردانده شد؛ {1} مورد ناموفق{2}." xml:space="preserve"><value>已恢复 {0} 个项目；{1} 个失败{2}。</value></data>
+  <data name="بازگردانی انجام نشد: " xml:space="preserve"><value>恢复未完成： </value></data>
+  <data name="نشست قرنطینه و فایل های آن برای همیشه حذف شد." xml:space="preserve"><value>隔离会话及其文件已被永久删除。</value></data>
+  <data name="حذف نشست قرنطینه انجام نشد." xml:space="preserve"><value>删除隔离会话未完成。</value></data>
+  <data name="حذف انجام نشد: " xml:space="preserve"><value>删除未完成： </value></data>
+  <data name="آیا از حذف «{0}» اطمینان دارید؟&#xA;آنیستالر رسمی برنامه باز خواهد شد و ادامه ی حذف در اختیار خودش است." xml:space="preserve"><value>您确定要删除 "{0}" 吗？
+程序的官方卸载程序将会启动，剩下的删除操作由其处理。</value></data>
+  <data name="آیا از حذف {0} بسته درایور انتخاب شده اطمینان دارید؟&#xA;این عملیات با بررسی ایمنی انجام خواهد شد." xml:space="preserve"><value>您确定要删除选中的 {0} 个驱动程序包吗？
+此操作将进行安全检查。</value></data>
+  <data name="تعداد {0} بسته درایور انتخاب‌شده توسط شما شناسایی شده است.&#xA;&#xA;پیش از شروع، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.&#xA;آیا مایل به حذف بسته‌های انتخاب‌شده هستید؟" xml:space="preserve"><value>已检测到您选择的 {0} 个驱动程序包。
+
+在开始之前，将创建一个系统还原点以确保完全安全。
+您想要删除所选的包吗？</value></data>
+  <data name="تعداد {0} بسته درایور قدیمی و تکراری شناسایی شده است.&#xA;&#xA;پیش از شروع، یک نقطه بازیابی سیستم (Restore Point) جهت امنیت کامل ساخته خواهد شد.&#xA;آیا مایل به شروع فرآیند پاکسازی هستید؟" xml:space="preserve"><value>{0} 检测到旧的和重复的驱动程序包。
+
+在开始之前，将创建一个系统还原点以确保完全安全。
+您想要开始清理过程吗？</value></data>
+  <data name="{0}&#xA;&#xA;جهت دریافت و نصب، به بخش 'آپدیت ویندوز' مراجعه فرمایید." xml:space="preserve"><value>{0}
+
+要下载和安装，请转到“Windows 更新”部分。</value></data>
+  <data name="پاکسازی تاریخچه" xml:space="preserve"><value>清除历史记录</value></data>
+  <data name="بروزرسانی فهرست درایورها" xml:space="preserve"><value>刷新驱动程序列表</value></data>
+  <data name="گزارش دستاوردهای بهینه‌سازی سیستم" xml:space="preserve"><value>系统优化成果报告</value></data>
+  <data name="عملیات با موفقیت پایان یافت؛ خلاصهٔ فضای آزادشده و اقدامات انجام‌شده در زیر آمده است:" xml:space="preserve"><value>操作已成功完成；下面显示已释放空间和所采取操作的摘要：</value></data>
+  <data name="فایل های موقت با موفقیت پاکسازی شدند و به اطلاعات شخصی آسیبی نرسید." xml:space="preserve"><value>临时文件已成功清理，没有影响个人数据。</value></data>
+  <data name="تأیید و بازگشت به داشبورد" xml:space="preserve"><value>确认并返回仪表板</value></data>
+  <data name="مثلاً سی‌سی" xml:space="preserve"><value>例如 Winy</value></data>
+  <data name="حجم بالای ۱.۲۵× از درون کارت بیرون می زند" xml:space="preserve"><value>大于 1.25× 的尺寸会溢出卡片</value></data>
+  <data name="خودکار (بر اساس ساعت و منطقه)" xml:space="preserve"><value>自动（基于时间和区域）</value></data>
+  <data name="CleanC در حال مراقبت از سیستم شماست" xml:space="preserve"><value>CleanC 正在照顾您的系统</value></data>
+  <data name="{0} مورد انتخاب شده{1}. ادامه می دهید؟" xml:space="preserve"><value>已选择 {0} 项 {1}。继续吗？</value></data>
+  <data name="DeepStoragePermanentNote" xml:space="preserve"><value>这些项目将被永久删除，无法恢复。</value></data>
+  <data name="DeepStorageRecycleOptIn" xml:space="preserve"><value>移至回收站而不是永久删除（不会释放磁盘空间）</value></data>
+  <data name="DeepStorageDeletingProgress" xml:space="preserve"><value>正在删除… {0}/{1}</value></data>
+  <data name="MessCatOldInstaller" xml:space="preserve"><value>旧安装程序（安装 / 安装器）</value></data>
+  <data name="MessCatOldArchive" xml:space="preserve"><value>压缩档案（Zip / Rar）</value></data>
+  <data name="MessCatDuplicateCopy" xml:space="preserve"><value>重复副本（复制 / 重复）</value></data>
+  <data name="MessCatOldScreenshot" xml:space="preserve"><value>旧截图</value></data>
+  <data name="MessCatTempJunk" xml:space="preserve"><value>临时 / 垃圾文件</value></data>
+  <data name="MessCatLargeFile" xml:space="preserve"><value>非常大的文件（&gt;200MB）</value></data>
+  <data name="MessCatExtractedArchiveDup" xml:space="preserve"><value>已解压档案重复（存在同名文件夹）</value></data>
+  <data name="MessCatIncompleteDownload" xml:space="preserve"><value>未完成的临时下载（crdownload / part）</value></data>
+  <data name="MessCatOemDriveRoot" xml:space="preserve"><value>驱动器根目录的OEM安装残留</value></data>
+  <data name="MessCatUpdater" xml:space="preserve"><value>更新程序残留（Electron / Squirrel）</value></data>
+  <data name="MessCatSyncDevice" xml:space="preserve"><value>设备传输 / OneDrive 临时残留</value></data>
+  <data name="MessCatOfficeLock" xml:space="preserve"><value>Office 临时锁定文件 (~$)</value></data>
+  <data name="MessCatOther" xml:space="preserve"><value>其他</value></data>
+  <data name="EvSystemComponent" xml:space="preserve"><value>系统组件条目（SystemComponent）— 通常是驱动或硬件工具；仅在完全了解的情况下删除</value></data>
+  <data name="EvTrialInName" xml:space="preserve"><value>应用名称包含“试用”</value></data>
+  <data name="EvTrialInNameLocalized" xml:space="preserve"><value>应用名称包含“试用版”</value></data>
+  <data name="NoteProvisioned" xml:space="preserve"><value> — 已在 Windows 映像中配置并自动为新用户安装</value></data>
+  <data name="EvEmptyFolder30Days" xml:space="preserve"><value>空闲超过 30 天（最后修改时间：{0:yyyy/MM/dd})</value></data>
+  <data name="EvOfficeLockFile" xml:space="preserve"><value>Office 临时锁定文件 — 文档已关闭，此文件被遗留下来</value></data>
+  <data name="EvDownloadCompleted" xml:space="preserve"><value>完整文件“{0}”存在 — 下载完成后遗留</value></data>
+  <data name="EvDownloadAbandoned" xml:space="preserve"><value>超过 24 小时未更改 — 放弃的下载</value></data>
+  <data name="EvTmpOld72h" xml:space="preserve"><value>Downloads/Desktop 中超过 72 小时的 .tmp 文件</value></data>
+  <data name="EvInstallerMatched" xml:space="preserve"><value>“{0}”的安装程序 — 应用已安装，该文件不再需要</value></data>
+  <data name="EvInstallerNoMatch" xml:space="preserve"><value>旧安装程序（超过 14 天） — 系统中未找到同名应用</value></data>
+  <data name="EvCrossDevice" xml:space="preserve"><value>临时设备交换（CrossDevice）</value></data>
+  <data name="EvCrossDeviceSub" xml:space="preserve"><value>Windows / Phone Link 暂存文件夹链接，用于手机到 PC 的文件传输</value></data>
+  <data name="EvOneDriveTemp" xml:space="preserve"><value>OneDrive 临时文件夹</value></data>
+  <data name="EvOneDriveTempSub" xml:space="preserve"><value>放弃上传的 OneDrive 文件的临时存储</value></data>
+  <data name="ScanProgressDriveRoots" xml:space="preserve"><value>正在扫描驱动器根目录和更新程序残留...</value></data>
+  <data name="EvDriveRootLeftover" xml:space="preserve"><value>以供应商 {0} 命名的驱动器根目录文件夹 — 证据: {1}</value></data>
+  <data name="EvRemnantInstallerFile" xml:space="preserve"><value>残留的安装文件 "{0}"</value></data>
+  <data name="EvVendorArtifact" xml:space="preserve"><value>供应商特定的工件 "{0}"（启动镜像 / 驱动程序包）</value></data>
+  <data name="EvPreloadFile" xml:space="preserve"><value>供应商预装文件 "{0}"</value></data>
+  <data name="EvRootEmptyFolder" xml:space="preserve"><value>驱动器根目录的空文件夹 — 30 天以上无内容（最后修改: {0:yyyy/MM/dd})</value></data>
+  <data name="EvUpdaterPendingInstaller" xml:space="preserve"><value>更新程序文件夹包含残留安装程序 "{0}" — 更新不完整</value></data>
+  <data name="EvUpdaterNoPending" xml:space="preserve"><value>更新程序文件夹匹配 *-updater / SquirrelTemp（未发现待安装内容）</value></data>
+  <data name="EvBlockmapOld" xml:space="preserve"><value>Electron 更新器遗留的 .blockmap 文件（超过 30 天未修改）</value></data>
+  <data name="SensitiveKeyFile" xml:space="preserve"><value>密钥/安全文件 ({0})</value></data>
+  <data name="EvDriverNoHardware" xml:space="preserve"><value>没有设备（即使已断开连接）与此软件包关联——硬件从未存在或已不再存在</value></data>
+  <data name="LockUserVetoError" xml:space="preserve"><value>此路径被用户锁定</value></data>
+  <data name="EvStartupFileMissing" xml:space="preserve"><value>启动文件 "{0}" 在磁盘上不存在</value></data>
+  <data name="EvStartupExeMissing" xml:space="preserve"><value>可执行文件 "{0}" 不存在——未安装应用遗留文件</value></data>
+  <data name="DescCrashLogs" xml:space="preserve"><value>崩溃报告日志、WER 文件、内存转储和内核报告 (LiveKernelReports)</value></data>
+  <data name="JunkPrefetchTitle" xml:space="preserve"><value>Windows 预取缓存 (.pf 文件)</value></data>
+  <data name="JunkPrefetchDesc" xml:space="preserve"><value>加快应用启动——自动重建，删除安全</value></data>
+  <data name="AdminRequired" xml:space="preserve"><value>需要管理员权限</value></data>
+  <data name="LockReasonDeepScan" xml:space="preserve"><value>已从深度扫描页面锁定</value></data>
+  <data name="LockInfoBarTitle" xml:space="preserve"><value>路径被锁定</value></data>
+  <data name="LockSaveFailed" xml:space="preserve"><value>保存锁失败 — 请检查对 locks.json 的访问权限。</value></data>
+  <data name="SensitiveSectionTitle" xml:space="preserve"><value>检测到敏感文件（{0} 项 — 仅报告，未删除）</value></data>
+  <data name="SpeedTestCancelled" xml:space="preserve"><value>测试已停止</value></data>
+  <data name="BadgeTargetMissing" xml:space="preserve"><value>目标丢失</value></data>
+  <data name="DriverBannerDupAndOrphan" xml:space="preserve"><value>在 Windows 驱动程序存储中找到 {0} 个重复和旧的包 + {1} 个无硬件包</value></data>
+  <data name="DriverBannerOrphan" xml:space="preserve"><value>在 Windows 驱动程序存储中找到 {0} 个无硬件包（已断开设备的遗留物）</value></data>
+  <data name="DriverBannerDup" xml:space="preserve"><value>在 Windows 驱动程序存储中找到 {0} 个重复和旧的包</value></data>
+  <data name="BadgeNoHardware" xml:space="preserve"><value>无硬件</value></data>
+  <data name="DriverDeleteOrphanTitle" xml:space="preserve"><value>删除无硬件包 {0}</value></data>
+  <data name="DriverDeleteOldTitle" xml:space="preserve"><value>删除旧驱动 {0}</value></data>
+  <data name="DriverDeleteOrphanBody" xml:space="preserve"><value>软件包 '{0}' 属于不再连接到系统的硬件。&amp;#10;您确定要删除此软件包吗？&amp;#10;此操作在没有强制开关的情况下运行，如果系统正在使用它，将会停止。</value></data>
+  <data name="DriverDeleteOldBody" xml:space="preserve"><value>您确定要删除旧的驱动程序包 '{0}' ({1}) 吗？&amp;#10;此操作将在未使用强制开关的情况下运行，如果系统正在使用它，将会停止。</value></data>
+  <data name="RamCurrentlyUsed" xml:space="preserve"><value>当前使用的内存</value></data>
+  <data name="Total" xml:space="preserve"><value>总计</value></data>
+  <data name="HighUsage" xml:space="preserve"><value>高使用率</value></data>
+  <data name="MediumUsage" xml:space="preserve"><value>中等使用</value></data>
+  <data name="SmoothUsage" xml:space="preserve"><value>光滑</value></data>
+  <data name="ActiveTraffic" xml:space="preserve"><value>活跃交通</value></data>
+  <data name="IdleTraffic" xml:space="preserve"><value>空闲</value></data>
+  <data name="NoBackgroundTraffic" xml:space="preserve"><value>没有背景流量（网络稳定）</value></data>
+  <data name="CpuLoadSummary" xml:space="preserve"><value>核心负荷</value></data>
+  <data name="PowerPlugged" xml:space="preserve"><value>已连接</value></data>
+  <data name="PowerCharging" xml:space="preserve"><value>充电</value></data>
+  <data name="PowerBattery" xml:space="preserve"><value>电池</value></data>
+  <data name="BoostError" xml:space="preserve"><value>系统优化失败</value></data>
+  <data name="OptimizationFeatures" xml:space="preserve"><value>优化功能</value></data>
+  <data name="ToolsHeaderSubtitle" xml:space="preserve"><value>一套有用的系统管理和优化工具</value></data>
+  <data name="LauncherWindowsUpdateTitle" xml:space="preserve"><value>Windows 更新</value></data>
+  <data name="LauncherWindowsUpdateDesc" xml:space="preserve"><value>检查、暂停5周，并修复卡住的下载</value></data>
+  <data name="LauncherUninstallerTitle" xml:space="preserve"><value>卸载应用</value></data>
+  <data name="LauncherUninstallerDesc" xml:space="preserve"><value>带图标的应用列表，轻松卸载</value></data>
+  <data name="LauncherStartupTitle" xml:space="preserve"><value>启动应用</value></data>
+  <data name="LauncherStartupDesc" xml:space="preserve"><value>管理启动应用和启动速度</value></data>
+  <data name="LauncherSpeedTestTitle" xml:space="preserve"><value>网络速度测试</value></data>
+  <data name="LauncherSpeedTestDesc" xml:space="preserve"><value>真实下载、上传、延迟及ISP测量</value></data>
+  <data name="ToolsSectionFrequentlyUsed" xml:space="preserve"><value>常用</value></data>
+  <data name="ToolsSectionOtherTools" xml:space="preserve"><value>其他工具</value></data>
+  <data name="LauncherToolDeepStorage" xml:space="preserve"><value>深度磁盘清理</value></data>
+  <data name="LauncherToolSpecs" xml:space="preserve"><value>系统规格</value></data>
+  <data name="LauncherToolPersonalization" xml:space="preserve"><value>风格与图形</value></data>
+  <data name="LauncherToolDrivers" xml:space="preserve"><value>驱动管理</value></data>
+  <data name="LauncherToolDns" xml:space="preserve"><value>DNS及绕行设置</value></data>
+  <data name="LauncherToolPrivacy" xml:space="preserve"><value>隐私与防追踪</value></data>
+  <data name="LauncherToolRecycleBin" xml:space="preserve"><value>回收站</value></data>
+  <data name="AutoStartDesc" xml:space="preserve"><value>在登录时自动启动 CleanC。这与任务管理器 › 启动中显示的条目相同。</value></data>
+  <data name="AppDataSettingsLabel" xml:space="preserve"><value>设置：</value></data>
+  <data name="AppDataLogsLabel" xml:space="preserve"><value>错误日志：</value></data>
+  <data name="VersionLabel" xml:space="preserve"><value>应用版本：</value></data>
+  <data name="OsLabel" xml:space="preserve"><value>操作系统：</value></data>
+  <data name="NotificationHistoryTitle" xml:space="preserve"><value>通知和操作历史</value></data>
+  <data name="NotificationClear" xml:space="preserve"><value>清除</value></data>
+  <data name="NotificationEmpty" xml:space="preserve"><value>尚无通知。</value></data>
+  <data name="SelectAll" xml:space="preserve"><value>全选</value></data>
+  <data name="SpecsHeaderTitle" xml:space="preserve"><value>完整硬件规格</value></data>
+  <data name="SpecsHeaderSubtitle" xml:space="preserve"><value>实时 CPU、内存、主板、GPU、驱动器和许可证信息</value></data>
+  <data name="CopySpecs" xml:space="preserve"><value>复制规格</value></data>
+  <data name="RefreshSpecs" xml:space="preserve"><value>刷新</value></data>
+  <data name="UninstallerHeaderTitle" xml:space="preserve"><value>管理和卸载应用</value></data>
+  <data name="UninstallerSearchPlaceholder" xml:space="preserve"><value>搜索应用...</value></data>
+  <data name="UninstallerSortNewest" xml:space="preserve"><value>最新安装</value></data>
+  <data name="UninstallerSortLargest" xml:space="preserve"><value>最大体积</value></data>
+  <data name="UninstallerSortName" xml:space="preserve"><value>名称（A-Z）</value></data>
+  <data name="SpeedTestHeaderTitle" xml:space="preserve"><value>网络测速</value></data>
+  <data name="SpeedTestHeaderSubtitle" xml:space="preserve"><value>从Cloudflare服务器测量下载、上传和延迟</value></data>
+  <data name="SpeedIp" xml:space="preserve"><value>IP</value></data>
+  <data name="SpeedIsp" xml:space="preserve"><value>ISP</value></data>
+  <data name="SpeedLocation" xml:space="preserve"><value>位置</value></data>
+  <data name="ReadyToStartSpeedTest" xml:space="preserve"><value>准备开始速度测试</value></data>
+  <data name="StartSpeedTest" xml:space="preserve"><value>开始速度测试</value></data>
+  <data name="StopSpeedTest" xml:space="preserve"><value>停止测试</value></data>
+  <data name="PingLatency" xml:space="preserve"><value>Ping延迟</value></data>
+  <data name="DownloadSpeed" xml:space="preserve"><value>下载速度</value></data>
+  <data name="UploadSpeed" xml:space="preserve"><value>上传速度</value></data>
+  <data name="PersonalizationHeaderTitle" xml:space="preserve"><value>Windows样式、主题和图形</value></data>
+  <data name="PersonalizationHeaderSubtitle" xml:space="preserve"><value>无需重启立即应用</value></data>
+  <data name="StartupHeaderTitle" xml:space="preserve"><value>管理启动应用</value></data>
+  <data name="StartupRefresh" xml:space="preserve"><value>刷新列表</value></data>
+  <data name="WindowsUpdateHeaderTitle" xml:space="preserve"><value>管理Windows更新</value></data>
+  <data name="WindowsUpdateHeaderSubtitle" xml:space="preserve"><value>检查更新，官方暂停最长5周，并修复卡住的下载</value></data>
+  <data name="CheckNewUpdates" xml:space="preserve"><value>检查新更新</value></data>
+  <data name="UpdateStatusHeadline" xml:space="preserve"><value>操作系统更新状态</value></data>
+  <data name="UpdateStatusActive" xml:space="preserve"><value>激活</value></data>
+  <data name="UpdateRow1Title" xml:space="preserve"><value>官方暂停最长5周</value></data>
+  <data name="UpdateRow1Sub" xml:space="preserve"><value>使用官方 Windows 设置机制暂停包交付</value></data>
+  <data name="Pause5Weeks" xml:space="preserve"><value>暂停 5 周</value></data>
+  <data name="ResumeUpdates" xml:space="preserve"><value>恢复更新</value></data>
+  <data name="UpdateRow2Title" xml:space="preserve"><value>Windows 更新服务 (wuauserv)</value></data>
+  <data name="UpdateRow2Sub" xml:space="preserve"><value>完全启用或禁用后台服务</value></data>
+  <data name="DisableService" xml:space="preserve"><value>禁用</value></data>
+  <data name="EnableService" xml:space="preserve"><value>启用</value></data>
+  <data name="UpdateRow3Title" xml:space="preserve"><value>修复卡住的更新（清除缓存）</value></data>
+  <data name="UpdateRow3Sub" xml:space="preserve"><value>停止服务，完全清空 SoftwareDistribution 文件夹，然后重启</value></data>
+  <data name="CleanCache" xml:space="preserve"><value>清除缓存</value></data>
+  <data name="UpdatePendingSectionTitle" xml:space="preserve"><value>等待安装的更新</value></data>
+  <data name="NoUpdatesBanner" xml:space="preserve"><value>未发现任何待处理或等待的更新。Windows 已完全更新。</value></data>
+  <data name="DriversHeaderTitle" xml:space="preserve"><value>管理和清理驱动程序</value></data>
+  <data name="DriversHeaderSubtitle" xml:space="preserve"><value>检测错误并安全清理重复的 DriverStore 版本</value></data>
+  <data name="CheckDriverUpdates" xml:space="preserve"><value>检查驱动程序更新</value></data>
+  <data name="DriversTotalLabel" xml:space="preserve"><value>驱动程序包总数</value></data>
+  <data name="DriversErrorLabel" xml:space="preserve"><value>硬件错误</value></data>
+  <data name="DriversDuplicateLabel" xml:space="preserve"><value>重复版本</value></data>
+  <data name="DriversDuplicateBannerTitle" xml:space="preserve"><value>清理占用空间的重复包</value></data>
+  <data name="DriversDuplicateBannerSub" xml:space="preserve"><value>旧版本在创建还原点后安全删除。</value></data>
+  <data name="CleanDriverStore" xml:space="preserve"><value>清理 DriverStore</value></data>
+  <data name="DriversSearchPlaceholder" xml:space="preserve"><value>搜索驱动程序...</value></data>
+  <data name="DriversSelectAll" xml:space="preserve"><value>全选</value></data>
+  <data name="DriversBatchDelete" xml:space="preserve"><value>删除所选</value></data>
+  <data name="DnsHeaderTitle" xml:space="preserve"><value>智能 DNS 设置</value></data>
+  <data name="DnsHeaderSubtitle" xml:space="preserve"><value>可靠绕过并降低连接延迟</value></data>
+  <data name="ResetDnsDhcp" xml:space="preserve"><value>重置为自动 (DHCP)</value></data>
+  <data name="ActiveDnsLabel" xml:space="preserve"><value>活动 DNS</value></data>
+  <data name="FlushDns" xml:space="preserve"><value>刷新 DNS 缓存</value></data>
+  <data name="DnsPresetsTitle" xml:space="preserve"><value>预设</value></data>
+  <data name="PrivacyHeaderTitle" xml:space="preserve"><value>隐私和遥测移除</value></data>
+  <data name="PrivacyHeaderSubtitle" xml:space="preserve"><value>停止报告发送和搜索优化</value></data>
+  <data name="PrivacyBannerTitle" xml:space="preserve"><value>应用并实时保存</value></data>
+  <data name="PrivacyBannerSub" xml:space="preserve"><value>每个开关会立即应用到注册表和服务。</value></data>
+  <data name="PrivacyBannerBadge" xml:space="preserve"><value>活动</value></data>
+  <data name="PrivacyFooterHint" xml:space="preserve"><value>为了最大限度的安全性，建议保持所有选项启用。</value></data>
+  <data name="PrivacyResetDefaults" xml:space="preserve"><value>Windows 默认设置</value></data>
+  <data name="PrivacyEnableAll" xml:space="preserve"><value>全部启用</value></data>
+  <data name="DeepStorageHeaderTitle" xml:space="preserve"><value>深度磁盘清理和垃圾整理</value></data>
+  <data name="DeepStorageHeaderSubtitle" xml:space="preserve"><value>查找重复文件、空文件夹、下载文件和大文件</value></data>
+  <data name="StartDeepScan" xml:space="preserve"><value>开始深度扫描</value></data>
+  <data name="DeepStorageDuplicatesLabel" xml:space="preserve"><value>重复文件</value></data>
+  <data name="DeepStorageEmptyFoldersLabel" xml:space="preserve"><value>空文件夹</value></data>
+  <data name="DeepStorageEmptyFoldersSub" xml:space="preserve"><value>没有文件或子文件夹</value></data>
+  <data name="TabMess" xml:space="preserve"><value>垃圾和杂乱文件</value></data>
+  <data name="DeepStorageLargeFilesLabel" xml:space="preserve"><value>大文件</value></data>
+  <data name="DeepStorageLargeFilesSub" xml:space="preserve"><value>超过 500 MB</value></data>
+  <data name="DeepStorageSortLabel" xml:space="preserve"><value>排序：</value></data>
+  <data name="DeepStorageSortSize" xml:space="preserve"><value>大小</value></data>
+  <data name="DeepStorageSortDate" xml:space="preserve"><value>日期</value></data>
+  <data name="DeepStorageSortName" xml:space="preserve"><value>名称</value></data>
+  <data name="CleanSelectedItems" xml:space="preserve"><value>清理所选项目</value></data>
+  <data name="DeepStorageScanStatus" xml:space="preserve"><value>正在对文件结构进行深度扫描并进行内容哈希...</value></data>
+  <data name="RecycleBinHeaderTitle" xml:space="preserve"><value>管理回收站</value></data>
+  <data name="RecycleBinHeaderSubtitle" xml:space="preserve"><value>逐项预览；恢复或永久删除每个对象</value></data>
+  <data name="RecycleBinRefresh" xml:space="preserve"><value>刷新</value></data>
+  <data name="RecycleBinTotalLabel" xml:space="preserve"><value>项目数</value></data>
+  <data name="RecycleBinSizeLabel" xml:space="preserve"><value>已用空间</value></data>
+  <data name="RecycleBinRestoreSelected" xml:space="preserve"><value>恢复所选</value></data>
+  <data name="RecycleBinDeleteSelected" xml:space="preserve"><value>永久删除所选</value></data>
+  <data name="RecycleBinEmptyBtn" xml:space="preserve"><value>清空整个回收站</value></data>
+  <data name="RecycleBinEmptyHint" xml:space="preserve"><value>回收站为空；没有可恢复或删除的内容。</value></data>
+  <data name="RecycleBinLoading" xml:space="preserve"><value>正在读取回收站列表...</value></data>
+  <data name="NetworkSysTraffic" xml:space="preserve"><value>系统与Windows流量</value></data>
+  <data name="HealthExcellent" xml:space="preserve"><value>优秀</value></data>
+  <data name="HealthDescExcellent" xml:space="preserve"><value>系统健康稳定且优秀</value></data>
+  <data name="HealthGood" xml:space="preserve"><value>良好</value></data>
+  <data name="HealthDescGood" xml:space="preserve"><value>整体系统性能良好</value></data>
+  <data name="HealthFair" xml:space="preserve"><value>一般</value></data>
+  <data name="HealthDescFair" xml:space="preserve"><value>系统需要清理内存并优化文件</value></data>
+  <data name="HealthNeedsOpt" xml:space="preserve"><value>需要优化</value></data>
+  <data name="HealthDescPoor" xml:space="preserve"><value>高资源使用；建议进行快速清理</value></data>
+  <data name="BadgeTrial" xml:space="preserve"><value>试用版</value></data>
+  <data name="BadgeComponent" xml:space="preserve"><value>组件 / 驱动程序</value></data>
+  <data name="LockTooltipUnlock" xml:space="preserve"><value>解锁 — 此路径可以再次建议</value></data>
+  <data name="LockTooltipLock" xml:space="preserve"><value>锁定 — 此路径将永不建议或删除</value></data>
+  <data name="JunkApps" xml:space="preserve"><value>应用程序与开发者缓存</value></data>
+  <data name="JunkBoost" xml:space="preserve"><value>实时系统加速</value></data>
+  <data name="آماده اسکن برنامه ها" xml:space="preserve"><value>准备扫描应用程序</value></data>
+  <data name="بررسی استارتاپ" xml:space="preserve"><value>启动检查</value></data>
+  <data name="سنجش بلادرنگ پینگ و سرعت" xml:space="preserve"><value>实时 Ping 和速度测试</value></data>
+  <data name="DeepStorageMessSub" xml:space="preserve"><value>临时文件、安装程序和垃圾文件</value></data>
+  <data name="سخت افزار معیوب" xml:space="preserve"><value>故障硬件</value></data>
+  <data name="در حال شناسایی..." xml:space="preserve"><value>正在检测...</value></data>
+  <data name="اکسپدیشن وینی" xml:space="preserve"><value>Winy 的探险</value></data>
+  <data name="اجرای بازی گرافیکی در دسترس نیست (WebView2 Runtime نصب شده باشد)." xml:space="preserve"><value>图形游戏不可用（必须安装 Microsoft WebView2 运行时）。</value></data>
+  <data name="کپی نام‌دار «({0})»" xml:space="preserve"><value>命名副本 "({0})"</value></data>
+  <data name="دوقلوی اصلی همین پوشه: {0}" xml:space="preserve"><value>此文件夹中的原始副本：{0}</value></data>
+  <data name="حجم همتا: {0}" xml:space="preserve"><value>副本大小：{0}</value></data>
+  <data name="پسوند نیمه‌تمام مرورگر ({0})" xml:space="preserve"><value>未完成的浏览器下载（{0}]）</value></data>
+  <data name="عمر: {0}" xml:space="preserve"><value>年龄：{0}</value></data>
+  <data name="پسوند موقت ({0})" xml:space="preserve"><value>临时扩展名 ({0})</value></data>
+  <data name="نصب‌کننده ({0}) به حجم {1}" xml:space="preserve"><value>安装程序 ({0}) 位于 {1}</value></data>
+  <data name="نصب‌کننده پس از نصب معمولاً بی‌استفاده می‌ماند" xml:space="preserve"><value>安装后安装程序通常保持未使用状态</value></data>
+  <data name="حجم {0}" xml:space="preserve"><value>大小 {0}</value></data>
+  <data name="هیچ الگوی کپی یا موقتی ندارد؛ داوری با شماست" xml:space="preserve"><value>无复制或临时模式；由您判断决定</value></data>
+  <data name="حجم صفر (خالی) و قدیمی" xml:space="preserve"><value>零字节（空）且过时</value></data>
+  <data name="مسیر دانلودها در دسترس نیست" xml:space="preserve"><value>下载文件夹不可用</value></data>
+  <data name="API ناشناخته است: {0}" xml:space="preserve"><value>未知 API: {0}</value></data>
+  <data name="سال" xml:space="preserve"><value>年</value></data>
+  <data name="ماه" xml:space="preserve"><value>月</value></data>
+  <data name="هفته" xml:space="preserve"><value>周</value></data>
+  <data name="روز" xml:space="preserve"><value>日</value></data>
 </root>

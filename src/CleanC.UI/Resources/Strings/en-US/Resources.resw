@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve">
     <value>CleanC</value>
@@ -3560,7 +3560,7 @@ To download and install, go to the 'Windows Update' section.</value>
     <value>Confirm and return to dashboard</value>
   </data>
   <data name="مثلاً سی‌سی" xml:space="preserve">
-    <value>e.g. Cici</value>
+    <value>e.g. Winy</value>
   </data>
   <data name="حجم بالای ۱.۲۵× از درون کارت بیرون می زند" xml:space="preserve">
     <value>Sizes above 1.25× overflow the card</value>
@@ -3570,5 +3570,714 @@ To download and install, go to the 'Windows Update' section.</value>
   </data>
   <data name="CleanC در حال مراقبت از سیستم شماست" xml:space="preserve">
     <value>CleanC is taking care of your system</value>
+  </data>
+  <data name="{0} مورد انتخاب شده{1}. ادامه می دهید؟" xml:space="preserve">
+    <value>{0} items selected{1}. Continue?</value>
+  </data>
+  <data name="DeepStoragePermanentNote" xml:space="preserve"><value>These items will be permanently deleted and cannot be restored.</value></data>
+  <data name="DeepStorageRecycleOptIn" xml:space="preserve"><value>Move to Recycle Bin instead of permanent deletion (disk space won&apos;t be freed)</value></data>
+  <data name="DeepStorageDeletingProgress" xml:space="preserve"><value>Deleting… {0} of {1}</value></data>
+  <data name="MessCatOldInstaller" xml:space="preserve">
+    <value>Old installer (Setup / Installer)</value>
+  </data>
+  <data name="MessCatOldArchive" xml:space="preserve">
+    <value>Archive (Zip / Rar)</value>
+  </data>
+  <data name="MessCatDuplicateCopy" xml:space="preserve">
+    <value>Duplicate copy (Copy / Duplicated)</value>
+  </data>
+  <data name="MessCatOldScreenshot" xml:space="preserve">
+    <value>Old screenshot</value>
+  </data>
+  <data name="MessCatTempJunk" xml:space="preserve">
+    <value>Temp / junk file</value>
+  </data>
+  <data name="MessCatLargeFile" xml:space="preserve">
+    <value>Very large file (&gt;200MB)</value>
+  </data>
+  <data name="MessCatExtractedArchiveDup" xml:space="preserve">
+    <value>Extracted archive duplicate (folder with the same name exists)</value>
+  </data>
+  <data name="MessCatIncompleteDownload" xml:space="preserve">
+    <value>Incomplete temporary download (crdownload / part)</value>
+  </data>
+  <data name="MessCatOemDriveRoot" xml:space="preserve">
+    <value>OEM install leftover at the drive root</value>
+  </data>
+  <data name="MessCatUpdater" xml:space="preserve">
+    <value>Updater leftover (Electron / Squirrel)</value>
+  </data>
+  <data name="MessCatSyncDevice" xml:space="preserve">
+    <value>Device transfer / OneDrive temp leftover</value>
+  </data>
+  <data name="MessCatOfficeLock" xml:space="preserve">
+    <value>Office temporary lock file (~$)</value>
+  </data>
+  <data name="MessCatOther" xml:space="preserve">
+    <value>Other</value>
+  </data>
+  <data name="EvSystemComponent" xml:space="preserve">
+    <value>System component entry (SystemComponent) — usually a driver or hardware utility; remove only with full awareness</value>
+  </data>
+  <data name="EvTrialInName" xml:space="preserve">
+    <value>App name contains &quot;Trial&quot;</value>
+  </data>
+  <data name="EvTrialInNameLocalized" xml:space="preserve">
+    <value>App name contains &quot;trial version&quot;</value>
+  </data>
+  <data name="NoteProvisioned" xml:space="preserve">
+    <value> — provisioned in the Windows image and auto-installed for new users</value>
+  </data>
+  <data name="EvEmptyFolder30Days" xml:space="preserve">
+    <value>Empty for over 30 days (last modified: {0:yyyy/MM/dd})</value>
+  </data>
+  <data name="EvOfficeLockFile" xml:space="preserve">
+    <value>Office temporary lock file — the document is closed and this file was left behind</value>
+  </data>
+  <data name="EvDownloadCompleted" xml:space="preserve">
+    <value>Complete file &quot;{0}&quot; exists — leftover from a finished download</value>
+  </data>
+  <data name="EvDownloadAbandoned" xml:space="preserve">
+    <value>No changes for over 24 hours — abandoned download</value>
+  </data>
+  <data name="EvTmpOld72h" xml:space="preserve">
+    <value>.tmp file older than 72 hours in Downloads/Desktop</value>
+  </data>
+  <data name="EvInstallerMatched" xml:space="preserve">
+    <value>Installer for &quot;{0}&quot; — the app is installed and this file is no longer needed</value>
+  </data>
+  <data name="EvInstallerNoMatch" xml:space="preserve">
+    <value>Old installer (over 14 days) — no app with the same name found on the system</value>
+  </data>
+  <data name="EvCrossDevice" xml:space="preserve">
+    <value>Temporary device exchange (CrossDevice)</value>
+  </data>
+  <data name="EvCrossDeviceSub" xml:space="preserve">
+    <value>Link to Windows / Phone Link staging folder for phone-to-PC file transfers</value>
+  </data>
+  <data name="EvOneDriveTemp" xml:space="preserve">
+    <value>OneDrive temp folder</value>
+  </data>
+  <data name="EvOneDriveTempSub" xml:space="preserve">
+    <value>Temporary storage for abandoned OneDrive uploads</value>
+  </data>
+  <data name="ScanProgressDriveRoots" xml:space="preserve">
+    <value>Scanning drive roots and updater leftovers...</value>
+  </data>
+  <data name="EvDriveRootLeftover" xml:space="preserve">
+    <value>Drive-root folder named after vendor {0} — evidence: {1}</value>
+  </data>
+  <data name="EvRemnantInstallerFile" xml:space="preserve">
+    <value>Leftover installer file &quot;{0}&quot;</value>
+  </data>
+  <data name="EvVendorArtifact" xml:space="preserve">
+    <value>Vendor-specific artifact &quot;{0}&quot; (boot image / driver package)</value>
+  </data>
+  <data name="EvPreloadFile" xml:space="preserve">
+    <value>Vendor preload file &quot;{0}&quot;</value>
+  </data>
+  <data name="EvRootEmptyFolder" xml:space="preserve">
+    <value>Empty folder at the drive root — no content for over 30 days (last modified: {0:yyyy/MM/dd})</value>
+  </data>
+  <data name="EvUpdaterPendingInstaller" xml:space="preserve">
+    <value>Updater folder contains leftover installer &quot;{0}&quot; — incomplete update</value>
+  </data>
+  <data name="EvUpdaterNoPending" xml:space="preserve">
+    <value>Updater folder matching *-updater / SquirrelTemp (no pending install found)</value>
+  </data>
+  <data name="EvBlockmapOld" xml:space="preserve">
+    <value>Electron updater leftover .blockmap file (untouched for over 30 days)</value>
+  </data>
+  <data name="SensitiveKeyFile" xml:space="preserve">
+    <value>Key/security file ({0})</value>
+  </data>
+  <data name="EvDriverNoHardware" xml:space="preserve">
+    <value>No device (even disconnected) is linked to this package — the hardware was never or is no longer present</value>
+  </data>
+  <data name="LockUserVetoError" xml:space="preserve">
+    <value>This path is locked by the user</value>
+  </data>
+  <data name="EvStartupFileMissing" xml:space="preserve">
+    <value>Startup file &quot;{0}&quot; does not exist on disk</value>
+  </data>
+  <data name="EvStartupExeMissing" xml:space="preserve">
+    <value>Executable &quot;{0}&quot; does not exist — leftover from an uninstalled app</value>
+  </data>
+  <data name="DescCrashLogs" xml:space="preserve">
+    <value>Crash report logs, WER files, memory dumps, and kernel reports (LiveKernelReports)</value>
+  </data>
+  <data name="JunkPrefetchTitle" xml:space="preserve">
+    <value>Windows Prefetch cache (.pf files)</value>
+  </data>
+  <data name="JunkPrefetchDesc" xml:space="preserve">
+    <value>Speeds up app launches — rebuilt automatically and safe to delete</value>
+  </data>
+  <data name="AdminRequired" xml:space="preserve">
+    <value>Administrator access required</value>
+  </data>
+  <data name="LockReasonDeepScan" xml:space="preserve">
+    <value>Locked from the Deep Scan page</value>
+  </data>
+  <data name="LockInfoBarTitle" xml:space="preserve">
+    <value>Path locked</value>
+  </data>
+  <data name="LockSaveFailed" xml:space="preserve">
+    <value>Failed to save the lock — check access to locks.json.</value>
+  </data>
+  <data name="SensitiveSectionTitle" xml:space="preserve">
+    <value>Sensitive files detected ({0} items — report only, not deleted)</value>
+  </data>
+  <data name="SpeedTestCancelled" xml:space="preserve">
+    <value>Test stopped</value>
+  </data>
+  <data name="BadgeTargetMissing" xml:space="preserve">
+    <value>Target missing</value>
+  </data>
+  <data name="DriverBannerDupAndOrphan" xml:space="preserve">
+    <value>Found {0} duplicate and old packages + {1} packages with no hardware in the Windows DriverStore</value>
+  </data>
+  <data name="DriverBannerOrphan" xml:space="preserve">
+    <value>Found {0} packages with no hardware (leftovers from disconnected devices) in the Windows DriverStore</value>
+  </data>
+  <data name="DriverBannerDup" xml:space="preserve">
+    <value>Found {0} duplicate and old packages in the Windows DriverStore</value>
+  </data>
+  <data name="BadgeNoHardware" xml:space="preserve">
+    <value>No hardware</value>
+  </data>
+  <data name="DriverDeleteOrphanTitle" xml:space="preserve">
+    <value>Delete package with no hardware {0}</value>
+  </data>
+  <data name="DriverDeleteOldTitle" xml:space="preserve">
+    <value>Delete old driver {0}</value>
+  </data>
+  <data name="DriverDeleteOrphanBody" xml:space="preserve">
+    <value>Package &apos;{0}&apos; belongs to hardware that is no longer connected to the system.&amp;#10;Are you sure you want to delete this package?&amp;#10;This operation runs without the force switch and will stop if the system is using it.</value>
+  </data>
+  <data name="DriverDeleteOldBody" xml:space="preserve">
+    <value>Are you sure you want to delete the old driver package &apos;{0}&apos; ({1})?&amp;#10;This operation runs without the force switch and will stop if the system is using it.</value>
+  </data>
+  <data name="RamCurrentlyUsed" xml:space="preserve">
+    <value>Currently used memory</value>
+  </data>
+  <data name="Total" xml:space="preserve">
+    <value>Total</value>
+  </data>
+  <data name="HighUsage" xml:space="preserve">
+    <value>High usage</value>
+  </data>
+  <data name="MediumUsage" xml:space="preserve">
+    <value>Medium usage</value>
+  </data>
+  <data name="SmoothUsage" xml:space="preserve">
+    <value>Smooth</value>
+  </data>
+  <data name="ActiveTraffic" xml:space="preserve">
+    <value>Active traffic</value>
+  </data>
+  <data name="IdleTraffic" xml:space="preserve">
+    <value>Idle</value>
+  </data>
+  <data name="NoBackgroundTraffic" xml:space="preserve">
+    <value>No background traffic (network stable)</value>
+  </data>
+  <data name="CpuLoadSummary" xml:space="preserve">
+    <value>Core load</value>
+  </data>
+  <data name="PowerPlugged" xml:space="preserve">
+    <value>Plugged In</value>
+  </data>
+  <data name="PowerCharging" xml:space="preserve">
+    <value>Charging</value>
+  </data>
+  <data name="PowerBattery" xml:space="preserve">
+    <value>Battery</value>
+  </data>
+  <data name="BoostError" xml:space="preserve">
+    <value>System optimization failed</value>
+  </data>
+  <data name="OptimizationFeatures" xml:space="preserve">
+    <value>Optimization features</value>
+  </data>
+  <data name="ToolsHeaderSubtitle" xml:space="preserve">
+    <value>A set of useful system management and optimization tools</value>
+  </data>
+  <data name="LauncherWindowsUpdateTitle" xml:space="preserve">
+    <value>Windows Update</value>
+  </data>
+  <data name="LauncherWindowsUpdateDesc" xml:space="preserve">
+    <value>Check, pause for 5 weeks, and fix stuck downloads</value>
+  </data>
+  <data name="LauncherUninstallerTitle" xml:space="preserve">
+    <value>Uninstall apps</value>
+  </data>
+  <data name="LauncherUninstallerDesc" xml:space="preserve">
+    <value>App list with icons and easy removal</value>
+  </data>
+  <data name="LauncherStartupTitle" xml:space="preserve">
+    <value>Startup apps</value>
+  </data>
+  <data name="LauncherStartupDesc" xml:space="preserve">
+    <value>Manage startup apps and boot speed</value>
+  </data>
+  <data name="LauncherSpeedTestTitle" xml:space="preserve">
+    <value>Internet speed test</value>
+  </data>
+  <data name="LauncherSpeedTestDesc" xml:space="preserve">
+    <value>Real download, upload, ping, and ISP measurement</value>
+  </data>
+  <data name="ToolsSectionFrequentlyUsed" xml:space="preserve">
+    <value>Frequently used</value>
+  </data>
+  <data name="ToolsSectionOtherTools" xml:space="preserve">
+    <value>Other tools</value>
+  </data>
+  <data name="LauncherToolDeepStorage" xml:space="preserve">
+    <value>Deep disk cleanup</value>
+  </data>
+  <data name="LauncherToolSpecs" xml:space="preserve">
+    <value>System specs</value>
+  </data>
+  <data name="LauncherToolPersonalization" xml:space="preserve">
+    <value>Style &amp; graphics</value>
+  </data>
+  <data name="LauncherToolDrivers" xml:space="preserve">
+    <value>Driver management</value>
+  </data>
+  <data name="LauncherToolDns" xml:space="preserve">
+    <value>DNS &amp; bypass settings</value>
+  </data>
+  <data name="LauncherToolPrivacy" xml:space="preserve">
+    <value>Privacy &amp; anti-tracking</value>
+  </data>
+  <data name="LauncherToolRecycleBin" xml:space="preserve">
+    <value>Recycle Bin</value>
+  </data>
+  <data name="AutoStartDesc" xml:space="preserve">
+    <value>Launch CleanC automatically when you sign in. This is the same entry shown in Task Manager › Startup.</value>
+  </data>
+  <data name="AppDataSettingsLabel" xml:space="preserve">
+    <value>Settings:</value>
+  </data>
+  <data name="AppDataLogsLabel" xml:space="preserve">
+    <value>Error logs:</value>
+  </data>
+  <data name="VersionLabel" xml:space="preserve">
+    <value>App version:</value>
+  </data>
+  <data name="OsLabel" xml:space="preserve">
+    <value>Operating system:</value>
+  </data>
+  <data name="NotificationHistoryTitle" xml:space="preserve">
+    <value>Notification and action history</value>
+  </data>
+  <data name="NotificationClear" xml:space="preserve">
+    <value>Clear</value>
+  </data>
+  <data name="NotificationEmpty" xml:space="preserve">
+    <value>No notifications yet.</value>
+  </data>
+  <data name="SelectAll" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="SpecsHeaderTitle" xml:space="preserve">
+    <value>Full hardware specifications</value>
+  </data>
+  <data name="SpecsHeaderSubtitle" xml:space="preserve">
+    <value>Live CPU, RAM, motherboard, GPU, drives, and license information</value>
+  </data>
+  <data name="CopySpecs" xml:space="preserve">
+    <value>Copy specs</value>
+  </data>
+  <data name="RefreshSpecs" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="UninstallerHeaderTitle" xml:space="preserve">
+    <value>Manage and uninstall apps</value>
+  </data>
+  <data name="UninstallerSearchPlaceholder" xml:space="preserve">
+    <value>Search apps...</value>
+  </data>
+  <data name="UninstallerSortNewest" xml:space="preserve">
+    <value>Newest installed</value>
+  </data>
+  <data name="UninstallerSortLargest" xml:space="preserve">
+    <value>Largest size</value>
+  </data>
+  <data name="UninstallerSortName" xml:space="preserve">
+    <value>Name (A-Z)</value>
+  </data>
+  <data name="SpeedTestHeaderTitle" xml:space="preserve">
+    <value>Internet speed test</value>
+  </data>
+  <data name="SpeedTestHeaderSubtitle" xml:space="preserve">
+    <value>Measure download, upload, and latency from Cloudflare servers</value>
+  </data>
+  <data name="SpeedIp" xml:space="preserve">
+    <value>IP</value>
+  </data>
+  <data name="SpeedIsp" xml:space="preserve">
+    <value>ISP</value>
+  </data>
+  <data name="SpeedLocation" xml:space="preserve">
+    <value>Location</value>
+  </data>
+  <data name="ReadyToStartSpeedTest" xml:space="preserve">
+    <value>Ready to start the speed test</value>
+  </data>
+  <data name="StartSpeedTest" xml:space="preserve">
+    <value>Start speed test</value>
+  </data>
+  <data name="StopSpeedTest" xml:space="preserve">
+    <value>Stop test</value>
+  </data>
+  <data name="PingLatency" xml:space="preserve">
+    <value>Ping latency</value>
+  </data>
+  <data name="DownloadSpeed" xml:space="preserve">
+    <value>Download speed</value>
+  </data>
+  <data name="UploadSpeed" xml:space="preserve">
+    <value>Upload speed</value>
+  </data>
+  <data name="PersonalizationHeaderTitle" xml:space="preserve">
+    <value>Windows style, theme, and graphics</value>
+  </data>
+  <data name="PersonalizationHeaderSubtitle" xml:space="preserve">
+    <value>Apply instantly without a restart</value>
+  </data>
+  <data name="StartupHeaderTitle" xml:space="preserve">
+    <value>Manage startup apps</value>
+  </data>
+  <data name="StartupRefresh" xml:space="preserve">
+    <value>Refresh list</value>
+  </data>
+  <data name="WindowsUpdateHeaderTitle" xml:space="preserve">
+    <value>Manage Windows updates</value>
+  </data>
+  <data name="WindowsUpdateHeaderSubtitle" xml:space="preserve">
+    <value>Check updates, pause officially for 5 weeks, and fix stuck downloads</value>
+  </data>
+  <data name="CheckNewUpdates" xml:space="preserve">
+    <value>Check for new updates</value>
+  </data>
+  <data name="UpdateStatusHeadline" xml:space="preserve">
+    <value>OS update status</value>
+  </data>
+  <data name="UpdateStatusActive" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="UpdateRow1Title" xml:space="preserve">
+    <value>Official pause up to 5 weeks</value>
+  </data>
+  <data name="UpdateRow1Sub" xml:space="preserve">
+    <value>Pause package delivery using the official Windows settings mechanism</value>
+  </data>
+  <data name="Pause5Weeks" xml:space="preserve">
+    <value>Pause 5 weeks</value>
+  </data>
+  <data name="ResumeUpdates" xml:space="preserve">
+    <value>Resume updates</value>
+  </data>
+  <data name="UpdateRow2Title" xml:space="preserve">
+    <value>Windows Update service (wuauserv)</value>
+  </data>
+  <data name="UpdateRow2Sub" xml:space="preserve">
+    <value>Fully enable or disable the background service</value>
+  </data>
+  <data name="DisableService" xml:space="preserve">
+    <value>Disable</value>
+  </data>
+  <data name="EnableService" xml:space="preserve">
+    <value>Enable</value>
+  </data>
+  <data name="UpdateRow3Title" xml:space="preserve">
+    <value>Fix stuck updates (clear cache)</value>
+  </data>
+  <data name="UpdateRow3Sub" xml:space="preserve">
+    <value>Stop the service, fully clear the SoftwareDistribution folder, and restart</value>
+  </data>
+  <data name="CleanCache" xml:space="preserve">
+    <value>Clear cache</value>
+  </data>
+  <data name="UpdatePendingSectionTitle" xml:space="preserve">
+    <value>Updates pending installation</value>
+  </data>
+  <data name="NoUpdatesBanner" xml:space="preserve">
+    <value>No pending or waiting updates found. Windows is fully up to date.</value>
+  </data>
+  <data name="DriversHeaderTitle" xml:space="preserve">
+    <value>Manage and clean drivers</value>
+  </data>
+  <data name="DriversHeaderSubtitle" xml:space="preserve">
+    <value>Detect errors and safely clean duplicate DriverStore versions</value>
+  </data>
+  <data name="CheckDriverUpdates" xml:space="preserve">
+    <value>Check driver updates</value>
+  </data>
+  <data name="DriversTotalLabel" xml:space="preserve">
+    <value>Total driver packages</value>
+  </data>
+  <data name="DriversErrorLabel" xml:space="preserve">
+    <value>Hardware errors</value>
+  </data>
+  <data name="DriversDuplicateLabel" xml:space="preserve">
+    <value>Duplicate versions</value>
+  </data>
+  <data name="DriversDuplicateBannerTitle" xml:space="preserve">
+    <value>Clean duplicate packages that waste space</value>
+  </data>
+  <data name="DriversDuplicateBannerSub" xml:space="preserve">
+    <value>Old versions are removed safely after creating a Restore Point.</value>
+  </data>
+  <data name="CleanDriverStore" xml:space="preserve">
+    <value>Clean DriverStore</value>
+  </data>
+  <data name="DriversSearchPlaceholder" xml:space="preserve">
+    <value>Search drivers...</value>
+  </data>
+  <data name="DriversSelectAll" xml:space="preserve">
+    <value>Select all</value>
+  </data>
+  <data name="DriversBatchDelete" xml:space="preserve">
+    <value>Delete selected</value>
+  </data>
+  <data name="DnsHeaderTitle" xml:space="preserve">
+    <value>Smart DNS settings</value>
+  </data>
+  <data name="DnsHeaderSubtitle" xml:space="preserve">
+    <value>Reliable bypass and lower connection ping</value>
+  </data>
+  <data name="ResetDnsDhcp" xml:space="preserve">
+    <value>Reset to automatic (DHCP)</value>
+  </data>
+  <data name="ActiveDnsLabel" xml:space="preserve">
+    <value>Active DNS</value>
+  </data>
+  <data name="FlushDns" xml:space="preserve">
+    <value>Flush DNS cache</value>
+  </data>
+  <data name="DnsPresetsTitle" xml:space="preserve">
+    <value>Presets</value>
+  </data>
+  <data name="PrivacyHeaderTitle" xml:space="preserve">
+    <value>Privacy and telemetry removal</value>
+  </data>
+  <data name="PrivacyHeaderSubtitle" xml:space="preserve">
+    <value>Stop report sending and search optimization</value>
+  </data>
+  <data name="PrivacyBannerTitle" xml:space="preserve">
+    <value>Applied and saved in real time</value>
+  </data>
+  <data name="PrivacyBannerSub" xml:space="preserve">
+    <value>Every switch is applied instantly to the registry and services.</value>
+  </data>
+  <data name="PrivacyBannerBadge" xml:space="preserve">
+    <value>Active</value>
+  </data>
+  <data name="PrivacyFooterHint" xml:space="preserve">
+    <value>For maximum security, keeping all options enabled is recommended.</value>
+  </data>
+  <data name="PrivacyResetDefaults" xml:space="preserve">
+    <value>Windows defaults</value>
+  </data>
+  <data name="PrivacyEnableAll" xml:space="preserve">
+    <value>Enable all</value>
+  </data>
+  <data name="DeepStorageHeaderTitle" xml:space="preserve">
+    <value>Deep disk cleanup and junk organization</value>
+  </data>
+  <data name="DeepStorageHeaderSubtitle" xml:space="preserve">
+    <value>Find duplicate files, empty folders, downloads, and large files</value>
+  </data>
+  <data name="StartDeepScan" xml:space="preserve">
+    <value>Start deep scan</value>
+  </data>
+  <data name="DeepStorageDuplicatesLabel" xml:space="preserve">
+    <value>Duplicate files</value>
+  </data>
+  <data name="DeepStorageEmptyFoldersLabel" xml:space="preserve">
+    <value>Empty folders</value>
+  </data>
+  <data name="DeepStorageEmptyFoldersSub" xml:space="preserve">
+    <value>No files or subfolders</value>
+  </data>
+  <data name="TabMess" xml:space="preserve">
+    <value>Junk and cluttered files</value>
+  </data>
+  <data name="DeepStorageLargeFilesLabel" xml:space="preserve">
+    <value>Large files</value>
+  </data>
+  <data name="DeepStorageLargeFilesSub" xml:space="preserve">
+    <value>Over 500 MB</value>
+  </data>
+  <data name="DeepStorageSortLabel" xml:space="preserve">
+    <value>Sort:</value>
+  </data>
+  <data name="DeepStorageSortSize" xml:space="preserve">
+    <value>Size</value>
+  </data>
+  <data name="DeepStorageSortDate" xml:space="preserve">
+    <value>Date</value>
+  </data>
+  <data name="DeepStorageSortName" xml:space="preserve">
+    <value>Name</value>
+  </data>
+  <data name="CleanSelectedItems" xml:space="preserve">
+    <value>Clean selected items</value>
+  </data>
+  <data name="DeepStorageScanStatus" xml:space="preserve">
+    <value>Deep-scanning the file structure and hashing content...</value>
+  </data>
+  <data name="RecycleBinHeaderTitle" xml:space="preserve">
+    <value>Manage Recycle Bin</value>
+  </data>
+  <data name="RecycleBinHeaderSubtitle" xml:space="preserve">
+    <value>Preview item by item; restore or permanently delete each object</value>
+  </data>
+  <data name="RecycleBinRefresh" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="RecycleBinTotalLabel" xml:space="preserve">
+    <value>Item count</value>
+  </data>
+  <data name="RecycleBinSizeLabel" xml:space="preserve">
+    <value>Used space</value>
+  </data>
+  <data name="RecycleBinRestoreSelected" xml:space="preserve">
+    <value>Restore selected</value>
+  </data>
+  <data name="RecycleBinDeleteSelected" xml:space="preserve">
+    <value>Permanently delete selected</value>
+  </data>
+  <data name="RecycleBinEmptyBtn" xml:space="preserve">
+    <value>Empty entire Recycle Bin</value>
+  </data>
+  <data name="RecycleBinEmptyHint" xml:space="preserve">
+    <value>The Recycle Bin is empty; there is nothing to restore or delete.</value>
+  </data>
+  <data name="RecycleBinLoading" xml:space="preserve">
+    <value>Reading the Recycle Bin list...</value>
+  </data>
+  <data name="NetworkSysTraffic" xml:space="preserve">
+    <value>System &amp; Windows Traffic</value>
+  </data>
+  <data name="HealthExcellent" xml:space="preserve">
+    <value>Excellent</value>
+  </data>
+  <data name="HealthDescExcellent" xml:space="preserve">
+    <value>System health is stable and excellent</value>
+  </data>
+  <data name="HealthGood" xml:space="preserve">
+    <value>Good</value>
+  </data>
+  <data name="HealthDescGood" xml:space="preserve">
+    <value>Overall system performance is good</value>
+  </data>
+  <data name="HealthFair" xml:space="preserve">
+    <value>Fair</value>
+  </data>
+  <data name="HealthDescFair" xml:space="preserve">
+    <value>The system needs RAM cleanup and file optimization</value>
+  </data>
+  <data name="HealthNeedsOpt" xml:space="preserve">
+    <value>Needs optimization</value>
+  </data>
+  <data name="HealthDescPoor" xml:space="preserve">
+    <value>High resource usage; running a quick cleanup is recommended</value>
+  </data>
+  <data name="BadgeTrial" xml:space="preserve">
+    <value>Trial version</value>
+  </data>
+  <data name="BadgeComponent" xml:space="preserve">
+    <value>Component / driver</value>
+  </data>
+  <data name="LockTooltipUnlock" xml:space="preserve">
+    <value>Unlock — this path can be suggested again</value>
+  </data>
+  <data name="LockTooltipLock" xml:space="preserve">
+    <value>Lock — this path will never be suggested or deleted</value>
+  </data>
+  <data name="JunkApps" xml:space="preserve">
+    <value>App &amp; Developer Caches</value>
+  </data>
+  <data name="JunkBoost" xml:space="preserve">
+    <value>Live System Boost</value>
+  </data>
+  <data name="آماده اسکن برنامه ها" xml:space="preserve">
+    <value>Ready to scan apps</value>
+  </data>
+  <data name="بررسی استارتاپ" xml:space="preserve">
+    <value>Startup check</value>
+  </data>
+  <data name="سنجش بلادرنگ پینگ و سرعت" xml:space="preserve">
+    <value>Live ping and speed test</value>
+  </data>
+  <data name="DeepStorageMessSub" xml:space="preserve">
+    <value>Temporary, installers, and junk</value>
+  </data>
+  <data name="سخت افزار معیوب" xml:space="preserve">
+    <value>Faulty hardware</value>
+  </data>
+  <data name="در حال شناسایی..." xml:space="preserve">
+    <value>Detecting...</value>
+  </data>
+
+  <data name="اکسپدیشن وینی" xml:space="preserve">
+    <value>Winy's Expedition</value>
+  </data>
+  <data name="اجرای بازی گرافیکی در دسترس نیست (WebView2 Runtime نصب شده باشد)." xml:space="preserve">
+    <value>The graphical game is unavailable (Microsoft WebView2 Runtime must be installed).</value>
+  </data>
+  <data name="کپی نام‌دار «({0})»" xml:space="preserve">
+    <value>Named copy "({0})"</value>
+  </data>
+  <data name="دوقلوی اصلی همین پوشه: {0}" xml:space="preserve">
+    <value>Original twin in this folder: {0}</value>
+  </data>
+  <data name="حجم همتا: {0}" xml:space="preserve">
+    <value>Twin size: {0}</value>
+  </data>
+  <data name="پسوند نیمه‌تمام مرورگر ({0})" xml:space="preserve">
+    <value>Unfinished browser download ({0})</value>
+  </data>
+  <data name="عمر: {0}" xml:space="preserve">
+    <value>Age: {0}</value>
+  </data>
+  <data name="پسوند موقت ({0})" xml:space="preserve">
+    <value>Temporary extension ({0})</value>
+  </data>
+  <data name="نصب‌کننده ({0}) به حجم {1}" xml:space="preserve">
+    <value>Installer ({0}) at {1}</value>
+  </data>
+  <data name="نصب‌کننده پس از نصب معمولاً بی‌استفاده می‌ماند" xml:space="preserve">
+    <value>Installers usually stay unused after installation</value>
+  </data>
+  <data name="حجم {0}" xml:space="preserve">
+    <value>Size {0}</value>
+  </data>
+  <data name="هیچ الگوی کپی یا موقتی ندارد؛ داوری با شماست" xml:space="preserve">
+    <value>No copy or temp pattern; your judgment decides</value>
+  </data>
+  <data name="حجم صفر (خالی) و قدیمی" xml:space="preserve">
+    <value>Zero bytes (empty) and old</value>
+  </data>
+  <data name="مسیر دانلودها در دسترس نیست" xml:space="preserve">
+    <value>The Downloads folder is unavailable</value>
+  </data>
+  <data name="API ناشناخته است: {0}" xml:space="preserve">
+    <value>Unknown API: {0}</value>
+  </data>
+  <data name="سال" xml:space="preserve">
+    <value>year</value>
+  </data>
+  <data name="ماه" xml:space="preserve">
+    <value>month</value>
+  </data>
+  <data name="هفته" xml:space="preserve">
+    <value>week</value>
+  </data>
+  <data name="روز" xml:space="preserve">
+    <value>day</value>
   </data>
 </root>

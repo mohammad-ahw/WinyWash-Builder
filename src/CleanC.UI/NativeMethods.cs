@@ -47,7 +47,7 @@ namespace CleanC.UI
         {
             try
             {
-                IntPtr hWnd = FindWindowW(null, "CleanC");
+                IntPtr hWnd = FindWindowW(null, "WinyWash");
                 if (hWnd == IntPtr.Zero) return;
 
                 if (IsIconic(hWnd)) ShowWindow(hWnd, SW_RESTORE);

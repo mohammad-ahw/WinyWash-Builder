@@ -895,7 +895,8 @@ namespace CleanC.Core.Services
         // منبع حقیقت «رجیستری» است نه AppSettings، چون کاربر می تواند همین آیتم را
         // از Task Manager هم غیرفعال کند؛ ذخیره در فایل تنظیمات باعث ناهمگامی می شد.
         private const string DefaultRunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-        private const string RunValueName = "CleanC";
+        private const string RunValueName = "WinyWash";
+        private const string LegacyRunValueName = "CleanC";
 
         /// <summary>مسیر کلید رجیستری؛ فقط تست ها آن را به یک کلید موقت تغییر می دهند.</summary>
         private static string? _runKeyPathOverride;
@@ -920,7 +921,7 @@ namespace CleanC.Core.Services
             string exe = Environment.ProcessPath ?? string.Empty;
             if (!string.IsNullOrEmpty(exe)) return exe;
 
-            return Path.Combine(AppContext.BaseDirectory, "CleanC.UI.exe");
+            return Path.Combine(AppContext.BaseDirectory, "WinyWash.exe");
         }
 
         /// <summary>مقدار رجیستری را به مسیر فایل تبدیل می کند (نقل قول ها را برمی دارد).</summary>
@@ -972,9 +973,16 @@ namespace CleanC.Core.Services
                 if (key == null) return false;
 
                 if (enabled)
+                {
                     key.SetValue(RunValueName, $"\"{GetCurrentExecutablePath()}\"", RegistryValueKind.String);
+                    // ورودی نسخه ی قبلی پاک می شود تا ویندوز دو بار برنامه را اجرا نکند.
+                    key.DeleteValue(LegacyRunValueName, throwOnMissingValue: false);
+                }
                 else
+                {
                     key.DeleteValue(RunValueName, throwOnMissingValue: false);
+                    key.DeleteValue(LegacyRunValueName, throwOnMissingValue: false);
+                }
 
                 return true;
             }

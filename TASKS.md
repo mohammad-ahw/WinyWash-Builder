@@ -1,6 +1,6 @@
-﻿# TASKS — وضعیت پروژه CleanC
+# TASKS — وضعیت پروژه CleanC
 
-> آخرین بروزرسانی: **۲۰۲۶/۱۰/۱۸ — v1.1.0 محلی تمام شد ✅ (i18n کامل + ۱۹۴ تست سبز + بنچمارک ۴۵/۵۹ بدون نقض قفل + ZIP نهایی با SHA256) — باقی‌مانده فقط فاز گیت‌هاب (معوق) و تست بصری انسانی**
+> آخرین بروزرسانی: **۲۰۲۶/۱۰/۱۹ — فاز ۲۳ «بومی‌سازی کامل ۸ زبان + ورودی شهر + پایداری هیرو» ✅ (بیلد ۰ هشدار/۰ خطا، ۲۰۰ تست سبز، publish تازه)** — گیت‌هاب و بازبینی بصری High Contrast همچنان معوق‌اند
 > وضعیت هر آیتم با بازبینی مستقیم کد مشخص شده (نه حافظه).
 > نشان‌گرها: ✅ انجام شده | ⚠️ ناقص/جزئی | ❌ انجام نشده | ⏳ در جریان | ⬜ نشده
 
@@ -45,6 +45,31 @@
 - **فیکس‌های واقعی:** ۵ رشتهٔ چندخطی `MainWindow.Tools.cs` با `string.Format + &#xA;`؛ مارکرهای `// i18n-logic:` برای مقایسهٔ منطقی با دادهٔ خارجی (`SystemStats` جداکنندهٔ اعشار عربی، `SensitiveNamePatterns`)؛ ar-SA سالم بود («۷۹ استاب فارسی» false positive بازهٔ یونیکد عربی بود — با اسکن حروف اختصاصی فارسی تأیید شد).
 - **آدیت XAML:** تمام نودهای فارسی `MainWindow.xaml` پوشش دارند — ۱۱ دکمهٔ بازگشت به فهرست ابزارها (حلقهٔ `BackToTools`)، ۶ کارت a11y (`AutomationProperties.SetName`)، ۳ لجند نوار دیسک، ۴ متن کارت گزارش پایان پاکسازی، دکمهٔ بروزرسانی فهرست درایورها، «انتخاب همه» حذف نرم‌افزار، placeholder اسم کاراکتر، tooltip اسلایدر اندازه، آیتم «خودکار» کمبوباکس زبان، fallback هیرو (`HeroHost`)، و دکمهٔ «حذف» ردیف‌های لیست با binding `DeleteLabel` در `AppListItemViewModel`. `SettingsLangTitle`/`ActiveDnsNameText`/`CardRamStatusText`/`CardDiskHealthText` از قبل پوشش داشتند (تأیید شد).
 - **تست‌ها:** ۳ گیت تست جدید `I18nGateTests` — (۱) ممنوعیت رشتهٔ خام فارسی بیرون از `Get` (با strip کامنت + lookback مارکر)، (۲) هر کلید فارسی Get باید ترجمهٔ en داشته باشد، (۳) برابری کلیدهای غیرفارسی بین هر ۱۰ زبان → **۱۹۴/۱۹۴ سبز** + exe smoke (۸ ثانیه alive).
+
+---
+
+## فاز ۲۲ — «اکسپدیشن وینی» (بازی داخل WinyWash): فاز ۰ + ۱
+
+> مدل بازی (قفل‌شده): **«گرفتن، نه کشتن»** — وسط بازی هیچ فایلی حذف نمی‌شود؛ فقط دستگیر (کاندید) و در پایانِ گشت با تأیید یک‌باره به `SafeDeleteService` سپرده می‌شود. سقوط نرم برای همه چیز (WebView2 نبود → پیام + بازگشت). تمام متن بازی داخل HTML است (الگوی هیرو) و C# فقط از کلیدهای resw-شده استفاده می‌کند.
+
+| مورد | وضعیت | یادداشت |
+| :--- | :--: | :--- |
+| **ExpeditionService.Core** | ✅ | اسکن واقعی Zone 1 (Downloads سطح اول): کپی نام‌دار «(1)» با همتای موجود (قطعی)، ناتمام‌ها `.crdownload/.part` ≥۶ ساعت (دانلود در جریان دست نمی‌خورد)، `.tmp/.temp` ≥۷ روز، نصب‌کننده ≥۲۰MB ≥۴۵ روز (محتمل)، حجیم ≥۵۰۰MB ≥۱۲۰ روز غیررسانه‌ای (مرزی)، فایل خالی قدیمی. گاردها: hidden/system/reparse رد می‌شوند، بدون زیرپوشه، سقف ۱۶۰ پرونده + ۶۰ محیطی، رسانه/سند شخصی بدون الگوی کپی هرگز کاندید نمی‌شود (دکترین D17). `ExecuteZoneBatchAsync` با گارد «فقط داخل Downloads» → `SafeDeleteService.DeleteFiles` |
+| **ExpeditionBridge** | ✅ | قرارداد پیام همسو با HeroBridge: اطلاعاتی (`ready`/`exit`) + RPC (`zone.scan`/`zone.execute`/`state.get`/`state.save`) جواب `{type:'rpc',id,ok,result}`؛ payload در کلید `state` |
+| **ExpeditionHost** | ✅ | WebView2 تمام‌صفحه با ۳ میزبان مجازی: `cleanc.exp` ← `Assets\Expedition` (بازی)، `cleanc.wall` ← `%LOCALAPPDATA%\CleanC\exped` (والپیپر کپی‌شده + save)، `cleanc.dl` ← پوشه‌ی Downloads واقعی (فقط بندانگشتی تصاویرِ پرونده‌ها). سقوط نرم به پنل فالبک + دکمه بازگشت. `ReloadGame` هر باز کردن = ورود تازه با وضعیت ذخیره |
+| **ExpeditionContentService** | ✅ | کپی والپیپر واقعی (TranscodedWallpaper → رجیستری `Desktop\WallPaper`) یک‌بار در هر باز شدن با FileStream اشتراکی (قفل explorer نمی‌شکند)؛ ذخیره/بارگذاری `expedition.save.json` |
+| **ExpeditionApi** | ✅ | hydrate (تم dark/light/system + اکسنت زنده + پروفایل + wallpaper.ok + saved + hostnameها)، dispatch درست RPC ها، exit → CloseExpedition |
+| **MainWindow.Expedition.cs** | ✅ | باز/بسته‌ی on-demand (WebView2 در استارت‌آپ بالا نمی‌آید)، فالبک InfoBar، بازگرداندن فوکوس، `GetWindowsAccentHex` در Hero internal شد، `AppSettings → ExpeditionSettings` |
+| **MainWindow.xaml** | ✅ | CTA کارت «اکسپدیشن وینی» بلافاصله زیر HeroCard داشبورد + لایه `ExpeditionOverlay` (سطر ۱ ریشه، عنوان‌بار بالای آن دیده می‌ماند) + ESC پشتیبان در rootElement.KeyDown با اولویت روی ESC ابزارها |
+| **HTML بازی** | ✅ نسخه ۲ | deck کارتی swipe، زنجیره (کمبو)، سکه، رِیس ۳۰ثانیه، مأموریت روزانه، صندوق گنج، فروشگاه، اصطکاک باس (۵۰۰MB+ با HP)، ضربه‌ی بحرانی، نشان‌ها، پیش‌نمایش بزرگ + **شهر وینی: نقشه‌ی محله‌ها با قفل درجه‌ای (هر محله با درجه‌ی مشخص باز می‌شود)، نوار آلودگی زنده، ستاره‌های محله (۱۳۰/۳۰/۱۲/۴ پاکسازی)، انبار و ابزارهای مصرفی (ذره‌بین بازجویی = دستگیری امن + XP کارات، صندوق فوری، آهنربای سکه)، موسیقی محیطی procedural نوآر + سه حالت صدا** |
+| **ExpeditionZonesService.Core** | ✅ جدید | زون‌های واقعی: استارتاپ (StartupOptimizerService + disable)، رجیستری (MuiCache یتیم + Uninstall شکسته — حذف با backup reg export)، تسک‌ها (schtasks query/xml + disable)، ساکنان سنگین (ProcessManagerService — فقط مشاهده)، پوشه‌ها (سطح اول Downloads → SafeDelete دایرکتوری)، تنظیمات (hiberfil/WSearch/SysMain/شفافیت — مشاهده‌ای). گاردها: اجرا فقط شناسه‌های کش‌شده‌ی همان session؛ رجیستری بدون backup حذف نمی‌شود؛ زون procs/settings هرگز اجرایی نیست |
+| **file.inspect / file.stage / sys.stat** | ✅ جدید | بازجویی: منبع دانلود (Zone.Identifier ADS: HostUrl/Referrer/زمان)، ایجاد فایل، محتوای zip (ورودی‌ها/حجم بازشده/فایل اجرایی/قدیمی‌ترین)، پیش‌نمایش متن. stage: کپی یک‌بار برای فایل‌های بیرون ریشه Downloads → cleanc.wall (سقف ۸۰۰MB). sys.stat: CPU/RAM/Disk زنده (SystemStatsService) |
+| **i18n** | ✅ | صفر رشته‌ی فارسی جدید در C# — زون‌های جدید فقط داده‌ی خام می‌فرستند و مدرک‌ها در HTML ساخته می‌شوند؛ گیت‌ها سبز (۲۰۰/۲۰۰) |
+| **بيلد/تست** | ✅ | `CleanC.sln` Debug = 0 خطا/0 هشدار؛ ۲۰۰/۲۰۰ تست سبز |
+| **HTML با کاراکتر واقعی وینی** | ⏳ | وینی canvas فعلی پورت فشرده است؛ ادغام رندر واقعی هیرو در نسخه بعد — قرارداد اتصال آماده: mount `#wn` (canvas `#wc`) + `say()` + حالت‌های mood (13 حالت) |
+| **فاز ۲** | ⬜ | Zone 2: دوئل کپی‌های نزدیکِ عکس (D16) |
+| **فاز ۳** | ⬜ | Zone 3: غارهای رجیستری (D05/D06/D09) + ریشه‌های درایوها (D01–D04/D10) |
+| **فاز ۴** | ⬜ | Zone 4: برج استارتاپ (D18) + گنجینه (رتبه‌ها/دستاورد) + صدا |
 
 ---
 
@@ -319,9 +344,56 @@
 
 ```powershell
 dotnet build CleanC.sln -c Release     # صفر خطا / صفر هشدار
-dotnet test    CleanC.sln -c Release --no-build   # تست‌ها (۱۳۳ عدد)
+dotnet test    CleanC.sln -c Release --no-build   # تست‌ها (۲۰۰ عدد)
 .\publish.ps1                          # خروجی توزیع
 dotnet list CleanC.sln package --vulnerable --include-transitive
 ```
 
 > `dotnet build` را با `-p:Platform` اجرا نکنید؛ پیکربندی solution فقط `Any CPU` است.
+
+---
+
+## فاز ۲۰ — آدیت نهایی i18n و ابزارها (۲۰۲۶/۱۰/۱۹) ✅
+
+| # | وضعیت | موضوع |
+| :-- | :--: | :--- |
+| 1 | ✅ | **ریشه‌ی نشتی فارسی:** ۲۰۷ کلید identifier در `LocalizationService.Get("Key", "متن فارسی")` از `en-US/Resources.resw` غایب بودند؛ همین باعث می‌شد tooltipها و برچسب‌های ابزارها در حالت انگلیسی فارسی بمانند. همه‌ی ۲۰۷ کلید + ۲ کلید گروه Junk + ۳ placeholder ابزارها + `DeepStorageMessSub` + نمایش «سخت افزار معیوب» + «در حال شناسایی...» به هر ۱۰ فایل زبان اضافه شد. مقادیر fa فارسی و بقیه انگلیسی (fallback) هستند. |
+| 2 | ✅ | **گیت جدید:** `AllIdentifierKeysUsedInGet_HaveEnglishEntry` اضافه شد تا هر identifier غیرفارسیِ استفاده‌شده در `Get` باید entry انگلیسی داشته باشد. `en-US` = ۱۴۰۵ entry و ۹ زبان دیگر = ۳۲۹ entry، بدون کلید تکراری. **۱۹۹/۱۹۹ تست سبز**. |
+| 3 | ✅ | **Tooltipهای هدر داشبورد:** علاوه بر `ToolTipService`، `AutomationProperties.Name` چهار دکمه‌ی `UndoCenterBtn`/`RefreshStatsBtn`/`NotificationHistoryBtn`/`SettingsHeaderBtn` هم در `ApplyLanguage` به‌روزرسانی می‌شود. UIAutomation در en: صفر فارسی. |
+| 4 | ✅ | **نشت‌های XAML:** placeholderهای اولیه‌ی Deep Storage (تعداد تکراری/پوشه خالی/فایل نامرتب/حجیم/انتخاب‌شده)، badgeهای چهار ابزار پرکاربرد، و دو chip سرعت اینترنت در `ApplyLanguage` مقدار محلی می‌گیرند؛ دیگر تا قبل از اولین اسکن/تست، متن فارسی در en دیده نمی‌شود. |
+| 5 | ✅ | **درایور:** `PublishedName` نگهبانِ «سخت افزار معیوب» برای منطق حذف حفظ شد، اما نمایش UI آن با `Get("سخت افزار معیوب")` انجام می‌شود؛ خطای صفحه‌ی درایورها در en صفر شد. |
+| 6 | ✅ | **اعتبارسنجی زنده (UIAutomation):** en-US → Dashboard / Tools / Settings / Deep Storage / Drivers / Speed Test همگی `persian=0`؛ de-DE → Dashboard / Tools / Settings `persian=0` با fallback انگلیسی؛ fa-IR → همه‌ی بخش‌ها فارسیِ مورد انتظار. Hero با Puppeteer: en `faCount=0`، de `faCount=0`، fa `faCount=25` با متن فارسی. |
+| 7 | ✅ | **پاک‌سازی کد مرده:** شاخه‌های switch با شناسه‌های گروه قدیمی (`system_junk`/`browsers`/`windows_caches`/`event_logs`/`delivery_opt`) از `RenderAdvancedGroups` حذف شدند؛ فقط `apps` و `system_boost` که واقعاً در `SystemGroup.Id` وجود دارند می‌مانند. |
+| 8 | ✅ | **وضعیت نهایی:** بیلد `0 Warning / 0 Error`، تست `199/199`، تنظیمات کاربر از بکاپ `settings.json.bak_i18n` به `fa-IR` بازگردانده شد و هیچ نمونه‌ی `CleanC.UI` در حال اجرا نمانده است. |
+
+**باقی‌مانده (خارج از این آدیت):** ترجمه‌ی نیتیو ۸ زبان غیر en/fa — در فاز ۲۳ انجام شد ✅؛ فاز گیت‌هاب و بازبینی بصری انسانی High Contrast همچنان معوق‌اند.
+
+---
+
+## فاز ۲۱ — ری‌برند WinyWash + تثبیت i18n زنده (۲۰۲۶/۱۰/۱۹) ✅
+
+| # | وضعیت | موضوع |
+| :-- | :--: | :--- |
+| 1 | ✅ | **ری‌برند:** `AssemblyName=WinyWash`، عنوان/محصول/شرکت، `app.manifest`، `Package.appxmanifest`، عنوان پنجره، هدر هیرو، اعلان ویندوز، tray، mutexها، Restore Point، گزارش تشخیصی، اسکریپت publish و ZIP به WinyWash تغییر کرد. مسیر داده‌ی `%LOCALAPPDATA%\CleanC`، namespaceها و API داخلی `window.CleanC` عمداً حفظ شدند. `LocalizationService.WithBrand()` نیز هر «CleanC» برگشتی از resw/fallback را در نمایش به «WinyWash» تبدیل می‌کند. |
+| 2 | ✅ | **مهاجرت استارتاپ:** مقدار جدید Run با نام `WinyWash` نوشته می‌شود و مقدار قدیمی `CleanC` هنگام enable/disable پاک می‌شود؛ fallback مسیر اجرایی هم `WinyWash.exe` است. |
+| 3 | ✅ | **هیرو انگلیسی کامل:** `L_EN` برای هر ۱۷۱ دسته‌ی دیالوگ تکمیل و به `say()` وصل شد؛ `bubble()` متن‌های ثابت را ترجمه می‌کند. پیش‌فرض نام کاراکتر در JS، `AppSettings`، `SettingsViewModel` و placeholder به `Winy` تغییر کرد. Puppeteer: `keys=171`، `missing=[]`، `persian=[]`، `leftovers=[]`؛ greeting/inspect/game bubble انگلیسی. |
+| 4 | ✅ | **رفع باگ زبان زنده در تنظیمات:** لیست اکسسوری/مناسبت دیگر در init استاتیک کش نمی‌شود؛ `HeroLooks.RefreshLocalizedNames()` هنگام تغییر زبان اجرا می‌شود و `RefreshCharacterComboItems()` آیتم‌ها را بازمی‌سازد. مقدار انتخاب‌شده‌ی لحن/شدت هم با reselect دوباره رندر می‌شود. نتیجه: Playful/High/Detective/None در en و شوخ‌طبع/زیاد/کارآگاه/بدون در fa، بدون restart. |
+| 5 | ✅ | **اعتبارسنجی زنده:** سوئیچ en↔fa در Settings و Dashboard بدون restart؛ hero، کارت‌ها، tool badgeها و DNS back به‌روز شدند. Deep Clean: تب فعال سبز `#1FA971` با متن سفید تأیید شد. DNS: دکمه‌ی Back در build منتشرشده دیده شد. |
+| 6 | ✅ | **وضعیت نهایی:** بیلد `0 Warning / 0 Error`، تست `200/200`، publish در `publish\WinyWash.exe` با ۴۰۰ فایل و `565.1 MB`، ZIP `WinyWash-Release-win-x64.zip` با `445.3 MB`. زبان نهایی `fa-IR` ذخیره شد. |
+| 7 | ✅ | **رفع باگ نمودار ۷ روزه در تغییر زبان:** تاریخ‌های `clean_stats.json` با تقویم زبان جاری ذخیره می‌شدند (مثلاً `1405-07-26`)؛ بعد از سوییچ به انگلیسی هیچ کلیدی مچ نمی‌شد و نمودار خالی می‌شد. حالا `ToCanonicalHistoryDate`/`NormalizeHistoryDate` تاریخ‌ها را همیشه میلادی و `Invariant` می‌نویسند، رکوردهای قدیمی فارسی‌تقویم هنگام load مهاجرت و merge می‌شوند، و `RenderCleanupHistory()` در `ApplyLanguage` هم اجرا می‌شود. تأیید زنده: نمودار در en و fa هر دو داده‌ها را نگه می‌دارد و `clean_stats.json` به `2026-10-*` تبدیل شد. |
+
+**باقی‌مانده:** انتشار GitHub، بازبینی بصری High Contrast، و بازبینی زبانی انسانی ترجمه‌ها (اختیاری). ساخت SHA256 و ترجمه‌ی نیتیو ۸ زبان در فاز ۲۳ انجام شد ✅.
+
+---
+
+## فاز ۲۳ — بومی‌سازی کامل ۸ زبان + ورودی شهر + پایداری هیرو (۲۰۲۶/۱۰/۱۹) ✅
+
+| # | وضعیت | موضوع |
+| :-- | :--: | :--- |
+| 1 | ✅ | **ترجمه‌ی نیتیو ۸ زبان:** `en-US` = ۱۴۲۴ کلید؛ `ar/de/es/fr/ja/ko/ru/zh` هرکدام = ۱۴۲۴ entry. ۱۱۳ مقدار نیتیو قبلی + `AppTitle` حفظ شد؛ کلیدهای جدید و مقادیر برابر انگلیسی ترجمه شدند. |
+| 2 | ✅ | **اعتبارسنجی ساختاری:** XML همه‌ی فایل‌ها معتبر؛ `missing=0`، `extra=0`، `placeholderMismatch=0`، `markerLeak=0` در هر ۸ زبان. کلیدهای دارای newline با `&#xA;` سالم شدند (۱۳ مورد در هر زبان). |
+| 3 | ✅ | **پایپ‌لاین ترجمه:** گوگل بعد از چند درخواست بلاک شد؛ Bing Translator جایگزین شد (IG + token/key + `ttranslatev3`). کش/بکاپ/لاگ در `%TEMP%`؛ ۱۹ override دستی برای اصطلاحات مهم (از جمله fallback کره‌ای و «Recommended items») اعمال شد. `escapeAttr` اسکریپت هم برای `\r\n\t` اصلاح شد. |
+| 4 | ✅ | **شهر:** autocomplete تهران/London، انتخاب با کیبورد، persist در `settings.json`، برگشت صحیح مقدار نامعتبر، و انتخاب قطعی `Tehran, Iran`. با شهر خالی، تشخیص خودکار `Dubai` تأیید شد. تنظیمات نهایی: `Language=fa-IR`، `CharacterCity=Tehran`. |
+| 5 | ✅ | **هیرو و Advanced:** حذف گم‌شدن دیالوگ‌های urgent از صف هیرو (تست regression + مشاهده‌ی بصری rapid-click)؛ بومی‌سازی زنده‌ی Advanced با حفظ `JunkSelections`؛ عنوان زبان انگلیسی دقیقاً `Language` و بدون suffix تکراری. |
+| 6 | ✅ | **بیلد/تست/انتشار:** `dotnet build` = ۰ هشدار/۰ خطا؛ `dotnet test` = ۲۰۰/۲۰۰؛ UI آلمان (UIA) و smoke اجرای publish فارسی سالم. publish: ۴۰۱ فایل / ۵۶۶٫۹MB؛ ZIP: ۴۴۵٫۷MB؛ SHA256: `A49B375D2B2390952A13F2ED78DCB0F8E226B3696A7C86B0B6D4A9C808887E82  WinyWash-Release-win-x64.zip`. |
+| 7 | ⚠️ | **باقی‌مانده‌ی انسانی:** انتشار GitHub، بازبینی بصری High Contrast، و بازبینی زبانی ترجمه‌ها توسط native speaker (اختیاری). اعتبارسنجی double-click سلفی هم فقط دستی ممکن است (CDP/WebView synthetic event جواب نداد). |
