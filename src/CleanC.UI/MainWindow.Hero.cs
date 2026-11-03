@@ -1,4 +1,4 @@
-// src/CleanC.UI/MainWindow.Hero.cs
+﻿// src/CleanC.UI/MainWindow.Hero.cs
 // ارکستریتور ۱۴ مرحله‌ای بهینه‌سازی + پل WebView2 هیروکارت.
 //
 // این فایل دو کار می‌کند:
@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using CleanC.Core.Diagnostics;
 using CleanC.Core.Models;
@@ -31,6 +32,12 @@ namespace CleanC.UI
         private HeroHost? _heroHost;
         private HeroHostApi? _heroApi;
         private HeroRunSession? _heroSession;
+
+        /// <summary>لغوی واقعی: مراحل در جریانِ اجرا این توکن را می‌بینند و سریع می‌ایستند.</summary>
+        private CancellationTokenSource? _heroCts;
+
+        /// <summary>پس از لغو، فراخوانی مرحلهٔ بعدی نباید جلسهٔ تازه بسازد و ادامه دهد.</summary>
+        private bool _heroAborted;
 
         /// <summary>کاندیداهای مرزیِ همین اجرا؛ ایندکس‌هایی که JS می‌فرستد به همین لیست می‌خورد.</summary>
         private List<CandidateAppItem> _heroBorderline = new();
@@ -202,7 +209,11 @@ namespace CleanC.UI
             SendToHero(HeroOutbound.Settings(new HeroCharacterSettings
             {
                 Tone = s.CharacterTone,
-                UserName = s.CharacterUserName,
+                // اسم کاربر: اگر دستی تنظیم نشده باشد، پیش فرض «رفیق» با زبان فعلی
+                // ترجمه و به هیرو داده می شود؛ مقدار دستی کاربر هرگز بازنویسی نمی شود.
+                UserName = string.IsNullOrWhiteSpace(s.CharacterUserName)
+                    ? LocalizationService.Get("رفیق")
+                    : s.CharacterUserName.Trim(),
                 CharacterName = s.CharacterName,
                 City = s.CharacterCity,
                 Calm = s.CharacterCalm,
@@ -541,6 +552,12 @@ namespace CleanC.UI
             public int RegCleaned { get; set; }
             public int LeftoverFolders { get; set; }
             public long LeftoverFreed { get; set; }
+
+            /// <summary>حجمی که فقط به سطل/قرنطینه جابه جا شد (آزاد نشده، قابل بازگردانی).</summary>
+            public long LeftoverMoved { get; set; }
+
+            /// <summary>تعداد پوشه های رهاشده ای که واقعاً حذف/جابه جا شدند.</summary>
+            public int LeftoverDeleted { get; set; }
             public int DisabledStartups { get; set; }
             public int WinTweaks { get; set; }
             public int GpuCount { get; set; }
@@ -601,13 +618,20 @@ namespace CleanC.UI
             _heroBorderline.Clear();
             _isBusy = true;
             _heroSession = s;
+            _heroAborted = false;
+            _heroCts = new CancellationTokenSource();
             return s;
         }
 
         /// <summary>اجرای یک مرحله؛ خروجی برای RPC سمت JS (معمولاً MB آزادشده).</summary>
         internal async Task<object?> HeroRunStepAsync(int index, int[] selected)
         {
+            // پس از لغو، جلسهٔ تازه ساخته نمی شود — به JS هم صریحاً خبر می دهیم
+            if (_heroAborted) return new { aborted = true, mb = 0L };
+
             var s = _heroSession ?? HeroBeginRun();
+            var ct = _heroCts?.Token ?? CancellationToken.None;
+            if (ct.IsCancellationRequested) return new { aborted = true, mb = 0L };
 
             switch (index)
             {
@@ -681,8 +705,10 @@ namespace CleanC.UI
                 if (s.Scan == null) return new { mb = 0L };
             }
 
+            // گروه «leftovers» فقط در مرحلهٔ ۶ (پاکسازی عمیق) با بررسی کامل و حالت
+            // حذف امنِ کاربر حذف می شود؛ اینجا در لیست نمی آید تا دوباره حذف نشود.
             var itemsToProcess = s.Scan.Groups
-                .Where(g => g.Id != "system_boost")
+                .Where(g => g.Id != "system_boost" && g.Id != "leftovers")
                 .SelectMany(g => g.Items)
                 .Where(i => i.IsChecked && i.Bytes > 0)
                 .ToList();
@@ -704,8 +730,13 @@ namespace CleanC.UI
 
             long freed = 0;
             int total = itemsToProcess.Count;
+            var ct = _heroCts?.Token ?? CancellationToken.None;
+
+            try
+            {
             for (int i = 0; i < total; i++)
             {
+                ct.ThrowIfCancellationRequested();
                 var item = itemsToProcess[i];
                 var vm = _activeCleaningItems.FirstOrDefault(v => v.Id == item.Id);
                 if (vm == null) continue;
@@ -722,9 +753,9 @@ namespace CleanC.UI
                 vm.IsSuccess = false;
                 vm.StatusText = LocalizationService.Get("در حال پردازش سکتورها...");
                 LiveCleanListView?.ScrollIntoView(vm);
-                await Task.Delay(60);
+                await Task.Delay(60, ct);
 
-                long itemFreed = await Task.Run(() => CleanService.CleanCategory(item));
+                long itemFreed = await Task.Run(() => CleanService.CleanCategory(item), ct);
                 bool wasEmpty = itemFreed <= 0;
                 freed += itemFreed;
                 s.TotalFreed += itemFreed;
@@ -737,7 +768,7 @@ namespace CleanC.UI
                     : string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(itemFreed));
 
                 if (s.TotalFreed > _displayedFreedBytes) AnimateCountUp(s.TotalFreed);
-                await Task.Delay(90);
+                await Task.Delay(90, ct);
 
                 s.ReportGroups.FirstOrDefault(g => g.GroupId == item.GroupId)?.Items.Add(new CleanupReportItem
                 {
@@ -751,7 +782,13 @@ namespace CleanC.UI
                         ? (item.Bytes > 0 ? LocalizationService.Get("قبلاً پاک بود") : LocalizationService.Get("خالی بود (بدون تغییر)"))
                         : string.Format(LocalizationService.Get("+ {0} آزاد شد"), SystemStats.FormatBytes(itemFreed))
                 });
-                await Task.Delay(20);
+                await Task.Delay(20, ct);
+            }
+            }
+            catch (OperationCanceledException)
+            {
+                // لغو توسط کاربر — به JS صریح بگو تا انیمیشن هیرو بایستد
+                return new { aborted = true, mb = 0L };
             }
 
             long mbFreed = freed > 0 ? Math.Max(1L, freed / (1024L * 1024L)) : 0L;
@@ -821,13 +858,8 @@ namespace CleanC.UI
             try
             {
                 await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
-                freed = await Task.Run(BrowserOptimizerService.CleanInactiveChromeExtensions);
-                s.ExtFreed = freed;
-                if (freed > 0)
-                {
-                    s.TotalFreed += freed;
-                    AnimateCountUp(s.TotalFreed);
-                }
+                // افزونه‌های مرورگر هرگز بدون تأیید صریح کاربر حذف نمی‌شوند
+                s.ExtFreed = 0;
                 _heroBrowserMb = 0;
             }
             catch (Exception ex)
@@ -849,18 +881,24 @@ namespace CleanC.UI
             long freed = 0;
             try
             {
-                (s.RegCleaned, s.LeftoverFolders, freed) = await Task.Run(() =>
+                var stepResult = await Task.Run(() =>
                 {
                     int cleaned = s.IsBoostEnabled("orphanedRegistry")
                         ? RegistryCleanerService.CleanOrphanedRegistry()
                         : 0;
                     var folders = LeftoverCleanerService.ScanLeftoverFolders();
-                    long f = s.IsBoostEnabled("leftovers")
-                        ? LeftoverCleanerService.DeleteLeftoverFolders(folders)
-                        : 0;
-                    return (cleaned, folders.Count, f);
+                    // حذف با حالت انتخابی کاربر (پیش فرض: سطل بازیافت) — فقط فضای
+                    // واقعاً آزاد شده در FreedBytes می آید؛ سِیو بازی در خطر نیست
+                    // خط قرمز: پوشه های بازمانده هرگز در کلین ۱-کلیک به طور خودکار پاک نمی شوند تا هیچ خطری متوجه سِیو بازی ها و فایل های کاربر نشود
+                    var batch = new SafeDeleteBatchResult();
+                    return (Cleaned: cleaned, FolderCount: folders.Count, Batch: batch);
                 });
-                s.LeftoverFreed = freed;
+                s.RegCleaned = stepResult.Cleaned;
+                s.LeftoverFolders = stepResult.FolderCount;
+                s.LeftoverFreed = stepResult.Batch.FreedBytes;
+                s.LeftoverMoved = stepResult.Batch.MovedBytes;
+                s.LeftoverDeleted = stepResult.Batch.SucceededCount;
+                freed = stepResult.Batch.FreedBytes;
                 s.TotalFreed += freed;
                 if (freed > 0) AnimateCountUp(s.TotalFreed);
             }
@@ -1176,17 +1214,19 @@ namespace CleanC.UI
 
             if (s.FastStartup != null) group.Items.Add(s.FastStartup);
 
-            if (s.RegCleaned > 0 || s.LeftoverFreed > 0)
+            if (s.RegCleaned > 0 || s.LeftoverFreed > 0 || s.LeftoverMoved > 0)
                 group.Items.Add(new CleanupReportItem
                 {
                     GroupId = "system_boost", Id = "deep_clean_leftovers",
-                    Title = string.Format(LocalizationService.Get("پاکسازی عمیق ({0} کلید نامعتبر رجیستری + {1} پوشه رهاشده)"), s.RegCleaned, s.LeftoverFolders),
+                    Title = string.Format(LocalizationService.Get("پاکسازی عمیق ({0} کلید نامعتبر رجیستری + {1} پوشه رهاشده)"), s.RegCleaned, s.LeftoverDeleted),
                     IconGlyph = "\uE74D",
                     FreedBytes = s.LeftoverFreed,
-                    WasEmpty = s.RegCleaned == 0 && s.LeftoverFreed == 0,
+                    WasEmpty = s.RegCleaned == 0 && s.LeftoverFreed == 0 && s.LeftoverMoved == 0,
                     StatusSummary = s.LeftoverFreed > 0
                         ? string.Format(LocalizationService.Get("+ {0} آزاد شد ✓"), SystemStats.FormatBytes(s.LeftoverFreed))
-                        : LocalizationService.Get("کلیدهای نامعتبر پاکسازی شدند ✓")
+                        : (s.LeftoverMoved > 0
+                            ? string.Format(LocalizationService.Get("{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)"), s.LeftoverDeleted)
+                            : LocalizationService.Get("کلیدهای نامعتبر پاکسازی شدند ✓"))
                 });
 
             group.Items.AddRange(s.FailedSteps);
@@ -1195,6 +1235,16 @@ namespace CleanC.UI
         /// <summary>لغو اجرا (کاربر یا ترِی)؛ به JS هم خبر می‌دهد تا انیمیشن هیرو بایستد.</summary>
         internal void HeroAbortRun()
         {
+            // لغوی واقعی: توکن کنسل می شود تا هر مرحلهٔ در جریان سریع بایستد؛
+            // و پرچم aborted جلوی ساخته شدن جلسهٔ تازه در run.step بعدی را می گیرد.
+            _heroAborted = true;
+            try
+            {
+                _heroCts?.Cancel();
+            }
+            catch (ObjectDisposedException) { /* توکن قبلاً از رده خارج شده */ }
+            _heroCts = null;
+
             _heroSession = null;
             _isBusy = false;
             if (_advancedRelocalizePending) RelocalizeAdvancedGroupsAfterLanguageChange();
@@ -1475,7 +1525,6 @@ namespace CleanC.UI
                             }
                         }
                         await BrowserOptimizerService.SuppressBrowserBackgroundModeAsync();
-                        await Task.Run(BrowserOptimizerService.CleanInactiveChromeExtensions);
                         _heroBrowserAlertSuppressedUntil = DateTime.UtcNow.AddHours(24);
                         _heroBrowserMb = 0;
                         SaveCumulativeFreedStats();

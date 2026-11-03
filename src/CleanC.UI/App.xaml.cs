@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
+using CleanC.Core.Services;
 using Microsoft.UI.Xaml;
 
 namespace CleanC.UI
@@ -68,6 +69,10 @@ namespace CleanC.UI
 
             this.InitializeComponent();
 
+            // مهاجرت یک باره ی داده ی کاربر از پوشه ی قدیمی CleanC به WinyWash
+            // باید قبل از ساخته شدن سرویس ها اجرا شود تا مسیرها از همان ابتدا درست باشند.
+            AppPaths.MigrateLegacyFolders();
+
             // ریشه ی ترکیب DI همین ابتدا ساخته می شود تا خطای ثبت سرویس ها
             // در همان لحظه ی اجرا دیده شود، نه وسط کارِ کاربر.
             AppServices.EnsureBuilt();
@@ -83,18 +88,16 @@ namespace CleanC.UI
         }
 
         /// <summary>
-        /// ثبت خطای غیرمنتظره در %LOCALAPPDATA%\CleanC\crash.log
+        /// ثبت خطای غیرمنتظره در %LOCALAPPDATA%\WinyWash\crash.log
         /// همه ی catchهای برنامه باید از اینجا استفاده کنند تا خطاها سکوت نشوند.
         /// </summary>
         public static void LogCrash(string context, Exception ex)
         {
             try
             {
-                string logDir = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC");
+                string logDir = AppPaths.LocalRoot;
                 Directory.CreateDirectory(logDir);
-                string logFile = Path.Combine(logDir, "crash.log");
-                File.AppendAllText(logFile,
+                File.AppendAllText(AppPaths.CrashLogFile,
                     $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss.fff}] {context}: {ex.Message}\n{ex}\n\n");
             }
             catch

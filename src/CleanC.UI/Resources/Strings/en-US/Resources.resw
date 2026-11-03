@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve">
-    <value>CleanC</value>
+    <value>WinyWash</value>
   </data>
   <data name="RunningAsAdmin" xml:space="preserve">
     <value>Running as administrator</value>
@@ -73,7 +73,7 @@
     <value>Language</value>
   </data>
   <data name="LanguageSub" xml:space="preserve">
-    <value>Switches layout direction (RTL/LTR) and optimizes typography automatically.</value>
+    <value>Choose the app language (the list will be completed over time).</value>
   </data>
   <data name="ThemeTitle" xml:space="preserve">
     <value>Color Theme</value>
@@ -106,7 +106,7 @@
     <value>Start with Windows</value>
   </data>
   <data name="AutoStartSub" xml:space="preserve">
-    <value>Launch CleanC automatically when logging into Windows.</value>
+    <value>Launch WinyWash automatically when logging into Windows.</value>
   </data>
   <data name="DeleteBehaviorTitle" xml:space="preserve">
     <value>Personal File Deletion Policy</value>
@@ -118,7 +118,7 @@
     <value>Move to Windows Recycle Bin (Recommended)</value>
   </data>
   <data name="DeleteModeQuarantine" xml:space="preserve">
-    <value>CleanC Quarantine — Restorable from Undo Center</value>
+    <value>WinyWash Quarantine — Restorable from Undo Center</value>
   </data>
   <data name="DeleteModePermanent" xml:space="preserve">
     <value>Permanent Deletion — Frees disk space immediately</value>
@@ -166,7 +166,7 @@
     <value>Hardware Specifications Report (.txt)</value>
   </data>
   <data name="AboutTitle" xml:space="preserve">
-    <value>About CleanC</value>
+    <value>About WinyWash</value>
   </data>
   <data name="AboutSub" xml:space="preserve">
     <value>Modern PC Manager, optimization suite, and hardware diagnostics for Windows 11.</value>
@@ -730,7 +730,7 @@
     <value>{0:N0} hours</value>
   </data>
   <data name="         گزارش مشخصات سیستم و سخت افزار (CleanC)     " xml:space="preserve">
-    <value>         System &amp; Hardware Report (CleanC)     </value>
+    <value>         System &amp; Hardware Report (WinyWash)     </value>
   </data>
   <data name="تاریخ گزارش: {0:yyyy.MM.dd HH:mm:ss}" xml:space="preserve">
     <value>Report date: {0:yyyy.MM.dd HH:mm:ss}</value>
@@ -1474,7 +1474,7 @@
     <value>Windows system root — never deleted</value>
   </data>
   <data name="لیست حفاظت پیش فرض CleanC" xml:space="preserve">
-    <value>CleanC default protection list</value>
+    <value>WinyWash default protection list</value>
   </data>
   <data name="پراکسی سیستم روی پورت {0} فعال مانده در حالی که کلاینت VPN بسته شده است و اینترنت ترمینال و ویندوز قطع می باشد." xml:space="preserve">
     <value>System proxy is still active on port {0} while the VPN client is closed, leaving terminal and Windows internet connection broken.</value>
@@ -1519,7 +1519,7 @@
     <value>Failed to create restore point: </value>
   </data>
   <data name="در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)" xml:space="preserve">
-    <value>Will be stored in CleanC Quarantine (restorable from the Restore Center)</value>
+    <value>Will be stored in WinyWash Quarantine (restorable from the Restore Center)</value>
   </data>
   <data name="برای همیشه حذف خواهد شد (قابل بازگردانی نیست)" xml:space="preserve">
     <value>Will be permanently deleted (cannot be restored)</value>
@@ -1532,6 +1532,18 @@
   </data>
   <data name="{0} مورد به سطل بازیافت منتقل شد" xml:space="preserve">
     <value>{0} item(s) moved to the Recycle Bin</value>
+  </data>
+  <data name="{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)" xml:space="preserve">
+    <value>{0} folder(s) moved to the Recycle Bin (space frees when the bin is emptied)</value>
+  </data>
+  <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
+    <value>Hardware ID for device '{0}' is unavailable — cancelled to avoid a wrong removal.</value>
+  </data>
+  <data name="جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}" xml:space="preserve">
+    <value>Removing defective device '{0}' failed: {1}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>Memory type: {0}</value>
   </data>
   <data name="{0} مورد در قرنطینه ذخیره شد" xml:space="preserve">
     <value>{0} item(s) saved in Quarantine</value>
@@ -2107,10 +2119,10 @@
     <value>Reset Settings</value>
   </data>
   <data name="گالری والپیپرهای CleanC و تصویر پس زمینه ویندوز" xml:space="preserve">
-    <value>CleanC Wallpaper Gallery &amp; Windows Background</value>
+    <value>WinyWash Wallpaper Gallery &amp; Windows Background</value>
   </data>
   <data name="انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({0} والپیپر گلچین 4K)" xml:space="preserve">
-    <value>Choose between the current Windows wallpaper or CleanC's custom wallpaper gallery ({0} curated 4K wallpapers)</value>
+    <value>Choose between the current Windows wallpaper or WinyWash's custom wallpaper gallery ({0} curated 4K wallpapers)</value>
   </data>
   <data name="والپیپر پیش فرض سیستم" xml:space="preserve">
     <value>System Default Wallpaper</value>
@@ -2119,7 +2131,7 @@
     <value>Current background image: {0}</value>
   </data>
   <data name="🎲 اعمال والپیپر تصادفی جدید CleanC" xml:space="preserve">
-    <value>🎲 Apply New Random CleanC Wallpaper</value>
+    <value>🎲 Apply New Random WinyWash Wallpaper</value>
   </data>
   <data name="تصویر پس زمینه دسکتاپ به «{0}» تغییر یافت." xml:space="preserve">
     <value>Desktop background changed to “{0}”.</value>
@@ -2533,13 +2545,13 @@
     <value>BoostRamAsync returned no result</value>
   </data>
   <data name="CleanC — سلامت سیستم: {0}%" xml:space="preserve">
-    <value>CleanC — System health: {0}%</value>
+    <value>WinyWash — System health: {0}%</value>
   </data>
   <data name="CleanC در تری آیکون" xml:space="preserve">
-    <value>CleanC in the system tray</value>
+    <value>WinyWash in the system tray</value>
   </data>
   <data name="CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود." xml:space="preserve">
-    <value>CleanC runs automatically when Windows starts.</value>
+    <value>WinyWash runs automatically when Windows starts.</value>
   </data>
   <data name="Fast Startup (خاموش شدن سریع ویندوز)" xml:space="preserve">
     <value>Fast Startup (Windows fast boot)</value>
@@ -2548,7 +2560,7 @@
     <value>Windows System Restore tool</value>
   </data>
   <data name="اجرای خودکار CleanC غیرفعال شد." xml:space="preserve">
-    <value>CleanC auto-start was disabled.</value>
+    <value>WinyWash auto-start was disabled.</value>
   </data>
   <data name="اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی." xml:space="preserve">
     <value>Run the standard Windows recovery wizard to go back to earlier dates.</value>
@@ -2641,7 +2653,7 @@
     <value>Couldn't open the project page.</value>
   </data>
   <data name="بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز." xml:space="preserve">
-    <value>Restore all registry keys and services changed by CleanC to Windows defaults.</value>
+    <value>Restore all registry keys and services changed by WinyWash to Windows defaults.</value>
   </data>
   <data name="بازگردانده شد ✓" xml:space="preserve">
     <value>Restored ✓</value>
@@ -2845,7 +2857,7 @@
     <value>Disabling telemetry; speeding up search, Explorer and Windows ads</value>
   </data>
   <data name="ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست." xml:space="preserve">
-    <value>CleanC could not be registered for auto-start; the app's executable path is unavailable.</value>
+    <value>WinyWash could not be registered for auto-start; the app's executable path is unavailable.</value>
   </data>
   <data name="حافظه رم با موفقیت بهینه‌سازی شد ({0} آزاد شد)." xml:space="preserve">
     <value>RAM was optimized successfully ({0} freed).</value>
@@ -2935,7 +2947,7 @@
     <value>Compacting...</value>
   </data>
   <data name="درباره CleanC" xml:space="preserve">
-    <value>About CleanC</value>
+    <value>About WinyWash</value>
   </data>
   <data name="دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم" xml:space="preserve">
     <value>System optimization and speed-up achievements</value>
@@ -3217,13 +3229,13 @@
     <value>None</value>
   </data>
   <data name="CleanC - بهینه ساز هوشمند ویندوز" xml:space="preserve">
-    <value>CleanC - Smart Windows Optimizer</value>
+    <value>WinyWash - Smart Windows Optimizer</value>
   </data>
   <data name="CleanC (پردازنده: {0}% • رم: {1}%)" xml:space="preserve">
-    <value>CleanC (CPU: {0}% • RAM: {1}%)</value>
+    <value>WinyWash (CPU: {0}% • RAM: {1}%)</value>
   </data>
   <data name="🪟 نمایش پنجره اصلی CleanC" xml:space="preserve">
-    <value>🪟 Show CleanC Main Window</value>
+    <value>🪟 Show WinyWash Main Window</value>
   </data>
   <data name="🚀 آزادسازی آنی حافظه رم (RAM Boost)" xml:space="preserve">
     <value>🚀 Instantly Free Up RAM (RAM Boost)</value>
@@ -3235,7 +3247,7 @@
     <value>🌐 Quick DNS &amp; Anti-Censorship Switch</value>
   </data>
   <data name="❌ خروج از CleanC" xml:space="preserve">
-    <value>❌ Exit CleanC</value>
+    <value>❌ Exit WinyWash</value>
   </data>
   <data name="آزادسازی حافظه رم" xml:space="preserve">
     <value>RAM Boost</value>
@@ -3469,7 +3481,7 @@ This cannot be undone.</value>
     <value>Quarantine is empty; there is nothing to restore.</value>
   </data>
   <data name="فایل های قرنطینه شده CleanC" xml:space="preserve">
-    <value>Files quarantined by CleanC</value>
+    <value>Files quarantined by WinyWash</value>
   </data>
   <data name="حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند." xml:space="preserve">
     <value>These deletions were made in Quarantine mode; they can be restored until you permanently delete them.</value>
@@ -3562,6 +3574,7 @@ To download and install, go to the 'Windows Update' section.</value>
   <data name="مثلاً سی‌سی" xml:space="preserve">
     <value>e.g. Winy</value>
   </data>
+  <data name="رفیق" xml:space="preserve"><value>Friend</value></data>
   <data name="حجم بالای ۱.۲۵× از درون کارت بیرون می زند" xml:space="preserve">
     <value>Sizes above 1.25× overflow the card</value>
   </data>
@@ -3569,7 +3582,7 @@ To download and install, go to the 'Windows Update' section.</value>
     <value>Auto (based on time and region)</value>
   </data>
   <data name="CleanC در حال مراقبت از سیستم شماست" xml:space="preserve">
-    <value>CleanC is taking care of your system</value>
+    <value>WinyWash is taking care of your system</value>
   </data>
   <data name="{0} مورد انتخاب شده{1}. ادامه می دهید؟" xml:space="preserve">
     <value>{0} items selected{1}. Continue?</value>
@@ -3854,7 +3867,7 @@ To download and install, go to the 'Windows Update' section.</value>
     <value>Recycle Bin</value>
   </data>
   <data name="AutoStartDesc" xml:space="preserve">
-    <value>Launch CleanC automatically when you sign in. This is the same entry shown in Task Manager › Startup.</value>
+    <value>Launch WinyWash automatically when you sign in. This is the same entry shown in Task Manager › Startup.</value>
   </data>
   <data name="AppDataSettingsLabel" xml:space="preserve">
     <value>Settings:</value>
@@ -4279,5 +4292,14 @@ To download and install, go to the 'Windows Update' section.</value>
   </data>
   <data name="روز" xml:space="preserve">
     <value>day</value>
+  </data>
+  <data name="  ظرفیت کل: {0}" xml:space="preserve">
+    <value>Total Capacity: {0}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>Memory Type: {0}</value>
+  </data>
+  <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
+    <value>No official description released by Microsoft</value>
   </data>
 </root>

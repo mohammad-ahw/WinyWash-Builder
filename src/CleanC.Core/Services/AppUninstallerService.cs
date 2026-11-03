@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
@@ -461,12 +461,19 @@ namespace CleanC.Core.Services
                     await process.WaitForExitAsync();
                     return process.ExitCode == 0;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    // بعضی uninstallerها با UseShellExecute قابل ردیابی نیستند؛
-                    // در این حالت فرض می کنیم اجرا شده و کاربر پنجره را می بیند
-                    await Task.Delay(3000);
-                    return true;
+                    CcLog.Ignore(ex, "AppUninstaller.WaitForExit");
+                    try
+                    {
+                        if (process.HasExited) return process.ExitCode == 0;
+                        // اگر فرآیند هنوز در حال اجراست (رابط کاربری uninstaller باز شده)، اجرا موفقیت آمیز بوده است
+                        return !process.HasExited;
+                    }
+                    catch
+                    {
+                        return false;
+                    }
                 }
             }
             catch

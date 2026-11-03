@@ -1821,7 +1821,7 @@
                             <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                 <StackPanel VerticalAlignment="Center" Spacing="4">
                                     <TextBlock x:Name="SettingsLangTitle" Text="زبان برنامه (Language)" FontWeight="SemiBold" FontSize="13" Foreground="{ThemeResource TextFillColorPrimaryBrush}" />
-                                    <TextBlock x:Name="SettingsLangDesc" Text="انتخاب زبان رابط کاربری، جهت نوشتاری (RTL / LTR) و تایپوگرافی نیتیو سیستم عامل." FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" MaxWidth="520" />
+                                    <TextBlock x:Name="SettingsLangDesc" Text="زبان برنامه را انتخاب کنید (لیست به مرور کامل‌تر می‌شود)" FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap" />
                                 </StackPanel>
                                 <ComboBox x:Name="LanguageComboBox" Grid.Column="1" Width="210" VerticalAlignment="Center" SelectionChanged="LanguageComboBox_SelectionChanged">
                                     <!-- پرچم‌ها حذف شدند: بدون فونت Segoe UI Emoji بصری شکل مربعی می گیرند؛
@@ -1882,7 +1882,7 @@
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
                                     <TextBlock x:Name="CharUserNameText" Text="اسم شما (برای سلام کردن)" FontSize="12.5" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
-                                    <TextBox x:Name="CharUserNameBox" Grid.Column="1" Width="190" MaxLength="24" Text="{x:Bind SettingsVm.CharacterUserName, Mode=TwoWay}" VerticalAlignment="Center" />
+                                    <TextBox x:Name="CharUserNameBox" Grid.Column="1" Width="190" MaxLength="24" Text="{x:Bind SettingsVm.CharacterUserName, Mode=TwoWay}" PlaceholderText="رفیق" VerticalAlignment="Center" />
                                 </Grid>
 
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="24">
@@ -1890,11 +1890,22 @@
                                     <AutoSuggestBox x:Name="CharCityBox" Grid.Column="1" Width="190" MaxWidth="190"
                                                     VerticalAlignment="Center"
                                                     Text="{x:Bind SettingsVm.CharacterCity, Mode=OneWay}"
-                                                    TextMemberPath="DisplayName"
+                                                    TextMemberPath="Name"
                                                     TextChanged="CharCityBox_TextChanged"
                                                     SuggestionChosen="CharCityBox_SuggestionChosen"
                                                     QuerySubmitted="CharCityBox_QuerySubmitted"
-                                                    LostFocus="CharCityBox_LostFocus" />
+                                                    LostFocus="CharCityBox_LostFocus">
+                                        <!-- آیتم پیشنهاد شهر: پرچم کشور + نام انگلیسی تمیز؛
+                                             بدون متن خام رکورد (Lat/Lon/Admin) -->
+                                        <AutoSuggestBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                                    <TextBlock Text="{Binding FlagEmoji}" FontFamily="Segoe UI Emoji" />
+                                                    <TextBlock Text="{Binding Name}" />
+                                                </StackPanel>
+                                            </DataTemplate>
+                                        </AutoSuggestBox.ItemTemplate>
+                                    </AutoSuggestBox>
                                 </Grid>
 
                                 <!-- شدت انیمیشن -->

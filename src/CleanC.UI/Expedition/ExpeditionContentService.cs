@@ -1,5 +1,5 @@
 // src/CleanC.UI/Expedition/ExpeditionContentService.cs
-// پوشه‌ی داده‌ی بازی در %LOCALAPPDATA%\CleanC\exped:
+// پوشه‌ی داده‌ی بازی در %LOCALAPPDATA%\WinyWash\exped:
 //   • wallpaper.img — کپیِ والپیپر واقعی ویندوز تا HTML با میزبان مجازی cleanc.wall بخواند
 //   • expedition.save.json — وضعیت بازی (XP، سطح، پرونده‌های دستگیرشده و …)
 //
@@ -12,6 +12,7 @@ using System.IO;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CleanC.Core.Diagnostics;
+using CleanC.Core.Services;
 
 namespace CleanC.UI.Expedition
 {
@@ -27,7 +28,7 @@ namespace CleanC.UI.Expedition
         {
             get
             {
-                try { return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC", "exped"); }
+                try { return AppPaths.ExpedDir; }
                 catch (Exception ex) { CcLog.Ignore(ex, "Expedition.DataDir"); return string.Empty; }
             }
         }

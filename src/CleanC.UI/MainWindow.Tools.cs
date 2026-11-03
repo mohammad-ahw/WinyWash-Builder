@@ -71,15 +71,24 @@ namespace CleanC.UI
 
             var cards = new List<FrameworkElement>();
 
-            // 1. CPU Card
-            var cpuChips = new List<string> { string.Format(LocalizationService.Get("{0} هسته"), specs.CpuCores), string.Format(LocalizationService.Get("{0} رشته"), specs.CpuThreads), $"{specs.CpuClockMhz} MHz" };
+            // 1. CPU Card — فقط مقادیر واقعی نمایش داده می شوند؛ نامشخص ها ادعای دروغ نمی شوند
+            var cpuChips = new List<string>
+            {
+                specs.CpuCores > 0 ? string.Format(LocalizationService.Get("{0} هسته"), specs.CpuCores) : LocalizationService.Get("نامشخص"),
+                string.Format(LocalizationService.Get("{0} رشته"), specs.CpuThreads), // رشته ها (threads) همیشه قطعی است
+                specs.CpuClockMhz > 0 ? $"{specs.CpuClockMhz} MHz" : LocalizationService.Get("نامشخص")
+            };
             if (specs.CpuL3CacheKb > 0) cpuChips.Add($"L3: {specs.CpuL3CacheKb / 1024} MB");
             cards.Add(CreateSpecCard("\uE774", LocalizationService.Get("پردازنده"), specs.CpuName, cpuChips));
 
-            // 2. RAM Card
-            var ramChips = new List<string> { specs.TotalRamFormatted, specs.RamType, $"{specs.RamSpeedMhz} MHz", string.Format(LocalizationService.Get("{0} اسلات"), specs.RamSlotsUsed) };
+            // 2. RAM Card — نوع/فرکانس/اسلات فقط وقتی WMI واقعی جواب داده باشد نمایش داده می شود
+            var ramChips = new List<string> { specs.TotalRamFormatted };
+            if (!string.IsNullOrEmpty(specs.RamType)) ramChips.Add(specs.RamType);
+            else ramChips.Add(LocalizationService.Get("نامشخص"));
+            if (specs.RamSpeedMhz > 0) ramChips.Add($"{specs.RamSpeedMhz} MHz");
+            if (specs.RamSlotsUsed > 0) ramChips.Add(string.Format(LocalizationService.Get("{0} اسلات"), specs.RamSlotsUsed));
             if (!string.IsNullOrEmpty(specs.RamManufacturer)) ramChips.Add(specs.RamManufacturer);
-            cards.Add(CreateSpecCard("\uE950", LocalizationService.Get("حافظه رم"), $"{specs.TotalRamFormatted} {specs.RamType}", ramChips));
+            cards.Add(CreateSpecCard("\uE950", LocalizationService.Get("حافظه رم"), specs.TotalRamFormatted, ramChips));
 
             // 3. GPU Cards
             if (specs.Gpus.Count > 0)
@@ -1655,7 +1664,7 @@ namespace CleanC.UI
 
                     // هش قطعی به جای GetHashCode — جزئیات در StableHash32
                     string hash = StableHash32(exe + appName);
-                    string cacheDir = Path.Combine(Path.GetTempPath(), "CleanC", "Icons");
+                    string cacheDir = Path.Combine(Path.GetTempPath(), "WinyWash", "Icons");
                     string iconPath = Path.Combine(cacheDir, $"{hash}.png");
                     if (File.Exists(iconPath)) return iconPath;
 
@@ -2741,7 +2750,7 @@ namespace CleanC.UI
 
             foreach (var d in selected)
             {
-                var (ok, _) = await DriverManagerService.DeleteDriverPackageAsync(d.PublishedName);
+                var (ok, _) = await DriverManagerService.DeleteDriverPackageAsync(d.PublishedName, d.HasError, d.OriginalName, d.DeviceId);
                 if (ok) successCount++;
                 else failCount++;
             }
@@ -2775,7 +2784,7 @@ namespace CleanC.UI
             var res = await dialog.ShowAsync();
             if (res == ContentDialogResult.Primary)
             {
-                var (success, msg) = await DriverManagerService.DeleteDriverPackageAsync(driver.PublishedName);
+                var (success, msg) = await DriverManagerService.DeleteDriverPackageAsync(driver.PublishedName, driver.HasError, driver.OriginalName, driver.DeviceId);
                 if (success)
                 {
                     ShowInfoBar(LocalizationService.Get("حذف درایور"), msg, InfoBarSeverity.Success);
@@ -2837,7 +2846,7 @@ namespace CleanC.UI
 
             foreach (var d in targets)
             {
-                var (success, _) = await DriverManagerService.DeleteDriverPackageAsync(d.PublishedName);
+                var (success, _) = await DriverManagerService.DeleteDriverPackageAsync(d.PublishedName, d.HasError, d.OriginalName, d.DeviceId);
                 if (success) deleted++;
                 else skipped++;
             }

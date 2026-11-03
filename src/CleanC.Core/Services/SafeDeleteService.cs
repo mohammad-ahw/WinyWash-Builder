@@ -149,9 +149,7 @@ namespace CleanC.Core.Services
             get
             {
                 if (!string.IsNullOrWhiteSpace(_quarantineRootOverride)) return _quarantineRootOverride!;
-                return Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    "CleanC", "quarantine");
+                return AppPaths.QuarantineDir;
             }
             set
             {

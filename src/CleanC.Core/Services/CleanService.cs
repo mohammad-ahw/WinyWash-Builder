@@ -1,4 +1,4 @@
-// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.Core\Services\CleanService.cs
+﻿// O:\OpenCode\AntiGravity\CleanC - NEW\src\CleanC.Core\Services\CleanService.cs
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -140,9 +140,64 @@ namespace CleanC.Core.Services
                 }
             }
 
+            if (item.GroupId == "system_boost" || item.Id == "ramBoost" || item.Id == "dnsFlush" ||
+                item.Id == "backgroundHelpers" || item.Id == "browserBoost" || item.Id == "startupOptimize" ||
+                item.Id == "bloatwareClean" || item.Id == "fastStartup" || item.Id == "gpuOptimize" ||
+                item.Id == "winTweaks" || item.Id == "inactiveHeavyApps")
+            {
+                try
+                {
+                    switch (item.Id)
+                    {
+                        case "ramBoost":
+                            var boost = OptimizerService.BoostRamAsync().GetAwaiter().GetResult();
+                            return boost.FreedBytes;
+                        case "dnsFlush":
+                            OptimizerService.FlushDns();
+                            return 0;
+                        case "backgroundHelpers":
+                            ProcessManagerService.CleanBackgroundHelpers();
+                            return 0;
+                        case "browserBoost":
+                            BrowserOptimizerService.SuppressBrowserBackgroundModeAsync().GetAwaiter().GetResult();
+                            return 0;
+                        case "startupOptimize":
+                            StartupOptimizerService.OptimizeStartupAppsAsync().GetAwaiter().GetResult();
+                            return 0;
+                        case "bloatwareClean":
+                            BloatwareService.CleanAutomaticBloatwareAsync().GetAwaiter().GetResult();
+                            return 0;
+                        case "fastStartup":
+                            FastStartupService.SetFastStartup(true);
+                            return 0;
+                        case "gpuOptimize":
+                            GpuOptimizerService.OptimizeGpuPreferencesAsync().GetAwaiter().GetResult();
+                            return 0;
+                        case "winTweaks":
+                            WindowsTweakService.ApplyLowRiskPerformanceTweaksAsync().GetAwaiter().GetResult();
+                            return 0;
+                        case "inactiveHeavyApps":
+                            ProcessManagerService.EaseHighCpuProcesses();
+                            return 0;
+                        default:
+                            return 0;
+                    }
+                }
+                catch (Exception __ex)
+                {
+                    CcLog.Ignore(__ex);
+                    return 0;
+                }
+            }
+
             var paths = item.TargetPaths != null && item.TargetPaths.Count > 0
                 ? item.TargetPaths
                 : (!string.IsNullOrEmpty(item.Path) ? new List<string> { item.Path } : new List<string>());
+
+            // حالت حذفِ کاربر برای پوشه های رهاشده — یک بار در ابتدای دسته خوانده می شود
+            SafeDeleteMode? leftoverMode = item.GroupId == "leftovers"
+                ? SafeDeleteService.ParseMode(SettingsService.Load().DeleteMode)
+                : null;
 
             foreach (var path in paths)
             {
@@ -150,6 +205,18 @@ namespace CleanC.Core.Services
 
                 // پوشه های رهاشده فقط با بازبینی کامل LeftoverCleaner حذف می شوند
                 if (item.GroupId == "leftovers" && !LeftoverCleanerService.IsSafeToDelete(path)) continue;
+
+                // پوشه ی بازمانده ممکن است سِیو بازی باشد → کل پوشه با حالت انتخابی کاربر
+                // حذف می شود (پیش فرض: سطل بازیافت)، نه پاک کردن قطعیِ محتوا.
+                // فقط فضای واقعاً آزاد شده (حالت Permanent) در «freed» شمرده می شود.
+                if (leftoverMode.HasValue)
+                {
+                    if (!Directory.Exists(path)) continue;
+                    var leftoverResult = SafeDeleteService.DeleteDirectory(path, leftoverMode.Value);
+                    if (leftoverResult.Outcome == SafeDeleteOutcome.Permanent)
+                        freed += leftoverResult.SizeBytes;
+                    continue;
+                }
 
                 if (Directory.Exists(path))
                 {
@@ -159,21 +226,6 @@ namespace CleanC.Core.Services
                         : null;
 
                     freed += SafeCleanFolder(path, minAge);
-
-                    if (item.GroupId == "leftovers")
-                    {
-                        try
-                        {
-                            if (Directory.Exists(path) && !Directory.EnumerateFileSystemEntries(path).Any())
-                            {
-                                Directory.Delete(path, false);
-                            }
-                        }
-                        catch (Exception __ex)
-                        {
-                            CcLog.Ignore(__ex);
-                        }
-                    }
                 }
                 else if (File.Exists(path))
                 {
@@ -217,6 +269,11 @@ namespace CleanC.Core.Services
 
                 // Disallow cleaning drive roots (e.g. C:, C:\, D:, D:\)
                 if (full.Length <= 3 && full.Contains(':')) return true;
+
+                // خط قرمز: پوشه های داده و نصب خود برنامه هرگز نباید پاک شوند
+                if (!string.IsNullOrEmpty(AppPaths.LocalRoot) && full.StartsWith(Path.GetFullPath(AppPaths.LocalRoot).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return true;
+                if (!string.IsNullOrEmpty(AppPaths.CommonRoot) && full.StartsWith(Path.GetFullPath(AppPaths.CommonRoot).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return true;
+                if (!string.IsNullOrEmpty(AppContext.BaseDirectory) && full.StartsWith(Path.GetFullPath(AppContext.BaseDirectory).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return true;
 
                 var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 var protectedExact = new List<string>

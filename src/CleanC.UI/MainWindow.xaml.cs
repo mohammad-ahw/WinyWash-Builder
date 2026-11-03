@@ -3305,7 +3305,7 @@ namespace CleanC.UI
                     rawLang = $"{rawLang} (Language)";
                 }
                 if (SettingsLangTitle != null) SettingsLangTitle.Text = rawLang;
-                if (SettingsLangDesc != null) SettingsLangDesc.Text = LocalizationService.Get("LanguageSub", "انتخاب زبان رابط کاربری، جهت نوشتاری (RTL / LTR) و تایپوگرافی نیتیو سیستم عامل.");
+                if (SettingsLangDesc != null) SettingsLangDesc.Text = LocalizationService.Get("LanguageSub", "زبان برنامه را انتخاب کنید (لیست به مرور کامل‌تر می‌شود)");
                 if (SettingsThemeTitle != null) SettingsThemeTitle.Text = LocalizationService.Get("ThemeTitle", "تم برنامه");
                 if (SettingsThemeDesc != null) SettingsThemeDesc.Text = LocalizationService.Get("ThemeSub", "«سیستم» از تم ویندوز پیروی می کند؛ دو حالت دیگر تم را ثابت نگه می دارند.");
                 if (ThemeSystemRadio != null) ThemeSystemRadio.Content = LocalizationService.Get("ThemeSystem", "سیستم");
@@ -3319,13 +3319,13 @@ namespace CleanC.UI
 
                 // Settings AutoStart
                 if (SettingsAutoStartTitle != null) SettingsAutoStartTitle.Text = LocalizationService.Get("AutoStartTitle", "شروع همراه با ویندوز");
-                if (SettingsAutoStartDesc != null) SettingsAutoStartDesc.Text = LocalizationService.Get("AutoStartDesc", "با ورود به حساب کاربری، CleanC به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود.");
+                if (SettingsAutoStartDesc != null) SettingsAutoStartDesc.Text = LocalizationService.Get("AutoStartDesc", "با ورود به حساب کاربری، WinyWash به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود.");
 
                 // Settings Delete Behavior
                 if (SettingsDeleteModeTitle != null) SettingsDeleteModeTitle.Text = LocalizationService.Get("DeleteBehaviorTitle", "رفتار حذف فایل های شخصی");
                 if (SettingsDeleteModeDesc != null) SettingsDeleteModeDesc.Text = LocalizationService.Get("DeleteBehaviorSub", "برای حذف تکراری ها، فایل های حجیم و سازماندهی دانلودها/دسکتاپ. کش و زباله ها همیشه قطعی حذف می شوند تا فضا واقعاً آزاد شود.");
                 if (DeleteModeRecycleRadio != null) DeleteModeRecycleRadio.Content = LocalizationService.Get("DeleteModeRecycle", "انتقال به سطل بازیافت (پیش فرض)");
-                if (DeleteModeQuarantineRadio != null) DeleteModeQuarantineRadio.Content = LocalizationService.Get("DeleteModeQuarantine", "قرنطینه ی CleanC — نگهداری در پوشه ی برنامه و قابل بازگردانی از مرکز بازیابی");
+                if (DeleteModeQuarantineRadio != null) DeleteModeQuarantineRadio.Content = LocalizationService.Get("DeleteModeQuarantine", "قرنطینه ی WinyWash — نگهداری در پوشه ی برنامه و قابل بازگردانی از مرکز بازیابی");
                 if (DeleteModePermanentRadio != null) DeleteModePermanentRadio.Content = LocalizationService.Get("DeleteModePermanent", "حذف قطعی — فوراً آزاد می شود اما قابل بازگردانی نیست");
 
                 // Settings Auto State Restore
@@ -3349,7 +3349,7 @@ namespace CleanC.UI
                 if (ExportAiReportText != null) ExportAiReportText.Text = LocalizationService.Get("ExportAiReport", "گزارش جامع برای هوش مصنوعی (.md)");
                 if (ExportSpecsTxtText != null) ExportSpecsTxtText.Text = LocalizationService.Get("ExportSpecsReport", "مشخصات کامل سیستم (.txt)");
 
-                if (SettingsAboutTitle != null) SettingsAboutTitle.Text = LocalizationService.Get("AboutTitle", "درباره CleanC");
+                if (SettingsAboutTitle != null) SettingsAboutTitle.Text = LocalizationService.Get("AboutTitle", "درباره WinyWash");
                 if (SettingsAboutDesc != null) SettingsAboutDesc.Text = LocalizationService.Get("AboutSub", "برای گزارش باگ، اطلاعات عیب یابی را کپی و همراه با مشکل ارسال کنید.");
 
                 // 1.5 — کارت «کاراکتر هیرو» (مقادیر خام HTML فارسی اند؛ برای زبان های دیگر انگلیسی برمی گردد)
@@ -3467,6 +3467,9 @@ namespace CleanC.UI
                 // حذف نرم افزار — چک باکس «انتخاب همه» + placeholder جعبه اسم کاراکتر
                 if (UninstallerSelectAllCheck != null) UninstallerSelectAllCheck.Content = LocalizationService.Get("SelectAll", "انتخاب همه");
                 if (CharNameBox != null) CharNameBox.PlaceholderText = LocalizationService.Get("مثلاً سی‌سی", "مثلاً وینی");
+                // اسم پیش فرض کاربر «رفیق» است و per-language ترجمه می شود؛ فقط placeholder است
+                // و در settings ذخیره نمی شود تا مقدار دستی کاربر همیشه دست نخورده بماند.
+                if (CharUserNameBox != null) CharUserNameBox.PlaceholderText = LocalizationService.Get("رفیق");
 
                 // تنظیمات ظاهر — توضیح اسلایدر اندازه کاراکتر
                 if (CharSizeSlider != null) ToolTipService.SetToolTip(CharSizeSlider, LocalizationService.Get("حجم بالای ۱.۲۵× از درون کارت بیرون می زند"));
@@ -4132,7 +4135,14 @@ namespace CleanC.UI
             try
             {
                 string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string statsFile = Path.Combine(localAppData, "CleanC", "clean_stats.json");
+                // آمار پاکسازی از پوشه داده‌ی فعلی برنامه خوانده می‌شود (AppPaths)؛
+                // اگر فایل قدیمی در پوشه CleanC مانده باشد، برای سازگاری همان خوانده می‌شود.
+                string statsFile = Path.Combine(AppPaths.LocalRoot, "clean_stats.json");
+                if (!File.Exists(statsFile))
+                {
+                    string legacyStats = Path.Combine(localAppData, "CleanC", "clean_stats.json");
+                    if (File.Exists(legacyStats)) statsFile = legacyStats;
+                }
                 if (File.Exists(statsFile))
                 {
                     string json = File.ReadAllText(statsFile);
@@ -4192,8 +4202,8 @@ namespace CleanC.UI
         {
             try
             {
-                string localAppData = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string folder = Path.Combine(localAppData, "CleanC");
+                // آمار همیشه در پوشه داده‌ی فعلی برنامه (AppPaths) ذخیره می‌شود
+                string folder = AppPaths.LocalRoot;
                 Directory.CreateDirectory(folder);
                 string statsFile = Path.Combine(folder, "clean_stats.json");
                 var obj = new

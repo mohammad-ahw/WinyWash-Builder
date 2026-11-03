@@ -1,134 +1,194 @@
 <!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>اکسپدیشن وینی</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>وینی استرایک — پرونده‌ی نویز</title>
 <style>
 @font-face{font-family:V;src:url('../Fonts/Vazirmatn-Regular.ttf');font-weight:400}
 @font-face{font-family:V;src:url('../Fonts/Vazirmatn-Bold.ttf');font-weight:700}
-:root{--ac:#1fa971;--fg:#f2f4f8;--mu:#9aa3b2;--gl:rgba(14,16,22,.62)}
+:root{--ac:#7fd8ff;--fg:#f2f4f8;--mu:#9aa3b2;--gl:rgba(14,16,22,.62)}
 *{box-sizing:border-box;margin:0}html,body{height:100%;overflow:hidden;background:#07080b;color:var(--fg);font:400 14px V,system-ui,sans-serif;user-select:none}
-#wall{position:fixed;inset:0;background:radial-gradient(80% 60% at 70% 20%,#1d2a3a,#07080b 70%) center/cover;transform:scale(1.06);filter:saturate(.8) brightness(.55)}
-#veil{position:fixed;inset:0;background:radial-gradient(70% 70% at 50% 45%,transparent,rgba(3,4,8,.82)),linear-gradient(#05060a99,#05060acc)}
-#beam{position:fixed;top:-20%;left:50%;width:70vmin;height:140%;margin-left:-35vmin;background:linear-gradient(var(--ac),transparent 70%);opacity:.07;transform:rotate(14deg);filter:blur(30px);animation:sw 9s ease-in-out infinite alternate}
-@keyframes sw{to{transform:rotate(-14deg);opacity:.11}}
-#hud{position:fixed;top:0;inset-inline:0;height:56px;display:flex;align-items:center;gap:18px;padding:0 22px;z-index:5}
-.pill{background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:999px;padding:7px 14px;display:flex;gap:8px;align-items:center;font-size:12.5px}
-.pill b{font-variant-numeric:tabular-nums}.xpb{width:110px;height:4px;border-radius:4px;background:#ffffff1c;overflow:hidden}.xpb i{display:block;height:100%;width:0;background:var(--ac);transition:width .5s}
-#combo{color:var(--ac);font-weight:700;opacity:0;transition:.3s}#combo.on{opacity:1}
-.sp{flex:1}.ib{width:34px;height:34px;border-radius:50%;border:1px solid #ffffff14;background:var(--gl);color:var(--fg);cursor:pointer;display:grid;place-items:center}.ib:hover{border-color:var(--ac)}
-#stage{position:fixed;inset:104px 0 0;display:grid;grid-template-columns:minmax(220px,1fr) minmax(300px,420px) minmax(220px,1fr);align-items:center;padding:0 3vw;gap:2vw}
-#wn{position:relative;justify-self:center;width:260px}#wc{width:260px;height:190px;display:block}
-#bub{position:absolute;top:-6px;inset-inline-start:100%;width:210px;background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff1a;border-radius:16px 16px 4px 16px;padding:10px 13px;font-size:13px;line-height:1.8;transition:.25s}
-#deck{position:relative;height:500px;perspective:900px}
-.card{position:absolute;inset:0;border-radius:24px;background:linear-gradient(160deg,#1a1e28ee,#0d0f15ee);border:1px solid #ffffff1c;box-shadow:0 30px 80px #000a,0 0 0 1px #0004;padding:18px;display:flex;flex-direction:column;gap:12px;transition:transform .45s cubic-bezier(.2,.8,.2,1),opacity .35s}
-.card.b1{transform:translateY(14px) scale(.96);opacity:.55;pointer-events:none}.card.b2{transform:translateY(28px) scale(.92);opacity:.28;pointer-events:none}
-.card.top{animation:in .5s cubic-bezier(.2,.9,.2,1)}@keyframes in{from{transform:translateY(40px) scale(.94);opacity:0}}
-.rar{height:3px;border-radius:3px}.th{height:190px;border-radius:16px;background:#0006;display:grid;place-items:center;overflow:hidden;position:relative}
-.th img{width:100%;height:100%;object-fit:cover}.ext{font:700 40px/1 ui-monospace,monospace;color:var(--ac);letter-spacing:-2px;direction:ltr}
-.tag{position:absolute;top:10px;inset-inline-end:10px;font-size:11px;padding:3px 10px;border-radius:999px;background:#000a;border:1px solid #fff2}
-.nm{direction:ltr;text-align:left;font:600 15px ui-monospace,monospace;word-break:break-all;line-height:1.4}.meta{display:flex;justify-content:space-between;color:var(--mu);font-size:12.5px}
-.ev{display:flex;flex-wrap:wrap;gap:6px}.ev span{font-size:12px;padding:4px 10px;border-radius:999px;background:#ffffff0d;border:1px solid #ffffff12;animation:ch .4s both}@keyframes ch{from{opacity:0;transform:translateY(6px)}}
-.cf{display:flex;gap:4px;align-items:center;font-size:12px;color:var(--mu)}.cf i{width:22px;height:5px;border-radius:3px;background:#ffffff1f}.cf i.o{background:var(--ac)}
-#acts{position:absolute;inset-inline:0;bottom:-74px;display:flex;gap:10px;justify-content:center}
-.b{font:inherit;font-weight:700;height:48px;padding:0 20px;border-radius:14px;border:1px solid #ffffff1c;background:var(--gl);backdrop-filter:blur(12px);color:var(--fg);cursor:pointer;transition:.18s;display:flex;gap:8px;align-items:center}
-.b:hover{transform:translateY(-2px)}.b.c{background:var(--ac);border-color:transparent;color:#04110b}.b kbd{font:11px ui-monospace;opacity:.6;border:1px solid currentColor;border-radius:5px;padding:0 5px}
-#side{justify-self:center;width:240px;display:flex;flex-direction:column;gap:12px}
-.pk{background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:18px;padding:14px}.pk h4{font-size:12px;color:var(--mu);margin-bottom:6px;font-weight:400}.big{font:700 28px ui-monospace,monospace;direction:ltr;text-align:right}
-.chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;max-height:110px;overflow:hidden}.chips i{font:11px ui-monospace;font-style:normal;padding:2px 7px;border-radius:6px;background:#ffffff10;direction:ltr;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ov{position:fixed;inset:0;background:#02030699;backdrop-filter:blur(10px);display:none;place-items:center;z-index:9}.ov.on{display:grid}
-.sh{width:min(560px,92vw);max-height:84vh;overflow:auto;background:#12151dee;border:1px solid #ffffff1c;border-radius:24px;padding:24px;animation:in .45s}
-.sh h2{font-size:22px;margin-bottom:6px}.row{display:flex;justify-content:space-between;gap:12px;padding:8px 0;border-bottom:1px solid #ffffff0d;font-size:13px}.row s{text-decoration:none;direction:ltr;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#tot{font:700 40px ui-monospace;color:var(--ac);margin:14px 0;direction:ltr;text-align:center}
-#lv{position:fixed;top:30%;inset-inline:0;text-align:center;font:700 44px V;letter-spacing:-.02em;opacity:0;pointer-events:none;z-index:8;text-shadow:0 0 40px var(--ac)}#lv.on{animation:lv 2.4s ease}@keyframes lv{20%,70%{opacity:1;transform:scale(1)}0%{transform:scale(.8)}100%{opacity:0;transform:scale(1.06)}}
-#fx{position:fixed;inset:0;pointer-events:none;z-index:7}
-#empty{display:none;text-align:center;color:var(--mu);line-height:2}
-@media(max-width:900px){#stage{grid-template-columns:1fr;overflow:auto;padding-top:10px}#side,#wn{display:none}}
-
-#tabs{position:fixed;top:56px;inset-inline:0;height:44px;display:flex;gap:8px;justify-content:center;z-index:5}
-.tb{font:inherit;font-size:12.5px;color:var(--mu);background:none;border:1px solid transparent;border-radius:999px;padding:6px 15px;cursor:pointer;display:flex;gap:7px;align-items:center;transition:.2s}
-.tb.on{color:var(--fg);background:var(--gl);border-color:#ffffff1c;backdrop-filter:blur(12px)}.tb i{font:700 10px ui-monospace;font-style:normal;background:var(--ac);color:#04110b;border-radius:999px;padding:1px 6px}
-.card{overflow:auto}.card::-webkit-scrollbar{width:0}.th video,.th iframe{width:100%;height:100%;border:0;background:#000}.th pre{font:11px/1.6 ui-monospace;direction:ltr;text-align:left;padding:12px;white-space:pre-wrap;align-self:start;color:#cbd5e1;width:100%}
-.th audio{position:absolute;bottom:8px;inset-inline:8px;width:calc(100% - 16px)}
-.tools{display:flex;gap:8px}.tools .b{height:36px;font-size:12.5px;padding:0 14px;border-radius:11px}
-.inq{border-top:1px solid #ffffff12;padding-top:10px;font-size:12.5px;line-height:1.9;color:var(--mu);animation:ch .4s}.inq b{color:var(--fg);direction:ltr;unicode-bidi:embed}
-.inq ul{list-style:none;padding:0;margin-top:6px;max-height:120px;overflow:auto;direction:ltr;text-align:left;font:11.5px/1.7 ui-monospace}.inq li{display:flex;justify-content:space-between;gap:10px}
-.gg{display:grid;gap:9px}.gg div{display:grid;grid-template-columns:34px 1fr 38px;align-items:center;gap:8px;font:11px ui-monospace;color:var(--mu)}.gg u{height:5px;border-radius:5px;background:#ffffff18;overflow:hidden}.gg u i{display:block;height:100%;width:50%;background:var(--ac);transition:width 1.2s,background .4s}
-.dl{font-size:10.5px;color:#ffd166;border:1px solid #ffd16655;border-radius:999px;padding:2px 9px;align-self:flex-start}
-#stage.shk{animation:shk .4s}@keyframes shk{20%{transform:translate(-6px,3px)}40%{transform:translate(5px,-3px)}60%{transform:translate(-3px,2px)}}
-.qr{display:flex;justify-content:space-between;font-size:12px;color:var(--mu);margin-top:8px}.qr.ok{color:var(--ac)}.qb{height:3px;border-radius:3px;background:#ffffff18;margin-top:3px;overflow:hidden}.qb i{display:block;height:100%;background:var(--ac);transition:width .6s}
-#ts{position:fixed;top:78px;left:50%;transform:translate(-50%,-20px);background:var(--gl);backdrop-filter:blur(14px);border:1px solid var(--ac);border-radius:999px;padding:9px 18px;font-size:13px;opacity:0;z-index:10;pointer-events:none}#ts.on{animation:tt 3s}@keyframes tt{10%,85%{opacity:1;transform:translate(-50%,0)}}
-.th{transition:height .3s}.th.zoom{height:330px}.th img{cursor:zoom-in}.card.top{cursor:grab;touch-action:pan-y}
-.hv{height:6px;border-radius:6px;background:#ffffff18;overflow:hidden}.hv i{display:block;height:100%;border-radius:6px}
-.zp{margin-top:8px;padding:10px;border-radius:12px;background:#ffffff0a;font-size:12px;line-height:1.9;color:var(--fg)}.zp em{font-style:normal;padding:1px 9px;border-radius:999px;background:#ffffff12;margin-inline-end:4px;display:inline-block}.zp .w{color:#ffd166}.zp .g{color:var(--ac)}
-.fk{width:100%;height:100%;display:grid;place-items:center;background:linear-gradient(120deg,#3a2a6a,#0f5e6e,#6a2a4a);background-size:300% 300%;animation:fk 6s linear infinite;font-size:34px}@keyframes fk{50%{background-position:100% 50%}}
-.pg{background:#f5f5f0;color:#222;width:58%;height:92%;border-radius:4px;padding:12px;font:10px/1.8 V;display:flex;flex-direction:column;gap:6px;align-self:center}.pg i{height:5px;background:#bbb;border-radius:3px}
-.fl{position:fixed;font:700 20px ui-monospace,V;pointer-events:none;z-index:9;animation:fl .9s ease-out forwards;text-shadow:0 2px 8px #000;transform:translateX(-50%)}@keyframes fl{to{transform:translate(-50%,-70px);opacity:0}}
-#cbar{position:fixed;top:50px;left:50%;width:160px;margin-left:-80px;height:3px;background:#ffffff14;border-radius:3px;z-index:6;opacity:0;transition:.3s}#cbar.on{opacity:1}#cbar i{display:block;height:100%;background:var(--ac)}
-#rt b{font-variant-numeric:tabular-nums;color:#ffd166}
-/* پیش‌نمایش بزرگ — مودال اختصاصی رسانه */
-#ovp .pv-stage{width:min(860px,94vw);height:min(560px,72vh);background:#05060acc;border:1px solid #ffffff1c;border-radius:24px;display:grid;place-items:center;overflow:hidden;position:relative}
-#ovp .pv-stage img{max-width:100%;max-height:100%;object-fit:contain}
-#ovp .pv-stage video{max-width:100%;max-height:100%}
-#ovp .pv-stage iframe{width:100%;height:100%;border:0;background:#fff}
-#ovp .pv-stage pre{font:12px/1.7 ui-monospace;direction:ltr;text-align:left;padding:18px;white-space:pre-wrap;color:#cbd5e1;width:100%;overflow:auto}
-#ovp .pv-title{position:absolute;top:14px;inset-inline-start:18px;font:600 13px V;direction:ltr;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;background:#0009;padding:5px 12px;border-radius:999px;border:1px solid #ffffff14}
-#ovp .pv-note{position:absolute;bottom:12px;inset-inline:0;text-align:center;font-size:11.5px;color:var(--mu)}
-#ovp audio{width:min(520px,80vw)}
-.ib svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-.pill svg{width:13px;height:13px;fill:currentColor}
-/* دستاوردها */
-#ova .ach{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #ffffff0d;font-size:13px}
-#ova .ach .ok{color:var(--ac);font-weight:700}
-#ova .ach .lk{color:#5a6274;font-size:12px}
-#ova .ach small{display:block;color:var(--mu);font-size:11px;margin-top:2px}
-#tb{position:relative}#tb i{position:absolute;top:-3px;inset-inline-end:-3px;font:700 9px ui-monospace;font-style:normal;background:var(--ac);color:#04110b;border-radius:999px;padding:0 4px;display:none}#tb i.on{display:block}
-.b svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-/* ── شهر: نقشه‌ی محله‌ها ── */
-#ovm{overflow:auto;padding:26px}
-#ovm .city{width:min(940px,94vw);display:grid;grid-template-columns:repeat(4,1fr);gap:12px;align-content:center;margin:auto}
-.vpill{font-size:10px;color:#9aa3ad;background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:3px 8px;height:28px;display:flex;align-items:center;user-select:none}
-@media(max-width:900px){#ovm .city{grid-template-columns:repeat(2,1fr)}}
-.bld{position:relative;background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:18px;padding:14px;cursor:pointer;transition:.2s;text-align:right;min-height:120px}
-.bld:hover{transform:translateY(-3px);border-color:var(--ac)}
-.bld .gn{font-weight:700;font-size:14px}
-.bld .gsub{color:var(--mu);font-size:11px;margin-top:2px}
-.bld .pol{height:5px;border-radius:5px;background:#ffffff18;margin-top:10px;overflow:hidden}
-.bld .pol i{display:block;height:100%;border-radius:5px;transition:width .6s}
-.bld .bmeta{display:flex;justify-content:space-between;margin-top:8px;font-size:11px;color:var(--mu);align-items:center}
-.bld .st{color:#ffd166;letter-spacing:1px;font-size:12px}
-.bld.lk{opacity:.45;filter:grayscale(.6)}
-.bld .lkx{position:absolute;top:10px;inset-inline-end:10px;font:700 10px ui-monospace;font-style:normal;background:#0009;border:1px solid #ffffff22;border-radius:999px;padding:2px 8px;color:var(--mu)}
-#ovm .citytitle{grid-column:1/-1;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
-#ovm .citytitle small{color:var(--mu);font-size:11.5px}
-#ovm .citytitle h2{font-size:20px}
-/* ── انبار ── */
-#invRow{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-#invRow button{font:inherit;font-size:11px;padding:5px 10px;border-radius:9px;border:1px solid #ffffff18;background:#ffffff0d;color:var(--fg);cursor:pointer;transition:.15s}
-#invRow button:hover{border-color:var(--ac)}
-#invRow button:disabled{opacity:.35;cursor:default}
-#invRow b{color:var(--ac)}
+#wall{position:fixed;inset:0;background:radial-gradient(90% 70% at 70% 10%,#12182a,#07080b 75%);transform:scale(1.05);filter:saturate(.9) brightness(.7)}
+#cv{position:fixed;inset:0;width:100%;height:100%;display:block;cursor:crosshair}
+#hud{position:fixed;top:0;inset-inline:0;height:52px;display:flex;align-items:center;gap:10px;padding:0 18px;z-index:5;pointer-events:none}
+#hud .ib{pointer-events:auto}
+.pill{background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffffff14;border-radius:999px;padding:6px 13px;display:flex;gap:8px;align-items:center;font-size:12.5px;pointer-events:auto;white-space:nowrap}
+.pill b{font-variant-numeric:tabular-nums}
+#zp{max-width:250px;overflow:hidden;text-overflow:ellipsis}
+.sp{flex:1}
+.ib{width:34px;height:34px;border-radius:50%;border:1px solid #ffffff14;background:var(--gl);color:var(--fg);cursor:pointer;display:grid;place-items:center}
+.ib:hover{border-color:var(--ac)}
+.ib svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.vpill{font-size:10px;color:#9aa3ad;background:rgba(14,16,22,.5);border:1px solid #ffffff10;border-radius:10px;padding:4px 8px;height:28px;display:flex;align-items:center}
+#hh{width:96px;height:8px;border-radius:5px;background:#ffffff1c;overflow:hidden;direction:ltr}
+#hh i{display:block;height:100%;width:100%;background:#5af2c0;transition:width .25s,background .3s}
+#nb{width:70px;height:6px;border-radius:4px;background:#ffffff1c;overflow:hidden;direction:ltr}
+#nb i{display:block;height:100%;width:0;background:#ffd166;transition:width .3s,background .3s}
+#bbar{position:fixed;top:62px;inset-inline:0;display:none;justify-content:center;z-index:5;pointer-events:none}
+#bbar .bx{width:min(560px,80vw);background:var(--gl);backdrop-filter:blur(12px);border:1px solid #ff4d5e66;border-radius:14px;padding:8px 14px;display:flex;flex-direction:column;gap:5px}
+#bbar .bn{display:flex;justify-content:space-between;font-size:12px}
+#bbar .bn b{direction:ltr;font:700 12px ui-monospace;color:#ff8a9a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:60%}
+#bbar u{height:9px;border-radius:6px;background:#ffffff16;overflow:hidden}
+#bbar u i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff4d5e,#ffb454);transition:width .2s}
+#cbox{position:fixed;top:120px;inset-inline-start:18px;width:250px;max-height:60vh;overflow:auto;z-index:5;display:flex;flex-direction:column;gap:8px;pointer-events:none}
+#cw{background:var(--gl);backdrop-filter:blur(14px);border:1px solid #ffd16644;border-radius:14px;padding:10px 12px;font-size:11.5px;line-height:1.8;animation:cin .4s}
+@keyframes cin{from{opacity:0;transform:translateX(-20px)}}
+#cw h5{font:700 11px V;color:#ffd166;margin-bottom:2px}
+#cw p{color:#d7dbe6;margin:0}
+#inb{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);width:min(430px,92vw);background:#12151df2;border:1px solid var(--ac);border-radius:16px;padding:13px 16px;z-index:8;display:none;box-shadow:0 20px 60px #000c}
+#inb.on{display:block;animation:cin .3s}
+#inb h4{font-size:13px;color:var(--ac);margin-bottom:6px}
+#inb .ie{font-size:12px;line-height:1.9;color:#cbd5e1}
+#inb .ie b{direction:ltr;unicode-bidi:embed;font-family:ui-monospace;color:var(--fg)}
+#inb .btns{display:flex;gap:8px;margin-top:10px}
+#inb .btns button{flex:1}
+.ov{position:fixed;inset:0;background:#020306aa;backdrop-filter:blur(10px);display:none;place-items:center;z-index:9}
+.ov.on{display:grid}
+.sh{width:min(720px,94vw);max-height:86vh;overflow:auto;background:#12151dee;border:1px solid #ffffff1c;border-radius:24px;padding:22px;animation:in .4s}
+@keyframes in{from{transform:translateY(30px) scale(.97);opacity:0}}
+.sh h2{font-size:21px;margin-bottom:4px}
+.sh .sub{color:var(--mu);font-size:12.5px;line-height:1.9;margin-bottom:12px}
+.row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:9px 0;border-bottom:1px solid #ffffff0d;font-size:13px}
+.row .nm{direction:ltr;text-align:left;font:600 12px ui-monospace,monospace;word-break:break-all;flex:1;min-width:0}
+.row s{text-decoration:none;direction:ltr;color:var(--mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.b{font:inherit;font-weight:700;height:44px;padding:0 20px;border-radius:14px;border:1px solid #ffffff1c;background:var(--gl);color:var(--fg);cursor:pointer;transition:.18s;display:inline-flex;gap:8px;align-items:center;justify-content:center}
+.b:hover{transform:translateY(-2px)}
+.b:disabled,.b:disabled:hover{opacity:.35;filter:saturate(.4);transform:none;cursor:not-allowed}
+.b.c{background:var(--ac);border-color:transparent;color:#041120}
+.b kbd{font:11px ui-monospace;opacity:.7;border:1px solid currentColor;border-radius:5px;padding:0 5px}
+#vb .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:10px}
+#vb .cd{border:1px solid #ffffff14;background:#ffffff05;border-radius:16px;padding:12px;cursor:pointer;transition:.18s;display:flex;flex-direction:column;gap:5px;min-height:104px}
+#vb .cd:hover{border-color:var(--ac);transform:translateY(-3px);background:#ffffff0a}
+#vb .cd.lk{opacity:.4;filter:grayscale(.7);cursor:default}
+#vb .gn{font-weight:700;font-size:14.5px}
+#vb .gsub{color:var(--mu);font-size:11px}
+#vb .pol{height:5px;border-radius:4px;background:#ffffff14;overflow:hidden;margin-top:4px}
+#vb .pol i{display:block;height:100%;border-radius:4px}
+#vb .bmeta{display:flex;justify-content:space-between;font-size:11px;color:var(--mu);margin-top:2px;align-items:center}
+#vb .st{color:#ffd166;letter-spacing:1px}
+#vb .tp{font:700 10px ui-monospace;border-radius:6px;padding:2px 8px;background:#ffffff10;align-self:flex-start}
+#vb .tp.cbt{background:#3a1420;color:#ff8a9a}
+#vb .tp.obs{background:#0d2e3e;color:#7fd8ff}
+#vb .tp.mix{background:#33301a;color:#ffd166}
+#vd .sus{border:1px solid #ffffff16;border-radius:14px;padding:14px 14px 10px;margin-bottom:11px;cursor:pointer;transition:.15s;position:relative}
+#vd .sus:hover{border-color:#ffd166;background:#ffd16610;transform:translateY(-1px)}
+#vd .rank{position:absolute;top:-9px;inset-inline-start:14px;font:700 10px V;background:#1a1f2c;border:1px solid #ffd16655;color:#ffd166;border-radius:8px;padding:2px 9px}
+#vd .pick{margin-top:9px;font:700 11px V;color:var(--ac);opacity:.7}
+#vd .sus:hover .pick{opacity:1}
+#vd .sus .sn{direction:ltr;text-align:left;font:600 12.5px ui-monospace;word-break:break-all;margin-bottom:4px}
+#vd .sus .se{display:flex;flex-wrap:wrap;gap:5px}
+#vd .sus .se span{font-size:11px;padding:3px 9px;border-radius:999px;background:#ffffff0d;border:1px solid #ffffff12}
+#vd .clues{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+#vd .clues span{font-size:11.5px;padding:5px 11px;border-radius:999px;background:#ffd16614;border:1px solid #ffd16644;color:#ffe9b0}
+#vd .clues .no{color:var(--mu);border-color:#ffffff14;background:#ffffff05}
+#vd .ck{display:flex;gap:8px;align-items:flex-start;font-size:12px;line-height:1.8;color:#cbd5e1;padding:10px 0}
+#vd .ck input{accent-color:var(--ac);width:16px;height:16px;margin-top:3px;flex:none}
+/* ---- پروندهٔ بازجویی (Dossier) ---- */
+.dsh{width:min(780px,95vw);display:flex;flex-direction:column;max-height:90vh;padding:16px 16px 14px}
+.dhead{display:flex;align-items:center;gap:12px;border-bottom:1px solid #ffffff14;padding-bottom:10px}
+.dico{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font:700 10px ui-monospace;background:#ffffff10;border:1px solid #ffffff26;flex:none;color:var(--ac)}
+.dtt{min-width:0;flex:1}
+.dtt h2{font:700 15px ui-monospace;direction:ltr;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtt .sub{margin:3px 0 0;font-size:11px}
+.dtabs{display:flex;gap:6px;margin:10px 0 8px}
+.dtabs button{font:700 12px V;color:var(--mu);background:#ffffff08;border:1px solid #ffffff12;border-radius:10px;padding:7px 14px;cursor:pointer;transition:.15s}
+.dtabs button:hover{color:var(--fg)}
+.dtabs button.on{color:#041120;background:var(--ac);border-color:transparent}
+.dbody{overflow:auto;min-height:220px;max-height:56vh;padding:2px 2px 10px}
+.dbody .row{font-size:12.5px}
+.dbody .row>span:first-child{color:var(--mu);flex:none}
+.dbody .row>b{font-weight:600;text-align:left;direction:ltr;font-family:ui-monospace;font-size:11.5px;word-break:break-all;min-width:0}
+.dfoot{display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid #ffffff14;padding-top:10px;justify-content:center}
+.evchips{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.evchips span{font-size:11px;padding:4px 10px;border-radius:999px;background:#ffffff0a;border:1px solid #ffffff14;color:#dbe3ee}
+.prevbox{background:#070a10;border:1px solid #ffffff14;border-radius:14px;padding:10px;display:grid;place-items:center;min-height:180px}
+.prevbox img,.prevbox video{max-width:100%;max-height:320px;border-radius:10px;display:block}
+.prevbox audio{width:100%}
+.prevbox iframe{width:100%;height:340px;border:0;border-radius:10px;background:#fff}
+.txtprev{width:100%;max-height:300px;overflow:auto;white-space:pre-wrap;direction:ltr;text-align:left;font:12px/1.7 ui-monospace;color:#c9e8ff;background:#070a10;border:1px solid #ffffff14;border-radius:12px;padding:12px}
+.zlist{width:100%;font:11.5px ui-monospace;direction:ltr}
+.zlist .zr{display:flex;justify-content:space-between;gap:10px;padding:6px 8px;border-bottom:1px solid #ffffff0d}
+.zlist .zr span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.zstat{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.zstat span{font-size:11px;padding:4px 10px;border-radius:999px;background:#ffd16612;border:1px solid #ffd16633;color:#ffe9b0}
+.warn{font-size:11.5px;line-height:1.8;color:#ffb454;background:#ffb45410;border:1px solid #ffb45433;border-radius:10px;padding:8px 10px;margin:8px 0}
+.stampwrap{display:grid;place-items:center;padding:8px 0 4px}
+.stamp{font:700 22px V;color:#ff8a9a;border:3px solid #ff8a9a;border-radius:10px;padding:4px 22px;transform:rotate(-8deg);letter-spacing:.06em;animation:stmp .45s cubic-bezier(.2,1.6,.4,1)}
+.stamp.ok{color:#5af2c0;border-color:#5af2c0;transform:rotate(7deg)}
+@keyframes stmp{0%{transform:scale(1.6) rotate(0);opacity:0}70%{opacity:1}100%{transform:scale(1) rotate(-8deg)}}
+.mkrow{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:6px}
+.chk{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border:1px solid #ffffff12;border-radius:12px;margin-bottom:7px;font-size:12px;line-height:1.7;cursor:pointer}
+.chk input{accent-color:#ff4d5e;width:16px;height:16px;margin-top:2px;flex:none}
+.chk b{direction:ltr;font-family:ui-monospace;font-size:11.5px;display:block;word-break:break-all;font-weight:600}
+.chk small{color:var(--mu);font-size:10.5px}
+.cxg{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.cxg .ci{background:#ffffff06;border:1px solid #ffffff12;border-radius:12px;padding:10px;min-width:0}
+.cxg .ci b{display:block;font-size:12px;margin-bottom:4px;color:var(--ac)}
+.cxg .ci span{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:top;font-size:10.5px;color:#cbd5e1;background:#ffffff0a;border-radius:7px;padding:2px 7px;margin:2px 2px 0 0;direction:ltr}
+.rk{display:flex;flex-direction:column;gap:5px;margin:8px 0}
+.rk .rkl{display:flex;justify-content:space-between;font-size:11.5px;color:var(--mu)}
+.rk .rkb{height:7px;border-radius:5px;background:#ffffff14;overflow:hidden}
+ .rk .rkb i{display:block;height:100%;background:linear-gradient(90deg,var(--ac),#5af2c0);border-radius:5px}
+ .facts{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}
+ .facts span{font-size:10.5px;padding:3px 9px;border-radius:999px;background:#7fd8ff0d;border:1px solid #7fd8ff33;color:#d7eefc}
+ .shop{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-top:10px}
+ .it{background:#ffffff06;border:1px solid #ffffff14;border-radius:14px;padding:12px;display:flex;flex-direction:column;gap:5px}
+ .it b{font-size:13px}.it .sub{margin:0;font-size:11px}
+ .it .lv{font-size:10px;color:#ffd166}
+ .it button{margin-top:auto;height:36px;border-radius:10px;font:700 12px V;border:1px solid #ffffff1c;background:var(--gl);color:var(--fg);cursor:pointer}
+ .it button.c{background:var(--ac);color:#041120;border-color:transparent}
+ .it button:disabled{opacity:.4;cursor:default}
+ .finline{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid #ffffff0d;font-size:12.5px}
+ .dy{font-size:10px;background:#ffd16622;color:#ffd166;border:1px solid #ffd16655;border-radius:6px;padding:1px 6px;margin-inline-start:6px}
+#hlp .kk{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;font-size:12.5px;align-items:center;margin-top:10px}
+#hlp kbd{font:11px ui-monospace;border:1px solid #ffffff30;border-radius:6px;padding:2px 8px;background:#ffffff08;justify-self:center;white-space:nowrap}
+#hlp .kk s{text-decoration:none;color:var(--mu)}
+#ts{position:fixed;top:12px;left:50%;transform:translateX(-50%);background:var(--gl);backdrop-filter:blur(14px);border:1px solid var(--ac);border-radius:999px;padding:9px 18px;font-size:13px;opacity:0;z-index:10;pointer-events:none;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+.ltr{direction:ltr;unicode-bidi:embed}
+#ts.on{animation:tt 2.6s}@keyframes tt{8%,80%{opacity:1;transform:translate(-50%,0)}}
+.flpx{position:fixed;font:700 17px ui-monospace,V;pointer-events:none;z-index:9;animation:flup .9s ease-out forwards;transform:translateX(-50%);text-shadow:0 2px 8px #000}
+@keyframes flup{to{transform:translate(-50%,-70px);opacity:0}}
+#lv{position:fixed;top:30%;inset-inline:0;text-align:center;font:700 34px V;letter-spacing:-.02em;color:var(--fg);opacity:0;pointer-events:none;z-index:8;text-shadow:0 0 40px var(--ac)}
+#lv.on{animation:lv 2.2s ease}@keyframes lv{18%,72%{opacity:1;transform:scale(1)}0%{transform:scale(.85)}100%{opacity:0;transform:scale(1.05)}}
+#shk{position:fixed;inset:0;z-index:4;pointer-events:none}
+#shk.on{animation:shkf .4s}@keyframes shkf{20%{transform:translate(-7px,4px)}40%{transform:translate(5px,-4px)}60%{transform:translate(-3px,2px)}80%{transform:translate(2px,-1px)}}
+@media(max-width:860px){#hud .pill{padding:5px 9px;font-size:11px}#hh{width:64px}#cbox{display:none}}
+@media(prefers-reduced-motion:reduce){*{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important;scroll-behavior:auto!important}.b:hover,.cd:hover{transform:none}}
 </style></head><body>
-<div id="wall"></div><div id="beam"></div><div id="veil"></div><canvas id="fx"></canvas>
-<div id="hud"><div class="pill" id="stk" title="روزهای پیاپی">روز <b id="sk">1</b></div><div class="pill"><span id="rk">کارآموز</span><div class="xpb"><i id="xb"></i></div><b id="xv">0</b></div><div class="pill" id="combo">x1</div><div class="pill"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><text x="12" y="16" text-anchor="middle" font-size="10" font-weight="700" fill="#04110b" stroke="none">C</text></svg> <b id="cn">0</b></div><div class="pill" id="rt" style="display:none"></div><span class="sp"></span>
-<button class="ib" id="hm" title="شهر وینی"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2zM9 4v14M15 6v14"/></svg></button><span class="vpill" id="vp">v23 · شهر وینی</span><button class="ib" id="rb" title="رِیس ۳۰ثانیه‌ای"><svg viewBox="0 0 24 24"><path d="M13 2 4 14h6l-1 8 9-12h-6z"/></svg></button><button class="ib" id="sb" title="فروشگاه"><svg viewBox="0 0 24 24"><path d="M6 7h12l1.5 13h-15zM9 7a3 3 0 0 1 6 0"/></svg></button><button class="ib" id="tb" title="دستاوردها"><svg viewBox="0 0 24 24"><path d="M8 21h8M12 17v4M7 4h10v5a5 5 0 0 1-10 0zM7 5H4a3 3 0 0 0 3 5M17 5h3a3 3 0 0 1-3 5"/></svg><i id="tbn">0</i></button><button class="ib" id="mu" title="صدا"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm10-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg></button><button class="ib" id="fin" title="پرونده‌ی نهایی"><svg viewBox="0 0 24 24"><path d="M4 12l5 5L20 6"/></svg></button><button class="ib" id="cl" title="خروج"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
-<div id="tabs"></div><div id="stage"><div id="wn"><canvas id="wc" width="520" height="380"></canvas><div id="bub"></div></div>
-<div id="deck"><div id="empty">محله ساکت است.<br>همه‌ی مظنون‌ها داوری شدند.</div><div id="acts">
-<button class="b" id="bk"><kbd>→</kbd>برگشت</button><button class="b" id="tr"><kbd>↓</kbd>اعتماد</button><button class="b c" id="ct"><kbd>←</kbd>دستگیر</button></div></div>
-<div id="side"><div class="pk"><h4>جیب وینی</h4><div class="big" id="pn">0</div><div class="meta"><span id="pb">0 B</span><span id="left"></span></div><div class="chips" id="pc"></div></div>
-<div class="pk"><h4>نبض سیستم</h4><div class="gg" id="gg"></div></div><div class="pk"><h4>پرونده‌ی کل</h4><div class="meta"><span>تاکنون گرفته‌ای</span><b id="allb">0 B</b></div></div><div class="pk"><h4>مأموریت‌های امروز</h4><div id="qs"></div></div><div class="pk"><h4>انبار وینی</h4><div id="invRow"></div></div></div></div>
-<div class="ov" id="ovf"><div class="sh"><h2>پرونده‌ی نهایی</h2><div style="color:var(--mu);font-size:12.5px;line-height:1.9">فقط این موارد به سطل بازیافت می‌روند و از مرکز بازیابی قابل بازگشت‌اند.</div><div id="fl"></div><div id="tot"></div>
-<div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="run">اجرا</button><button class="b" id="no">ادامه‌ی گشت</button></div></div></div>
-<div class="ov" id="ovd"><div class="sh" style="text-align:center"><h2 id="dt">گشت بسته شد</h2><div id="tot2"></div><div id="ds" style="color:var(--mu)"></div><br><button class="b c" id="db" style="margin:auto">بازگشت وینی</button></div></div>
-<div class="ov" id="ovp"><div class="pv-stage" id="pvStage"><div id="pvNote" class="pv-note"></div></div></div>
-<div class="ov" id="ova"><div class="sh"><h2>نشان‌ها</h2><div id="achList"></div><br><button class="b c" id="ax" style="margin:auto">بستن</button></div></div>
-<div class="ov" id="ovm"><div class="city" id="cityGrid"></div></div>
-<div id="lv"></div>
+<div id="wall"></div>
+<canvas id="cv"></canvas>
+<div id="shk"></div>
+<div id="hud">
+ <button class="ib" id="xcl" title="خروج"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+ <div class="pill"><span>جان</span><div id="hh"><i></i></div></div>
+ <div class="pill" id="zp">مأموریت: <b>—</b></div>
+ <div class="pill" id="cp">سرنخ —</div>
+ <div class="pill">شهر <div id="nb"><i></i></div></div>
+ <span class="sp"></span>
+ <div class="pill">امتیاز <b id="sc">0</b></div>
+ <div class="pill" id="cb" style="display:none">زنجیره ×<b id="cbv">2</b></div>
+ <div class="vpill">فصل ۱ · داهلیز</div>
+ <button class="ib" id="snd" title="صدا"><svg viewBox="0 0 24 24"><path d="M9 18V6l10-2v12M9 18a3 3 0 1 1-6 0 3 3 0 0 1 6 0zm10-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0z"/></svg></button>
+ <button class="ib" id="pause" title="توقف (Esc)"><svg viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></svg></button>
+</div>
+<div id="bbar"><div class="bx"><div class="bn"><b id="bn">—</b><span style="color:#ffb454">غول‌آخر</span></div><u><i id="bi"></i></u></div></div>
+<div id="cbox"></div>
+<div id="inb"><h4 id="inh">بازجویی</h4><div class="ie" id="inw"></div><div class="btns" id="inb2"></div></div>
+<div id="ts"></div><div id="lv"></div>
+<div class="ov" id="vb"><div class="sh" id="vbBody"></div></div>
+<div class="ov" id="vd"><div class="sh" id="vdBody"></div></div>
+<div class="ov" id="dos"><div class="sh dsh">
+ <div class="dhead"><div class="dico" id="dico">—</div><div class="dtt"><h2 id="dname">—</h2><div class="sub" id="dsub"></div></div><button class="ib" id="dx" title="بستن"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+ <div class="dtabs" id="dtabs"><button data-t="case">پرونده</button><button data-t="content">محتوا</button><button data-t="judge">داوری من</button></div>
+ <div class="dbody" id="dbody"></div>
+ <div class="dfoot" id="dfoot"></div>
+</div></div>
+<div class="ov" id="cxd"><div class="sh" id="cxBody"></div></div>
+<div class="ov" id="shp"><div class="sh" id="shpBody"></div></div>
+<div class="ov" id="fin"><div class="sh" id="finBody"></div></div>
+<div class="ov" id="mi"><div class="sh" id="miBody"></div></div>
+<div class="ov" id="pzc"><div class="sh" style="text-align:center"><h2>توقف</h2><div style="color:var(--mu);font-size:12px;margin-top:4px">بازی متوقف شد.</div><div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px"><button class="b c" id="pzr">ادامه</button><button class="b" id="pzw">مأموریت مجدد</button><button class="b" id="pzb">تابلوی پرونده‌ها</button><button class="b" id="pzh">راهنما</button></div></div></div>
+<div class="ov" id="hlp"><div class="sh"><h2>راهنمای کنترل</h2><div class="kk"><kbd>A / D یا ← →</kbd><s>حرکت</s><kbd>Space / W</kbd><s>پرش</s><kbd>موس</kbd><s>نشانه‌گیری</s><kbd>کلیک چپ</kbd><s>شلیک</s><kbd>E</kbd><s>باز کردن پرونده / سرنخ / ثبت مشاهده</s><kbd>راست‌کلیک</kbd><s>پروندهٔ پایهٔ ثبت و بقایا</s><kbd>Q</kbd><s>اسکن محیط — نشان‌دادن پرونده‌های بازرسی‌نشده و سرنخ‌ها</s><kbd>Esc</kbd><s>توقف / بستن پرونده</s></div><div class="sub" style="margin-top:14px">کنار هر فایل E بزن تا پرونده‌اش باز شود: منشأ و تاریخ، محتوا و پیش‌نمایش، و داوری خودت. سرنخ‌ها یک نشانهٔ مشخص از مقصر می‌دهند؛ آن‌ها را با شناسنامهٔ مظنون‌ها تطبیق بده. دروازه با «بازرسی» و «سرنخ» باز می‌شود، نه با کشتار. حذف فقط با انتخاب صریح تو و به سطل بازیافت است — یا همه را نگه می‌داری و ستارهٔ رحمت می‌گیری. سفیدها بی‌گناه‌اند؛ شلیک به آن‌ها شهر را آلوده می‌کند.</div><br><button class="b c" id="hlpx">فهمیدم</button></div></div>
 <script>
 'use strict';
 const $=i=>document.getElementById(i),post=o=>{try{window.chrome.webview.postMessage(o)}catch(e){}},HB=!!(window.chrome&&window.chrome.webview);
-let _id=1;const _p=new Map();
-function rpc(api,pl){if(!HB)return Promise.resolve(demo(api,pl||{}));return new Promise((res,rej)=>{const id=_id++;_p.set(id,{res,rej});post({type:'rpc',id,api,state:pl||{}});setTimeout(()=>{if(_p.has(id)){_p.delete(id);rej(new Error('rpc timeout'))}},25000)})}
-if(HB)window.chrome.webview.addEventListener('message',e=>{const d=e&&e.data;if(!d)return;if(d.type==='rpc'&&_p.has(d.id)){const p=_p.get(d.id);_p.delete(d.id);d.ok?p.res(d.result):p.rej(new Error(d.error))}else if(d.type==='hydrate')hydrate(d.pay)});
-post({type:'ready'});
-/* ---- demo ---- */
 const DAY=864e5,N=Date.now(),D='C:\\Users\\Demo\\Downloads\\';
 const mk=(n,s,d,b,c,ev,img)=>({path:D+n,name:n,sizeBytes:s,lastWrite:new Date(N-d*DAY).toISOString(),bucket:b,confidence:c,evidence:ev,isImage:!!img});
 const DEMO={zoneId:'downloads_dehleez',dir:D,scannedCount:96,cases:[
@@ -137,305 +197,934 @@ mk('setup_nvidia_552.exe',8.5e8,128,2,2,['نصاب ۸۱۲ مگابایتی','۱�
 mk('movie_part.mkv.crdownload',4.2e8,9,0,3,['دانلود ناتمام','۹ روز بی‌حرکت']),
 mk('tmp_8a3f.tmp',3.1e4,21,1,3,['فایل موقت','۲۱ روز قدیمی']),
 mk('IMG_2291 (1).jpg',3.4e6,60,3,3,['کپی نام‌دار','همتای اصلی موجود'],1),
-mk('backup_2021.zip',1.3e9,400,4,1,['۱.۲ گیگابایت','۴۰۰ روز قدیمی','احتمالاً بایگانی شخصی است']),mk('podcast_ep12.mp3',3.1e7,150,4,1,['حجم ۳۰ مگابایت','۱۵۰ روز بدون پخش']),mk('invoice_scan.pdf',4e5,180,1,1,['سند اسکن‌شده','شاید مهم باشد']),mk('notes_old.txt',9e3,210,1,2,['یادداشت قدیمی']),
+mk('backup_2021.zip',1.3e9,400,4,1,['۱.۲ گیگابایت','۴۰۰ روز قدیمی','احتمالاً بایگانی شخصی است']),
+mk('podcast_ep12.mp3',3.1e7,150,4,1,['حجم ۳۰ مگابایت','۱۵۰ روز بدون پخش']),
+mk('invoice_scan.pdf',4e5,180,1,1,['سند اسکن‌شده','شاید مهم باشد']),
+mk('notes_old.txt',9e3,210,1,2,['یادداشت قدیمی']),
 mk('chromesetup.exe',1.2e8,95,2,2,['نصاب مرورگر','۹۵ روز قدیمی']),
 mk('empty.txt',0,70,1,3,['فایل خالی قدیمی']),
 mk('thesis_draft_v2.docx',9.8e5,200,3,2,['نام شبیه نسخه‌ی دیگر','قدیمی‌تر از همتا']),
 mk('vlc-3.0.exe',4.0e7,300,2,2,['نصاب ۳۸ مگابایتی','۳۰۰ روز قدیمی']),
 mk('lecture.part',6e7,3,0,2,['دانلود ناتمام','فعال به‌نظر می‌رسد'])]};
-
 const mz=(k,n,sz,d,b,c,ev,detail,metric)=>({kind:k,path:k+':'+n,name:n,sizeBytes:sz,lastWrite:new Date(N-d*DAY).toISOString(),bucket:b,confidence:c,evidence:ev,detail,metric});
-const DZ={startup:[mz('startup','Adobe Updater Startup Utility',0,210,5,3,['راه‌انداز در هر بوت','۲۱۰ روز بدون استفاده از Adobe'],'C:\\Program Files (x86)\\Adobe\\Updater\\AdobeUpdater.exe /startup','تأخیر بوت ۴۱۰ms'),mz('startup','Spotify Web Helper',0,90,5,2,['مرورگر مرتبط حذف شده','فقط منابع می‌خورد'],'%APPDATA%\\Spotify\\SpotifyWebHelper.exe','تأخیر بوت ۱۸۰ms'),mz('startup','OneDrive',0,2,5,1,['ممکنه به همگام‌سازی نیاز داشته باشی'],'C:\\Users\\Demo\\AppData\\Local\\Microsoft\\OneDrive\\OneDrive.exe /background','تأخیر بوت ۶۲۰ms')],
-registry:[mz('registry','HKCU\\Software\\OldPlayer',0,500,6,3,['برنامه‌ای با این نام نصب نیست','آخرین نوشتن ۵۰۰ روز پیش'],'HKEY_CURRENT_USER\\Software\\OldPlayer\\Settings','۱۴ مقدار یتیم'),mz('registry','Uninstall\\{3F2A-91C0}',0,320,6,2,['مسیر نصب وجود ندارد','ورودی حذف‌نصب شکسته'],'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{3F2A-91C0}','۱ کلید'),mz('registry','Classes\\.xyz',0,40,6,1,['پسوند بدون برنامه‌ی مرتبط'],'HKCR\\.xyz','۳ مقدار')],
-tasks:[mz('tasks','GoogleUpdateTaskMachineUA',0,130,7,2,['هر ساعت اجرا می‌شود','Chrome مدت‌هاست خودش آپدیت می‌شود'],'\\GoogleUpdateTaskMachineUA · هر ۱ ساعت','۲۴ اجرا در روز'),mz('tasks','AdobeGCInvoker-1.0',0,260,7,3,['نرم‌افزار والد پیدا نشد'],'\\AdobeGCInvoker-1.0 · روزانه','۱ اجرا در روز')],
-procs:[mz('procs','chrome.exe ×14',1.8e9,0,8,2,['۱۴ تب بی‌حرکت','بیشترین رم سیستم'],'PID 9120 + 13 زیرپراسس','RAM ۱.۸ GB'),mz('procs','OneDrive.exe',2.4e8,0,8,1,['CPU ۱۲٪ بدون فعالیت دیده‌شده'],'PID 4412','CPU ۱۲٪ · RAM ۲۴۰ MB'),mz('procs','Teams.exe ×6',9.1e8,0,8,2,['بسته‌ی شده ولی هنوز زنده'],'PID 7788 + 5 زیرپراسس','RAM ۹۱۰ MB')]};
-DZ.folders=[mz('folders','Old Projects',3.1e9,310,9,2,['۴٬۲۰۰ فایل','۳۱۰ روز دست‌نخورده'],'C:\\Users\\Demo\\Downloads\\Old Projects','۳.۱ GB · ۴۲۰۰ فایل'),mz('folders','node_modules (قدیمی)',1.4e9,200,9,3,['قابل بازسازی','۲۰۰ روز بدون استفاده'],'D:\\dev\\old-site\\node_modules','۱.۴ GB · ۱۸٬۰۰۰ فایل'),mz('folders','Empty Folder',0,90,9,3,['کاملاً خالی'],'C:\\Users\\Demo\\Documents\\New folder','۰ فایل')];
-DZ.settings=[mz('settings','hiberfil.sys (هیبرنیت)',6e9,0,10,2,['هم‌اندازه‌ی بخشی از رم','اگر هیبرنیت نمی‌کنی بی‌مصرف است'],'powercfg /hibernate off','آزادسازی ≈ ۶ GB'),mz('settings','جلوه‌های بصری و شفافیت',0,0,10,1,['مصرف GPU/رم','سلیقه‌ای است'],'System ▸ Visual effects','CPU +۳٪'),mz('settings','ایندکس جستجوی ویندوز',0,0,10,2,['دیسک را مدام می‌خواند'],'services.msc ▸ WSearch','دیسک ۸٪ در پس‌زمینه')];
+const DZ={startup:[
+mz('startup','Adobe Updater Startup Utility',0,210,5,3,['راه‌انداز در هر بوت','۲۱۰ روز بدون استفاده از Adobe'],'C:\\Program Files (x86)\\Adobe\\Updater\\AdobeUpdater.exe /startup','تأخیر بوت ۴۱۰ms'),
+mz('startup','Spotify Web Helper',0,90,5,2,['مرورگر مرتبط حذف شده','فقط منابع می‌خورد'],'%APPDATA%\\Spotify\\SpotifyWebHelper.exe','تأخیر بوت ۱۸۰ms'),
+mz('startup','OneDrive',0,2,5,1,['ممکنه به همگام‌سازی نیاز داشته باشی'],'C:\\Users\\Demo\\AppData\\Local\\Microsoft\\OneDrive\\OneDrive.exe /background','تأخیر بوت ۶۲۰ms')],
+registry:[
+mz('registry','HKCU\\Software\\OldPlayer',0,500,6,3,['برنامه‌ای با این نام نصب نیست','آخرین نوشتن ۵۰۰ روز پیش'],'HKEY_CURRENT_USER\\Software\\OldPlayer\\Settings','۱۴ مقدار یتیم'),
+mz('registry','Uninstall\\{3F2A-91C0}',0,320,6,2,['مسیر نصب وجود ندارد','ورودی حذف‌نصب شکسته'],'HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Uninstall\\{3F2A-91C0}','۱ کلید'),
+mz('registry','Classes\\.xyz',0,40,6,1,['پسوند بدون برنامه‌ی مرتبط'],'HKCR\\.xyz','۳ مقدار')],
+tasks:[
+mz('tasks','GoogleUpdateTaskMachineUA',0,130,7,2,['هر ساعت اجرا می‌شود','Chrome مدت‌هاست خودش آپدیت می‌شود'],'\\GoogleUpdateTaskMachineUA · هر ۱ ساعت','۲۴ اجرا در روز'),
+mz('tasks','AdobeGCInvoker-1.0',0,260,7,3,['نرم‌افزار والد پیدا نشد'],'\\AdobeGCInvoker-1.0 · روزانه','۱ اجرا در روز')],
+procs:[
+mz('procs','chrome.exe ×14',1.8e9,0,8,2,['۱۴ تب بی‌حرکت','بیشترین رم سیستم'],'PID 9120 + 13 زیرپراسس','RAM ۱.۸ GB'),
+mz('procs','OneDrive.exe',2.4e8,0,8,1,['CPU ۱۲٪ بدون فعالیت دیده‌شده'],'PID 4412','CPU ۱۲٪ · RAM ۲۴۰ MB'),
+mz('procs','Teams.exe ×6',9.1e8,0,8,2,['بسته‌ی شده ولی هنوز زنده'],'PID 7788 + 5 زیرپراسس','RAM ۹۱۰ MB')]};
+DZ.folders=[
+mz('folders','Old Projects',3.1e9,310,9,2,['۴٬۲۰۰ فایل','۳۱۰ روز دست‌نخورده'],'C:\\Users\\Demo\\Downloads\\Old Projects','۳.۱ GB · ۴۲۰۰ فایل'),
+mz('folders','node_modules (قدیمی)',1.4e9,200,9,3,['قابل بازسازی','۲۰۰ روز بدون استفاده'],'D:\\dev\\old-site\\node_modules','۱.۴ GB · ۱۸٬۰۰۰ فایل'),
+mz('folders','Empty Folder',0,90,9,3,['کاملاً خالی'],'C:\\Users\\Demo\\Documents\\New folder','۰ فایل')];
+DZ.settings=[
+mz('settings','hiberfil.sys (هیبرنیت)',6e9,0,10,2,['هم‌اندازه‌ی بخشی از رم','اگر هیبرنیت نمی‌کنی بی‌مصرف است'],'powercfg /hibernate off','آزادسازی ≈ ۶ GB'),
+mz('settings','جلوه‌های بصری و شفافیت',0,0,10,1,['مصرف GPU/رم','سلیقه‌ای است'],'System ▸ Visual effects','CPU +۳٪'),
+mz('settings','ایندکس جستجوی ویندوز',0,0,10,2,['دیسک را مدام می‌خواند'],'services.msc ▸ WSearch','دیسک ۸٪ در پس‌زمینه')];
 const ORG=['github.com/releases/download','dl.google.com','download.videolan.org','mega.nz/file','cdn.discordapp.com/attachments'];
+const SZD={};
+/* معماری پل — مثل نسخه‌ی اکسپدیشن: فقط داده‌ی واقعی از سرویس‌ها می‌آید */
+let _id=1;const _p=new Map();
+function rpc(api,pl){if(!HB)return Promise.resolve(demo(api,pl||{}));return new Promise((res,rej)=>{const id=_id++;_p.set(id,{res,rej});post({type:'rpc',id,api,state:pl||{}});setTimeout(()=>{if(_p.has(id)){_p.delete(id);rej(new Error('rpc timeout'))}},25000)})}
+if(HB)window.chrome.webview.addEventListener('message',e=>{const d=e&&e.data;if(!d)return;if(d.type==='rpc'&&_p.has(d.id)){const p=_p.get(d.id);_p.delete(d.id);d.ok?p.res(d.result):p.rej(new Error(d.error))}else if(d.type==='hydrate')hydrate(d.pay)});
+post({type:'ready'});
+/* پیش‌نمایش دمو: تصویر شبیه‌سازی‌شده از نام فایل — در اپ واقعی فایل واقعی سرو می‌شود */
+function dsvg(name){let h=0;for(const ch of name)h=(h*37+ch.charCodeAt(0))%360;const svg='<svg xmlns="http://www.w3.org/2000/svg" width="640" height="400"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="hsl('+h+',55%,24%)"/><stop offset="1" stop-color="hsl('+((h+70)%360)+',60%,9%)"/></linearGradient></defs><rect width="640" height="400" fill="url(#g)"/><g fill="none" stroke="hsla('+h+',85%,72%,.35)"><circle cx="470" cy="120" r="95"/><circle cx="470" cy="120" r="62"/><path d="M-20 330 Q150 235 320 330 T680 330"/><path d="M-20 360 Q170 280 340 360 T680 360"/></g><text x="24" y="376" fill="#e8eefc" font-family="monospace" font-size="15">'+name.replace(/[<&>"]/g,'')+'  ·  DEMO PREVIEW</text></svg>';return 'data:image/svg+xml;charset=utf-8,'+encodeURIComponent(svg)}
+const SAMPLE={
+txt:'NOTEBOOK EXPORT  ·  page 04\n\n- renew domain before Friday\n- invoice #INV-2291 was paid twice?\n- ask Reza about the old backup\n\n(saved automatically · untitled session)',
+log:'2025-11-02 03:14:22  WARN   update.check  failed to reach mirror\n2025-11-02 03:14:22  INFO   update.check  retry 1/3 in 30s\n2025-11-02 03:15:02  WARN   update.check  failed to reach mirror\n2025-11-02 03:15:32  ERROR  update.agent  giving up — version stays 1.4.2',
+md:'# Thesis draft — v2\n\n## Abstract\nThis chapter covers the migration of the local archive...\n\n## TODO\n- [ ] merge notes from drive\n- [ ] re-check citations',
+csv:'date,item,amount,currency\n2025-09-14,license renewal,49.00,USD\n2025-10-01,cloud storage,8.99,USD\n2025-10-28,cloud storage,8.99,USD',
+json:'{\n  "app": "demo-reader",\n  "version": "1.4.2",\n  "endpoints": ["https://mirror-01.example.net"],\n  "autoUpdate": true\n}',
+ini:'[settings]\nLanguage=en\nAutoSave=1\nLastPath=C:\\\\Users\\\\Demo\\\\Downloads\nCheckUpdates=yes',
+nfo:'RELEASE NAME : sample.pack\nPLATFORM     : windows\nLANGUAGE     : en\nNOTES        : demo content for preview'};
 function demo(api,p){
 if(api==='sys.stat')return{cpu:20+Math.random()*50|0,ram:55+Math.random()*25|0,disk:62};
-if(api==='file.inspect'){const z=/\.(zip|rar|7z)$/i.test(p.path),h=p.path.length%5;return{host:ORG[h],referrer:'https://'+ORG[h].split('/')[0]+'/',created:new Date(N-70*DAY).toISOString(),entries:z?[{n:'setup/installer.msi',s:4.1e7},{n:'docs/readme.txt',s:3e3},{n:'bin/app.dll',s:8.2e6},{n:'assets/video_intro.mp4',s:6.4e7},{n:'license.txt',s:1e3}]:[]}}
+if(api==='file.inspect'){
+ const nm=(p.path||'').split('\\').pop()||'file',m=nm.match(/\.([a-z0-9]+)$/i),ext=m?m[1].toLowerCase():'';
+ const h=p.path.length%5,zip=ext==='zip',arc=/^(rar|7z|tar|gz|tgz)$/.test(ext),txt=/^(txt|log|md|csv|json|ini|nfo|srt)$/.test(ext);
+ const base={host:ORG[h],referrer:'https://'+ORG[h].split('/')[0]+'/',created:new Date(N-70*DAY).toISOString(),downloaded:new Date(N-66*DAY).toISOString()};
+ if(zip){const entries=[{n:'setup/installer.msi',s:4.1e7},{n:'docs/readme.txt',s:3e3},{n:'bin/app.dll',s:8.2e6},{n:'assets/video_intro.mp4',s:6.4e7},{n:'license.txt',s:1e3}];
+  return Object.assign(base,{entryCount:entries.length,uncompressed:1.15e8,exeCount:2,oldestEntry:new Date(N-420*DAY).toISOString(),newestEntry:new Date(N-40*DAY).toISOString(),entries});}
+ if(arc)return Object.assign(base,{archiveUnsupported:true});
+ if(txt)return Object.assign(base,{text:SAMPLE[ext]||SAMPLE.txt});
+ return base}
+if(api==='file.stage'){const e=(p.path||'').toLowerCase();if(/\.(png|jpe?g|gif|webp|bmp|svg|avif|ico)$/.test(e))return{demo:1,url:dsvg((p.path||'').split('\\').pop()||'image')};return{demo:1}}
 if(api==='zone.scan'&&p.zoneId&&p.zoneId!=='downloads')return{zoneId:p.zoneId,cases:DZ[p.zoneId]||[]};
-if(api==='zone.scan')return DEMO;if(api==='zone.execute')return{performed:p.paths.length,failed:0,freed:p.paths.reduce((a,x)=>a+(SZ[x]||0),0),moved:p.paths.length,mode:'RecycleBin'};
+if(api==='zone.scan')return DEMO;
+if(api==='zone.execute'){SZD.notes='demo';return{performed:p.paths.length,failed:0,freed:1.2e9,moved:p.paths.length,mode:'RecycleBin'}}
 if(api==='state.get'){try{return JSON.parse(localStorage.getItem('winy.exp'))}catch(e){return null}}
 if(api==='state.save'){try{localStorage.setItem('winy.exp',JSON.stringify(p))}catch(e){}return{saved:true}}}
 /* ---- state ---- */
-const RK=['کارآموز','گشت','کارآگاه','بازرس','سروان','کمیسر','افسانه'],TH=[0,60,160,320,560,900,1400];
-let S={v:1,xp:0,level:0,totalCaught:0,totalCaughtBytes:0,casesDone:0,sessions:0,streak:1,last:'',trusted:{},caught:[]},Q=[],pocket=[],SZ={},combo=0,mute=false,HOST={},sv;
+let S={v:4,coins:0,streak:1,last:'',xp:0,missions:{},ach:{},snd:0,caughtTotal:0,bytesTotal:0,coolNoizes:0,trusted:{},keptTotal:0,up:{hp:0,scan:0,magnet:0},intro:0,finale:0,codex:{hosts:{},exts:{},kinds:{},clues:{},previews:{}}};
+let svt;
+function save(){clearTimeout(svt);svt=setTimeout(()=>rpc('state.save',S),600)}
+function flushSave(){clearTimeout(svt);try{rpc('state.save',S)}catch(e){}}
+addEventListener('beforeunload',flushSave);
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')flushSave()});
 const fmt=b=>b>=1e9?(b/1e9).toFixed(1)+' GB':b>=1e6?(b/1e6).toFixed(1)+' MB':b>=1e3?(b/1e3).toFixed(0)+' KB':b+' B';
+const faNum=n=>String(n==null?'':n).replace(/[0-9]/g,d=>'۰۱۲۳۴۵۶۷۸۹'[+d]);
 const age=l=>{const d=Math.round((N-new Date(l))/DAY);return d>=365?Math.round(d/365)+' سال پیش':d+' روز پیش'};
-function save(){clearTimeout(sv);sv=setTimeout(()=>rpc('state.save',Object.assign({},S,{caught:pocket.map(c=>({path:c.path,name:c.name,size:c.sizeBytes,z:c.z}))})),600)}
-/* ---- sound ---- */
-let AC;function tone(f,d,t='sine',v=.07,s=0){if(mute)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain(),a=AC.currentTime+s;o.type=t;o.frequency.setValueAtTime(f,a);o.frequency.exponentialRampToValueAtTime(f*(s?1:1.5),a+d);g.gain.setValueAtTime(v,a);g.gain.exponentialRampToValueAtTime(.0001,a+d);o.connect(g).connect(AC.destination);o.start(a);o.stop(a+d)}catch(e){}}
-const SFX={catch:()=>{tone(220,.12,'square',.05);tone(440+combo*40,.18,'triangle',.08,.07)},trust:()=>{tone(523,.2);tone(784,.3,'sine',.06,.1)},back:()=>tone(200,.25,'sawtooth',.04),lvl:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.4,'triangle',.08,i*.1)),done:()=>[392,523,659,784,1046].forEach((f,i)=>tone(f,.5,'sine',.08,i*.12))};
-/* ---- Winy ---- */
-const wc=$('wc'),x=wc.getContext('2d');let mood='idle',mt=0,E={ex:0,ey:0,lt:0,bl:1},tgt=[0,0],pk=0,hex='#7fd8ff';
-const MOODS={idle:{c:'#7fd8ff',lt:0},scan:{c:'#8b9bff',lt:.2},happy:{c:'#5af2c0',lt:0},sad:{c:'#8f9bc4',lt:.4},cele:{c:'#7dffbf',lt:0},wait:{c:'#ffd166',lt:.1},empty:{c:'#9db4c4',lt:.3},angry:{c:'#ff4d5e',lt:0},win:{c:'#ffd166',lt:0},lose:{c:'#7a869e',lt:0},surp:{c:'#ffe28a',lt:0},sleep:{c:'#6f7fb0',lt:.75},love:{c:'#ff7ac8',lt:0}};
-function setMood(m,s=1.6){mood=m;mt=performance.now()+s*1e3}
-addEventListener('pointermove',e=>{const r=wc.getBoundingClientRect(),dx=e.clientX-r.left-r.width/2,dy=e.clientY-r.top-r.height/2,d=Math.hypot(dx,dy)||1,k=Math.min(d/300,1)/d;tgt=[dx*k,dy*k]});
-let blk=0,nb=2;
-function drawW(t){x.setTransform(2,0,0,2,0,0);x.clearRect(0,0,260,190);if(mood!=='idle'&&mood!=='wait'&&mood!=='empty'&&performance.now()>mt)mood=$('deck').querySelector('.card')?'scan':'empty';
-const M=MOODS[mood],c=M.c;hex=c;E.ex+=(tgt[0]-E.ex)*.1;E.ey+=(tgt[1]-E.ey)*.1;E.lt+=(M.lt-E.lt)*.15;pk*=.9;
-const bob=Math.sin(t*.0017)*3-(mood==='lose'?-5:0)-(mood==='angry'?Math.sin(t*.06)*1.5:0)-(mood==='cele'||mood==='win'?Math.abs(Math.sin(t*.012))*14:0);x.translate(130,95+bob);
-const g=x.createRadialGradient(0,0,20,0,0,110);g.addColorStop(0,c+'33');g.addColorStop(1,'transparent');x.fillStyle=g;x.fillRect(-130,-95,260,190);
-x.fillStyle='#0006';x.beginPath();x.ellipse(0,72-bob*.4,44,4,0,0,7);x.fill();
-const gr=x.createLinearGradient(-70,-55,70,55);gr.addColorStop(0,'#575d6b');gr.addColorStop(.5,'#2a2e38');gr.addColorStop(1,'#16181e');x.fillStyle=gr;x.beginPath();x.roundRect(-70,-55,140,110,36);x.fill();
-x.strokeStyle='#fff5';x.lineWidth=1;x.stroke();x.fillStyle='#03050a';x.beginPath();x.roundRect(-64,-49,128,98,30);x.fill();
-x.save();x.clip();x.translate(E.ex*5,E.ey*3);const sc=mood==='scan'?-1:0;
-if(blk>0)blk-=.08;else if(t/1e3>nb){blk=1;nb=t/1e3+2+Math.random()*3}
-const oc=blk>0?Math.abs(Math.cos(Math.PI*(1-blk))):1,sad=mood==='sad'||mood==='lose',ch=['happy','cele','win'].includes(mood);
-[-1,1].forEach(s=>{x.save();x.translate(s*25+E.ex*5,-6);x.scale(1,Math.max(.06,oc));const w=mood==='surp'?22:17,h=sad?22:mood==='surp'?38:mood==='angry'?24:29;x.shadowColor=c;x.shadowBlur=18;x.fillStyle=c;x.beginPath();x.roundRect(-w/2,-h/2,w,h,w/2);x.fill();x.shadowBlur=0;x.fillStyle='#03050a';
-if(E.lt>.02){x.save();x.rotate(-s*.25);x.fillRect(-20,-30,40,30*E.lt*1.4);x.restore()}
-if(ch){x.beginPath();x.arc(0,h/2+8,w*.7,0,7);x.fill()}x.restore()});
-ov(t,c);x.strokeStyle=c;x.lineWidth=3;x.lineCap='round';x.shadowColor=c;x.shadowBlur=10;x.beginPath();
-if(mood==='surp')x.arc(0,26,7,0,7);else if(mood==='angry')x.arc(0,34,10,Math.PI*1.15,Math.PI*1.85);else if(mood==='lose'){x.moveTo(-10,30);for(let i=1;i<=4;i++)x.lineTo(-10+i*5,30+(i%2?-3:3))}else if(mood==='sleep')x.arc(0,24,4,0,7);else if(mood==='love')x.arc(0,14,13,.1*Math.PI,.9*Math.PI);else if(mood==='wait'||mood==='empty')x.moveTo(-8,22),x.lineTo(8,22);else if(sad)x.arc(0,32,10,Math.PI*1.15,Math.PI*1.85);else x.arc(0,16,ch?12:8,.15*Math.PI,.85*Math.PI);x.stroke();x.restore();
-extras(t,c);if(mood==='scan'||pk>.2){x.strokeStyle='#e8eefc';x.lineWidth=3;x.shadowBlur=0;const a=Math.sin(t*.003)*8;x.beginPath();x.arc(88+a,10,14,0,7);x.moveTo(98+a,20);x.lineTo(110+a,34);x.stroke()}
-requestAnimationFrame(drawW)}
-function ov(t,c){if(!['lose','love','sleep','angry'].includes(mood))return;x.save();x.translate(E.ex*5,0);x.lineCap='round';
-[-1,1].forEach(s=>{const ex=s*25,ey=-6;
-if(mood==='angry'){x.shadowBlur=0;x.fillStyle='#03050a';x.beginPath();x.moveTo(s*12,-9);x.lineTo(s*42,-24);x.lineTo(s*42,-40);x.lineTo(s*12,-40);x.fill();x.strokeStyle=c;x.lineWidth=4;x.beginPath();x.moveTo(s*10,-11);x.lineTo(s*40,-27);x.stroke();return}
-x.shadowBlur=0;x.fillStyle='#03050a';x.fillRect(ex-16,ey-20,32,40);x.strokeStyle=c;x.fillStyle=c;x.lineWidth=4;x.shadowColor=c;x.shadowBlur=12;x.beginPath();
-if(mood==='lose'){x.moveTo(ex-8,ey-8);x.lineTo(ex+8,ey+8);x.moveTo(ex+8,ey-8);x.lineTo(ex-8,ey+8);x.stroke()}
-else if(mood==='sleep'){x.moveTo(ex-9,ey);x.quadraticCurveTo(ex,ey+9,ex+9,ey);x.stroke()}
-else{const p=1+Math.sin(t*.012)*.12;x.save();x.translate(ex,ey+2);x.scale(p,p);x.moveTo(0,10);x.bezierCurveTo(-18,-2,-10,-16,0,-6);x.bezierCurveTo(10,-16,18,-2,0,10);x.fill();x.restore()}});x.restore();x.shadowBlur=0}
-function extras(t,c){hat();x.shadowBlur=0;x.lineCap='round';
-if(mood==='win'){x.fillStyle='#ffd166';x.beginPath();x.moveTo(-26,-60);x.lineTo(-26,-84);x.lineTo(-13,-70);x.lineTo(0,-90);x.lineTo(13,-70);x.lineTo(26,-84);x.lineTo(26,-60);x.closePath();x.fill();for(let i=0;i<5;i++){const a=t*.004+i*1.26;x.fillStyle='#fff8d0';x.fillRect(Math.cos(a)*92-2,Math.sin(a)*52-2,4,4)}}
-else if(mood==='lose'){const y=((t*.03)%40);x.fillStyle='#7fd8ff';x.beginPath();x.arc(-33,14+y,3.5,0,7);x.fill();x.strokeStyle='#e8eefc';x.lineWidth=2;x.beginPath();x.moveTo(84,60);x.lineTo(84,6);x.stroke();x.fillStyle='#e8eefc';x.fillRect(84,6,24,16)}
-else if(mood==='angry'){for(let i=0;i<3;i++){const k=((t*.002+i/3)%1);x.globalAlpha=1-k;x.fillStyle='#ff4d5e';x.beginPath();x.arc(-58+i*58,-62-k*30,4+k*7,0,7);x.fill()}x.globalAlpha=1}
-else if(mood==='sleep'){x.fillStyle=c;for(let i=0;i<3;i++){const k=((t*.0006+i/3)%1);x.globalAlpha=1-k;x.font='700 '+(12+i*5)+'px sans-serif';x.fillText('Z',62+k*26,-40-k*34)}x.globalAlpha=1}
-else if(mood==='love'){x.fillStyle=c;for(let i=0;i<3;i++){const k=((t*.001+i/3)%1);x.globalAlpha=1-k;x.font='16px sans-serif';x.fillText('♥',-70+i*70+Math.sin(k*6)*8,-50-k*40)}x.globalAlpha=1}
-else if(mood==='surp'){x.fillStyle=c;x.font='700 34px sans-serif';x.fillText('!',-8,-66+Math.sin(t*.03)*3)}}
-const MS=[['happy','خوشحالم!'],['sad','ناراحتم...'],['angry','عصبانی‌ام!'],['scan','دارم بررسی می‌کنم...'],['win','بردم!'],['lose','باختم...'],['surp','وای! چی شد؟'],['sleep','خوابم میاد...'],['love','عاشق این پرونده‌ام!']];let mi=0,lastA=Date.now();
-wc.style.cursor='pointer';wc.onclick=()=>{const m=MS[mi++%MS.length];setMood(m[0],3);say(m[1])};
-['pointerdown','keydown'].forEach(e=>addEventListener(e,()=>{lastA=Date.now();MUS.start();if(mood==='sleep'){setMood('surp',1.2);say('هان؟ بیدارم!')}}));
-setInterval(()=>{if(Date.now()-lastA>45000&&mood!=='sleep'&&!document.querySelector('.ov.on')){setMood('sleep',999);say('خوابم برد...')}},5000);
-requestAnimationFrame(drawW);
-const LINES={catch:['گرفتمت.','یکی کم شد.','مدرک قطعی بود.','پرونده بسته.'],trust:['باشه، تو آزادی.','دیگه سراغت نمیام.','این یکی خودیه.'],back:['بعداً برمی‌گردم سراغش.','هنوز مطمئن نیستم...'],open:['مظنون بعدی.','این یکی مشکوک به‌نظر می‌رسه.','بیا ببینیم چی قایم کرده.','نگاهش کن، چی می‌بینی؟'],combo:['زنجیره‌ایه!','وای، دست‌گرم شدیم!','نگهش دار، نگهش دار!']};
-/* واکنش وینی به نوع مدرک (bucket داهلیز + زون‌های دیگر) */
-const CLBH={0:['نیمه‌کاره ول شده وسط خیابون.','دانلودی که هیچ‌وقت تمام نشد.'],1:['زباله‌ی خالص؛ همین.','کسی واقعاً اینم می‌خواست؟'],2:['نصاب‌های کهنه؛ یادگاری‌های بی‌فایده.','نصبش تموم شده؛ خودش بی‌کار شده.'],3:['دوقلوها نباید با هم برن.','کپیِ بی‌دلیل؛ اصیلش همینه.'],4:['غولِ محله. با احتیاط دستگیرش کن.'],5:['از لیست راه‌اندازی حذفش می‌کنم؛ بوت سبک‌تر می‌شه.'],6:['کلید بی‌صاحب؛ جاش گورستان رجیستریه.'],7:['دیگه هر ساعت بیدارت نمی‌کنم.'],9:['جعبه‌های سنگین محله؛ می‌رن سطل بازیافت.']};
-const pick=a=>a[Math.random()*a.length|0];
-function say(t){const b=$('bub');b.style.opacity=0;setTimeout(()=>{b.innerHTML=t;b.style.opacity=1},120)}
-/* ---- particles ---- */
-const fx=$('fx'),f=fx.getContext('2d');let PT=[];function rs(){fx.width=innerWidth;fx.height=innerHeight}rs();addEventListener('resize',rs);
-function burst(px,py,n,col){for(let i=0;i<n;i++)PT.push({x:px,y:py,vx:(Math.random()-.5)*10,vy:(Math.random()-.8)*10,l:1,c:col})}
-(function lp(){f.clearRect(0,0,fx.width,fx.height);PT=PT.filter(p=>p.l>0);PT.forEach(p=>{p.x+=p.vx;p.y+=p.vy;p.vy+=.3;p.l-=.02;f.globalAlpha=Math.max(0,p.l);f.fillStyle=p.c;f.fillRect(p.x,p.y,4,4)});requestAnimationFrame(lp)})();
-/* ---- game ---- */
-const ZN=[['downloads','دانلودها'],['startup','استارتاپ'],['registry','رجیستری'],['tasks','تسک‌ها'],['procs','رم و CPU'],['folders','پوشه‌ها'],['settings','تنظیمات']],QS={},EXT={img:/\.(jpe?g|png|gif|webp|bmp|svg)$/i,vid:/\.(mp4|webm|mov|m4v)$/i,aud:/\.(mp3|wav|ogg|m4a|flac|aac)$/i,pdf:/\.pdf$/i,txt:/\.(txt|log|md|csv|json|ini|nfo|srt)$/i,zip:/\.(zip|rar|7z|tar|gz|tgz)$/i},GL={startup:'RUN',registry:'REG',tasks:'TSK',procs:'CPU',folders:'DIR',settings:'CFG'},SEEN=new Set(),esc=t=>String(t).replace(/</g,'&lt;');
-let Z='downloads';const Qc=()=>QS[Z]||[];
-const ty=c=>{if(c.kind&&c.kind!=='file')return c.kind;for(const k in EXT)if(EXT[k].test(c.name))return k;return'file'};
-const url=c=>(HOST.downloads||'https://cleanc.dl/')+encodeURIComponent(c.name);
-/* آیا فایل مستقیم از میزبان cleanc.dl سرو می‌شود؟ (فقط ریشه‌ی Downloads) */
-const inDlRoot=p=>{const d=HOST.downloadsDir;if(!d||!p)return false;const s=p.startsWith(d+'\\')?p.slice(d.length+1):null;return!!s&&!s.includes('\\')};
-const BK=['دانلود ناتمام','زباله‌ی موقت','نصاب قدیمی','دوقلوی کپی','حجیم فراموش‌شده','استارتاپ اضافی','کلید یتیم','تسک زمان‌بندی','پراسس سنگین','پوشه‌ی سنگین','تنظیم سنگین'];
-const KL={startup:'راه‌انداز خودکار',registry:'کلید یتیم رجیستری',tasks:'تسک زمان‌بندی',procs:'ساکن سنگین',folders:'پوشه‌ی محله',settings:'تنظیم سیستم'};
-const OBSERVE=kind=>kind==='procs'||kind==='settings';
+/* ---- صدا ---- */
+let AC;function tone(f,d,t,v,ds){if(S.snd===2)return;try{AC=AC||new AudioContext();const o=AC.createOscillator(),g=AC.createGain(),a=AC.currentTime+(ds||0);o.type=t||'sine';o.frequency.setValueAtTime(f,a);o.frequency.exponentialRampToValueAtTime(f*1.5,a+d);g.gain.setValueAtTime(v||.07,a);g.gain.exponentialRampToValueAtTime(.0001,a+d);o.connect(g).connect(AC.destination);o.start(a);o.stop(a+d)}catch(e){}}
+const SFX={shot:()=>tone(760,.07,'square',.05),hit:()=>tone(180,.09,'sawtooth',.05),kill:()=>{tone(320,.1,'square',.06);tone(160,.16,'sawtooth',.05,.05)},hurt:()=>tone(110,.22,'sawtooth',.07),coin:()=>{tone(880,.07,'triangle',.06);tone(1320,.1,'triangle',.05,.06)},clue:()=>{tone(660,.1,'triangle',.06);tone(990,.16,'triangle',.05,.09)},scan:()=>tone(1200,.2,'sine',.04),boom:()=>tone(60,.4,'sawtooth',.09),lvl:()=>[523,659,784,1046].forEach((f,i)=>tone(f,.35,'triangle',.07,i*.09)),win:()=>[523,659,784,1046,1318].forEach((f,i)=>tone(f,.4,'sine',.07,i*.11)),lose:()=>[400,300,220,160].forEach((f,i)=>tone(f,.3,'sawtooth',.05,i*.12))};
+const MUS={step:0,timer:null,
+start(){if(S.snd!==0)return;try{AC=AC||new AudioContext()}catch(e){return}if(MUS.timer)return;MUS.timer=setInterval(MUS.tick,320)},
+stop(){clearInterval(MUS.timer);MUS.timer=null},
+tick(){const b=[55,55,65.4,55,49,49,58.3,65.4],s=(MUS.step++)%8;
+if(s%2===0)tone(b[s],.28,'triangle',.03);
+if(s===3||s===7)tone(b[s]*2,.12,'square',.015);
+if(s%4===2)tone(2600+Math.random()*600,.03,'square',.006)}};
+addEventListener('pointerdown',()=>MUS.start(),{once:true});
+/* ---- داده‌ی محله‌ها ---- */
+const ZN=[['downloads','داهلیز','صدای نویز در داهلیز'],['startup','پارازیت','ایستگاه راه‌اندازی'],['registry','زیرزمین','کلیدهای یتیم رجیستری'],['tasks','برج ساعت','تسک‌های زمان‌بندی بی‌صدا'],['procs','نیروگاه','ساکنان سنگین رم و CPU'],['folders','تالار غول‌ها','خیابان پوشه‌ها'],['settings','اتاق فرمان','تنظیمات سنگین سیستم']];
+const TYPE={downloads:'cbt',startup:'cbt',registry:'cbt',tasks:'mix',procs:'obs',folders:'cbt',settings:'mix'};
+const TPN={cbt:'شوتر',obs:'مشاهده',mix:'ترکیبی'};
+const UNLOCK={downloads:0,startup:1,folders:2,procs:2,registry:3,tasks:4,settings:5};
+const DINFO={downloads:'محله‌ی مهمان‌های قدیمی',startup:'هرچی اینجاست هر بوت معطلت می‌کنه',registry:'کلیدهای بی‌صاحب خاک می‌خورن',tasks:'کارهای بی‌صدای زمان‌بندی‌شده',procs:'ساکنان حجیم رم و CPU',folders:'انبارهای حجیم، کوچه‌های خالی',settings:'تنظیمات سنگین سیستم'};
+const PAL={downloads:'#7fd8ff',startup:'#ffd166',registry:'#c084fc',tasks:'#5af2c0',procs:'#ff8a4a',folders:'#8b9bff',settings:'#e2e8f0'};
+const KL={startup:'راه‌انداز خودکار',registry:'کلید یتیم',tasks:'تسک زمان‌بندی',procs:'پروسس سنگین',folders:'پوشه‌ی حجیم',settings:'تنظیم سیستم'};
+const OBSERVE=k=>k==='procs'||k==='settings';
+const BUCKET_N={0:'دانلود ناتمام',1:'فایل زائد',2:'نصاب قدیمی',3:'کپی اضافه',4:'فایل بزرگ'};
+const MAX_MISSION_CASES=24;
+function famOf(c){
+ if(c.kind&&c.kind!=='file')return KL[c.kind]||'رکورد سیستم';
+ const m=(c.name||'').match(/\.([a-z0-9]{1,6})$/i),e=m?m[1].toLowerCase():'';
+ if(/^(exe|msi|bat|cmd|scr|ps1|dll)$/.test(e))return'برنامهٔ اجرایی';
+ if(/^(zip|rar|7z|tar|gz|tgz)$/.test(e))return'آرشیو';
+ if(/^(png|jpe?g|gif|webp|bmp|svg|avif|ico)$/.test(e))return'تصویر';
+ if(/^(mp4|mkv|mov|webm|avi|m4v|wmv)$/.test(e))return'ویدیو';
+ if(/^(mp3|wav|ogg|m4a|flac|aac)$/.test(e))return'صدا';
+ if(/^(pdf|docx?|xlsx?|pptx?|txt|md|rtf|csv|json)$/.test(e))return'سند';
+ return'فایل متفرقه'}
+function sizeBand(c){const b=c.sizeBytes||0;return b>=1e9?'بیش از ۱ گیگابایت':b>=2e8?'۲۰۰MB تا ۱GB':b>=2e7?'۲۰ تا ۲۰۰MB':b>=1e6?'۱ تا ۲۰MB':'کمتر از ۱MB'}
+function ageBand(c){if(!c.lastWrite)return'نامشخص';const d=Math.round((N-new Date(c.lastWrite))/DAY);return d>=365?'بیش از یک سال':d>=120?'۳ ماه تا یک سال':d>=30?'۱ تا ۳ ماه':'کمتر از یک ماه'}
+function sigOf(c){const m=(c.name||'').match(/\.([a-z0-9]{1,6})$/i);return{fam:famOf(c),size:sizeBand(c),age:ageBand(c),bucket:BUCKET_N[c.bucket]||'نامشخص',ext:m?'.'+m[1].toLowerCase():'—',exact:fmt(c.sizeBytes||0)+' · '+dt2(c.lastWrite)}};
+/* FACTS: نشانه‌هایی که هم در پرونده دیده می‌شوند و هم می‌توانند مقصر را یکتا کنند */
+const FACTS=[['fam','جنس',c=>famOf(c)],['size','اندازه',c=>sizeBand(c)],['age','عمر',c=>ageBand(c)],['bucket','دستهٔ پرونده',c=>BUCKET_N[c.bucket]||'نامشخص'],['ext','پسوند',c=>{const m=(c.name||'').match(/\.([a-z0-9]{1,6})$/i);return m?'.'+m[1].toLowerCase():'—'}],['exact','اثر انگشت حجم و زمان',c=>fmt(c.sizeBytes||0)+' · '+dt2(c.lastWrite)]];
 /* مدرک‌ها از داده‌ی خام سرویس ساخته می‌شوند — Core فارسی نمی‌فرستد */
 function buildEvidence(c){
- if(Array.isArray(c.evidence)&&c.evidence.length)return c.evidence;
- const d=c.data||{},ev=[];
- if(c.kind==='startup'){ev.push(d.targetMissing?'برنامه‌اش دیگر روی دیسک نیست':'در هر بوت اجرا می‌شود');if(d.impactMs)ev.push('تأخیر بوت: '+d.impactMs+' میلی‌ثانیه');if(d.scheduled)ev.push('از طریق تسک زمان‌بندی');if(c.detail)ev.push(c.detail)}
- else if(c.kind==='registry'){ev.push('بدون دستور حذف‌نصب');ev.push('مسیر نصب گم شده: '+c.detail);if(d.regPath)ev.push(d.regPath)}
- else if(c.kind==='tasks'){ev.push(d.targetMissing?'برنامه‌ی هدفش پاک شده':'زمان‌بندی فعال');if(d.nextRun)ev.push('اجرای بعدی: '+d.nextRun);if(c.detail)ev.push(c.detail)}
- else if(c.kind==='procs'){ev.push('رم: '+fmt(c.sizeBytes||0));ev.push(d.critical?'پروسس سیستمی — فقط مشاهده':'ساکن حجیم حافظه');ev.push('PID '+d.pid)}
- else if(c.kind==='folders'){ev.push((d.files||0)+' فایل'+(d.approx?' (تقریبی)':''));ev.push((d.days||0)+' روز دست‌نخورده');ev.push('حذف به سطل بازیافت')}
- else if(c.kind==='settings'){const M={hibernate:['هم‌اندازه‌ی بخشی از رم است','با خاموشی هیبرنیت آزاد می‌شود'],wsearch:['سرویس جستجوی ویندوز','دیسک را مدام می‌خواند'],sysmain:['پیش‌بارگذاری پیش‌دستانه','فشار مداوم روی دیسک'],transparency:['جلوه‌ی شفافیت پنجره‌ها','مصرف GPU و رم دارد']};(M[c.path.split(':')[1]]||['تنظیم سنگین سیستم']).forEach(t=>ev.push(t))}
- return ev}
-const ZL=Object.fromEntries(ZN);
-function rarity(c){const s=c.sizeBytes;return s>=5e8?['افسانه‌ای','#ffb454']:s>=1e8?['نادر','#c07bff']:c.confidence===3?['قطعی','#5af2c0']:['معمولی','#8f9bc4']}
-function tabs(){$('tabs').innerHTML=ZN.map(([k,n])=>`<button class="tb ${k===Z?'on':''}" data-z="${k}">${n}${rankOK(k)?(QS[k]?`<i>${QS[k].length}</i>`:''):`<i style="background:#5a6274">${UNLOCK[k]}</i>`}</button>`).join('');$('tabs').querySelectorAll('.tb').forEach(b=>b.onclick=()=>{if(rankOK(b.dataset.z))enter(b.dataset.z);else openMap()})}
-async function enter(z){if(!S.citySeen){S.citySeen=1;save();setTimeout(()=>{if(!rushMode)openMap()},600)}if(!rankOK(z)){toast('محله‌ی «'+(ZL[z]||z)+'» هنوز قفله — به درجه‌ی '+RK[UNLOCK[z]]+' نیاز داری');openMap();return}Z=z;setMood('scan',99);quest('z',z);S.visited=S.visited||{};if(!S.visited[z]){S.visited[z]=1;save();chkAch()}if(!QS[z]){say('در حال گشت‌زنی در '+ZL[z]+'...');tabs();let r;try{r=await rpc('zone.scan',{zoneId:z})}catch(e){r={cases:[]}}
-QS[z]=(r.cases||[]).filter(c=>!S.trusted[c.path]&&!pocket.some(k=>k.path===c.path)).sort((a,b)=>b.confidence-a.confidence||b.sizeBytes-a.sizeBytes);if(z==='downloads'&&QS[z].length)QS[z][new Date().getDate()%QS[z].length].daily=1}
-render()}
-function render(){tabs();const Q=Qc(),dk=$('deck');dk.querySelectorAll('.card').forEach(e=>e.remove());const em=!Q.length;$('empty').style.display=em?'block':'none';$('acts').style.display=em?'none':'flex';
-if(em){setMood('empty',99);say(pocket.length?'این منطقه تمیزه. بریم منطقه‌ی بعد یا پرونده‌ی نهایی؟':'همه آزادن.')}
-Q.slice(0,3).reverse().forEach((c,i,a)=>{const d=a.length-1-i,[rn,rc]=rarity(c),e=document.createElement('div');e.className='card '+(d?'b'+d:'top');
-if(!d){const t=ty(c),file=!c.kind||c.kind==='file',im=t==='img'?`<img src="${url(c)}" onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'ext',textContent:'IMG'}))">`:`<div class="ext">${file?'.'+(c.name.split('.').pop()||'?').slice(0,5):GL[c.kind]}</div>`;
-const obs=OBSERVE(c.kind);
-e.innerHTML=`<div class="rar" style="background:${rc}"></div><div class="th">${im}<span class="tag" style="color:${rc}">${rn}</span></div>${c.daily?'<span class="dl">پرونده‌ی ویژه‌ی روز · XP دو برابر</span>':''}<div class="nm">${esc(c.name)}</div>
-<div class="meta"><span>${c.kind?KL[c.kind]||c.kind:BK[c.bucket]||'مشکوک'}</span><span>${c.metric||fmt(c.sizeBytes)+' · '+age(c.lastWrite)}</span></div>
-<div class="cf">اطمینان <i class="${c.confidence>0?'o':''}"></i><i class="${c.confidence>1?'o':''}"></i><i class="${c.confidence>2?'o':''}"></i></div>
-${c.kind==='procs'?'<div class="hv"><i style="width:'+Math.min(100,Math.max(12,c.sizeBytes/2e7))+'%;background:'+(c.sizeBytes>1e9?'#ff4d5e':'#ffb454')+'"></i></div>':''}${c.sizeBytes>=5e8?'<div class="hv" id="hp"><i style="width:'+(c.hp||5)*20+'%;background:#ffb454"></i></div>':''}<div class="ev">${buildEvidence(c).map((t,k)=>`<span style="animation-delay:${k*.12}s">${t}</span>`).join('')}</div>
-<div class="tools">${['img','vid','aud','pdf','txt'].includes(t)?'<button class="b" id="pv">پیش‌نمایش</button>':''}<button class="b" id="iq">بازجویی</button></div><div id="iqo"></div>`;
-setTimeout(()=>{const p=$('pv');if(p)p.onclick=()=>preview(c,t);$('iq').onclick=()=>inspect(c,t)})}else e.innerHTML='';dk.insertBefore(e,dk.firstChild)});
-if(Q.length){setMood('scan',2);pk=1;say(ZS[Z]&&!ZSEEN[Z]?(ZSEEN[Z]=1,ZS[Z]):pick(LINES.open))}
-const tc=Q[0];if(tc&&OBSERVE(tc.kind)){$('tr').innerHTML='<kbd>↓</kbd>ثبت مشاهده';$('ct').style.display='none'}else{$('tr').innerHTML='<kbd>↓</kbd>اعتماد';$('ct').style.display=''}
-$('left').textContent=Q.length+' مانده';hud()}
-function disc(c,n,m){if(SEEN.has(c.path+m))return;SEEN.add(c.path+m);quest(m);xp(n);setMood('surp',1.4);say('کشف تازه! +'+n+' XP');burst(innerWidth/2,innerHeight/2,16,'#ffd166')}
-/* ── پیش‌نمایش بزرگ: فایل‌های ریشه‌ی Downloads مستقیم از cleanc.dl؛ بقیه با file.stage کپی و از cleanc.wall ── */
-async function srcFor(c){
- if(inDlRoot(c.path))return url(c);
- try{const r=await rpc('file.stage',{path:c.path,sizeBytes:c.sizeBytes||0});
-  if(r&&r.url)return r.url;
-  if(r&&r.tooBig)return{err:'این فایل برای پیش‌نمایش خیلی بزرگ است (سقف ۸۰۰ مگابایت)'};
-  return{err:'پیش‌نمایش این فایل ممکن نشد'}}catch(e){return{err:'پیش‌نمایش این فایل ممکن نشد'}}}
-async function preview(c,t){
- const st=$('pvStage'),note=$('pvNote');$('ovp').classList.add('on');setMood('scan',2);say('بذار نگاه کنیم، چی تو شه؟');disc(c,4,'pv');
- st.querySelectorAll('img,video,audio,iframe,pre,.ext,.pg,.fk,.pv-title').forEach(e=>e.remove());
- const title=document.createElement('div');title.className='pv-title';title.textContent=c.name;st.appendChild(title);
- if(!HB){st.insertAdjacentHTML('beforeend',demoPrev(c,t));note.textContent='پیش‌نمایش نمونه — داخل برنامه خودِ فایل نمایش داده می‌شود';return}
- note.textContent='در حال باز کردن…';
- const s=await srcFor(c);
- if(typeof s!=='string'){note.textContent=s.err;return}
- if(t==='img'){st.insertAdjacentHTML('beforeend','<img>');const im=st.querySelector('img');im.onload=()=>note.textContent='';im.onerror=()=>{im.remove();note.textContent='پیش‌نمایش این تصویر ممکن نشد'};im.src=s}
- else if(t==='vid'){st.insertAdjacentHTML('beforeend','<video controls autoplay src="'+s+'"></video>');const v=st.querySelector('video');v.onerror=()=>{v.remove();note.textContent='این فرمت ویدئو در پیش‌نمایش پشتیبانی نمی‌شود'};note.textContent=''}
- else if(t==='aud'){st.insertAdjacentHTML('beforeend','<div class="ext">♪</div><audio controls autoplay src="'+s+'"></audio>');const a=st.querySelector('audio');a.onerror=()=>{a.remove();note.textContent='این فرمت صوتی پشتیبانی نمی‌شود'};note.textContent=''}
- else if(t==='pdf'){st.insertAdjacentHTML('beforeend','<iframe src="'+s+'#toolbar=0&navpanes=0"></iframe>');note.textContent='برای بستن: ESC یا کلیک بیرون کادر'}
- else if(t==='txt'){try{const r=await rpc('file.inspect',{path:c.path});st.insertAdjacentHTML('beforeend','<pre>'+esc((r&&r.text)||'— خالی یا خوانا نیست —')+'</pre>')}catch(e){st.insertAdjacentHTML('beforeend','<pre>—</pre>')}note.textContent=''}}
-$('ovp').addEventListener('click',e=>{if(e.target.id==='ovp'){$('ovp').classList.remove('on');$('pvStage').querySelectorAll('img,video,audio,iframe').forEach(x=>x.remove())}});
-async function inspect(c,t){const o=$('iqo');setMood('scan',2);
-if(c.kind&&c.kind!=='file'){o.innerHTML=`<div class="inq">محل دقیق: <b>${esc(c.detail||'—')}</b></div>`;say('مدرک دقیق رو پیدا کردم.');disc(c,6,'iq');return}
-let r;try{r=await rpc('file.inspect',{path:c.path})}catch(e){r=null}if(!r){o.innerHTML='<div class="inq">اطلاعات بیشتری پیدا نشد.</div>';return}
-if(r.archiveUnsupported){o.innerHTML=`<div class="inq">${r.host?'دانلود از: <b>'+esc(r.host)+'</b><br>':''}این قالب آرشیو (7z/rar) بدون کتابخانه‌ی خارجی باز نمی‌شود؛ فقط داده‌ی منبع نشان داده شد.</div>`;say('قفل این جعبه با ابزار فعلی باز نشد.');disc(c,6,'iq');return}
-const en=(r.entries||[]);
-o.innerHTML=`<div class="inq">${r.host?`دانلود از: <b>${esc(r.host)}</b><br>`:'<span>منشأ ثبت نشده است (کپی داخلی یا ویندوز رد نگرفته).</span><br>'}${r.referrer?`صفحه‌ی مرجع: <b>${esc(r.referrer)}</b><br>`:''}${r.downloaded?`زمان دانلود: <b>${age(r.downloaded)}</b><br>`:''}${r.created?`ایجاد فایل: <b>${age(r.created)}</b>`:''}${r.text?`<ul><li style="white-space:pre-wrap;direction:inherit;font:11.5px/1.8 V;color:#cbd5e1;max-height:120px;overflow:auto">${esc(r.text.slice(0,900))}</li></ul>`:''}${en.length?`<ul>${en.map(x=>`<li><span>${fmt(x.s)}</span><span>${esc(x.n)}</span></li>`).join('')}</ul>${zipStory(en,r,c,t)}`:''}</div>`;
-say(en.length?'داخلش رو دیدم. فقط خودت تصمیم بگیر.':(r.text?'همین چند خطش پیدا شد — خودت قضاوت کن.':'ردش رو زدم؛ ردی از اینترنت نبود.'));disc(c,10,'iq')}
-function hud(){const l=S.level;$('rk').textContent=RK[l];$('sk').textContent=S.streak||1;const a=TH[l],b=TH[l+1]||a+1;$('xb').style.width=Math.min(100,(S.xp-a)/(b-a)*100)+'%';$('xv').textContent=S.xp;
-$('pn').textContent=pocket.length;const pb=pocket.reduce((a,c)=>a+c.sizeBytes,0);$('pb').textContent=fmt(pb);$('allb').textContent=fmt(S.totalCaughtBytes+pb);
-$('pc').innerHTML=pocket.slice(-8).map(c=>`<i>${esc(c.name)}</i>`).join('');const cb=$('combo');cb.textContent='زنجیره x'+combo;cb.classList.toggle('on',combo>1);rq();renderInv()}
-function xp(n){S.xp+=n;fl(innerWidth/2+(Math.random()-.5)*160,innerHeight/2-90,'+'+n+' XP','#5af2c0');while(S.level<6&&S.xp>=TH[S.level+1]){S.level++;SFX.lvl();const v=$('lv');v.textContent='درجه‌ی تازه: '+RK[S.level];v.classList.remove('on');void v.offsetWidth;v.classList.add('on');setMood('cele',2.6);say('ارتقا گرفتم! دیگه '+RK[S.level]+'ام.');burst(innerWidth/2,innerHeight/3,60,'#ffd166');
- const un=ZN.filter(([z])=>z!=='downloads'&&S.level===UNLOCK[z]).map(([,nm])=>nm);if(un.length)setTimeout(()=>{toast('محله‌ی تازه باز شد: '+un.join('، '));burst(innerWidth/2,innerHeight*.18,50,'#7dffbf')},1500)}chkAch()}
-function act(k){const Q=Qc(),c=Q[0];if(!c||document.querySelector('.ov.on'))return;const t=$('deck').querySelector('.top');if(!t)return;if(OBSERVE(c.kind)&&(k==='catch'||k==='trust'))k='note';if(k==='catch'&&c.sizeBytes>=5e8&&(c.hp=c.hp||5)>1){boss(c,t);return}const r=t.getBoundingClientRect(),px=r.left+r.width/2,py=r.top+r.height/2;
-t.style.transform=k==='catch'?'translate(-120%,20px) rotate(-14deg) scale(.8)':k==='trust'?'translateY(120%) scale(.8)':'translate(120%,-10px) rotate(14deg) scale(.8)';t.style.opacity=0;
-if(k==='back'){setMood(combo>2?'angry':'sad',1.6);combo=0;Q.push(Q.shift());say(pick(LINES.back));SFX.back()}
-else{if(k==='note'){t.style.transform='translateY(-130%) scale(.85)';t.style.opacity=0;Q.shift();xp(4);fl(px,py,'+4 XP','#5af2c0');S.cleanCount[Z]=(S.cleanCount[Z]||0)+1;toast('ثبت شد — وارد دفترچه‌ی وینی شد');S.casesDone++;quest('c');save();setTimeout(render,280);return}const ok=k==='catch'?(c.revealed||c.confidence>=2):c.confidence<2;if(ok)combo++;else{combo=0;SFX.back();toast('ریسکی بود! زنجیره شکست')}lastC=Date.now();Q.shift();const base=[0,6,12,20][c.confidence]||6,g=Math.round(base*(1+Math.min(combo,8)*.15)*(c.daily?2:1)*(c.revealed?1.4:1));
-if(k==='catch'){pocket.push(Object.assign({z:Z},c));SZ[c.path]=c.sizeBytes;S.cleanCount[Z]=(S.cleanCount[Z]||0)+1;if(c.hp===1)S.bossDown=1;setMood('happy',1.4);say(combo>2&&combo%3===0?pick(LINES.combo):(CLBH[c.bucket]?pick(CLBH[c.bucket]):pick(LINES.catch)));SFX.catch();burst(px,py,30,rarity(c)[1]);quest('c');crit(g)}
-else{S.trusted[c.path]=Date.now();S.trustCount=(S.trustCount||0)+1;setMood('love',1.4);say(pick(LINES.trust));SFX.trust();burst(px,py,18,'#7fd8ff');xp(Math.round(g/2))}S.casesDone++;reward(k,c,ok,px,py)}
-save();setTimeout(render,300)}
-function final(){if(!pocket.length){say('جیبم خالیه. اول چند نفر رو دستگیر کن.');return}
-$('fl').innerHTML=pocket.map(c=>`<div class="row"><span>${c.kind&&c.kind!=='file'?KL[c.kind]||ZL[c.z]:fmt(c.sizeBytes)}</span><s>${esc(c.name)}</s></div>`).join('');$('tot').textContent=fmt(pocket.filter(c=>!c.kind||c.kind==='file'||c.kind==='folders').reduce((a,c)=>a+c.sizeBytes,0));$('ovf').classList.add('on');setMood('wait',99);say('آخرین تصمیم با خودته.')}
-async function run(){$('run').disabled=true;let R={performed:0,failed:0,freed:0};
-const zs=[...new Set(pocket.map(c=>c.z||'downloads'))];
-for(const z of zs){const paths=pocket.filter(c=>(c.z||'downloads')===z).map(c=>c.path);try{const r=await rpc('zone.execute',{zoneId:z,paths});R.performed+=r.performed;R.failed+=r.failed;R.freed+=r.freed}catch(e){R.failed+=paths.length}}
-$('run').disabled=false;$('ovf').classList.remove('on');S.totalCaught+=R.performed;S.totalCaughtBytes+=R.freed;S.sessions++;xp(40+R.performed*4);pocket=[];combo=0;
-if(S.inv.magnet>0){S.inv.magnet--;S.coins=(S.coins||0)+40;toast('آهنربای سکه: +۴۰ سکه')}
-save();
-$('tot2').textContent=fmt(R.freed);$('tot2').style.cssText='font:700 48px ui-monospace;color:var(--ac);margin:12px 0;direction:ltr';
-$('ds').innerHTML=R.performed+' مورد اجرا شد'+(R.failed?' · '+R.failed+' ناموفق':'')+' — همه در سطل بازیافت، قابل بازگشت<br>'+zs.map(z=>starsOf(z)?ZL[z]+' <span style="color:#ffd166">'+'★'.repeat(starsOf(z))+'</span>':'').filter(Boolean).join(' · ');
-$('ovd').classList.add('on');setMood(R.performed?'win':'lose',9);say(R.performed?'پرونده بسته شد. شهر نفس کشید.':'نشد... چیزی اجرا نشد.');SFX.done();burst(innerWidth/2,innerHeight/2,120,'#7dffbf');hud()}
-$('ct').onclick=()=>act('catch');$('tr').onclick=()=>act('trust');$('bk').onclick=()=>act('back');$('fin').onclick=final;$('no').onclick=()=>{$('ovf').classList.remove('on');render()};$('run').onclick=run;
-$('db').onclick=()=>{$('ovd').classList.remove('on');render()};let sndMode=0,musicOn=true;
-$('mu').onclick=()=>{sndMode=(sndMode+1)%3;mute=sndMode===2;musicOn=sndMode===0;if(musicOn)MUS.start();else MUS.stop();$('mu').style.opacity=sndMode===2?.4:1;toast(['موسیقی + افکت صدا','فقط افکت‌ها','بی‌صدا'][sndMode])};
-function exit(){const ovn=document.querySelector('.ov.on');if(ovn){ovn.classList.remove('on');if(ovn.id==='ovp')$('pvStage').querySelectorAll('img,video,audio,iframe').forEach(x=>x.remove());return}if(pocket.length){final();return}post({type:'exit'})}$('cl').onclick=exit;
-addEventListener('keydown',e=>{if(e.key==='Escape')exit();else if(e.key==='ArrowLeft')act('catch');else if(e.key==='ArrowDown')act('trust');else if(e.key==='ArrowRight')act('back')});
-const GA=[['CPU','cpu'],['RAM','ram'],['DSK','disk']];$('gg').innerHTML=GA.map(([n,k])=>`<div><span>${n}</span><u><i id="g_${k}"></i></u><b id="v_${k}">-</b></div>`).join('');
-async function sys(){try{const r=await rpc('sys.stat');GA.forEach(([n,k])=>{const v=r[k]||0;$('g_'+k).style.width=v+'%';$('g_'+k).style.background=v>80?'#ff4d5e':v>60?'#ffb454':'';$('v_'+k).textContent=v+'%'})}catch(e){}}
-setInterval(sys,4000);sys();
-async function hydrate(p){p=p||{};HOST=p.host||{};if(p.theme&&p.theme.accent)document.documentElement.style.setProperty('--ac',p.theme.accent);
-if(p.wallpaper&&p.wallpaper.ok)$('wall').style.backgroundImage=`url(${HOST.wall||'https://cleanc.wall/wallpaper.img'})`;
-const sv=p.saved||await rpc('state.get');if(sv&&sv.v===1)Object.assign(S,sv);if(Array.isArray(sv&&sv.caught))pocket=sv.caught.map(c=>({path:c.path,name:c.name,sizeBytes:c.size,confidence:2,bucket:1,lastWrite:new Date(),evidence:[],z:c.z||'downloads'}));pocket.forEach(c=>SZ[c.path]=c.sizeBytes);
-const dy=new Date().toDateString();if(S.last!==dy){S.streak=S.last===new Date(Date.now()-DAY).toDateString()?(S.streak||0)+1:1;S.last=dy;save()}
-chkAch();enter('downloads')}
-if(!HB)setTimeout(()=>hydrate({theme:{accent:'#3ddc97'},wallpaper:{ok:false},host:{}}),80);
-/* ---- v2 ---- */
-const ZS={downloads:'شروع شهر: محله‌ی دانلودها پر از مهمان‌های قدیمیه.',startup:'ایستگاه راه‌اندازی. هرچی اینجاست هر بوت تو رو معطل می‌کنه.',registry:'آرشیو زیرزمینی رجیستری. کلیدهای یتیم اینجا خاک می‌خورن.',tasks:'ساعت‌شهر: کارهای زمان‌بندی‌شده بی‌صدا هر ساعت بیدار می‌شن.',procs:'نیروگاه! رم و CPU اینجا می‌سوزن. حواست به نوار قرمز باشه.',folders:'خیابان پوشه‌ها: انبارهای حجیم و کوچه‌های خالی.',settings:'اتاق فرمان: تنظیمات سنگین رو یکی‌یکی بسنج.'},ZSEEN={};
-const QL=[['c','دستگیری ۵ مظنون',5],['pv','پیش‌نمایش ۲ فایل',2],['iq','بازجویی ۲ مورد',2],['z','سر زدن به ۴ منطقه',4]];
-function qd(){const d=new Date().toDateString();if(!S.q||S.q.d!==d)S.q={d,c:0,pv:0,iq:0,z:[],done:{}};return S.q}
-function quest(k,z){const q=qd();if(k==='z'){if(!q.z.includes(z))q.z.push(z)}else if(q[k]!==undefined)q[k]++;
-QL.forEach(([id,n,t])=>{const v=id==='z'?q.z.length:q[id];if(v>=t&&!q.done[id]){q.done[id]=1;xp(30);toast('مأموریت کامل شد: '+n+' · +30 XP');SFX.lvl();burst(innerWidth/2,90,40,'#ffd166')}});save();rq()}
-function rq(){const q=qd(),e=$('qs');$('cn').textContent=S.coins||0;if(e)e.innerHTML=QL.map(([id,n,t])=>{const v=Math.min(t,id==='z'?q.z.length:q[id]);return `<div class="qr${v>=t?' ok':''}"><span>${n}</span><b>${v}/${t}</b></div><div class="qb"><i style="width:${v/t*100}%"></i></div>`}).join('')}
-function toast(t){let e=$('ts');if(!e){e=document.createElement('div');e.id='ts';document.body.appendChild(e)}e.textContent=t;e.classList.remove('on');void e.offsetWidth;e.classList.add('on')}
-function crit(g){if(Math.random()<.14){const s=$('stage');s.classList.remove('shk');void s.offsetWidth;s.classList.add('shk');toast('ضربه‌ی بحرانی! XP ×۳');say('وای! ضربه‌ی بحرانی!');burst(innerWidth/2,innerHeight/2,70,'#ff8a4a');xp(g*3)}else xp(g)}
-let dg=null;$('deck').addEventListener('pointerdown',e=>{const t=e.target.closest('.card.top');if(!t||e.target.closest('button,iframe,video,audio,ul'))return;dg={t,x:e.clientX,y:e.clientY,dx:0,dy:0};t.style.transition='none'});
-addEventListener('pointermove',e=>{if(!dg)return;dg.dx=e.clientX-dg.x;dg.dy=e.clientY-dg.y;dg.t.style.transform=`translate(${dg.dx}px,${Math.max(0,dg.dy)}px) rotate(${dg.dx/18}deg)`;dg.t.style.borderColor=dg.dx<-60?'#5af2c0':dg.dx>60?'#8f9bc4':dg.dy>60?'#7fd8ff':''});
-addEventListener('pointerup',()=>{if(!dg)return;const{t,dx,dy}=dg;dg=null;t.style.transition='';t.style.borderColor='';t.style.transform='';if(dx<-110)act('catch');else if(dx>110)act('back');else if(dy>110)act('trust')});
-$('deck').addEventListener('click',e=>{const i=e.target.closest('.th img');if(i)i.parentNode.classList.toggle('zoom')});
-function wav(){const n=16000,b=new DataView(new ArrayBuffer(44+n*2)),w=(o,s)=>[...s].forEach((c,i)=>b.setUint8(o+i,c.charCodeAt(0)));w(0,'RIFF');b.setUint32(4,36+n*2,true);w(8,'WAVEfmt ');b.setUint32(16,16,true);b.setUint16(20,1,true);b.setUint16(22,1,true);b.setUint32(24,8000,true);b.setUint32(28,16000,true);b.setUint16(32,2,true);b.setUint16(34,16,true);w(36,'data');b.setUint32(40,n*2,true);const F=[262,330,392,523];for(let i=0;i<n;i++)b.setInt16(44+i*2,Math.sin(i*2*Math.PI*F[(i/4000|0)%4]/8000)*3000*(1-(i%4000)/4000),true);let s='';new Uint8Array(b.buffer).forEach(v=>s+=String.fromCharCode(v));return'data:audio/wav;base64,'+btoa(s)}
-function demoPrev(c,t){const grd='<img style="width:100%;height:100%;object-fit:cover" src="data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 3"><defs><linearGradient id="g"><stop offset="0" stop-color="#ff8a4a"/><stop offset="1" stop-color="#6a5cff"/></linearGradient></defs><rect width="4" height="3" fill="url(#g)"/></svg>')+'">';
-return t==='img'?grd:t==='aud'?`<div class="ext">♪</div><audio controls autoplay src="${wav()}"></audio>`:t==='vid'?'<div class="fk">▶</div>':t==='pdf'?'<div class="pg"><b>'+esc(c.name)+'</b><i></i><i></i><i style="width:70%"></i><i></i><i style="width:50%"></i></div>':'<pre>'+esc('نمونه‌ی متن فایل\n'+c.name+'\n...')+'</pre>'}
-const OFF=/github\.com|google\.com|videolan\.org|microsoft\.com|mozilla\.org|nvidia\.com/i,KT=[['برنامه',/\.(exe|msi|bat|cmd|dll|ps1)$/i],['مدیا',/\.(mp4|mkv|mp3|wav|flac|mov)$/i],['تصویر',/\.(jpe?g|png|gif|webp|svg)$/i],['سند',/\.(pdf|docx?|txt|md|xlsx?)$/i]];
-function zipStory(en,r,c,t){if(!en.length)return'';const g={},sum=r.uncompressed!=null?r.uncompressed:en.reduce((a,x)=>a+x.s,0);en.forEach(x=>{const k=(KT.find(k=>k[1].test(x.n))||['سایر'])[0];g[k]=(g[k]||0)+1});
-const ex=r.exeCount!=null?r.exeCount:g['برنامه']||0,ok=r.host&&OFF.test(r.host),o=Math.round((N-new Date(r.created||N))/DAY),count=r.entryCount||en.length;
-return `<div class="zp"><b>${t==='zip'?'پرونده‌ی آرشیو':'محتوا'}</b> · ${count} فایل داخلش<br>${Object.entries(g).map(([k,v])=>`<em>${k} ${v}</em>`).join('')}<br>حجم بازشده: <b>${fmt(sum)}</b> · حجم فشرده: ${fmt(c.sizeBytes)}<br>${r.created?'ایجاد آرشیو: <b>'+new Date(r.created).toLocaleDateString('fa-IR')+'</b> ('+age(r.created)+')<br>':''}${r.host?'منبع: <b>'+esc(r.host)+'</b> — <span class="'+(ok?'g':'w')+'">'+(ok?'منبع شناخته‌شده':'منبع ناشناس')+'</span>':'<span class="w">آدرس دانلود ثبت نشده (ویندوز ردی نگذاشته).</span>'}${ex?'<br><span class="w">دارای '+ex+' فایل اجرایی؛ بدون اطمینان از منبع اجرا نکن.</span>':''}${o>365&&!ex?'<br>بیش از یک سال بدون استفاده؛ کاندید مرور و حذف.':''}</div>`}
-/* ---- v3: game loop ---- */
-let lastC=0,RU=null;
-const fl=(px,py,t,c)=>{const e=document.createElement('div');e.className='fl';e.textContent=t;e.style.cssText=`left:${px}px;top:${py}px;color:${c}`;document.body.appendChild(e);setTimeout(()=>e.remove(),900)};
-const shk=()=>{const g=$('stage');g.classList.remove('shk');void g.offsetWidth;g.classList.add('shk')};
-const big=t=>{const v=$('lv');v.textContent=t;v.classList.remove('on');void v.offsetWidth;v.classList.add('on')};
-function boss(c,t){c.hp--;const b=$('hp');if(b)b.firstChild.style.width=c.hp*20+'%';shk();SFX.catch();setMood('angry',.8);say(c.hp>1?'باس سرسخته! '+(c.hp-1)+' ضربه‌ی دیگه...':'ضربه‌ی آخر! بزن!');const r=t.getBoundingClientRect();fl(r.left+r.width/2,r.top+70,'-1 HP','#ff4d5e');burst(r.left+r.width/2,r.top+90,14,'#ff4d5e');t.animate([{transform:'scale(1.04)'},{transform:'scale(1)'}],160)}
-function reward(k,c,ok,px,py){const co=k==='catch'?(c.sizeBytes>=5e8?15:c.sizeBytes>=1e8?8:c.confidence===3?4:2):1;S.coins=(S.coins||0)+co;fl(px,py-20,'+'+co+' سکه','#ffd166');
-if(RU){if(ok){RU.score+=Math.round(10*(1+Math.min(combo,10)*.3));RU.end+=1000;fl(px,py-50,'+1s','#5af2c0')}else{RU.end-=3000;shk()}}
-if(k==='catch'&&(S.chest=(S.chest||0)+1)%5===0)chest()}
-function chest(){const R=[['۴۰ سکه',()=>S.coins+=40],['۶۰ XP',()=>xp(60)],['۲۵ سکه',()=>S.coins+=25],['۱۰۰ XP + ۲۰ سکه',()=>{xp(100);S.coins+=20}]],r=R[Math.random()*4|0];setTimeout(()=>{big('صندوق گنج: '+r[0]);r[1]();SFX.lvl();burst(innerWidth/2,innerHeight/3,60,'#ffd166');setMood('happy',2);hud()},350)}
-function rush(){if(RU||!Qc().length)return;RU={end:Date.now()+30000,score:0};combo=0;toast('رِیس ۳۰ثانیه‌ای! قضاوت درست = +۱ ثانیه · غلط = −۳ ثانیه');setMood('scan',60);say('بزن بریم! شواهد رو سریع بخون.')}
-function endRush(){const r=RU;RU=null;$('rt').style.display='none';const nb=r.score>(S.best||0);if(nb)S.best=r.score;const co=Math.round(r.score/8);S.coins=(S.coins||0)+co;xp(Math.round(r.score/4));big(nb?'رکورد تازه: '+r.score:'امتیاز رِیس: '+r.score);setMood(nb?'win':'happy',4);say('رِیس تموم شد! +'+co+' سکه'+(S.best?' · بهترین: '+S.best:''));SFX.done();burst(innerWidth/2,innerHeight/2,80,'#ffd166');save();hud()}
-const cbd=document.createElement('div');cbd.id='cbar';cbd.innerHTML='<i></i>';document.body.appendChild(cbd);
-setInterval(()=>{const n=Date.now(),d=Math.max(0,1-(n-lastC)/6000);cbd.classList.toggle('on',combo>1);cbd.firstChild.style.width=d*100+'%';if(combo>0&&d<=0){combo=0;hud()}
-if(RU){const l=RU.end-n,e=$('rt');e.style.display='flex';e.innerHTML='<b>'+Math.max(0,l/1000).toFixed(1)+'</b> ثانیه · امتیاز <b>'+RU.score+'</b>';if(l<=0)endRush()}},100);
-const HATS=[['none','بدون لوازم',0],['cap','کلاه کپ',30],['ant','آنتن',50],['glass','عینک دودی',80],['head','هدفون',120],['crown','تاج',300]];
-function shop(){let o=$('ovs');if(!o){o=document.createElement('div');o.id='ovs';o.className='ov';document.body.appendChild(o)}S.own=S.own||['none'];
-o.innerHTML='<div class="sh"><h2>فروشگاه وینی</h2><div style="color:var(--mu);margin-bottom:8px">سکه: '+(S.coins||0)+'</div>'+HATS.map(([k,n,p])=>`<div class="row"><span>${n}</span><button class="b" data-k="${k}" style="height:32px;padding:0 14px">${S.skin===k?'پوشیده ✓':S.own.includes(k)?'بپوش':p+' سکه'}</button></div>`).join('')
-+'<div style="margin:12px 0 4px;color:var(--mu);font-size:11px">ابزار مصرفی</div>'+SHOPIT.map(([k,n,p])=>`<div class="row"><span>${n}${S.inv[k]?' <small style="color:var(--ac)">×'+S.inv[k]+'</small>':''}</span><button class="b" data-buy="${k}" style="height:32px;padding:0 14px">${p} سکه</button></div>`).join('')
-+'<br><button class="b c" id="sx" style="margin:auto">بستن</button></div>';
-o.classList.add('on');o.querySelectorAll('[data-k]').forEach(b=>b.onclick=()=>{const k=b.dataset.k,h=HATS.find(z=>z[0]===k);if(!S.own.includes(k)){if((S.coins||0)<h[2]){toast('سکه‌ات کمه!');return}S.coins-=h[2];S.own.push(k);SFX.lvl();chkAch()}S.skin=k;setMood('happy',2);say('چه بهم میاد!');save();hud();shop()});
-o.querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>{const k=b.dataset.buy,it=SHOPIT.find(x=>x[0]===k);if((S.coins||0)<it[2]){toast('سکه‌ات کمه!');return}S.coins-=it[2];S.inv[k]=(S.inv[k]||0)+1;toast('خرید شد: '+it[1]);SFX.lvl();save();hud();shop()});$('sx').onclick=()=>o.classList.remove('on')}
-function hat(){const k=S.skin;if(!k||k==='none')return;x.shadowBlur=0;x.lineCap='round';
-if(k==='cap'){x.fillStyle='#e0455a';x.beginPath();x.roundRect(-40,-76,80,28,[28,28,4,4]);x.fill();x.fillRect(-4,-52,66,6)}
-else if(k==='ant'){x.strokeStyle='#aab';x.lineWidth=3;x.beginPath();x.moveTo(0,-55);x.lineTo(0,-82);x.stroke();x.fillStyle=hex;x.beginPath();x.arc(0,-86,6+Math.sin(performance.now()*.01)*1.5,0,7);x.fill()}
-else if(k==='glass'){x.fillStyle='#000d';x.strokeStyle='#fff6';x.lineWidth=2;[-1,1].forEach(z=>{x.beginPath();x.roundRect(z*25-18,-22,36,24,8);x.fill();x.stroke()});x.fillRect(-8,-14,16,3)}
-else if(k==='head'){x.strokeStyle='#cfd5e2';x.lineWidth=7;x.beginPath();x.arc(0,-8,76,Math.PI*1.1,Math.PI*1.9);x.stroke();x.fillStyle='#3b4252';[-1,1].forEach(z=>x.fillRect(z*76-6,-22,12,30))}
-else if(k==='crown'&&mood!=='win'){x.fillStyle='#ffd166';x.beginPath();x.moveTo(-26,-60);x.lineTo(-26,-84);x.lineTo(-13,-70);x.lineTo(0,-90);x.lineTo(13,-70);x.lineTo(26,-84);x.lineTo(26,-60);x.closePath();x.fill()}}
-$('rb').onclick=rush;$('sb').onclick=shop;
-/* ---- نشان‌ها (achievements) ---- */
-const ACH=[['a1','اولین دستگیری','اولین مظنون رو به جیب انداختی',()=>S.casesDone>=1],
-['a10','ده داوری','ده پرونده بستی یا آزاد کردی',()=>S.casesDone>=10],
-['a50','پنجاه داوری','نیم‌قرن داوری!',()=>S.casesDone>=50],
-['c5','زنجیره‌ی ۵تایی','پنج دستگیری پیاپی',()=>combo>=5],
-['boss','شکارچی باس','یک غول ۵۰۰+ مگابایتی رو انداختی',()=>!!S.bossDown],
-['g1','گیگ‌کن','مجموع یک گیگابایت آزاد کردی',()=>S.totalCaughtBytes>=1e9],
-['z7','جهانگرد','به هر ۷ منطقه سر زدی',()=>ZN.every(z=>S.visited&&S.visited[z[0]])],
-['r20','رِیس‌باز','۲۰ امتیاز در یک رِیس',()=>(S.best||0)>=20],
-['star3','سه‌ستاره','یک محله رو سه‌ستاره کردی',()=>ZN.some(([z])=>starsOf(z)>=3)],
-['mag','چشم تیز','اولین ذره‌بین رو استفاده کردی',()=>S.magUsed===1],
-['buy','خریدار','اولین خرید از فروشگاه وینی',()=>(S.own||[]).length>1],
-['t10','ده اعتماد','ده مظنون رو تبرئه کردی',()=>(S.trustCount||0)>=10]];
-function chkAch(){S.ach=S.ach||{};let n=0;ACH.forEach(([id,nm])=>{if(!S.ach[id]&&ACH.find(a=>a[0]===id)[3]()){S.ach[id]=Date.now();n++;toast('نشان تازه: '+nm);burst(innerWidth/2,innerHeight*.2,36,'#ffd166');SFX.lvl()}});if(n)save();const c=Object.keys(S.ach).length,b=$('tbn');b.textContent=c;b.className=c?'on':''}
-$('tb').onclick=()=>{const l=$('achList');l.innerHTML=ACH.map(([id,nm,ds])=>{const on=!!(S.ach&&S.ach[id]);return `<div class="ach"><span>${nm}<small>${ds}</small></span><b class="${on?'ok':'lk'}">${on?'باز شد':'قفل'}</b></div>`}).join('');$('ova').classList.add('on')};
-$('ax').onclick=()=>$('ova').classList.remove('on');
-/* ---- شهر: نقشه‌ی محله‌ها + درجه‌بندی باز شدن + ستاره ---- */
-const UNLOCK={downloads:0,startup:1,folders:2,procs:2,registry:3,tasks:3,settings:4};
-const DINFO={downloads:['داهلیز دانلودها','محله‌ی مهمان‌های قدیمی'],startup:['ایستگاه راه‌اندازی','هرچی اینجاست هر بوت معطلت می‌کنه'],registry:['آرشیو زیرزمینی','کلیدهای بی‌صاحب خاک می‌خورن'],tasks:['برج ساعت','کارهای بی‌صدای زمان‌بندی‌شده'],procs:['نیروگاه','ساکنان سنگین رم و CPU'],folders:['خیابان پوشه‌ها','انبارهای حجیم، کوچه‌های خالی'],settings:['اتاق فرمان','تنظیمات سنگین سیستم']};
-S.cleanCount=S.cleanCount||{};S.inv=S.inv||{mag:0,box:0,magnet:0};
-const rankOK=z=>S.level>=(UNLOCK[z]||0);
-const starsOf=z=>{const n=S.cleanCount[z]||0;return n>=30?3:n>=12?2:n>=4?1:0};
-const pollution=z=>{const n=(QS[z]||[]).length;return Math.min(100,n*10+(n?8:0))};
-function openMap(){const g=$('cityGrid');const act=ZN.filter(([z])=>rankOK(z)).length;
- g.innerHTML=`<div class="citytitle"><h2>شهر وینی</h2><small>${act}/${ZN.length} محله فعال · مجموع آزادشده: ${fmt(S.totalCaughtBytes)} · لرزش داهلیز را حس می‌کنی؟</small></div>`;
- ZN.forEach(([z,nm])=>{
-  const lk=!rankOK(z),pol=pollution(z),st=starsOf(z);
-  const d=document.createElement('div');d.className='bld'+(lk?' lk':'');
-  d.innerHTML=`<div class="gn">${nm}</div><div class="gsub">${DINFO[z][1]}</div>
-  <div class="pol"><i style="width:${pol}%;background:${pol>60?'#ff4d5e':pol>30?'#ffb454':'#5af2c0'}"></i></div>
-  <div class="bmeta"><span class="st">${st?'★'.repeat(st):'—'}</span><span>${lk?'درجه '+RK[UNLOCK[z]]+': قفل':((QS[z]||[]).length+' مظنون')}</span></div>
-  ${lk?'':(QS[z]||[]).some(c=>c.daily)?'<span class="dl">پرونده‌ی ویژه‌ی امروز</span>':''}`;
-  if(!lk)d.onclick=()=>{$('ovm').classList.remove('on');enter(z)};
-  else d.onclick=()=>toast('به درجه‌ی «'+RK[UNLOCK[z]]+'» نیاز داری — گشت بده تا باز شه');
-  g.appendChild(d)});
- $('ovm').classList.add('on');
- if(!$('ovm')._cl){$('ovm')._cl=1;$('ovm').addEventListener('click',e=>{if(e.target.id==='ovm')$('ovm').classList.remove('on')})}}
-$('hm').onclick=openMap;
-/* ---- انبار: ابزار مصرفی ---- */
-const SHOPIT=[['mag','ذره‌بین بازجویی',60],['box','صندوق فوری گنج',80],['magnet','آهنربای سکه',100]];
-function useMag(){const c=Qc()[0];if(!c){toast('پرونده‌ای جلوت نیست');return}
- if(!S.inv.mag){toast('ذره‌بینی نداری — از فروشگاه بخر');return}
- S.inv.mag--;c.revealed=1;S.magUsed=1;toast('ذره‌بین: مدرک تأیید شد — دستگیری این یکی امنه و XP کاراته');
- SFX.trust();setMood('scan',1.5);say('با ذره‌بین خطا نمی‌شه — بزن بریم.');save();renderInv()}
-function useBox(){if(!S.inv.box){toast('صندوقی ذخیره نداری');return}S.inv.box--;chest();renderInv();save()}
-function renderInv(){const r=$('invRow');if(!r)return;
- r.innerHTML='';
- const mk=(label,val,fn,dis)=>{const b=document.createElement('button');b.innerHTML=label+(val?' <b>×'+val+'</b>':'');b.disabled=!!dis;b.onclick=fn;r.appendChild(b)};
- mk('ذره‌بین',S.inv.mag||0,useMag,!S.inv.mag);
- mk('صندوق فوری',S.inv.box||0,useBox,!S.inv.box);
- mk('آهنربای سکه',S.inv.magnet||0,()=>toast('در پایان گشتِ بعدی خودکار مصرف می‌شود'),!S.inv.magnet)}
-/* ---- موسیقی محیطی procedural (نوآر آرام) ---- */
-const MUS={step:0,timer:null,
- start(){if(!musicOn||mute)return;try{AC=AC||new AudioContext()}catch(e){return}if(MUS.timer)return;MUS.timer=setInterval(MUS.tick,350)},
- stop(){clearInterval(MUS.timer);MUS.timer=null},
- tick(){const s=(MUS.step++)%16;
-  const bass=[55,55,65.4,55,49,49,58.3,65.4];
-  if(s%4===0)tone(bass[(s/4)|0],.3,'triangle',.035);
-  if(s===8||s===12)tone(220,.06,'sine',.02);
-  if(s%2===1)tone(2800+Math.random()*500,.02,'square',.005);
-  if(s===0&&MUS.bar===undefined)MUS.bar=0;
-  if(s===0&&(++MUS.bar%8===0))tone(58.3,.6,'sine',.02)}};
-/* قرارداد پل بدون تغییر. افزوده‌های اختیاری و فقط-افزایشی: zone.scan{zoneId}، zone.execute{zoneId}، file.inspect{path}، sys.stat، و کلیدهای last/streak در state. */
-</script></body></html>
+if(Array.isArray(c.evidence)&&c.evidence.length)return c.evidence;
+const d=c.data||{},ev=[];
+if(c.kind==='startup'){ev.push(d.targetMissing?'برنامه‌اش دیگر روی دیسک نیست':'در هر بوت اجرا می‌شود');if(d.impactMs)ev.push('تأخیر بوت: '+d.impactMs+' میلی‌ثانیه');if(c.detail)ev.push(c.detail)}
+else if(c.kind==='registry'){ev.push('بدون دستور حذف‌نصب');ev.push('مسیر نصب گم شده: '+c.detail)}
+else if(c.kind==='tasks'){ev.push(d.targetMissing?'برنامه‌ی هدفش پاک شده':'زمان‌بندی فعال');if(d.nextRun)ev.push('اجرای بعدی: '+d.nextRun);if(c.detail)ev.push(c.detail)}
+else if(c.kind==='procs'){ev.push('رم: '+fmt(c.sizeBytes||0));ev.push(d.critical?'پروسس سیستمی — فقط مشاهده':'ساکن حجیم حافظه');if(d.pid)ev.push('PID '+d.pid)}
+else if(c.kind==='folders'){ev.push((d.files||0)+' فایل');ev.push((d.days||0)+' روز دست‌نخورده');ev.push('حذف به سطل بازیافت')}
+else if(c.kind==='settings'){const M={hibernate:['هم‌اندازه‌ی بخشی از رم است','با خاموشی هیبرنیت آزاد می‌شود'],wsearch:['سرویس جستجوی ویندوز','دیسک را مدام می‌خواند'],sysmain:['پیش‌بارگذاری پیش‌دستانه','فشار مداوم روی دیسک'],transparency:['جلوه‌ی شفافیت پنجره‌ها','مصرف GPU و رم دارد']};(M[(c.path||'').split(':')[1]]||['تنظیم سنگین سیستم']).forEach(t=>ev.push(t))}
+else{if(c.confidence===3)ev.push('دلایل قطعی');if(c.sizeBytes>=5e8)ev.push('حجم سنگین: '+fmt(c.sizeBytes));if(c.lastWrite)ev.push(age(c.lastWrite))}
+return ev}
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+/* امتیاز خطر واقعی — مقصرِ هر مأموریت از همین‌جا می‌آید */
+const dangerScore=c=>((c.confidence||0)*2)+Math.min(3,Math.log10((c.sizeBytes||1)+10)/2.2)+(KL[c.kind]?1:0)+(/\.(exe|msi|bat|cmd|scr|dll|ps1)$/i.test(c.name||'')?1.4:0)+(c.bucket===0?1:0);
+/* ---- ابزار ---- */
+const pick=a=>a[Math.random()*a.length|0],clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+const rndSeed=s=>()=>{s=(s*16807|0)%2147483647;return(s<0?s+2147483647:s)/2147483647};
+function toast(t){const e=$('ts');e.textContent=t;e.classList.remove('on');void e.offsetWidth;e.classList.add('on')}
+function flpx(x,y,t,c){const e=document.createElement('div');e.className='flpx';e.textContent=t;e.style.cssText='left:'+x+'px;top:'+y+'px;color:'+c;document.body.appendChild(e);setTimeout(()=>e.remove(),900)}
+function big(t){const v=$('lv');v.textContent=t;v.classList.remove('on');void v.offsetWidth;v.classList.add('on')}
+function shake(){const s=$('shk');s.classList.remove('on');void s.offsetWidth;s.classList.add('on')}
+function zn2(z,i){const f=ZN.find(x=>x[0]===z);return f?(i?f[2]:f[1]):z}
+function clearedCount(){return Object.keys(S.missions||{}).filter(z=>S.missions[z]&&S.missions[z].clears>0).length}
+/* ---- رتبهٔ کارآگاه، کشف‌نامه و امتیاز تجربه ---- */
+const RANKS=[[0,'کارآموز'],[120,'گشت‌زن'],[300,'بازرس'],[600,'کارآگاه'],[1000,'کارآگاه ارشد'],[1600,'سایهٔ شهر'],[2400,'افسانهٔ داهلیز']];
+function rankOf(xp){xp=Math.max(0,xp||0);let i=0;for(let k=0;k<RANKS.length;k++)if(xp>=RANKS[k][0])i=k;const cur=RANKS[i],nx=RANKS[i+1];if(!nx)return{name:cur[1],i,next:'—',pct:100,left:0};const base=cur[0],top=nx[0];return{name:cur[1],i,next:nx[1],pct:clamp(Math.round((xp-base)/(top-base)*100),0,100),left:Math.max(0,top-xp)}}
+function addXP(n){if(!n)return;const before=rankOf(S.xp).i;S.xp=(S.xp||0)+Math.max(0,Math.round(n));const after=rankOf(S.xp);save();if(after.i>before)setTimeout(()=>{big('رتبهٔ تازه: '+after.name);SFX.lvl();toast('رتبه ارتقا یافت — '+after.name)},380)}
+function codexInit(){S.codex=S.codex||{};['hosts','exts','kinds','clues','previews'].forEach(k=>S.codex[k]=S.codex[k]||{})}
+function cxAdd(kind,key){codexInit();if(!key)return false;const s=String(key).slice(0,80);if(S.codex[kind][s])return false;S.codex[kind][s]=1;addXP(4);return true}
+function codexCount(){codexInit();return ['hosts','exts','kinds','clues','previews'].reduce((n,k)=>n+Object.keys(S.codex[k]).length,0)}
+function dt2(t){if(!t)return'—';try{return new Date(t).toLocaleString('fa-IR',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'})}catch(e){return String(t).slice(0,16).replace('T',' ')}}
+function dailyZ(){const s=new Date().toDateString();let h=0;for(let i=0;i<s.length;i++)h=(h*31+s.charCodeAt(i))|0;return ZN[Math.abs(h)%ZN.length][0]}
+/* ══════════ موتور بازی ۲بعدی — سایداسکرول شوتر ══════════ */
+const cv=$('cv'),cx=cv.getContext('2d');let VW=innerWidth,VH=innerHeight,DPR=Math.min(devicePixelRatio||1,2);
+function rsz(){VW=innerWidth;VH=innerHeight;cv.width=VW*DPR;cv.height=VH*DPR;cx.setTransform(DPR,0,0,DPR,0,0)}
+addEventListener('resize',rsz);rsz();
+const GY=()=>VH-96,GRAV=1560,JUMPV=-600,RUN=265;
+const keys={},ms={x:innerWidth/2,y:innerHeight/2,dn:false};
+const KEYMAP={KeyA:'a',KeyD:'d',KeyW:'w',ArrowLeft:'a',ArrowRight:'d',ArrowUp:'w',Space:' ',KeyE:'e',KeyQ:'q'};
+const keyOf=e=>KEYMAP[e.code]||String(e.key||'').toLowerCase();
+function clearInput(){for(const k in keys)keys[k]=0;ms.dn=false}
+let MSHIP=null,PL=null,cam=0,PCOOL=0,HITSTOP=0,SC=0;
+let PT=[];
+function burst(x,y,n,col){for(let i=0;i<n;i++)PT.push({x,y,vx:(Math.random()-.5)*440,vy:(Math.random()-.9)*420,l:.7+Math.random()*.4,c:col,s:2+Math.random()*3})}
+function updPT(dt){PT=PT.filter(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vy+=760*dt;p.l-=dt;return p.l>0&&p.y<GY()+30})}
+function ovOpen(){return!!document.querySelector('.ov.on')}
+/* ---- ورودی: بر اساس e.code تا با لی‌اوت فارسی هم WASD/E کار کند ---- */
+addEventListener('keydown',e=>{
+ const k=keyOf(e);
+ if([' ','arrowup','arrowdown','arrowleft','arrowright'].includes(k))e.preventDefault();
+ const tag=(e.target&&e.target.tagName)||'';
+ if((k===' '||k==='enter')&&/^(BUTTON|INPUT|TEXTAREA|SELECT)$/.test(tag))return;
+ if(e.repeat&&(k==='e'||k==='q'))return;
+ if(k==='a')keys.a=1;else if(k==='d')keys.d=1;else if(k==='w')keys.w=1;else keys[k]=1;
+  if(k==='escape'){const ovs=document.querySelectorAll('.ov.on');const ov=ovs[ovs.length-1];if(ov){if(ov.id==='vb'&&!MSHIP)ov.classList.remove('on');else if(ov.id!=='vb'&&ov.id!=='vd')ov.classList.remove('on')}else if(MSHIP&&MSHIP.activity)togglePause(true);return}
+  if(k==='q'&&MSHIP&&!ovOpen())doScan();
+  if(k==='e'&&MSHIP&&!ovOpen())doInteract();
+});
+addEventListener('keyup',e=>{const k=keyOf(e);if(k==='a')keys.a=0;else if(k==='d')keys.d=0;else if(k==='w')keys.w=0;else keys[k]=0});
+addEventListener('pointermove',e=>{ms.x=e.clientX;ms.y=e.clientY});
+addEventListener('pointerdown',e=>{if(e.button===0&&e.target===cv)ms.dn=1});
+addEventListener('pointerup',()=>ms.dn=0);
+addEventListener('contextmenu',e=>{
+ e.preventDefault();if(!MSHIP||ovOpen())return;
+ const x=e.clientX+cam,y=e.clientY;let best=null,bd=74;
+ for(const p of MSHIP.props){if(!p.c||p.got)continue;const d=Math.hypot(p.x-cam-e.clientX,(GY()-50)-e.clientY);if(d<bd){bd=d;best=p.c}}
+ for(const en of MSHIP.ents){if(!en.c||en.dead)continue;const d=Math.hypot(en.x-cam-e.clientX,(en.y-36)-e.clientY);if(d<bd){bd=d;best=en.c}}
+ if(best){clearInput();dosOpen(best,'field')}
+});
+/* ---- رندر پس‌زمینه ---- */
+const SKYR=()=>{const r=rndSeed(MSHIP?MSHIP.z.length*911+7:3);return Array.from({length:26},()=>({x:r()*2400,w:60+r()*160,h:120+r()*380,c:r()}))};
+let SBO=SKYR();
+function drawBG(M){
+ const g=cx.createLinearGradient(0,0,0,VH);const p=PAL[M.z];
+ g.addColorStop(0,'#0a0d16');g.addColorStop(.72,'#101420');g.addColorStop(1,'#07080b');
+ cx.fillStyle=g;cx.fillRect(0,0,VW,VH);
+ /* ستاره‌ها — ثابت با پارالاکس خفیف */
+ cx.fillStyle='#fff9';for(let i=0;i<60;i++){const sx=(i*97-cam*.06)%(VW+80)+40,sy=(i*61)%(VH*.5);cx.globalAlpha=.25+((i*13)%9)/22;cx.fillRect(sx,sy,1.6,1.6)}
+ cx.globalAlpha=1;
+ /* ماه و هاله */
+ const mx=VW*.8,my=VH*.17;
+ const mg=cx.createRadialGradient(mx,my,6,mx,my,120);mg.addColorStop(0,'#e8eefc2e');mg.addColorStop(1,'#e8eefc00');cx.fillStyle=mg;cx.beginPath();cx.arc(mx,my,120,0,7);cx.fill();
+ cx.fillStyle='#e8eefc';cx.beginPath();cx.arc(mx,my,26,0,7);cx.fill();
+ cx.fillStyle='#c9d2e2';cx.beginPath();cx.arc(mx+8,my-7,5,0,7);cx.arc(mx-9,my+8,3.5,0,7);cx.fill();
+ /* اسکای‌لاین دور */
+ cx.fillStyle='#141827cc';SBO.forEach((b,i)=>{const x=b.x-cam*.22;if(x>-b.w&&x<VW+b.w){cx.fillRect(x,GY()-b.h*.7,b.w,b.h*.7);if(b.c>.72){cx.fillStyle=p+'44';cx.fillRect(x+6,GY()-b.h*.7+8,b.w-12,b.h*.2);cx.fillStyle='#141827cc'}}});
+ /* مه شهری روی خط افق */
+ const fg=cx.createLinearGradient(0,GY()-330,0,GY());fg.addColorStop(0,'#0a0d1600');fg.addColorStop(1,'#0a0d1655');cx.fillStyle=fg;cx.fillRect(0,GY()-330,VW,330);
+ /* اسکای‌لاین نزدیک با پنجره‌ها */
+ cx.fillStyle='#0e1220';SBO.forEach((b,i)=>{const x=b.x*1.4-cam*.45;if(x>-b.w&&x<VW+b.w){cx.fillRect(x,GY()-b.h,b.w,b.h);cx.fillStyle='#ffd16622';for(let wy=GY()-b.h+14;wy<GY()-16;wy+=22){for(let wx=x+8;wx<x+b.w-10;wx+=18){if((wx*wy)%7<3)cx.fillRect(wx,wy,7,10)}}cx.fillStyle='#0e1220'}});
+ /* زمین */
+ cx.fillStyle='#14161d';cx.fillRect(0,GY(),VW,VH-GY());
+ cx.fillStyle='#1c1f29';cx.fillRect(0,GY(),VW,10);
+ cx.strokeStyle='#ffffff10';cx.lineWidth=1;
+ for(let x=-((cam*1)%60);x<VW;x+=60){cx.beginPath();cx.moveTo(x,GY()+10);cx.lineTo(x-24,VH);cx.stroke()}
+ /* تیرهای چراغ + بیلبورد محله به‌فاصله‌های منظم */
+ const step=560;for(let i=0;i<8;i++){const wx=Math.floor((cam*0.98+200)/step)*step+i*step,sx=wx-cam;if(sx<-140||sx>VW+140)continue;
+  cx.strokeStyle='#3a4152';cx.lineWidth=4;cx.beginPath();cx.moveTo(sx,GY());cx.lineTo(sx,GY()-170);cx.lineTo(sx+34,GY()-170);cx.stroke();
+   cx.fillStyle=p;cx.globalAlpha=.8;cx.beginPath();cx.arc(sx+34,GY()-164,5,0,7);cx.fill();
+   const lg=cx.createRadialGradient(sx+34,GY()-164,4,sx+34,GY()-164,78);lg.addColorStop(0,(p+'55'));lg.addColorStop(1,(p+'00'));cx.globalAlpha=1;cx.fillStyle=lg;cx.beginPath();cx.arc(sx+34,GY()-164,78,0,7);cx.fill();
+  cx.fillStyle='#101321f2';cx.fillRect(sx+58,GY()-118,86,54);cx.strokeStyle=p+'66';cx.strokeRect(sx+58,GY()-118,86,54);
+   cx.fillStyle=p;cx.font='700 11px V';cx.textAlign='center';cx.fillText(i%3===0?zn2(M.z,0):(i%3===1?'نویز ۱۱۰':'گشت شبانه'),sx+101,GY()-87);cx.textAlign='start'}}
+/* ---- رندر اشیا/دشمن/بازیکن ---- */
+function extOf(c){if(!c)return'DRONE';const m=(c.name||'').match(/\.([a-z0-9]{1,6})$/i);return(m?'.'+m[1].toUpperCase():'DIR')}
+function drawProp(p){if(p.t==='clue'){if(p.got)return;const y=GY()-56+Math.sin(performance.now()*.004)*6;cx.fillStyle='#ffd166';cx.strokeStyle='#07080b';cx.lineWidth=3;cx.beginPath();cx.arc(p.x-cam,y,13,0,7);cx.fill();cx.strokeStyle='#7a5a00';cx.lineWidth=5;cx.beginPath();cx.moveTo(p.x-cam+8,y+8);cx.lineTo(p.x-cam+17,y+18);cx.stroke();cx.fillStyle='#ffd166';cx.font='700 12px V';cx.fillText('سرنخ',p.x-cam-16,y-28)}
+ else if(p.t==='heart'){if(p.got)return;cx.fillStyle='#ff6b81';cx.font='700 24px V';cx.fillText('♥',p.x-cam-10,GY()-28)}
+ else if(p.t==='crate'){if(p.hp<=0&&!p.looted)return;if(p.looted)return;const w=64,h=54;cx.fillStyle='#6b4a2e';cx.fillRect(p.x-cam-w/2,GY()-h,w,h);cx.strokeStyle='#8f6a44';cx.lineWidth=3;cx.strokeRect(p.x-cam-w/2+5,GY()-h+5,w-10,h-10);cx.fillStyle='#d2a06a';cx.font='700 10px ui-monospace';cx.fillText('CRATE',p.x-cam-23,GY()-18)}
+ else if(p.t==='scan'){const sx=p.x-cam;if(sx<-90||sx>VW+90)return;cx.fillStyle=p.done?'#1d3b4a':'#22262f';cx.strokeStyle=p.done?'#5af2c0':PAL[MSHIP.z];cx.lineWidth=3;cx.beginPath();cx.roundRect(sx-24,GY()-84,48,74,9);cx.fill();cx.stroke();cx.fillStyle=p.done?'#5af2c0':'#e8eefc';cx.font='700 10px V';cx.textAlign='center';cx.fillText(p.done?'تأیید':'ثبت',sx,GY()-54);cx.fillText(extOf(p.c).slice(0,6),sx,GY()-38);cx.fillText('E نگه‌دار',sx,GY()-100);cx.textAlign='start';
+   if(p.scanning>0&&!p.done){cx.strokeStyle='#5af2c0';cx.lineWidth=5;cx.beginPath();cx.arc(sx,GY()-104,16,-Math.PI/2,-Math.PI/2+2*Math.PI*Math.min(1,p.scanning/p.need));cx.stroke()}}
+ else if(p.t==='corpse'){const sx=p.x-cam;if(sx<-80||sx>VW+80)return;cx.fillStyle='#1a1f2a';cx.strokeStyle='#7fd8ff66';cx.lineWidth=2;cx.beginPath();cx.roundRect(sx-22,GY()-34,44,30,6);cx.fill();cx.stroke();cx.fillStyle='#7fd8ff';cx.font='700 9px ui-monospace';cx.textAlign='center';cx.fillText(extOf(p.c).slice(0,6),sx,GY()-18);cx.font='700 9px V';cx.fillText('E · پرونده',sx,GY()-42);cx.textAlign='start'}}
+function drawEnt(e){
+ if(e.dead)return;
+ const sx=e.x-cam;if(sx<-110||sx>VW+110)return;
+ const isInn=e.kind==='inn'||e.tamed;
+ if(isInn){const g=cx.createRadialGradient(sx,e.y-30,8,sx,e.y-30,46);g.addColorStop(0,'#e8eefc26');g.addColorStop(1,'#e8eefc00');cx.fillStyle=g;cx.beginPath();cx.arc(sx,e.y-30,46,0,7);cx.fill()}
+ const bob=Math.sin(e.t*6)*2;
+ /* پاها */
+ cx.strokeStyle=isInn?'#9db4c4':'#ff6a7d';cx.lineWidth=5;cx.lineCap='round';
+ cx.beginPath();cx.moveTo(sx-6,e.y-15);cx.lineTo(sx-8,e.y);cx.moveTo(sx+6,e.y-15);cx.lineTo(sx+8,e.y);cx.stroke();
+ /* بدن */
+ cx.fillStyle=e.flash>0?'#ffffff':(isInn?'#e8eefc':'#731d2b');cx.strokeStyle=isInn?'#bfe8ff':'#ff4d5e';cx.lineWidth=3;
+ cx.beginPath();cx.roundRect(sx-19,e.y-62+bob,38,50,10);cx.fill();cx.stroke();
+ /* چشم‌ها */
+ cx.fillStyle=isInn?'#3aa0d8':'#ffd166';cx.beginPath();cx.arc(sx-7,e.y-46+bob,3.5,0,7);cx.arc(sx+7,e.y-46+bob,3.5,0,7);cx.fill();
+ if(!isInn){cx.strokeStyle='#ff4d5e';cx.lineWidth=2;cx.beginPath();cx.moveTo(sx-9,e.y-53+bob);cx.lineTo(sx-4,e.y-50+bob);cx.moveTo(sx+9,e.y-53+bob);cx.lineTo(sx+4,e.y-50+bob);cx.stroke()}
+ cx.fillStyle='#0a0c10';cx.font='700 9px ui-monospace';cx.textAlign='center';cx.fillText(extOf(e.c).slice(0,6),sx,e.y-20+bob);cx.textAlign='start';
+ if(e.c&&!e.dead){const mk=MSHIP.marks?MSHIP.marks[e.c.path]:0;if(mk){cx.fillStyle=mk==='safe'?'#5af2c0':'#ff8a9a';cx.font='700 10px V';cx.textAlign='center';cx.fillText(mk==='safe'?'✓ امن':'! مشکوک',sx,e.y-94);cx.textAlign='start'}else{cx.fillStyle='#7fd8ffaa';cx.font='700 9px V';cx.textAlign='center';cx.fillText('E · پرونده',sx,e.y-94);cx.textAlign='start'}}
+ if(e.hp>1&&e.kind!=='inn'&&e.kind!=='drone'){cx.fillStyle='#ffffff30';cx.fillRect(sx-19,e.y-74,38,5);cx.fillStyle='#ff4d5e';cx.fillRect(sx-19,e.y-74,38*e.hp/(e.hpm||3),5)}
+ if(MSHIP.scanT>0&&e.c){const done=MSHIP.inspected.includes(e.c.path);cx.fillStyle=done?'#5af2c0':'#ffd166';cx.font='700 11px V';cx.textAlign='center';cx.fillText(done?'ثبت شد':'بازرسی‌نشده',sx,e.y-86);cx.textAlign='start'}}
+function drawBoss(B){
+ const sx=B.x-cam;if(sx<-280||sx>VW+280)return;
+ cx.fillStyle=B.flash>0?'#fff':'#5b1220';cx.strokeStyle='#ff4d5e';cx.lineWidth=5;
+ cx.beginPath();cx.roundRect(sx-74,GY()-198,148,198,20);cx.fill();cx.stroke();
+ cx.fillStyle='#2d0b12';cx.beginPath();cx.roundRect(sx-54,GY()-170,108,132,12);cx.fill();
+ /* خارهای سرشانه */
+ cx.fillStyle='#ff4d5e';for(const s of [-1,1]){cx.beginPath();cx.moveTo(sx+s*74,GY()-190);cx.lineTo(sx+s*56,GY()-216);cx.lineTo(sx+s*44,GY()-186);cx.closePath();cx.fill()}
+ /* چشم‌های درخشان */
+ cx.fillStyle='#ffb454';cx.beginPath();cx.moveTo(sx-38,GY()-148);cx.lineTo(sx-8,GY()-148);cx.lineTo(sx-23,GY()-112);cx.closePath();cx.fill();
+ cx.beginPath();cx.moveTo(sx+38,GY()-148);cx.lineTo(sx+8,GY()-148);cx.lineTo(sx+23,GY()-112);cx.closePath();cx.fill();
+ cx.fillStyle='#ff8a9a';cx.font='700 12px V';cx.textAlign='center';cx.fillText('نگهبان نویز',sx,GY()-82);cx.fillText('دروازه‌ی داوری',sx,GY()-64);cx.textAlign='start';
+ if(MSHIP.gate<1){cx.fillStyle='#0f3b52';cx.fillRect(sx+86,GY()-190,12,190);cx.fillStyle='#5af2c0';cx.font='700 10px V';cx.fillText('🔒 دروازه',sx+46,GY()-200)}}
+function drawGate(M){
+ const B=M.boss;if(!B)return;const sx=B.x-cam;if(sx<-220||sx>VW+220)return;
+ const t=performance.now()*.003,a=.35+Math.sin(t*2)*.12;
+ cx.fillStyle='rgba(255,77,94,'+a.toFixed(2)+')';cx.fillRect(sx-30,GY()-170,60,170);
+ cx.fillStyle='#ff6a7d';cx.fillRect(sx-4,GY()-170,8,170);
+ cx.fillStyle='#0b0e14ee';cx.fillRect(sx-96,GY()-206,192,30);
+ cx.fillStyle='#ffd9de';cx.font='700 10px V';cx.textAlign='center';
+ cx.fillText('🔒 دروازه · '+gateHint(),sx,GY()-186);cx.textAlign='start'}
+function drawPlayer(){
+ if(!PL)return;const sx=PL.x-cam,t=performance.now()*.011;
+ const run=PL.moving?1:0;
+ /* اسکارف دنباله‌دار — امضای بصری وینی */
+ cx.strokeStyle='#ff4d5e';cx.lineWidth=6;cx.lineCap='round';cx.beginPath();cx.moveTo(sx-PL.face*5,PL.y-64);
+ for(let i=1;i<=4;i++)cx.lineTo(sx-PL.face*(5+i*9),PL.y-64+Math.sin(t+i)*4+i*3.5);cx.stroke();
+ /* پاها */
+ cx.strokeStyle='#e8eefc';cx.lineWidth=7;const lg=run?Math.sin(t*2.4)*13:0;
+ cx.beginPath();cx.moveTo(sx-4,PL.y-32);cx.lineTo(sx-8+lg,PL.y);cx.moveTo(sx+4,PL.y-32);cx.lineTo(sx+8-lg,PL.y);cx.stroke();
+ if(PL.inv>0&&Math.floor(PL.inv*12)%2)return;
+ /* پالتو */
+ cx.fillStyle='#12151df2';cx.strokeStyle='#3aa0d8';cx.lineWidth=3;
+ cx.beginPath();cx.roundRect(sx-18,PL.y-72,36,44,9);cx.fill();cx.stroke();
+ cx.fillStyle='#3aa0d8';cx.beginPath();cx.moveTo(sx-7,PL.y-72);cx.lineTo(sx,PL.y-56);cx.lineTo(sx+7,PL.y-72);cx.closePath();cx.fill();
+ /* سر */
+ cx.fillStyle='#e8eefc';cx.beginPath();cx.arc(sx+PL.face*3,PL.y-84,12,0,7);cx.fill();
+ cx.fillStyle='#0a0c10';cx.beginPath();cx.arc(sx+PL.face*7,PL.y-85,2.2,0,7);cx.fill();
+ /* سلاح به سمت موس */
+ cx.strokeStyle='#c9d2e2';cx.lineWidth=6;const ay=Math.atan2(ms.y-(PL.y-44),ms.x-(PL.x-cam+10));
+ cx.beginPath();cx.moveTo(sx,PL.y-46);cx.lineTo(sx+Math.cos(ay)*26,PL.y-44+Math.sin(ay)*26);cx.stroke();
+ if(PL.gunFlash>0){cx.fillStyle='#ffd166';cx.beginPath();cx.arc(sx+Math.cos(ay)*33,PL.y-44+Math.sin(ay)*33,PL.gunFlash*26,0,7);cx.fill()}
+ if(MSHIP.noGun){cx.fillStyle='#7fd8ff';cx.font='700 10px V';cx.textAlign='center';cx.fillText('مشاهده',sx,PL.y-108);cx.textAlign='start'}}
+/* ---- آپدیت ---- */
+let HUDT=0;
+function upd(dt){
+ if(!MSHIP||ovOpen())return;const M=MSHIP;M.t+=dt;
+ if(HITSTOP>0){HITSTOP-=dt;return}
+ /* بازیکن */
+ const onG=PL.y>=GY()-.5;let ix=(keys.d?1:0)-(keys.a?1:0);
+ PL.moving=!!ix;if(ix)PL.face=ix;else PL.face=ms.x>PL.x-cam?1:-1;
+ PL.vx=ix*RUN;if((keys.w||keys[' '])&&onG)PL.vy=JUMPV;
+ PL.vy+=GRAV*dt;PL.x=clamp(PL.x+PL.vx*dt,40,M.w-90);PL.y+=PL.vy*dt;
+ if(PL.y>GY()){PL.y=GY();PL.vy=0;if(PL.slam){shake();burst(PL.x,GY(),10,'#8f9bc4');PL.slam=0}}
+ if(PL.inv>0)PL.inv-=dt;if(PL.gunFlash>0)PL.gunFlash-=dt*9;
+ /* شلیک خودکار با کلیک نگه‌داشته */
+ PCOOL-=dt;if(M.gun&&ms.dn&&PCOOL<=0)shoot();
+ /* اسکن */
+ if(M.scanT>0)M.scanT-=dt;if(M.scanCd>0)M.scanCd-=dt;
+ /* دوربین نرم */
+ const ct=clamp(PL.x-VW*.42,0,Math.max(0,M.w-VW));cam+=(ct-cam)*Math.min(1,dt*9);
+ /* پیشرفت مشاهده با نگه‌داشتن E */
+ const eHeld=keys.e;
+ const cr=70+(S.up&&S.up.magnet?48:0);
+ for(const p of M.props){
+  if(p.t==='clue'&&!p.got&&eHeld&&Math.abs(p.x-PL.x)<cr)grabClue(p);
+  if(p.t==='heart'&&!p.got&&Math.abs(p.x-PL.x)<64)grabHeart(p);
+  if(p.t==='scan'&&!p.done){
+    if(eHeld&&Math.abs(p.x-PL.x)<86)p.scanning=Math.min(p.need,(p.scanning||0)+dt);
+    else p.scanning=Math.max(0,(p.scanning||0)-dt*1.5);
+    if(p.scanning>=p.need){p.done=1;SFX.clue();SC+=80;toast('ثبت شد: '+extOf(p.c)+' — '+(p.c.metric||fmt(p.c.sizeBytes||0)));M.scans=(M.scans||0)+1;updHud();maybeObsDone()}
+     else if(p.scanning>0&&p.scanning<p.need){if(!eHeld)p.scanning=Math.max(0,p.scanning-dt*1.5)}}}
+ /* زنجیره */
+ if(M.chain>0){M.chainT-=dt;if(M.chainT<=0){M.chain=0;updHud()}}
+ /* دروازه باس */
+ if(M.boss&&M.gate<1&&gateOpen())openGate();
+ /* گلوله بازیکن */ M.bull=M.bull.filter(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;b.l-=dt;
+  if(b.l<=0||b.x<cam-60||b.x>cam+VW+80||b.y<-20||b.y>GY()+16)return false;
+  /* برخورد با دشمن‌ها */
+  for(const e of M.ents){
+   if(e.kind==='drone')continue;
+   if(e.hp<=0)continue;
+   if(Math.abs(b.x-e.x)<27&&Math.abs(b.y-(e.y-36))<32){
+    if(e.kind==='inn'||e.tamed){e.hp=0;e.dead=1;SFX.hurt();M.noise=Math.min(100,M.noise+9);SC=Math.max(0,SC-70);toast('صلیب سفید را سوراخ کردی! آلودگی +۹ — امتیاز −۷۰');flpx(b.x-cam,Math.max(90,b.y-30),'تبرئه باید می‌شد','#ff8a9a');burst(b.x,b.y,8,'#9db4c4');updHud();return false}
+    e.hp--;e.flash=.1;SFX.hit();burst(b.x,b.y,5,'#ffb454');
+    if(e.hp<=0){killEnt(e)}return false}
+  }
+  /* برخورد با جعبه */
+  for(const p of M.props){if(p.t==='crate'&&!p.looted&&Math.abs(b.x-p.x)<42&&b.y>GY()-62){p.hp--;SFX.hit();burst(b.x,b.y,4,'#d2a06a');if(p.hp<=0){p.looted=1;const heal=M.hp<M.maxHp;if(heal){M.hp++}else{SC+=25}SFX.coin();flpx(p.x-cam,GY()-58,heal?'+۱ جان و ۱۰ امتیاز':'+۲۵','#ffd166');SC+=10;burst(p.x,GY()-24,18,'#d2a06a');updHud()}return false}}
+  /* برخورد با باس */
+  const B=M.boss;if(B&&B.hp>0&&M.gate>=1){if(Math.abs(b.x-B.x)<84&&b.y>GY()-210){B.hp--;B.flash=.12;SFX.hit();burst(b.x,b.y,6,'#ff8a9a');updBossBar();HITSTOP=.03;shake();if(B.hp<=0)bossDown();return false}}
+  return true});
+ /* گلوله دشمن */
+ M.ebull=M.ebull.filter(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;
+  if(b.x<cam-90||b.x>cam+VW+90||b.y>GY()+10||b.y<-20)return false;
+  if(Math.abs(b.x-PL.x)<18&&Math.abs(b.y-(PL.y-40))<24){hurt();return false}
+  return true});
+ /* دشمن‌ها */
+ for(const e of M.ents){
+  if(e.dead)continue;e.t+=dt;e.flash=Math.max(0,(e.flash||0)-dt);
+  const dx=PL.x-e.x,ad=Math.abs(dx);
+  if(e.kind==='inn'||e.tamed){e.vx=e.vx||((dx>0?-1:1)*46);if(ad<170)e.vx=(dx>0?-1:1)*95;e.x+=e.vx*dt;e.x=clamp(e.x,70,M.w-80);continue}
+  if(e.kind==='turret'){e.cd=(e.cd||0)-dt;if(ad<520&&e.cd<=0){e.cd=1.7;const a=Math.atan2((PL.y-26)-(e.y-40),PL.x-e.x);M.ebull.push({x:e.x,y:e.y-40,vx:Math.cos(a)*330,vy:Math.sin(a)*330})}continue}
+  if(e.kind==='floater'){e.y=GY()-64-Math.abs(Math.sin(e.t*1.8))*66;e.x+=((dx>0?1:-1)*76*dt);e.x=clamp(e.x,70,M.w-90);e.cd=(e.cd||0)-dt;if(ad<430&&e.cd<=0){e.cd=1.5;M.ebull.push({x:e.x,y:e.y,vx:(dx>0?1:-1)*300,vy:40})}if(ad<56)hurt();continue}
+  if(e.kind==='charger'||e.kind==='drone'){
+    if(e.cd<=0&&ad<430&&(M.gun||e.kind==='drone')){e.cd=2;e.vx=(dx>0?1:-1)*370}
+    else if(e.cd>0){e.cd-=dt;e.x+=e.vx*dt;e.x=clamp(e.x,70,M.w-90);if(ad<56)hurt();if(M.t>3&&e.cd<=.55&&ad<90)e.vx=0}
+    else{e.vx*=.8;e.x+=e.vx*dt}
+    continue}
+  /* walker */
+  if(ad<470){e.x+=(dx>0?1:-1)*80*dt;if(ad<54)hurt()}}
+ /* باس */
+ const B=M.boss;
+ if(B&&B.hp>0&&M.gate>=1){B.t+=dt;B.flash=Math.max(0,(B.flash||0)-dt);B.cd-=dt;B.vy+=GRAV*dt;B.y+=B.vy*dt;if(B.y>GY()){B.y=GY();if(B.vy>400){shake();burst(B.x,GY(),14,'#8f9bc4')}B.vy=0}
+  if(B.cd<=0){B.cd=2.2;const a=Math.atan2((PL.y-24)-(B.y-96),PL.x-B.x);for(let i=-1;i<=1;i++){const aa=a+i*.16;M.ebull.push({x:B.x,y:B.y-96,vx:Math.cos(aa)*340,vy:Math.sin(aa)*340})}}
+  if(PL.inv<=0&&Math.abs(B.x-PL.x)<100&&PL.y>GY()-6)hurt()}
+ /* ذرات */
+ updPT(dt);
+ /* افت طبیعی آلودگی */
+ if(M.noise>0)M.noise=Math.max(0,M.noise-dt*1.4);
+ /* HUD */
+ HUDT-=dt;if(HUDT<=0){HUDT=.2;updHud()}}
+/* ══════════ لایه مأموریت — تولید مرحله از داده واقعی ══════════ */
+function rankOK(z){return clearedCount()>=(UNLOCK[z]||0)}
+async function enterMission(z){
+ if(!rankOK(z)){toast('مأموریت «'+zn2(z,1)+'» قفله — '+UNLOCK[z]+' پرونده را ببند تا باز شود');return}
+ big('در حال گشت‌زنی در '+zn2(z,0)+'…');
+ let r;try{r=await rpc('zone.scan',{zoneId:z})}catch(e){toast('سرویس اسکن پاسخ نداد — اتصال را چک کن و دوباره بزن');renderBoard();return}
+ const all=r.cases||[];const total=r.scannedCount||all.length;
+ let live=all.filter(c=>!(S.trusted[c.path]&&S.trusted[c.path]===c.lastWrite));
+ if(live.length<4)live=all;
+ if(live.length>MAX_MISSION_CASES){
+  const ranked=[...live].sort((a,b)=>dangerScore(b)-dangerScore(a));
+  const head=ranked.slice(0,10);const rest=ranked.slice(10);
+  const rr=rndSeed((Date.now()%2147483646)+1);
+  for(let i=rest.length-1;i>0;i--){const j=rr()*(i+1)|0;const t=rest[i];rest[i]=rest[j];rest[j]=t}
+  live=head.concat(rest.slice(0,MAX_MISSION_CASES-head.length))}
+ startMission(z,live,{total,scanned:r.scannedCount||total});
+}
+function mkEnt(kind,x,c){const hp=kind==='tank'?6:kind==='charger'?4:3;return{kind,x,y:kind==='floater'?GY()-90:GY()-46,vx:0,vy:0,c,hp,hpm:hp,dead:0,t:Math.random()*7,cd:Math.random()*1.2,flash:0}}
+function entType(c,z){if(z==='registry')return'turret';if(z==='tasks')return'charger';if(/\.(mp4|mkv|mov|mp3|avi|wav)$/i.test(c.name))return'floater';if((c.sizeBytes||0)>=2e8)return'tank';if(/\.(exe|msi)$/i.test(c.name))return'charger';return'walker'}
+function mkBoss(x){return{kind:'boss',x,y:GY(),vy:0,hp:12,hpm:12,t:0,cd:2.6,flash:0}}
+/* ---- سازندهٔ معما: مقصر از میان مظنون‌های خطرناک، سرنخ‌ها یکتاکننده ---- */
+function buildMystery(cases,seed){
+ const ranked=[...cases].sort((a,b)=>dangerScore(b)-dangerScore(a));
+ const pool=ranked.slice(0,Math.min(8,ranked.length));
+ if(!pool.length)return{suspects:[],culprit:null,facts:[]};
+ if(pool.length===1)return{suspects:pool.slice(),culprit:pool[0],facts:[]};
+ const rnd=rndSeed(seed||7);
+ const culprit=pool[Math.floor(rnd()*Math.min(5,pool.length))];
+ const sigs=new Map(pool.map(c=>[c,sigOf(c)]));const cs=sigs.get(culprit);
+ const cover=ds=>{const un=new Set(ds),out=[];while(un.size&&out.length<4){let best=null,bn=0;for(const f of FACTS){if(out.includes(f[0]))continue;let n=0;for(const d of un)if(cs[f[0]]!==sigs.get(d)[f[0]])n++;if(n>bn){bn=n;best=f}}if(!best||!bn)break;out.push(best[0]);for(const d of [...un])if(cs[best[0]]!==sigs.get(d)[best[0]])un.delete(d)}return out};
+ let pair=null,cov=null;
+ for(let i=0;i<pool.length;i++)for(let j=i+1;j<pool.length;j++){const a=pool[i],b=pool[j];if(a===culprit||b===culprit)continue;const c=cover([a,b]);if(c.length&&(!cov||c.length<cov.length)){pair=[a,b];cov=c}}
+ if(!pair){pair=pool.filter(c=>c!==culprit).slice(0,2);cov=['exact']}
+ if(!cov||!cov.length)cov=['exact'];
+ if(cov.length<2&&cases.length>=2){const extra=FACTS.find(f=>!cov.includes(f[0]));if(extra)cov.push(extra[0])}
+ const facts=cov.map(k=>{const f=FACTS.find(x=>x[0]===k);return{k,l:f[1],v:f[2](culprit),text:f[1]+': '+f[2](culprit)}});
+ const suspects=[culprit,...pair].filter(Boolean);
+ for(let i=suspects.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));const t=suspects[i];suspects[i]=suspects[j];suspects[j]=t}
+ return{suspects,culprit,facts};
+}
+function startMission(z,cs,meta){
+ MSHIP=null;meta=meta||{};
+ if(!cs.length){toast('محله «'+zn2(z,0)+'» همین الان پاکه — مظنونی نمی‌بینم');renderBoard();return}
+ const type=TYPE[z];
+ const mys=buildMystery(cs,(Date.now()^((cs.length*2654435761)>>>0))>>>0);
+ const M={z,type,cases:cs,ents:[],bull:[],ebull:[],props:[],found:0,scans:0,score:0,chain:0,chainT:0,noise:0,hp:5+(S.up.hp||0),maxHp:5+(S.up.hp||0),kills:0,noGun:type==='obs',gun:type==='cbt'?1:0,scanT:0,scanCd:0,boss:null,gate:0,activity:0,t:0,w:0,bossKilled:0,culprit:mys.culprit,suspects:mys.suspects,clueFacts:mys.facts,clueNeed:mys.facts.length,caught:[],clueEvs:[],hostileTotal:0,finished:0,locked:0,scored:0,marks:{},inspected:[],di:{},ds:{},needIns:2,scannedCount:meta.total||cs.length};
+ const W=1500+cs.length*260;M.w=W;SBO=SKYR();
+ const seed=(Date.now()^((cs.length*911)>>>0))>>>0,rr=rndSeed(seed||3);
+ const order=[...cs];for(let i=order.length-1;i>0;i--){const j=rr()*(i+1)|0;const t=order[i];order[i]=order[j];order[j]=t}
+ const spacing=(W-1100)/Math.max(1,order.length);
+ let witnesses=2;
+ order.forEach((c,i)=>{
+  const x=640+spacing*i+(rr()-.5)*70;
+  if(type==='obs'){M.props.push({t:'scan',x,y:0,c,need:1.1,scanning:0});if(witnesses>0){M.ents.push(mkEnt('inn',clamp(x+120,80,W-160),c));witnesses--}}
+  else if(OBSERVE(c.kind))M.props.push({t:'scan',x,y:0,c,need:.9,scanning:0});
+  else M.ents.push(mkEnt(entType(c,z),x,c))});
+ M.needIns=type==='obs'?Math.min(2,Math.max(1,M.ents.filter(e=>e.c).length)):Math.min(3,Math.max(1,cs.length));
+ M.scanNeed=type==='obs'?Math.min(3,Math.max(1,Math.ceil(cs.length/2))):(type==='mix'?Math.min(3,M.props.filter(p=>p.t==='scan').length):0);
+ if(type!=='obs')M.boss=mkBoss(W-380);
+ mys.facts.forEach((f,i)=>M.props.push({t:'clue',x:Math.round((W-900)*(.26+i*.2))+60,c:mys.culprit,tk:i,ev:f.text,got:0}));
+ [.22,.62].forEach(f=>M.props.push({t:'heart',x:Math.round((W-800)*f)+350,got:0}));
+ order.filter(c=>(c.sizeBytes||0)>=1e8&&!OBSERVE(c.kind)).slice(0,4).forEach(c=>M.props.push({t:'crate',x:700+rr()*(W-1500),hp:4,looted:0,c}));
+ if(type==='obs')for(let i=0;i<2;i++)M.ents.push({kind:'drone',x:900+i*700,y:GY()-120,vx:(i?-1:1)*140,vy:0,c:null,hp:99,hpm:99,dead:0,t:0,cd:0,flash:0});
+ M.hostileTotal=M.ents.filter(e=>e.kind!=='inn'&&e.kind!=='drone').length;
+ MSHIP=M;PL={x:140,y:GY(),vx:0,vy:0,face:1,inv:0,gunFlash:0,moving:0};cam=0;SC=0;PT.length=0;
+ $('zp').innerHTML='مأموریت: <b>'+zn2(z,1)+'</b>';
+ $('cp').innerHTML='سرنخ '+faNum(0)+'/'+faNum(M.clueNeed);$('hh').firstChild.style.width='100%';$('hh').firstChild.style.background='#5af2c0';
+ $('nb').firstChild.style.width='0%';$('bbar').style.display='none';$('cbox').innerHTML='';$('vb').classList.remove('on');$('vd').classList.remove('on');$('dos').classList.remove('on');$('shp').classList.remove('on');$('fin').classList.remove('on');
+ missionIntro(z,cs,type,meta)}
+function missionIntro(z,cs,type,meta){
+ const g0=gateNeed();
+ const lines={cbt:'کنار هر فایل E بزن: پروندهٔ واقعی‌اش را ببین — منشأ، تاریخ، محتوا و پیش‌نمایش. با بازرسی و سرنخ، دروازه باز می‌شود. روی پایه‌های ثبت راست‌کلیک کن. شلیک فقط برای بقاست، نه پیشرفت.',
+ obs:'سلاح قفل است. پایه‌های ثبت را نگه‌دار-E کن ('+faNum(g0.scans)+' تا کافی است) و '+faNum(g0.ins)+' شاهدِ زنده را با E بازرسی کن. روی پایه‌ها راست‌کلیک هم پرونده را باز می‌کند.',
+ mix:'ترکیبی: پایه‌های ثبت را نگه‌دار-E کن، پرونده‌ها را بازرسی کن و سرنخ‌ها را جمع کن. روی پایه‌ها راست‌کلیک کن. با باز شدن دروازه سلاح آزاد می‌شود.'};
+ let bossRow=type==='obs'?'<div class="row"><span>دروازه</span><b>با مشاهده باز می‌شود — نگهبان ندارد</b></div>':'<div class="row"><span>نگهبان دروازه</span><b>موجود نویزی — فایل نیست</b></div>';
+ const req=[];if(g0.scans)req.push(faNum(g0.scans)+' ثبت');req.push(faNum(g0.ins)+' بازرسی');if(g0.clu)req.push(faNum(g0.clu)+' سرنخ');
+ const cond=req.join(' + ');
+ const smp=(meta&&meta.total&&meta.total>cs.length)?'<div class="row"><span>نمونهٔ پرونده‌ها</span><b>'+faNum(cs.length)+' از '+faNum(meta.total)+'</b></div>':'';
+ $('miBody').innerHTML='<h2>پرونده: '+zn2(z,1)+'</h2><div class="sub">'+esc(DINFO[z]||'')+'</div><div class="sub">'+lines[type]+'</div>'
+  +'<div class="row"><span>نوع مأموریت</span><b>'+TPN[type]+'</b></div>'
+  +'<div class="row"><span>شرط باز شدن دروازه</span><b>'+cond+'</b></div>'
+  +'<div class="row"><span>حذف خودکار</span><b>ندارد — تصمیم تو</b></div>'
+  +'<div class="row"><span>مظنون ثبت‌شده</span><b>'+faNum(cs.length)+'</b></div>'+smp+bossRow
+  +'<br><div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="migo">بریم</button><button class="b" id="mih">راهنما</button></div>';
+ $('mi').classList.add('on');
+ $('migo').onclick=()=>{clearInput();$('mi').classList.remove('on');MSHIP.activity=1;MUS.start();big('شروع!');setTimeout(()=>toast('کنار فایل‌ها E بزن — پرونده‌شان را باز کن'),2200)};
+ $('mih').onclick=()=>$('hlp').classList.add('on')}
+/* ---- اکشن‌ها ---- */
+function shoot(){const M=MSHIP;if(!M||!M.gun||ovOpen())return;PCOOL=.14;SFX.shot();
+ let tx=ms.x+cam,ty=ms.y,best=150;
+ for(const e of M.ents){if(e.dead||e.kind==='drone'||e.kind==='inn'||e.tamed)continue;const d=Math.hypot((e.x-cam)-ms.x,(e.y-38)-ms.y);if(d<best){best=d;tx=e.x;ty=e.y-38}}
+ const B=M.boss;if(B&&B.hp>0&&M.gate>=1){const d=Math.hypot((B.x-cam)-ms.x,(GY()-110)-ms.y);if(d<best+90){tx=B.x;ty=GY()-110}}
+ const ay=Math.atan2(ty-(PL.y-44),tx-(PL.x+8));
+ M.bull.push({x:PL.x+8+Math.cos(ay)*30,y:PL.y-44+Math.sin(ay)*30,vx:Math.cos(ay)*900,vy:Math.sin(ay)*900,l:.85});
+ PL.gunFlash=1}
+function doScan(){const M=MSHIP;if(!M||M.scanCd>0||(!M.gun&&!M.noGun))return;M.scanCd=S.up.scan?5:8;M.scanT=4;SFX.scan();toast('اسکن روشن — پرونده‌های بازرسی‌نشده و سرنخ‌ها')}
+function grabClue(p){p.got=1;MSHIP.found++;SFX.clue();SC+=120;updHud();
+ const ev=p.ev||pick(buildEvidence(p.c));(MSHIP.clueEvs=MSHIP.clueEvs||[]).push(ev);cxAdd('clues',ev);
+ const c=document.createElement('div');c.id='cw';c.innerHTML='<h5>سرنخ '+(p.tk+1)+'</h5><p>'+esc(ev)+'</p>';$('cbox').appendChild(c);
+ toast('سرنخ ثبت شد ('+faNum(MSHIP.found)+'/'+faNum(MSHIP.clueNeed)+')');
+ if(MSHIP.boss&&MSHIP.gate<1&&gateOpen())openGate();
+ maybeObsDone()}
+function grabHeart(p){p.got=1;MSHIP.hp=Math.min(MSHIP.maxHp,MSHIP.hp+2);SFX.coin();flpx(innerWidth/2,innerHeight/2,'+2 جان','#5af2c0');updHud()}
+function doInteract(){const M=MSHIP;if(!M)return;
+ for(const p of M.props){if(p.t==='clue'&&!p.got&&Math.abs(p.x-PL.x)<78){grabClue(p);return}
+  if(p.t==='heart'&&!p.got&&Math.abs(p.x-PL.x)<70){grabHeart(p);return}
+  if(p.t==='corpse'&&Math.abs(p.x-PL.x)<86){dosOpen(p.c,'field');return}}
+ let best=null,bd=95;
+ for(const e of M.ents){if(e.dead||!e.c)continue;const d=Math.abs(e.x-PL.x);if(d<bd){bd=d;best=e}}
+ if(best)dosOpen(best.c,'field')}
+function killEnt(e){const M=MSHIP;e.dead=1;M.kills++;M.caught.push(e.c);
+ if(e.c&&!OBSERVE(e.c.kind))M.props.push({t:'corpse',x:e.x,c:e.c,got:0});
+ const g=Math.round((30+dangerScore(e.c||{})*14)*(1+Math.min(M.chain,9)*.15));M.chain++;M.chainT=3;
+ SC+=g;SFX.kill();burst(e.x,e.y-34,26,PAL[M.z]);flpx(e.x-cam,e.y-78,'+'+g,PAL[M.z]);updHud()}
+/* ---- دروازه بر اساس کشف، نه کشتار ---- */
+function gateNeed(){const M=MSHIP;if(!M)return{ins:2,clu:2,scans:0};
+  return{ins:M.needIns||Math.min(3,Math.max(1,M.cases.length)),clu:M.clueNeed||0,scans:(M.type==='obs'||M.type==='mix')?(M.scanNeed||0):0}}
+function gateOpen(){const M=MSHIP;if(!M)return false;const g=gateNeed();
+ if(M.inspected.length<g.ins)return false;
+ if(M.type==='obs')return M.scans>=g.scans;
+ if(M.found<g.clu)return false;
+ if(M.type==='mix'&&M.scans<g.scans)return false;
+ return true}
+function gateHint(){const M=MSHIP;if(!M)return'';const g=gateNeed();const parts=[];
+ if((M.type==='obs'||M.type==='mix')&&g.scans)parts.push('ثبت '+faNum(M.scans)+'/'+faNum(g.scans));
+ parts.push('بازرسی '+faNum(M.inspected.length)+'/'+faNum(g.ins));
+ if(g.clu)parts.push('سرنخ '+faNum(M.found)+'/'+faNum(g.clu));
+ return parts.join(' · ')}
+function openGate(){const M=MSHIP;if(!M||!M.boss||M.gate)return;M.gate=1;M.gun=1;
+ $('bbar').style.display='flex';$('bn').textContent='نگهبان نویز · '+zn2(M.z,0);
+ big('دروازهٔ داوری باز شد!');SFX.lvl();toast('نگهبان نویز جلوی دروازه است — شکستش بده تا میز داوری حاضر شود')}
+function freezeForVerdict(){MSHIP.activity=0;PL.inv=99;clearInput();$('pzc').classList.remove('on')}
+function maybeObsDone(){const M=MSHIP;if(!M||M.type!=='obs'||M.finished)return;const g=gateNeed();
+ if(M.scans>=g.scans&&M.inspected.length>=g.ins){M.gate=2;freezeForVerdict();big('پروندهٔ مشاهده کامل شد');setTimeout(()=>finishMission(),850)}}
+function bossDown(){const M=MSHIP;if(!M)return;M.gate=2;M.bossKilled=1;freezeForVerdict();
+ burst(MSHIP.boss.x,MSHIP.boss.y-120,80,'#ff4d5e');shake();SFX.boom();SC+=400;
+ $('bbar').style.display='none';big('نگهبان شکست خورد — میز داوری!');setTimeout(()=>finishMission(),900)}
+function finishMission(){const M=MSHIP;if(!M||M.finished)return;M.finished=1;freezeForVerdict();openVerdict()}
+function updBossBar(){const M=MSHIP;if(!M||!M.boss)return;const f=Math.max(0,M.boss.hp)/(M.boss.hpm||12);$('bi').style.width=Math.max(0,Math.min(100,f*100))+'%'}
+function hurt(){const M=MSHIP;if(!M||PL.inv>0||ovOpen())return;PL.inv=1;M.hp--;shake();SFX.hurt();
+ flpx(innerWidth/2,innerHeight-160,'آخ! -1 جان','#ff8a9a');updHud();
+ if(M.hp<=0){M.activity=0;$('pzc').classList.add('on');clearInput();
+  $('pzc').querySelector('h2').textContent='وینی افتاد…';
+  $('pzr').textContent='تلاش مجدد';$('pzr').onclick=()=>{$('pzc').classList.remove('on');$('pzc').querySelector('h2').textContent='توقف';$('pzr').textContent='ادامه';enterMissionRetry()}}}
+function updHud(){const M=MSHIP;if(!M)return;
+ const h=Math.max(0,M.hp)/M.maxHp;const bar=$('hh').firstChild;
+ bar.style.width=(h*100)+'%';bar.style.background=M.hp<=1?'#ff4d5e':M.hp<=2?'#ffb454':'#5af2c0';
+ $('cp').innerHTML=gateHint();
+ $('nb').firstChild.style.width=Math.round(M.noise)+'%';$('nb').firstChild.style.background=M.noise>60?'#ff4d5e':'#ffd166';
+ $('sc').textContent=faNum(SC);$('cb').style.display=M.chain>1?'flex':'none';$('cbv').textContent=faNum(M.chain)}
+/* ══════════ پروندهٔ بازجویی — کشف، پیش‌نمایش، داوری کاربر ══════════ */
+const DOS={c:null,tab:'case',mode:'field'};
+const TEXTE=/\.(txt|log|md|csv|json|ini|nfo|srt)$/i;
+const IMGE=/\.(png|jpe?g|gif|webp|bmp|svg|avif|ico)$/i;
+const VIDE=/\.(mp4|mkv|mov|webm|avi|m4v|wmv)$/i;
+const AUDE=/\.(mp3|wav|ogg|m4a|flac|aac)$/i;
+const ARCE=/\.(zip|rar|7z|tar|gz|tgz)$/i;
+const PDFE=/\.pdf$/i;
+const DATA_LBL={targetMissing:'برنامهٔ هدف موجود؟',impactMs:'تأخیر بوت (ms)',nextRun:'اجرای بعدی',status:'وضعیت',pid:'PID',critical:'پروسس حیاتی؟',files:'تعداد فایل',approx:'حجم تقریبی',days:'روز دست‌نخورده',start:'نوع استارت',regPath:'مسیر رجیستری',valueName:'نام مقدار',target:'مسیر هدف'};
+const PNAME={img:'تصویر',vid:'ویدیو',aud:'صدا',pdf:'PDF',arc:'آرشیو',txt:'متن'};
+function pkind(c){const n=c.name||'';if(IMGE.test(n))return'img';if(VIDE.test(n))return'vid';if(AUDE.test(n))return'aud';if(PDFE.test(n))return'pdf';if(ARCE.test(n))return'arc';if(TEXTE.test(n))return'txt';return'none'}
+const isGen=c=>!!(c.kind&&c.kind!=='file');
+/* ---- باز و بسته کردن ---- */
+function dosOpen(c,mode){
+ if(!MSHIP||!c)return;const R=MSHIP;clearInput();
+ DOS.c=c;DOS.tab='case';DOS.mode=mode||'field';
+ $('dname').textContent=c.name||'—';
+ $('dico').textContent=(isGen(c)?String(c.kind||'KEY').toUpperCase():extOf(c).replace('.','')).slice(0,5);
+ $('dsub').textContent=(isGen(c)?(KL[c.kind]||c.kind):'فایل')+' · '+(c.metric||fmt(c.sizeBytes||0));
+ $('dos').classList.add('on');
+ dosBody('case');
+ if(!isGen(c))ensureInspect(c)}
+function dosClose(){$('dos').classList.remove('on');DOS.c=null}
+$('dx').onclick=dosClose;
+$('dos').addEventListener('click',e=>{if(e.target.id==='dos')dosClose()});
+/* ---- دادهٔ بازرسی و پیش‌نمایش ---- */
+function ensureInspect(c){
+ const M=MSHIP;if(!M||isGen(c))return;const k=c.path;
+ if(k in M.di&&M.di[k]!==null)return;
+ M.di[k]=null;
+ rpc('file.inspect',{path:k}).then(r=>{
+  M.di[k]=r||{failed:1};
+  if(r&&r.host)cxAdd('hosts',r.host);
+  if(DOS.c===c)dosBody(DOS.tab);
+ }).catch(()=>{M.di[k]={failed:1};if(DOS.c===c)dosBody(DOS.tab)})}
+let STQ=Promise.resolve();
+function stageLimit(pk){return pk==='img'?25e6:pk==='aud'?60e6:pk==='vid'?350e6:pk==='pdf'?100e6:0}
+function ensureStage(c){
+ const M=MSHIP;if(!M)return;const k=c.path;
+ if(k in M.ds&&M.ds[k]!==null)return;
+ const pk=pkind(c);const lim=stageLimit(pk);
+ if(lim&&(c.sizeBytes||0)>lim){M.ds[k]={tooBig:1};if(DOS.c===c)dosBody('content');return}
+ M.ds[k]=null;
+ const run=()=>rpc('file.stage',{path:k,sizeBytes:c.sizeBytes||0}).then(r=>{
+  if(r&&r.url)r.u=r.url+(r.url.includes('?')?'&':'?')+'t='+Date.now();
+  M.ds[k]=r||{failed:1};if(DOS.c===c)dosBody('content');
+ }).catch(()=>{M.ds[k]={failed:1};if(DOS.c===c)dosBody('content')});
+ STQ=STQ.then(run,run);
+ STQ.catch(()=>{})}
+/* ---- تب‌ها ---- */
+function dosBody(tab){
+ DOS.tab=tab;const c=DOS.c;if(!c){dosClose();return}
+ $('dtabs').querySelectorAll('button').forEach(b=>{b.classList.toggle('on',b.dataset.t===tab);b.onclick=()=>dosBody(b.dataset.t)});
+ const gen=isGen(c),ins=gen?null:MSHIP.di[c.path];
+ let h='',f='';
+ if(tab==='case'){h=dosCase(c,ins,gen);f='<button class="b" id="djt">داوری من</button><button class="b c" id="dcl">بستن</button>'}
+ else if(tab==='content'){h=dosContent(c,ins,gen);f='<button class="b" id="djt">داوری من</button><button class="b c" id="dcl">بستن</button>'}
+ else{h=dosJudge(c,ins,gen);
+  f=DOS.mode==='verdict'
+   ?'<button class="b c" id="jacc">این را مقصر اعلام کن ←</button><button class="b" id="dcl">بازگشت به میز</button>'
+   :'<button class="b c" id="jmk_ok">امن است — نگهش دار</button><button class="b" id="jmk_sus">مشکوک است</button><button class="b" id="dcl">بستن</button>'}
+ $('dbody').innerHTML=h;$('dfoot').innerHTML=f;
+ const wire=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
+ wire('dcl',dosClose);wire('djt',()=>dosBody('judge'));
+ wire('jmk_ok',()=>markFile(c,'safe'));wire('jmk_sus',()=>markFile(c,'unsafe'));
+ wire('jacc',()=>{const cc=DOS.c;dosClose();accuse(cc)});
+ wire('dretry',()=>{delete MSHIP.di[c.path];ensureInspect(c);dosBody('case')});
+ wire('sretry',()=>{delete MSHIP.ds[c.path];ensureStage(c);dosBody('content')})}
+/* ---- تب پرونده ---- */
+function dosCase(c,ins,gen){
+ const rw=(k,v)=>'<div class="row"><span>'+k+'</span><b>'+esc(v==null||v===''?'—':v)+'</b></div>';
+ const mark=MSHIP.marks[c.path];const sg=sigOf(c);
+ let h='<div class="sub">'+(HB?'این پرونده از دادهٔ واقعی ساخته شده — هرچه می‌بینی قابل استناد است.':'حالت دمو (بدون میزبان WinyWash): پرونده و پیش‌نمایش‌ها شبیه‌سازی‌شده‌اند.')+'</div>';
+ h+=rw('نوع',' '+(gen?(KL[c.kind]||c.kind):(extOf(c).replace('.','')||'FILE')));
+ h+=rw('جنس',sg.fam);h+=rw('دستهٔ پرونده',sg.bucket);
+ h+=rw('اندازه',c.metric||fmt(c.sizeBytes||0));
+ if(gen&&c.detail)h+=rw('محل / کلید',c.detail);
+ h+=rw('آخرین تغییر',c.lastWrite?dt2(c.lastWrite):'—');
+ if(ins&&!ins.failed){
+  if(ins.created)h+=rw('زمان ایجاد فایل',dt2(ins.created));
+  if(ins.host)h+=rw('مبدأ دانلود (Host)',ins.host);
+  if(ins.referrer)h+=rw('ارجاع‌دهنده',ins.referrer);
+  if(ins.downloaded)h+=rw('زمان دانلود',dt2(ins.downloaded));
+  if(!ins.host&&!ins.created)h+=rw('ردپای منشأ','در دسترس نیست (فایل محلی/کپی‌شده)');
+ }else if(!gen&&ins===null)h+='<div class="sub" style="margin-top:8px">در حال خواندن ردپای فایل…</div>';
+ else if(!gen&&ins&&ins.failed)h+='<div class="warn">ردپای فایل خوانده نشد — فایل ممکن است جابه‌جا شده یا در دسترس نباشد.</div><div style="display:flex;justify-content:center"><button class="b" id="dretry">تلاش دوباره</button></div>';
+ if(c.pairName)h+=rw('همتای اصلی',c.pairName+' · '+(c.pairSize?fmt(c.pairSize):'—'));
+ if(gen&&c.data)Object.keys(c.data).forEach(k=>{let v=c.data[k];if(typeof v==='boolean')v=v?'بله':'خیر';if(v==null||v==='')return;if(typeof v==='object')v=JSON.stringify(v);h+=rw(DATA_LBL[k]||k,v)});
+ const ev=buildEvidence(c);
+ if(ev.length)h+='<div class="evchips">'+ev.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>';
+ if(mark)h+='<div class="sub">داوری تو: <b style="color:'+(mark==='safe'?'#5af2c0':'#ff8a9a')+'">'+(mark==='safe'?'امن — نگه داشته شود':'مشکوک')+'</b></div>';
+ const pk=pkind(c);
+ if(pk!=='none')h+=rw('محتوا',PNAME[pk]+' — تب «محتوا» را ببین');
+ else if(gen)h+='<div class="sub" style="margin-top:8px">این مورد فایل نیست (کلید/تسک/سرویس)؛ پیش‌نمایش ندارد اما کارت شناسایی کامل دارد.</div>';
+ return h}
+/* ---- تب محتوا ---- */
+function dosContent(c,ins,gen){
+ if(gen)return'<div class="warn">این پرونده یک کلید/تسک/سرویس است، نه فایل. محتوای قابل پیش‌نمایشی وجود ندارد؛ اما منشأ، دستور اجرا و شواهد در تب «پرونده» هست.</div>';
+ const pk=pkind(c);
+ if(pk==='txt'){
+  if(ins===undefined||ins===null)return'<div class="sub">در حال خواندن متن…</div>';
+  if(ins&&ins.text){cxAdd('previews',PNAME.txt);return'<div class="sub">۲۰۴۸ بایت اولِ فایل — خوانده‌شده توسط سرویس امن.</div><pre class="txtprev">'+esc(ins.text)+'</pre>'}
+  return'<div class="warn">متنی برای نمایش پیدا نشد (شاید فایل خالی یا دودویی است).</div>'+dosEvidence(c)}
+ if(pk==='arc'){
+  if(ins===undefined||ins===null)return'<div class="sub">در حال باز کردن آرشیو…</div>';
+  if(!ins)return'<div class="sub">آرشیو در دسترس نیست.</div>';
+  if(ins.archiveUnsupported)return'<div class="warn">این فرمت آرشیو در بازی باز نمی‌شود (rar/7z). فقط منشأ و شواهد قابل بررسی است.</div>'+dosEvidence(c);
+  if(!ins.entries)return'<div class="warn">محتوای آرشیو خوانده نشد.</div>'+dosEvidence(c);
+  cxAdd('previews',PNAME.arc);
+  let h='<div class="zstat"><span>'+faNum(ins.entryCount)+' عضو</span><span>بازشده: '+fmt(ins.uncompressed||0)+'</span><span>فایل اجرایی: '+faNum(ins.exeCount||0)+'</span></div>';
+  if(ins.exeCount)h+='<div class="warn">این آرشیو '+faNum(ins.exeCount)+' فایل اجرایی دارد — قبل از باز کردن، منشأ را جدی بگیر.</div>';
+  h+='<div class="zlist">'+ins.entries.map(e=>'<div class="zr"><span>'+esc(e.n)+'</span><span>'+fmt(e.s||0)+'</span></div>').join('')+'</div>';
+  if(ins.oldestEntry)h+='<div class="sub" style="margin-top:8px">قدیمی‌ترین عضو: '+dt2(ins.oldestEntry)+' · تازه‌ترین عضو: '+dt2(ins.newestEntry)+'</div>';
+  return h}
+ if(pk==='none')return'<div class="warn">این نوع فایل پیش‌نمایش داخل بازی ندارد (اجرای فایل هم انجام نمی‌شود — امنیت).</div>'+dosEvidence(c);
+ const st=MSHIP.ds[c.path];
+ if(st===undefined||st===null){if(st===undefined)ensureStage(c);return'<div class="sub">در حال آماده‌سازی پیش‌نمایش…</div>'}
+ if(st.failed)return'<div class="warn">پیش‌نمایش ممکن نشد — فایل در دسترس نیست یا سرویس رد کرد.</div><div style="display:flex;justify-content:center"><button class="b" id="sretry">تلاش دوباره</button></div>'+dosEvidence(c);
+ if(st.tooBig)return'<div class="warn">برای پیش‌نمایش سبک، این فایل بیش از حد مجاز حجم دارد.</div>'+dosEvidence(c);
+ if(!st.url&&!st.u)return'<div class="warn">سرویس پیش‌نمایش آدرسی برنگرداند — فایل در دسترس نیست.</div><div style="display:flex;justify-content:center"><button class="b" id="sretry">تلاش دوباره</button></div>'+dosEvidence(c);
+ const demo=!!st.demo;const u=esc(st.u||st.url||'');
+ cxAdd('previews',PNAME[pk]);
+ let note=demo?'<div class="sub" style="margin-top:8px">پیش‌نمایش شبیه‌سازی‌شده — نسخهٔ دمو بدون میزبان WinyWash. در اپ واقعی، فایل واقعی همین‌جا سرو می‌شود.</div>':'';
+ if(pk==='img')return'<div class="prevbox"><img src="'+u+'" alt="پیش‌نمایش" referrerpolicy="no-referrer"></div>'+note;
+ if(pk==='vid')return demo
+  ?'<div class="prevbox"><div style="width:100%;aspect-ratio:16/9;max-height:300px;background:linear-gradient(135deg,#0d2233,#1a0f24);border-radius:10px;display:grid;place-items:center;color:#7fd8ff;font:700 14px V">▶ پیش‌نمایش ویدیو (دمو)</div></div>'+note
+  :'<div class="prevbox"><video src="'+u+'" controls autoplay muted loop playsinline></video></div>'+note;
+ if(pk==='aud')return demo
+  ?'<div class="prevbox"><div style="color:#7fd8ff;font:700 14px V">♪ پیش‌نمایش صدا (دمو)</div></div>'+note
+  :'<div class="prevbox"><audio src="'+u+'" controls autoplay></audio></div>'+note;
+ if(pk==='pdf')return demo
+  ?'<div class="prevbox"><div style="width:72%;min-height:280px;background:#f5f4ef;border-radius:6px;padding:18px;color:#333;direction:ltr"><b style="font:700 11px ui-monospace">'+esc(c.name)+'</b><div style="height:2px;background:#c00;margin:8px 0"></div><div style="font:10px/1.9 ui-monospace;opacity:.55">'+'document preview · page 1 of 2<br>'.repeat(8)+'</div></div></div>'+note
+  :'<div class="prevbox"><iframe src="'+u+'" title="PDF preview" loading="lazy"></iframe></div>'+note;
+ return''}
+function dosEvidence(c){const ev=buildEvidence(c);return ev.length?'<div class="evchips">'+ev.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>':''}
+/* ---- تب داوری ---- */
+function dosJudge(c,ins,gen){
+ const mark=MSHIP.marks[c.path];const g=gateNeed();let h='';
+ if(mark)h+='<div class="stampwrap"><div class="stamp '+(mark==='safe'?'ok':'')+'">'+(mark==='safe'?'امن':'مشکوک')+'</div></div>';
+ h+='<div class="sub">'+(DOS.mode==='verdict'?'این پرونده را با شواهد کامل دیدی. اگر مطمئنی، اتهام بزن — اما حذف همچنان با انتخاب خودت است.':'پرونده‌ات را بخوان، بعد تصمیم بگیر. «امن» یعنی دیگر به آن شلیک نکن؛ «مشکوک» یعنی در فهرست حذفِ اختیاری میز داوری می‌آید.')+'</div>';
+ if(MSHIP.clueEvs&&MSHIP.clueEvs.length)h+='<div class="sub">نشانه‌های پرونده:</div><div class="facts">'+MSHIP.clueEvs.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div>';
+ h+=dosEvidence(c);
+ h+='<div class="row"><span>بازرسی‌های این مأموریت</span><b>'+faNum(MSHIP.inspected.length)+' / '+faNum(g.ins)+'</b></div>';
+ h+='<div class="row"><span>سرنخ‌های جمع‌شده</span><b>'+faNum(MSHIP.found)+' / '+faNum(g.clu||0)+'</b></div>';
+ if(DOS.mode!=='verdict')h+='<div class="sub">هر بازرسی تازه +۴۵ امتیاز و +۶ تجربه می‌دهد و در کشف‌نامه ثبت می‌شود.</div>';
+ return h}
+/* ---- ثبت داوری ---- */
+function markFile(c,kind){
+ const M=MSHIP;if(!M||!c)return;
+ const first=!M.marks[c.path];
+ M.marks[c.path]=kind;
+ if(!M.inspected.includes(c.path))M.inspected.push(c.path);
+ const e=M.ents.find(x=>x.c===c);
+ if(kind==='safe'){
+  if(e){e.tamed=1;e.hp=Math.max(1,e.hp)}
+  S.trusted[c.path]=c.lastWrite||1;
+ }else{
+  delete S.trusted[c.path];
+  if(e&&e.kind!=='inn')e.tamed=0;
+ }
+ const ex=(c.name||'').match(/\.([a-z0-9]+)$/i);
+ cxAdd('kinds',isGen(c)?(c.kind||'file'):'file');
+ if(ex)cxAdd('exts','.'+ex[1].toLowerCase());
+ if(first){SC+=45;SFX.clue();addXP(6);flpx(innerWidth/2,innerHeight-210,'+۴۵ کشف','#5af2c0')}
+ save();updHud();
+ toast(kind==='safe'?'پرونده امن شد — دیگر به او شلیک نکن':'مشکوک ثبت شد — در فهرست حذف اختیاری می‌آید');
+ if(M.boss&&M.gate<1&&gateOpen())openGate();
+ maybeObsDone();
+ dosBody('judge')}
+/* ---- کشف‌نامه ---- */
+function openCodex(){
+ codexInit();
+ const sec=[['hosts','مبدأهای کشف‌شده'],['exts','پسوندها'],['kinds','انواع پرونده'],['clues','سرنخ‌های ثبت‌شده'],['previews','پیش‌نمایش‌های دیده‌شده']];
+ let h='<h2>کشف‌نامه</h2><div class="sub">هر چیز تازه‌ای که دیدی اینجا ثبت می‌شود — '+faNum(codexCount())+' اکتشاف · هر کشف +۴ تجربه</div><div class="cxg">';
+ sec.forEach(([k,label])=>{const o=S.codex[k]||{},ks=Object.keys(o);
+  h+='<div class="ci"><b>'+label+' ('+faNum(ks.length)+')</b>'+(ks.length?ks.slice(0,24).map(x=>'<span title="'+esc(x)+'">'+esc(x)+'</span>').join(''):'<span style="opacity:.45">هنوز خالی</span>')+'</div>'});
+ h+='</div><br><div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="cxx">بستن</button></div>';
+ $('cxBody').innerHTML=h;$('cxx').onclick=()=>$('cxd').classList.remove('on');
+ $('cxd').classList.add('on')}
+/* ══════════ تجهیزات، پایان فصل ══════════ */
+const SHOP=[
+ {id:'hp',name:'جانِ اضافه',desc:'+۱ جان در شروع هر پرونده',max:2,prices:[120,220]},
+ {id:'scan',name:'اسکنر سریع',desc:'شارژ اسکن Q: ۸ → ۵ ثانیه',max:1,prices:[110]},
+ {id:'magnet',name:'حسگر سرنخ',desc:'برداشتن سرنخ از فاصلهٔ بیشتر',max:1,prices:[90]}
+];
+function upLvl(id){return (S.up&&S.up[id])||0}
+function upPrice(it){const l=upLvl(it.id);return it.prices[Math.min(l,it.prices.length-1)]}
+function openShop(){renderShop();$('shp').classList.add('on')}
+function renderShop(){
+ const h='<h2>تجهیزات وینی</h2><div class="sub">سکه‌ها خرج می‌شوند — هر ارتقا دائمی است و در همهٔ پرونده‌ها اثر دارد. موجودی: <b>'+faNum(S.coins||0)+'</b> سکه</div><div class="shop">'
+  +SHOP.map(it=>{const l=upLvl(it.id),max=l>=it.max,p=upPrice(it),can=!max&&(S.coins||0)>=p;
+   return '<div class="it"><b>'+it.name+'</b><div class="sub">'+it.desc+'</div><div class="lv">'+(max?'تکمیل شد':'سطح '+faNum(l)+' از '+faNum(it.max))+'</div><button class="'+(can?'c':'')+'" data-buy="'+it.id+'" '+(can?'':'disabled')+'>'+(max?'تکمیل شد':('خرید · '+faNum(p)+' سکه'))+'</button></div>'}).join('')
+  +'</div><br><div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="shpx">بستن</button></div>';
+ $('shpBody').innerHTML=h;
+ $('shpBody').querySelectorAll('[data-buy]').forEach(b=>b.onclick=()=>buyUp(b.dataset.buy));
+ $('shpx').onclick=()=>{$('shp').classList.remove('on');if(!MSHIP)renderBoard()};
+ if(!$('shp')._cl){$('shp')._cl=1;$('shp').addEventListener('click',e=>{if(e.target.id==='shp'){$('shp').classList.remove('on');if(!MSHIP)renderBoard()}})}
+}
+function buyUp(id){
+ const it=SHOP.find(x=>x.id===id);if(!it)return;
+ const l=upLvl(id);if(l>=it.max)return;
+ const p=upPrice(it);if((S.coins||0)<p){toast('سکه کافی نداری');return}
+ S.coins-=p;S.up[id]=l+1;save();SFX.coin();toast(it.name+' ارتقا یافت');renderShop()
+}
+function maybeFinale(){
+ if(S.finale||clearedCount()<7||MSHIP)return;
+ S.finale=1;save();SFX.win();
+ const rk=rankOf(S.xp);
+ const rows=[['محله‌های تمیزشده',faNum(clearedCount())+' / ۷'],['حجم آزادشده',fmt(S.bytesTotal||0)],['حکم‌های اجراشده',faNum(S.caughtTotal||0)],['پرونده‌های نجات‌داده‌شده',faNum(S.keptTotal||0)],['رتبهٔ نهایی',rk.name],['اکتشافات',faNum(codexCount())]];
+ $('finBody').innerHTML='<h2>فصل اول تمام شد</h2><div class="sub">داهلیز آرام گرفت. هفت محله تمیز شدند، ولی نویز همیشه راهی برای برگشتن پیدا می‌کند.</div>'
+  +rows.map(([k,v])=>'<div class="finline"><span>'+k+'</span><b>'+v+'</b></div>').join('')
+  +'<div class="sub" style="margin-top:12px">فصل دوم در راه است — تا آن موقع می‌توانی گشت آزاد بزنی، کشف‌نامه را کامل کنی و رکورد ستاره‌ها را بالا ببری.</div>'
+  +'<div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="finx">ادامهٔ گشت</button><button class="b" id="finb">تابلو</button></div>';
+ $('fin').classList.add('on');
+ $('finx').onclick=()=>{$('fin').classList.remove('on');renderBoard()};
+ $('finb').onclick=()=>{$('fin').classList.remove('on');renderBoard()};
+}
+/* ══════════ میز داوری، تابلوی پرونده‌ها، راه‌اندازی ══════════ */
+function draw(){
+ const M=MSHIP;if(!M){cx.fillStyle='#07080b';cx.fillRect(0,0,VW,VH);return}
+ drawBG(M);M.props.forEach(drawProp);
+ const B=M.boss;if(B){if(M.gate<1)drawGate(M);else if(B.hp>0)drawBoss(B)}
+ M.ents.forEach(drawEnt);
+ cx.strokeStyle='#7fd8ff';cx.lineWidth=3;
+ M.bull.forEach(b=>{cx.globalAlpha=Math.max(0,b.l);cx.beginPath();cx.moveTo(b.x-cam-10,b.y);cx.lineTo(b.x-cam+6,b.y);cx.stroke()});
+ cx.strokeStyle='#ff6a7d';cx.lineWidth=4;
+ M.ebull.forEach(b=>{cx.beginPath();cx.moveTo(b.x-cam-8,b.y);cx.lineTo(b.x-cam+8,b.y+b.vy*.02);cx.stroke()});
+ cx.globalAlpha=1;drawPlayer();
+ PT.forEach(p=>{cx.globalAlpha=Math.max(0,p.l*1.2);cx.fillStyle=p.c;cx.fillRect(p.x-cam,p.y,p.s,p.s)});
+ cx.globalAlpha=1;
+ if(M.scanT>0){cx.fillStyle='#7fd8ff14';cx.fillRect(0,0,VW,VH);cx.fillStyle='#7fd8ff';cx.font='700 11px V';cx.beginPath();cx.arc(PL.x-cam+70,GY()-90,60,0,7);cx.strokeStyle='#7fd8ff66';cx.lineWidth=2;cx.stroke()}}
+function nextZone(){const open=ZN.map(z=>z[0]).filter(z=>rankOK(z));const fresh=open.filter(z=>!(S.missions[z]&&S.missions[z].clears));const cur=MSHIP&&MSHIP.z;
+ return fresh.find(z=>z!==cur)||fresh[0]||open.find(z=>z!==cur)||'downloads'}
+function renderBoard(){
+ clearInput();if(document.activeElement&&document.activeElement.blur)document.activeElement.blur();
+ $('pzc').classList.remove('on');$('vd').classList.remove('on');$('mi').classList.remove('on');$('dos').classList.remove('on');$('cxd').classList.remove('on');$('shp').classList.remove('on');$('fin').classList.remove('on');
+ MSHIP=null;$('bbar').style.display='none';$('cbox').innerHTML='';$('inb').classList.remove('on');
+ setFailPause();
+ const c=clearedCount(),rk=rankOf(S.xp),dz=dailyZ();
+ let h='<h2>تابلوی پرونده‌ها</h2><div class="sub">داهلیز هر شب نویز می‌سازد؛ تو پرونده‌ها را می‌شنوی، نه پاک می‌کنی. '+(7-c?faNum(7-c)+' محله هنوز آلوده است':'همهٔ محله‌ها تمیزند — شهر نفس می‌کشد.')+(S.streak>1?' · روز '+faNum(S.streak)+' پیاپی':'')+'</div>'
+  +'<div class="row"><span>رتبهٔ کارآگاه</span><b>'+rk.name+' · '+faNum(S.xp||0)+' XP</b></div>'
+  +'<div class="rk"><div class="rkl"><span>'+faNum(rk.pct)+'٪ تا '+rk.next+'</span><span>'+faNum(rk.left)+' XP</span></div><div class="rkb"><i style="width:'+rk.pct+'%"></i></div></div>'
+  +'<div class="row"><span>سکه</span><b>'+faNum(S.coins||0)+'</b></div>'
+  +'<div class="row"><span>حجم واقعی آزادشده (حکم)</span><b class="ltr">'+fmt(S.bytesTotal||0)+'</b></div>'
+  +'<div class="row"><span>حکم‌های اجراشده روی فایل</span><b>'+faNum(S.caughtTotal||0)+'</b></div>'
+  +'<div class="row"><span>پرونده‌های نگه‌داشته‌شده</span><b>'+faNum(S.keptTotal||0)+'</b></div>'
+  +'<div class="row"><span>اکتشافات کشف‌نامه</span><b>'+faNum(codexCount())+'</b></div><div class="grid">';
+ ZN.forEach(([z,n])=>{const Mz=(S.missions||{})[z]||{};const lk=!rankOK(z);const st=Mz.st||0;const dyd=dz===z;
+  h+='<div class="cd'+(lk?' lk':'')+'" data-z="'+z+'"><span class="tp '+TYPE[z]+'">'+TPN[TYPE[z]]+'</span><div class="gn">'+n+(dyd?'<span class="dy">×۲ امشب</span>':'')+(c===0&&z==='downloads'?'<span class="dy">شروع اینجا</span>':'')+'</div><div class="gsub">'+esc(DINFO[z]||'')+'</div>'
+   +'<div class="pol"><i style="width:'+(st*33)+'%;background:'+PAL[z]+'"></i></div>'
+   +'<div class="bmeta"><span class="st">'+(st?'★'.repeat(st):'—')+(Mz.mercy?' ♥':'')+'</span><span>'+(lk?'بعد از '+faNum(UNLOCK[z])+' پرونده باز می‌شود':(Mz.clears?faNum(Mz.clears)+' بار تمیزشده':'پرونده باز است'))+'</span></div></div>'});
+ h+='</div><br><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="b" id="hlpb">راهنما</button><button class="b" id="cxb">کشف‌نامه ('+faNum(codexCount())+')</button><button class="b" id="shpb">تجهیزات ('+faNum(S.coins||0)+' سکه)</button><button class="b c" id="reftb">گشت تازه</button></div>';
+ $('vbBody').innerHTML=h;
+ const b=$('vbBody');b.querySelector('#hlpb').onclick=()=>$('hlp').classList.add('on');
+ b.querySelector('#cxb').onclick=openCodex;b.querySelector('#shpb').onclick=()=>openShop();
+ b.querySelector('#reftb').onclick=()=>{const z=nextZone();$('vb').classList.remove('on');enterMission(z)};
+ b.querySelectorAll('.cd').forEach(d=>{d.onclick=()=>{const z=d.dataset.z;if(rankOK(z))enterMission(z);else toast('کارت قفله — '+faNum(UNLOCK[z])+' مأموریت را ببند تا باز شه')}});
+ $('vb').classList.add('on');
+ if(!$('vb')._cl){$('vb')._cl=1;$('vb').addEventListener('click',e=>{if(e.target.id==='vb'&&!MSHIP)$('vb').classList.remove('on')})}
+ if(typeof maybeFinale==='function')setTimeout(maybeFinale,350)}
+/* ---- وِردیکت: مظنون‌ها، نشانه‌ها، تصمیم کاربر ---- */
+function openVerdict(){
+ const M=MSHIP;if(!M)return;M.locked=0;clearInput();
+ let clueH='<div class="facts">';
+ if(M.clueEvs&&M.clueEvs.length)clueH+=M.clueEvs.map(t=>'<span>'+esc(t)+'</span>').join('');
+ else clueH+='<span style="opacity:.6">این پرونده به سرنخ نیاز نداشت</span>';
+ clueH+='</div>';
+ let susH='<div class="sub" style="margin:6px 0 10px">هر کارت را باز کن، شناسنامه و محتوایش را ببین، بعد تصمیم بگیر. مقصر واقعی باید همهٔ نشانه‌های بالا را داشته باشد. حذف خودکار وجود ندارد.</div>';
+ M.suspects.forEach((c,i)=>{
+  const sg=sigOf(c);const chips=[sg.ext!=='—'?sg.ext:null,sg.fam,sg.size,sg.age,sg.bucket].filter(Boolean);
+  const mk=M.marks[c.path];
+  susH+='<div class="sus" data-i="'+i+'"><div class="rank">مظنون '+['۱','۲','۳','۴'][i]+(mk?' · '+(mk==='safe'?'امن':'مشکوک'):'')+'</div><div class="sn">'+esc(c.name)+' <span style="color:var(--mu)">'+(c.metric||fmt(c.sizeBytes||0))+'</span></div><div class="facts">'+chips.map(t=>'<span>'+esc(t)+'</span>').join('')+'</div><div class="pick">پرونده را باز کن و داوری کن ←</div></div>'});
+ $('vdBody').innerHTML='<h2>میز داوری · '+zn2(M.z,1)+'</h2><div class="sub">'+(M.noGun?'این محله مشاهدهٔ محض است؛ چیزی حذف نمی‌شود و فقط ثبت نهایی انجام می‌شود.':'اگر مقصر را درست تشخیص بدهی، فرمان اجرا آزاد می‌شود — اما حذف فقط با تیک خودت انجام می‌شود. می‌توانی همه را نگه داری.')+'</div>'
+  +'<div class="sub" style="margin:0 0 4px">نشانه‌های ثبت‌شده:</div>'+clueH
+  +'<div class="row"><span>بازرسی‌های انجام‌شده</span><b>'+faNum(M.inspected.length)+' / '+faNum(M.needIns||0)+'</b></div>'
+  +'<div class="row"><span>سرنخ‌های جمع‌شده</span><b>'+faNum(M.found)+' / '+faNum(M.clueNeed||0)+'</b></div>'
+  +'<div class="row"><span>امتیاز مأموریت</span><b>'+faNum(SC)+'</b></div>'
+  +'<div class="row"><span>نگهبان دروازه</span><b>'+(M.bossKilled?'شکست خورد':'—')+'</b></div>'
+  +susH+'<div id="vout"></div><br><div style="display:flex;gap:8px;justify-content:center"><button class="b" id="skipv">بدون حکم — بستن پرونده</button></div>';
+ $('skipv').onclick=()=>{const M2=MSHIP;if(!M2)return;finStore(M2,0,{kept:0,executed:0,deleted:0});renderBoard()};
+ $('vd').classList.add('on');
+ $('vdBody').querySelectorAll('.sus').forEach(d=>d.onclick=()=>dosOpen(M.suspects[+d.dataset.i],'verdict'))}
+function accuse(c){
+ const M=MSHIP;if(!M||M.locked||!c)return;M.locked=1;
+ const correct=c===M.culprit;
+ const cands=[];const add=(f,why)=>{if(f&&f.path&&!cands.some(x=>x.f.path===f.path))cands.push({f,why})};
+ if(correct)add(M.culprit,'متهم اصلی پرونده');
+ else add(c,'اتهام تو (اشتباه)');
+ Object.keys(M.marks).forEach(p=>{if(M.marks[p]==='unsafe'&&(correct||p!==M.culprit.path)){const f=M.cases.find(x=>x.path===p);if(f)add(f,'خودت مشکوک زدی')}});
+ M.candCount=cands.length;
+ const out=$('vout');const sk=$('skipv');if(sk)sk.style.display='none';
+ const vdb=$('vdBody');if(vdb&&vdb.children)Array.from(vdb.children).forEach(x=>{if(x!==out&&x.style)x.style.display='none'});
+ let h='<h2>داوری نهایی · '+zn2(M.z,1)+'</h2><div class="sub">'+(correct?'✅ دقتِ کارآگاه — همین بود!':'❌ حکم غلط: مقصرِ اصلی «'+esc((M.culprit.name||'').slice(0,44))+'» بود.')+'</div>';
+ if(M.noGun){
+  h+='<div class="warn">این محله مشاهدهٔ محض است — هیچ فایلی حذف نمی‌شود. فقط ثبت نهایی.</div><div style="display:flex;gap:8px;justify-content:center"><button class="b c" id="knv">ثبت نهایی پرونده</button><button class="b" id="backv">بازگشت</button></div>';
+  out.innerHTML=h;
+  $('knv').onclick=()=>{finStore(M,correct?2:0,{kept:cands.length,executed:0,deleted:0});renderBoard()};
+  $('backv').onclick=()=>{M.locked=0;openVerdict()};return}
+ h+='<div class="sub" style="margin-top:6px">این پرونده‌ها پیشنهاد حذف شده‌اند. هیچ‌کدام از قبل تیک نخورده — خودت انتخاب کن. حذف به سطل بازیافت است و بازگشتنی. اگر هیچ‌کدام را نمی‌خواهی، «همه را نگه دار».</div>';
+ h+='<div id="cand">'+cands.map(x=>{const f=x.f;
+  return '<label class="chk"><input type="checkbox" value="'+esc(f.path)+'"><span><b>'+esc(f.name)+'</b><small>'+esc(x.why)+' · '+(f.metric||fmt(f.sizeBytes||0))+'</small></span></label>'}).join('')+'</div>';
+ h+='<div class="warn">حذف واقعی فقط روی موارد تیک‌خورده اجرا می‌شود — بقیه دست‌نخورده می‌مانند.</div>';
+ h+='<div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="b c" id="exv" disabled>حذف انتخاب‌شده‌ها</button><button class="b" id="knv">همه را نگه دار — پرونده را ببند</button><button class="b" id="backv">بازگشت</button></div>';
+ out.innerHTML=h;
+ const sync=()=>{const n=out.querySelectorAll('#cand input:checked').length;const b=$('exv');if(b){b.disabled=!n;b.textContent=n?('حذف '+faNum(n)+' مورد انتخاب‌شده'):'حذف انتخاب‌شده‌ها'}};
+ out.querySelectorAll('#cand input').forEach(i=>i.onchange=sync);sync();
+ scrollVout(out);
+ $('knv').onclick=()=>{const mercy=correct?1:0;finStore(M,correct?2:0,{kept:cands.length,executed:0,deleted:0,mercy});
+  finishPanel('همه‌چیز دست‌نخورده ماند — هیچ فایلی حذف نشد.'+(mercy?' ستارهٔ رحمت به پرونده اضافه شد.':''))};
+ $('backv').onclick=()=>{M.locked=0;openVerdict()};
+ $('exv').onclick=()=>runExec(M,[...out.querySelectorAll('#cand input:checked')].map(i=>i.value),cands.length,correct)}
+async function runExec(M,sel,candCount,correct){
+ if(!M||!sel||!sel.length){toast('چیزی برای حذف انتخاب نشده');return}
+ const out=$('vout');$('exv').disabled=1;
+ out.innerHTML='<div class="sub">در حال اجرای حکم واقعی…</div>';
+ let R=null;try{R=await rpc('zone.execute',{zoneId:M.z,paths:sel})}catch(e){R={performed:0,failed:sel.length,freed:0}}
+ const ok=R&&R.performed>0;
+ if(ok){S.bytesTotal=(S.bytesTotal||0)+(R.freed||0);S.caughtTotal=(S.caughtTotal||0)+(R.performed||0)}
+ const kept=Math.max(0,(candCount||0)-sel.length);
+ const culpritDeleted=sel.includes((M.culprit||{}).path);
+ const innocentDeleted=sel.filter(p=>p!==(M.culprit||{}).path).length;
+ const mercy=correct&&!culpritDeleted&&!innocentDeleted?1:0;
+ finStore(M,correct?2:0,{kept,executed:ok?R.freed:0,deleted:ok?R.performed:0,mercy,innocentDeleted});
+ let msg=ok?('✅ '+faNum(R.performed||0)+' مورد حذف شد — '+fmt(R.freed||0)+' آزاد شد. همه در سطل بازیافت است.')+(kept?' '+faNum(kept)+' پرونده دست‌نخورده ماند.':''):('مرکز حکم را نپذیرفت'+(R&&R.failed?(' — '+faNum(R.failed)+' مورد ناموفق'):'')+'؛ فقط نمره ثبت شد.');
+ if(innocentDeleted)msg+=' <b style="color:#ffb454">یک بی‌گناه هم قربانی شد — ستارهٔ کامل نگرفت.</b>';
+ finishPanel(msg)}
+function scrollVout(el){
+ const sh=el&&el.closest?el.closest('.sh'):null;if(!sh)return;
+ const r=el.getBoundingClientRect(),s=sh.getBoundingClientRect();
+ sh.scrollTop=Math.max(0,sh.scrollTop+(r.top-s.top)-10)
+}
+function finishPanel(txt){
+ const nz=nextZone();const M=MSHIP;const st=(M&&M.lastStars)||0;const rw=(M&&M.lastCoins)||0;
+ const why=(M&&M.lastStarWhy)||'';
+ $('vout').innerHTML='<h2>پرونده بسته شد</h2>'+(st?'<div class="sub" style="text-align:center;font-size:18px;color:#ffd166;letter-spacing:2px">'+'★'.repeat(st)+'</div><div class="sub" style="text-align:center">+'+faNum(rw)+' سکه — رتبهٔ پرونده ثبت شد</div>':'')+(why?'<div class="sub" style="text-align:center;color:#ffb454">برای ستارهٔ کامل: '+esc(why)+'</div>':'')+'<div class="sub">'+txt+'</div><div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap"><button class="b c" id="exdone">تابلو</button><button class="b" id="exnext">پروندهٔ بعدی ←</button></div>';
+ scrollVout($('vout'));
+ $('exdone').onclick=()=>renderBoard();
+ $('exnext').onclick=()=>{$('vd').classList.remove('on');renderBoard();enterMission(nz)}}
+function finStore(M,correctFlag,meta){
+ meta=meta||{};if(!M||M.scored)return;M.scored=1;
+ const clean=!(meta.innocentDeleted>0);
+ const cluesOk=M.found>=(M.clueNeed||0),noiseOk=(M.noise||0)<25;
+ const st=correctFlag>=2?((cluesOk&&noiseOk&&clean)?3:2):1;
+ const why=[];if(correctFlag<2)why.push('حکم نادرست');if(!cluesOk)why.push('سرنخ کامل نشد');if(!noiseOk)why.push('سروصدای زیاد');if(!clean)why.push('حذف بیگناه');
+ M.lastStarWhy=st<3?why.join(' · '):'';
+ const Mz=S.missions[M.z]||(S.missions[M.z]={clears:0,best:0,st:0});
+ Mz.clears++;Mz.best=Math.max(Mz.best||0,SC);Mz.st=Math.max(Mz.st||0,st);
+ if(correctFlag>=2)Mz.det=1;
+ if(M.bossKilled)Mz.boss=1;
+ if(meta.mercy)Mz.mercy=1;
+ S.keptTotal=(S.keptTotal||0)+(meta.kept||0);
+ const noiseCut=Math.max(.55,1-(M.noise||0)/240);
+ const dbl=dailyZ()===M.z?2:1;
+ const gain=Math.round((SC/18)*noiseCut)+(correctFlag?25:0)+(meta.mercy?15:0);
+ S.coins=(S.coins||0)+gain*dbl;M.lastStars=st;M.lastCoins=gain*dbl;
+ addXP(Math.round(SC/10)+(correctFlag?15:0));
+ save();chkAch();
+ toast('پرونده بسته شد — '+faNum(st)+' ستاره · +'+faNum(gain*dbl)+' سکه'+(dbl>1?' (شب ×۲)':''));
+ SFX.win();$('dos').classList.remove('on');$('cxd').classList.remove('on');$('shp').classList.remove('on')}
+/* ---- نشان‌ها ---- */
+const ACHS=[['a1','اولین پرونده','یک محله بسته شد',()=>Object.keys(S.missions||{}).some(z=>S.missions[z].clears>0),30],
+['det','داورِ تیز','یک داوری درست',()=>Object.keys(S.missions||{}).some(z=>S.missions[z].det),50],
+['boss','نگهبان‌شکن','یک نگهبان نویز را شکستی',()=>Object.keys(S.missions||{}).some(z=>S.missions[z].boss),40],
+['mercy','دستِ بخشنده','یک مقصر را نجات دادی',()=>Object.keys(S.missions||{}).some(z=>S.missions[z].mercy),60],
+['g1','حافظه‌ی عمیق','۱۰+ مگابایت واقعی آزاد شد',()=>(S.bytesTotal||0)>=26214400,40],
+['c25','کاوشگر','۲۵ اکتشاف در کشف‌نامه',()=>codexCount()>=25,80],
+['z7','همه‌قلم','هر ۷ محله یک‌بار بسته شد',()=>clearedCount()>=7,200],
+['st7','استریک ۷ روزه','پیگیریِ هفتگی',()=>(S.streak||0)>=7,100]];
+function chkAch(){S.ach=S.ach||{};let n=0;ACHS.forEach(([id,nm,,test,rw])=>{if(!S.ach[id]&&test()){S.ach[id]=Date.now();S.coins=(S.coins||0)+(rw||0);n++;toast('نشان تازه: '+nm+(rw?' +'+faNum(rw)+' سکه':''));SFX.lvl()}});if(n)save()}
+/* ---- مکث/خروج/صدا ---- */
+function setFailPause(){const h=$('pzc').querySelector('h2');h.textContent='توقف';$('pzr').textContent='ادامه';$('pzr').onclick=()=>{clearInput();$('pzc').classList.remove('on')}}
+function togglePause(on){if(!MSHIP||!MSHIP.activity)return;clearInput();$('pzc').classList.toggle('on',!!on)}
+function retryMission(){const z=MSHIP&&MSHIP.z;if(!z){toast('مأموریتی فعال نیست');return}
+ $('pzc').classList.remove('on');const h=$('pzc').querySelector('h2');h.textContent='توقف';$('pzr').textContent='ادامه';$('pzr').onclick=()=>{clearInput();$('pzc').classList.remove('on')};
+ MSHIP=null;$('bbar').style.display='none';enterMission(z)}
+$('xcl').onclick=()=>{flushSave();post({type:'exit'})};
+$('pause').onclick=()=>togglePause(true);
+$('pzr').onclick=()=>{clearInput();$('pzc').classList.remove('on')};
+$('pzw').onclick=()=>{if(MSHIP)retryMission()};
+$('pzb').onclick=()=>{clearInput();$('pzc').classList.remove('on');renderBoard()};
+$('pzh').onclick=()=>$('hlp').classList.add('on');
+$('hlpx').onclick=()=>$('hlp').classList.remove('on');
+$('snd').onclick=()=>{S.snd=(S.snd+1)%3;if(S.snd===0)MUS.start();else MUS.stop();$('snd').style.opacity=S.snd===2?.35:1;toast(['موسیقی + افکت','فقط افکت','بی‌صدا'][S.snd]);save()};
+function enterMissionRetry(){const z=MSHIP&&MSHIP.z;if(!z)return;MSHIP=null;$('bbar').style.display='none';enterMission(z)}
+/* ---- hydrate / boot ---- */
+async function hydrate(p){
+ p=p||{};let sv=p.saved;
+ if(!sv&&HB){try{sv=await rpc('state.get')}catch(e){sv=null}}
+ if(sv&&sv.v>=2)Object.assign(S,sv);
+ else if(sv&&sv.v===1){S.coins=sv.coins||0;S.streak=sv.streak||1;S.last=sv.last||''}
+ if(sv&&(sv.v||0)<4)S.trusted={};
+ S.trusted=S.trusted||{};S.missions=S.missions||{};S.ach=S.ach||{};S.keptTotal=S.keptTotal||0;
+ S.up=Object.assign({hp:0,scan:0,magnet:0},S.up||{});
+ codexInit();
+ if(p.theme&&p.theme.accent)document.documentElement.style.setProperty('--ac',p.theme.accent);
+ const dy=new Date().toDateString();
+ if(S.last!==dy){S.streak=S.last===new Date(Date.now()-DAY).toDateString()?(S.streak||0)+1:1;S.last=dy;
+  if(S.streak>1){S.coins=(S.coins||0)+25;toast('هدیه‌ی روز '+faNum(S.streak)+'پیاپی: ۲۵ سکه')}
+  save();chkAch()}
+ if(sv&&(sv.v||0)<4)save();
+ renderBoard()}
+const DQ=HB?null:new URLSearchParams(location.search);
+if(!HB)setTimeout(async()=>{await hydrate({});
+ if(DQ&&DQ.get('dev')){const z=DQ.get('dev');await enterMission(z==='1'?'downloads':z);
+  if(DQ.get('play'))setTimeout(()=>{if(MSHIP){clearInput();MSHIP.activity=1;document.querySelectorAll('.ov').forEach(o=>o.classList.remove('on'))}},600);
+  if(DQ.get('dos'))setTimeout(()=>{if(MSHIP){const e=MSHIP.ents.find(x=>x.c)||{c:MSHIP.suspects[0]};if(e&&e.c)dosOpen(e.c,'field')}},1000);
+  if(DQ.get('verdict'))setTimeout(()=>{if(MSHIP){MSHIP.found=MSHIP.clueNeed;MSHIP.clueEvs=(MSHIP.clueFacts||[]).map(f=>f.text);MSHIP.boss=null;MSHIP.gate=2;finishMission()}},1200)}},60);
+window.addEventListener('error',e=>console.error('[winy]',e.error||e.message));
+window.__G={get M(){return MSHIP},get P(){return PL},start:enterMission,upd,draw,ms,keys,get S(){return S},get DOS(){return DOS},dos:dosOpen,codex:openCodex,exec:runExec,sig:sigOf,mark:markFile,shop:openShop,accuse};
+let lastTs=0;
+requestAnimationFrame(function loop(ts){
+ try{const dt=Math.min(.033,(ts-lastTs)/1e3||0);lastTs=ts;if(MSHIP){if(MSHIP.activity&&!ovOpen())upd(dt);draw()}}catch(err){console.error('[winy]',err)}
+ requestAnimationFrame(loop)});
+</script>
+</body>
+</html>

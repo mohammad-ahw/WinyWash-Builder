@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <root>
-  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>تشغيل كمسؤول</value></data>
   <data name="RestoreCenter" xml:space="preserve"><value>مركز الاستعادة والتراجع</value></data>
   <data name="RefreshStatus" xml:space="preserve"><value>تحديث حالة النظام</value></data>
@@ -24,7 +24,7 @@
   <data name="SettingsTitle" xml:space="preserve"><value>إعدادات التطبيق</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>المظهر، اللغة، سلوك شريط المهام وتصدير التقارير</value></data>
   <data name="LanguageTitle" xml:space="preserve"><value>لغة التطبيق</value></data>
-  <data name="LanguageSub" xml:space="preserve"><value>تغيير اتجاه الواجهة (RTL/LTR) مع تكييف الخطوط المناسبة لكل لغة.</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>اختر لغة التطبيق (ستُستكمل القائمة تدريجياً).</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>سمة التطبيق</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>اتباع سمة ويندوز أو التثبيت على الوضع الفاتح أو الداكن.</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>النظام</value></data>
@@ -35,11 +35,11 @@
   <data name="CloseToTray" xml:space="preserve"><value>البقاء قيد التشغيل في الخلفية عند إغلاق النافذة</value></data>
   <data name="MinimizeToTray" xml:space="preserve"><value>التصغير مباشرة إلى منطقة الإشعارات</value></data>
   <data name="AutoStartTitle" xml:space="preserve"><value>بدء التشغيل مع ويندوز</value></data>
-  <data name="AutoStartSub" xml:space="preserve"><value>تشغيل CleanC تلقائياً عند تسجيل الدخول إلى النظام.</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>تشغيل WinyWash تلقائياً عند تسجيل الدخول إلى النظام.</value></data>
   <data name="DeleteBehaviorTitle" xml:space="preserve"><value>سياسة حذف الملفات الشخصية</value></data>
   <data name="DeleteBehaviorSub" xml:space="preserve"><value>تنطبق على الملفات المكررة والكبيرة. ملفات النظام المهملة تحذف دائماً بشكل نهائي.</value></data>
   <data name="DeleteModeRecycle" xml:space="preserve"><value>النقل إلى سلة المحذوفات (مستحسن)</value></data>
-  <data name="DeleteModeQuarantine" xml:space="preserve"><value>حجر CleanC — حفظ آمن مع إمكانية الاستعادة</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>حجر WinyWash — حفظ آمن مع إمكانية الاستعادة</value></data>
   <data name="DeleteModePermanent" xml:space="preserve"><value>حذف نهائي — تحرير المساحة فوراً بدون استعادة</value></data>
   <data name="AutoStateRestoreTitle" xml:space="preserve"><value>استعادة الحالة تلقائياً</value></data>
   <data name="AutoStateRestoreSub" xml:space="preserve"><value>حفظ موقع النافذة، خيارات الفحص والصفحة الأخيرة.</value></data>
@@ -55,7 +55,7 @@
   <data name="ExportReportSub" xml:space="preserve"><value>توليد تقارير سياقية للذكاء الاصطناعي ومواصفات عتاد تفصيلية.</value></data>
   <data name="ExportAiReport" xml:space="preserve"><value>تقرير الذكاء الاصطناعي (.md)</value></data>
   <data name="ExportSpecsReport" xml:space="preserve"><value>تقرير مواصفات العتاد (.txt)</value></data>
-  <data name="AboutTitle" xml:space="preserve"><value>حول CleanC</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>حول WinyWash</value></data>
   <data name="AboutSub" xml:space="preserve"><value>أداة عصرية لتحسين وصيانة وإدارة عتاد ويندوز 11.</value></data>
   <data name="CheckUpdates" xml:space="preserve"><value>التحقق من التحديثات</value></data>
   <data name="ProjectPage" xml:space="preserve"><value>صفحة المشروع على GitHub</value></data>
@@ -243,7 +243,7 @@
   <data name="نامطلوب" xml:space="preserve"><value>ضعيف</value></data>
   <data name="{0}% سلامت" xml:space="preserve"><value>{0}% صحة</value></data>
   <data name="{0:N0} ساعت" xml:space="preserve"><value>{0:N0} ساعات</value></data>
-  <data name="         گزارش مشخصات سیستم و سخت افزار (CleanC)     " xml:space="preserve"><value>         تقرير النظام والأجهزة (CleanC)     </value></data>
+  <data name="         گزارش مشخصات سیستم و سخت افزار (CleanC)     " xml:space="preserve"><value>         تقرير النظام والأجهزة (WinyWash)     </value></data>
   <data name="تاریخ گزارش: {0:yyyy.MM.dd HH:mm:ss}" xml:space="preserve"><value>تاريخ التقرير: {0:yyyy.MM.dd HH:mm:ss}</value></data>
   <data name="[پردازنده مرکزی - CPU]" xml:space="preserve"><value>[وحدة المعالجة المركزية - CPU]</value></data>
   <data name="  مدل: {0}" xml:space="preserve"><value>  الطراز: {0}</value></data>
@@ -491,7 +491,7 @@
   <data name="در حال اسکن پوشه: {0}..." xml:space="preserve"><value>جارٍ مسح المجلد: {0}...</value></data>
   <data name="C:\Users (پروفایل کاربر)" xml:space="preserve"><value>C:\Users (ملف تعريف المستخدم)</value></data>
   <data name="ریشه ی سیستمی ویندوز — هرگز حذف نمی شود" xml:space="preserve"><value>جذر نظام ويندوز — لا يُحذف أبدًا</value></data>
-  <data name="لیست حفاظت پیش فرض CleanC" xml:space="preserve"><value>قائمة الحماية الافتراضية CleanC</value></data>
+  <data name="لیست حفاظت پیش فرض CleanC" xml:space="preserve"><value>قائمة الحماية الافتراضية WinyWash</value></data>
   <data name="پراکسی سیستم روی پورت {0} فعال مانده در حالی که کلاینت VPN بسته شده است و اینترنت ترمینال و ویندوز قطع می باشد." xml:space="preserve"><value>الوكيل النظامي لا يزال نشطًا على المنفذ {0} بينما عميل VPN مغلق، مما يؤدي إلى تعطّل الاتصال بمحطة العمل وWindows بالإنترنت.</value></data>
   <data name="پایدار" xml:space="preserve"><value>مستقر</value></data>
   <data name="لپ تاپ شما به شارژر متصل است" xml:space="preserve"><value>جهاز الكمبيوتر المحمول الخاص بك متصل بالشاحن</value></data>
@@ -506,7 +506,7 @@
   <data name="نقطه بازگردانی ویندوز با موفقیت ثبت شد (نسخه های قدیمی تر به صورت خودکار پاکسازی شدند)." xml:space="preserve"><value>تم إنشاء نقطة استعادة Windows بنجاح (تمت إزالة النقاط القديمة تلقائيًا).</value></data>
   <data name="ویندوز ساخت نقطه بازگردانی را رد کرد (کد {0}) — محافظت از سیستم (System Protection) را فعال کنید." xml:space="preserve"><value>رفض Windows إنشاء نقطة الاستعادة (الرمز {0}) — قم بتمكين حماية النظام.</value></data>
   <data name="ساخت نقطه بازگردانی ناموفق بود: " xml:space="preserve"><value>فشل إنشاء نقطة الاستعادة: </value></data>
-  <data name="در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)" xml:space="preserve"><value>سيتم تخزينه في CleanC الحجز الصحي (قابل للاستعادة من مركز الاستعادة)</value></data>
+  <data name="در قرنطینه ی CleanC ذخیره خواهد شد (قابل بازگردانی از مرکز بازیابی)" xml:space="preserve"><value>سيتم تخزينه في WinyWash الحجز الصحي (قابل للاستعادة من مركز الاستعادة)</value></data>
   <data name="برای همیشه حذف خواهد شد (قابل بازگردانی نیست)" xml:space="preserve"><value>سيتم حذفه نهائياً (لا يمكن استعادته)</value></data>
   <data name="به سطل بازیافت منتقل خواهد شد" xml:space="preserve"><value>سيتم نقله إلى سلة المحذوفات</value></data>
   <data name="هیچ موردی حذف نشد." xml:space="preserve"><value>لم يتم حذف أي عناصر.</value></data>
@@ -702,11 +702,11 @@
   <data name="بازنشانی به پیش فرض" xml:space="preserve"><value>إعادة إلى الوضع الافتراضي</value></data>
   <data name="تنظیمات به مقادیر پیش فرض بازنشانی شد." xml:space="preserve"><value>تم إعادة الإعدادات إلى الافتراضي.</value></data>
   <data name="بازنشانی تنظیمات" xml:space="preserve"><value>إعادة الإعدادات</value></data>
-  <data name="گالری والپیپرهای CleanC و تصویر پس زمینه ویندوز" xml:space="preserve"><value>CleanC معرض الخلفيات وخلفيات ويندوز</value></data>
-  <data name="انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({0} والپیپر گلچین 4K)" xml:space="preserve"><value>اختر بين خلفية ويندوز الحالية أو معرض الخلفيات المخصص لـ CleanC ({0} خلفيات 4K مختارة)</value></data>
+  <data name="گالری والپیپرهای CleanC و تصویر پس زمینه ویندوز" xml:space="preserve"><value>WinyWash معرض الخلفيات وخلفيات ويندوز</value></data>
+  <data name="انتخاب بین والپیپر فعلی ویندوز یا گالری والپیپرهای سفارشی CleanC ({0} والپیپر گلچین 4K)" xml:space="preserve"><value>اختر بين خلفية ويندوز الحالية أو معرض الخلفيات المخصص لـ WinyWash ({0} خلفيات 4K مختارة)</value></data>
   <data name="والپیپر پیش فرض سیستم" xml:space="preserve"><value>الخلفية الافتراضية للنظام</value></data>
   <data name="تصویر فعلی پس زمینه: {0}" xml:space="preserve"><value>الصورة الحالية للخلفية: {0}</value></data>
-  <data name="🎲 اعمال والپیپر تصادفی جدید CleanC" xml:space="preserve"><value>🎲 تطبيق خلفية جديدة عشوائية لـ CleanC</value></data>
+  <data name="🎲 اعمال والپیپر تصادفی جدید CleanC" xml:space="preserve"><value>🎲 تطبيق خلفية جديدة عشوائية لـ WinyWash</value></data>
   <data name="تصویر پس زمینه دسکتاپ به «{0}» تغییر یافت." xml:space="preserve"><value>تم تغيير خلفية سطح المكتب إلى "{0}".</value></data>
   <data name="والپیپر دسکتاپ" xml:space="preserve"><value>خلفية سطح المكتب</value></data>
   <data name="امکان تغییر والپیپر دسکتاپ وجود ندارد." xml:space="preserve"><value>غير قادر على تغيير خلفية سطح المكتب.</value></data>
@@ -844,12 +844,12 @@
   <data name="+ {0} فضا آزاد شد." xml:space="preserve"><value>+ {0} مساحة متاحة.</value></data>
   <data name="+ 0 بایت آزاد شد" xml:space="preserve"><value>+ 0 بايت تم تحريره</value></data>
   <data name="BoostRamAsync نتیجه‌ای برنگرداند" xml:space="preserve"><value>لم تُرجع BoostRamAsync أي نتيجة</value></data>
-  <data name="CleanC — سلامت سیستم: {0}%" xml:space="preserve"><value>CleanC — حالة النظام: {0}%</value></data>
-  <data name="CleanC در تری آیکون" xml:space="preserve"><value>CleanC في علبة النظام</value></data>
-  <data name="CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود." xml:space="preserve"><value>CleanC يعمل تلقائيًا عند بدء تشغيل ويندوز.</value></data>
+  <data name="CleanC — سلامت سیستم: {0}%" xml:space="preserve"><value>WinyWash — حالة النظام: {0}%</value></data>
+  <data name="CleanC در تری آیکون" xml:space="preserve"><value>WinyWash في علبة النظام</value></data>
+  <data name="CleanC هنگام ورود به ویندوز به صورت خودکار اجرا می شود." xml:space="preserve"><value>WinyWash يعمل تلقائيًا عند بدء تشغيل ويندوز.</value></data>
   <data name="Fast Startup (خاموش شدن سریع ویندوز)" xml:space="preserve"><value>بدء التشغيل السريع (تمهيد ويندوز السريع)</value></data>
   <data name="ابزار بازیابی سیستم ویندوز (System Restore)" xml:space="preserve"><value>أداة استعادة نظام ويندوز</value></data>
-  <data name="اجرای خودکار CleanC غیرفعال شد." xml:space="preserve"><value>تم تعطيل التشغيل التلقائي لـ CleanC.</value></data>
+  <data name="اجرای خودکار CleanC غیرفعال شد." xml:space="preserve"><value>تم تعطيل التشغيل التلقائي لـ WinyWash.</value></data>
   <data name="اجرای ویزارد استاندارد و رسمی ریکاوری ویندوز جهت بازگشت به تاریخ های قبلی." xml:space="preserve"><value>قم بتشغيل معالج استعادة Windows القياسي للرجوع إلى تواريخ سابقة.</value></data>
   <data name="ارتقا یافت ✓" xml:space="preserve"><value>تم الترقية ✓</value></data>
   <data name="ارزیابی و بهینه‌سازی استارتاپ ویندوز" xml:space="preserve"><value>تقييم وتحسين بدء تشغيل ويندوز</value></data>
@@ -880,7 +880,7 @@
   <data name="با موفقیت نوسازی شد ✓" xml:space="preserve"><value>تم التحديث بنجاح ✓</value></data>
   <data name="باز کردن System Restore" xml:space="preserve"><value>افتح استعادة النظام</value></data>
   <data name="باز کردن صفحه ی پروژه ممکن نشد." xml:space="preserve"><value>تعذر فتح صفحة المشروع.</value></data>
-  <data name="بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز." xml:space="preserve"><value>استعادة جميع مفاتيح السجل والخدمات التي قام CleanC بتغييرها إلى إعدادات Windows الافتراضية.</value></data>
+  <data name="بازگرداندن تمام کلیدهای رجیستری و سرویس های تغییر یافته توسط CleanC به مقادیر پیش فرض ویندوز." xml:space="preserve"><value>استعادة جميع مفاتيح السجل والخدمات التي قام WinyWash بتغييرها إلى إعدادات Windows الافتراضية.</value></data>
   <data name="بازگردانده شد ✓" xml:space="preserve"><value>تمت الاستعادة ✓</value></data>
   <data name="بازگردانی تغییرات" xml:space="preserve"><value>تم التراجع عن التغييرات</value></data>
   <data name="بازگردانی تنظیمات" xml:space="preserve"><value>استعادة الإعدادات</value></data>
@@ -948,7 +948,7 @@
   <data name="توقف تله‌متری و روان‌سازی پردازشی ویندوز" xml:space="preserve"><value>تعطيل جمع البيانات وتحسين أداء ويندوز</value></data>
   <data name="توقف تله‌متری و روان‌سازی ویندوز" xml:space="preserve"><value>تعطيل جمع البيانات وتحسين ويندوز</value></data>
   <data name="توقف تله‌متری، افزایش سرعت سرچ، اکسپلورر و تبلیغات ویندوز" xml:space="preserve"><value>تعطيل جمع البيانات؛ وتسريع البحث، والمستكشف، وإعلانات ويندوز</value></data>
-  <data name="ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست." xml:space="preserve"><value>CleanC لم يتم تسجيله للتشغيل التلقائي؛ مسار البرنامج القابل للتنفيذ غير متاح.</value></data>
+  <data name="ثبت CleanC در اجرای خودکار انجام نشد؛ مسیر اجرایی برنامه در دسترس نیست." xml:space="preserve"><value>WinyWash لم يتم تسجيله للتشغيل التلقائي؛ مسار البرنامج القابل للتنفيذ غير متاح.</value></data>
   <data name="حافظه رم با موفقیت بهینه‌سازی شد ({0} آزاد شد)." xml:space="preserve"><value>تم تحسين ذاكرة الوصول العشوائي بنجاح ({0} تم تحريره).</value></data>
   <data name="حافظه رم بررسی و تمام کش‌های غیرضروری تخلیه شدند." xml:space="preserve"><value>تم فحص ذاكرة الوصول العشوائي وتم مسح جميع ذاكرات التخزين المؤقت غير الضرورية.</value></data>
   <data name="حافظه رم بهینه شد ({0} آزاد شد) و {1} روندهای پس‌زمینه بسته شدند." xml:space="preserve"><value>تم تحسين ذاكرة الوصول العشوائي ({0} تم تحريره) وتم إغلاق مهام الخلفية {1}.</value></data>
@@ -978,7 +978,7 @@
   <data name="در حال تخصیص هوشمند کارت گرافیک..." xml:space="preserve"><value>جارٍ تعيين GPU الذكي...</value></data>
   <data name="در حال حذف برنامه ها و بازی های تبلیغاتی (Debloat)..." xml:space="preserve"><value>إزالة تطبيقات وألعاب البرامج المدمجة (Debloat)...</value></data>
   <data name="در حال فشرده سازی..." xml:space="preserve"><value>ضغط...</value></data>
-  <data name="درباره CleanC" xml:space="preserve"><value>حول CleanC</value></data>
+  <data name="درباره CleanC" xml:space="preserve"><value>حول WinyWash</value></data>
   <data name="دستاوردهای بهینه‌سازی و ارتقای سرعت سیستم" xml:space="preserve"><value>تحسين النظام وتحقيق سرعة الأداء</value></data>
   <data name="دسترسی لازم برای تخلیه Working Set فراهم نشد" xml:space="preserve"><value>لم يكن الوصول المطلوب لقص مجموعة العمل متاحًا</value></data>
   <data name="دستور TRIM با موفقیت اجرا شد و سکتورهای درایو ویندوز بهینه سازی گردیدند." xml:space="preserve"><value>تم تنفيذ أمر TRIM بنجاح وتم تحسين قطاعات قرص Windows.</value></data>
@@ -1072,13 +1072,13 @@
   <data name="جدی" xml:space="preserve"><value>جدي</value></data>
   <data name="خاموش" xml:space="preserve"><value>إيقاف</value></data>
   <data name="بدون" xml:space="preserve"><value>لا شيء</value></data>
-  <data name="CleanC - بهینه ساز هوشمند ویندوز" xml:space="preserve"><value>CleanC - مُحسّن نوافذ ذكي</value></data>
-  <data name="CleanC (پردازنده: {0}% • رم: {1}%)" xml:space="preserve"><value>CleanC (وحدة المعالجة المركزية: {0}% • الذاكرة العشوائية: {1}%)</value></data>
-  <data name="🪟 نمایش پنجره اصلی CleanC" xml:space="preserve"><value>🪟 عرض النافذة الرئيسية لـ CleanC</value></data>
+  <data name="CleanC - بهینه ساز هوشمند ویندوز" xml:space="preserve"><value>WinyWash - مُحسّن نوافذ ذكي</value></data>
+  <data name="CleanC (پردازنده: {0}% • رم: {1}%)" xml:space="preserve"><value>WinyWash (وحدة المعالجة المركزية: {0}% • الذاكرة العشوائية: {1}%)</value></data>
+  <data name="🪟 نمایش پنجره اصلی CleanC" xml:space="preserve"><value>🪟 عرض النافذة الرئيسية لـ WinyWash</value></data>
   <data name="🚀 آزادسازی آنی حافظه رم (RAM Boost)" xml:space="preserve"><value>🚀 تحرير الذاكرة العشوائية فورًا (تعزيز الذاكرة)</value></data>
   <data name="🧹 بهینه سازی کامل سیستم (Quick Boost)" xml:space="preserve"><value>🧹 تحسين النظام بالكامل (تعزيز سريع)</value></data>
   <data name="🌐 تغییر سریع DNS و تحریم شکن" xml:space="preserve"><value>🌐 تبديل سريع لنظام أسماء النطاقات ومكافحة الرقابة</value></data>
-  <data name="❌ خروج از CleanC" xml:space="preserve"><value>❌ إنهاء CleanC</value></data>
+  <data name="❌ خروج از CleanC" xml:space="preserve"><value>❌ إنهاء WinyWash</value></data>
   <data name="آزادسازی حافظه رم" xml:space="preserve"><value>تعزيز الذاكرة العشوائية</value></data>
   <data name="مقدار {0} حافظه رم با موفقیت آزاد شد." xml:space="preserve"><value>تم تحرير {0} من الذاكرة العشوائية بنجاح.</value></data>
   <data name="اجرای آزادسازی رم با خطا مواجه شد — جزئیات در crash.log ثبت شد." xml:space="preserve"><value>فشل تعزيز الذاكرة العشوائية — تم كتابة التفاصيل في crash.log.</value></data>
@@ -1158,7 +1158,7 @@
   <data name="خطا در پاکسازی" xml:space="preserve"><value>خطأ في التنظيف</value></data>
   <data name="حذف ایمن موارد انتخاب شده" xml:space="preserve"><value>حذف العناصر المحددة بأمان</value></data>
   <data name="قرنطینه خالی است؛ چیزی برای بازگردانی وجود ندارد." xml:space="preserve"><value>الحجر الصحي فارغ؛ لا يوجد شيء لاستعادته.</value></data>
-  <data name="فایل های قرنطینه شده CleanC" xml:space="preserve"><value>الملفات المحجوزة بواسطة CleanC</value></data>
+  <data name="فایل های قرنطینه شده CleanC" xml:space="preserve"><value>الملفات المحجوزة بواسطة WinyWash</value></data>
   <data name="حذف هایی که در حالت «قرنطینه» انجام شده اند؛ تا زمانی که خودتان حذف قطعی نکنید، قابل بازگردانی هستند." xml:space="preserve"><value>تمت هذه الحذوفات في وضع الحجر الصحي؛ يمكن استعادتها حتى تقوم بحذفها بشكل دائم.</value></data>
   <data name="مسیر نامشخص" xml:space="preserve"><value>مسار غير معروف</value></data>
   <data name="{0} مورد · {1} · {2}" xml:space="preserve"><value>{0} عناصر · {1} · {2}</value></data>
@@ -1196,9 +1196,10 @@
   <data name="فایل های موقت با موفقیت پاکسازی شدند و به اطلاعات شخصی آسیبی نرسید." xml:space="preserve"><value>تم تنظيف الملفات المؤقتة بنجاح ولم تتأثر أي بيانات شخصية.</value></data>
   <data name="تأیید و بازگشت به داشبورد" xml:space="preserve"><value>تأكيد والعودة إلى لوحة التحكم</value></data>
   <data name="مثلاً سی‌سی" xml:space="preserve"><value>مثال: Winy</value></data>
+  <data name="رفیق" xml:space="preserve"><value>صديق</value></data>
   <data name="حجم بالای ۱.۲۵× از درون کارت بیرون می زند" xml:space="preserve"><value>الأحجام التي تزيد عن 1.25× تتجاوز حجم البطاقة</value></data>
   <data name="خودکار (بر اساس ساعت و منطقه)" xml:space="preserve"><value>تلقائي (استنادًا إلى الوقت والمنطقة)</value></data>
-  <data name="CleanC در حال مراقبت از سیستم شماست" xml:space="preserve"><value>CleanC يعتني بنظامك</value></data>
+  <data name="CleanC در حال مراقبت از سیستم شماست" xml:space="preserve"><value>WinyWash يعتني بنظامك</value></data>
   <data name="{0} مورد انتخاب شده{1}. ادامه می دهید؟" xml:space="preserve"><value>{0} عناصر مختارة{1}. هل تريد المتابعة؟</value></data>
   <data name="DeepStoragePermanentNote" xml:space="preserve"><value>سيتم حذف هذه العناصر نهائيًا ولا يمكن استعادتها.</value></data>
   <data name="DeepStorageRecycleOptIn" xml:space="preserve"><value>نقل إلى سلة المحذوفات بدلاً من الحذف النهائي (لن يتم تحرير المساحة)</value></data>
@@ -1295,7 +1296,7 @@
   <data name="LauncherToolDns" xml:space="preserve"><value>إعدادات DNS والتجاوز</value></data>
   <data name="LauncherToolPrivacy" xml:space="preserve"><value>الخصوصية ومكافحة التتبع</value></data>
   <data name="LauncherToolRecycleBin" xml:space="preserve"><value>سلة المحذوفات</value></data>
-  <data name="AutoStartDesc" xml:space="preserve"><value>قم بتشغيل CleanC تلقائيًا عند تسجيل الدخول. هذا هو نفس الإدخال المعروض في إدارة المهام › بدء التشغيل.</value></data>
+  <data name="AutoStartDesc" xml:space="preserve"><value>قم بتشغيل WinyWash تلقائيًا عند تسجيل الدخول. هذا هو نفس الإدخال المعروض في إدارة المهام › بدء التشغيل.</value></data>
   <data name="AppDataSettingsLabel" xml:space="preserve"><value>الإعدادات:</value></data>
   <data name="AppDataLogsLabel" xml:space="preserve"><value>سجلات الأخطاء:</value></data>
   <data name="VersionLabel" xml:space="preserve"><value>إصدار التطبيق:</value></data>

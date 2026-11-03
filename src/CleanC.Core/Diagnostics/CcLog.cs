@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Threading;
+using CleanC.Core.Services;
 
 namespace CleanC.Core.Diagnostics
 {
@@ -13,7 +14,7 @@ namespace CleanC.Core.Diagnostics
     /// چرا لازم است: تا پیش از این ۲۱۶ تا <c>catch { }</c> خالی در پروژه بود و هیچ کس
     /// نمی فهمید عملیاتِ شکست خورده کدام بود. حالا هر خطای نادیده گرفته شده:
     ///   ۱) در یک حلقه ی حافظه (۲۵۶ ردیف آخر) نگه داشته می شود،
-    ///   ۲) با حداکثر ۲ خط در ثانیه در %LOCALAPPDATA%\CleanC\logs\ignored.log می نویسد.
+    ///   ۲) با حداکثر ۲ خط در ثانیه در %LOCALAPPDATA%\WinyWash\logs\ignored.log می نویسد.
     ///
     /// سقفِ نرخ عمداً پایین است: بعضی از این catchها داخل حلقه های اسکن فایل اجرا
     /// می شوند و نباید به خاطر لاگ، روی سرعت پاکسازی اثر بگذارند.
@@ -32,12 +33,10 @@ namespace CleanC.Core.Diagnostics
         private static long _lastFlushTick;
 
         /// <summary>
-        /// پوشه ی خروجی. پیش فرض %LOCALAPPDATA%\CleanC\logs است و فقط برای تست ها
+        /// پوشه ی خروجی. پیش فرض %LOCALAPPDATA%\WinyWash\logs است و فقط برای تست ها
         /// قابل تغییر است تا اجرای تست ها روی داده ی واقعی کاربر اثر نگذارد.
         /// </summary>
-        public static string LogDirectory { get; set; } = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CleanC", "logs");
+        public static string LogDirectory { get; set; } = AppPaths.LogsDir;
 
         /// <summary>تعداد کل خطاهای نادیده گرفته شده در این اجرا.</summary>
         public static long TotalIgnored => Interlocked.Read(ref _total);

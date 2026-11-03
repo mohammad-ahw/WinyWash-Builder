@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -629,7 +629,7 @@ namespace CleanC.Core.Services
                         TargetPaths = deadExtList.Select(e => e.InstallPath).Where(p => !string.IsNullOrEmpty(p)).ToList(),
                         Bytes = deadExtBytes,
                         IconGlyph = "\uE774",
-                        IsChecked = deadExtList.Count > 0
+                        IsChecked = false // هرگز به صورت خودکار انتخاب نشود؛ نیاز به تأیید کاربر دارد
                     });
                 }
                 catch (Exception __ex)
@@ -881,7 +881,8 @@ namespace CleanC.Core.Services
                                 Path = lo.FullPath,
                                 TargetPaths = new List<string> { lo.FullPath },
                                 Bytes = lo.SizeBytes,
-                                IconGlyph = "\uE74D"
+                                IconGlyph = "\uE74D",
+                                IsChecked = false // پوشه های بازمانده هرگز به صورت خودکار برای پاکسازی تیک نمی خورند
                             });
                         }
 

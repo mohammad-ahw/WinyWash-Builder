@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,6 +22,9 @@ namespace CleanC.Core.Services
         // برای همه ی دیتکتورها وجود داشته باشد. رفتار معادل، اتحاد همان نام هاست.
 
         // Extensions that identify personal user documents, media, or source code projects - if found, folder is NEVER a leftover!
+        // نکته ی حیاتی: پسوندهای سِیو بازی هم اینجا هستند — پوشه ی بازمانده ای که سِیو
+        // بازی (مثلاً Stardew Valley، Dark Souls، Resident Evil) داخلش باشد هرگز
+        // «زباله» حساب نمی شود و حذف نمی شود. (باگ واقعی: پاک شدن سِیوهای کاربر)
         private static readonly HashSet<string> PersonalDocumentExtensions = new(StringComparer.OrdinalIgnoreCase)
         {
             ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".pdf",
@@ -29,7 +32,12 @@ namespace CleanC.Core.Services
             ".mp4", ".mkv", ".avi", ".mov", ".wmv", ".mp3", ".wav", ".flac",
             ".zip", ".rar", ".7z", ".tar", ".gz",
             ".sln", ".csproj", ".vbproj", ".fsproj", ".vcxproj",
-            ".cs", ".cpp", ".c", ".h", ".py", ".rs", ".go", ".java", ".ts", ".blend"
+            ".cs", ".cpp", ".c", ".h", ".py", ".rs", ".go", ".java", ".ts", ".blend",
+            // سِیو/ذخیره ی بازی ها و فایل های پشتیبان — اکثر موتورهای بازی از اینها استفاده می کنند
+            ".sav", ".save", ".bak", ".vdf", ".wld", ".psv", ".stg", ".sl2", ".ssf",
+            ".d2s", ".mlx", ".gam", ".plrk", ".gci", ".srm", ".dsv", ".mcr", ".vmc",
+            ".dat", ".bin", ".sqlite", ".db", ".bytes", ".profile", ".lsv", ".co2", ".sgd", ".gamedata",
+            ".state", ".opt", ".cfg", ".pak", ".asset", ".unity3d", ".bundle", ".rpf"
         };
 
         public static List<LeftoverFolderItem> ScanLeftoverFolders()
@@ -44,7 +52,7 @@ namespace CleanC.Core.Services
                 string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
                 string appData = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
                 string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-                string localLow = Path.Combine(userProfile, @"AppData\LocalLow");
+                // AppData\LocalLow is strictly protected and never scanned
                 string programData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
                 string publicDir = Environment.GetEnvironmentVariable("PUBLIC") ?? @"C:\Users\Public";
 
@@ -54,11 +62,7 @@ namespace CleanC.Core.Services
                 // 3. Scan LocalAppData
                 ScanCandidateDirectory(localApp, "AppData (Local)", installedNames, leftovers);
 
-                // 4. Scan LocalLow (games, unity, legacy tools)
-                if (Directory.Exists(localLow))
-                {
-                    ScanCandidateDirectory(localLow, "AppData (LocalLow)", installedNames, leftovers);
-                }
+
 
                 // 5. Scan ProgramData
                 ScanCandidateDirectory(programData, "ProgramData", installedNames, leftovers);
@@ -90,8 +94,10 @@ namespace CleanC.Core.Services
                 {
                     string dirName = Path.GetFileName(dir);
 
+                    if (LockRegistryService.IsLockedPath(dir)) continue;
                     if (LockRegistryService.IsProtectedName(dirName)) continue;
                     if (dirName.StartsWith(".") || dirName.StartsWith("$")) continue;
+                    if (HasPersonalOrProjectFiles(dir)) continue;
 
                     // Skip junctions / symlinks
                     try
@@ -274,7 +280,7 @@ namespace CleanC.Core.Services
                         return true; // Contains personal document/media/project - protect it!
                     }
 
-                    if (scannedCount > 100) break;
+                    if (scannedCount > 500) break;
                 }
             }
             catch (Exception __ex)
@@ -464,6 +470,49 @@ namespace CleanC.Core.Services
                 CcLog.Ignore(__ex);
             }
 
+                        // Game libraries on all drives (Steam, Epic, GOG, Riot, Ubisoft, etc.)
+            try
+            {
+                foreach (var drive in DriveInfo.GetDrives())
+                {
+                    if (drive.DriveType != DriveType.Fixed || !drive.IsReady) continue;
+                    string root = drive.RootDirectory.FullName;
+                    string[] gameDirs = {
+                        Path.Combine(root, "Games"),
+                        Path.Combine(root, "Game"),
+                        Path.Combine(root, "SteamLibrary", "steamapps", "common"),
+                        Path.Combine(root, "Program Files", "Epic Games"),
+                        Path.Combine(root, "GOG Games"),
+                        Path.Combine(root, "Riot Games"),
+                        Path.Combine(root, "Ubisoft", "Ubisoft Game Launcher", "games"),
+                        Path.Combine(root, "XboxGames")
+                    };
+
+                    foreach (var gDir in gameDirs)
+                    {
+                        if (Directory.Exists(gDir))
+                        {
+                            foreach (var sub in Directory.GetDirectories(gDir))
+                            {
+                                if (HasAnyFile(sub))
+                                {
+                                    string gName = Path.GetFileName(sub);
+                                    signatures.Add(gName);
+                                    foreach (var word in gName.Split(new[] { ' ', '-', '_', '.', '(', ')' }, StringSplitOptions.RemoveEmptyEntries))
+                                    {
+                                        if (word.Length >= 3 && !GenericAppWords.Contains(word)) signatures.Add(word);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+
             return signatures;
         }
 
@@ -500,7 +549,7 @@ namespace CleanC.Core.Services
             {
                 Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                Path.Combine(userProfile, @"AppData\LocalLow"),
+                // LocalLow excluded from allowed roots
                 Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
                 userProfile,
                 Environment.GetEnvironmentVariable("PUBLIC") ?? @"C:\Users\Public",
@@ -525,6 +574,7 @@ namespace CleanC.Core.Services
                 string dirName = Path.GetFileName(full);
 
                 if (string.IsNullOrEmpty(dirName)) return false;
+                                if (LockRegistryService.IsLockedPath(full)) return false;
                 if (LockRegistryService.IsProtectedName(dirName)) return false;
                 if (dirName.StartsWith(".") || dirName.StartsWith("$")) return false;
 
@@ -554,14 +604,23 @@ namespace CleanC.Core.Services
         }
 
         /// <summary>
-        /// پوشه های رهاشده را حذف می کند و «فقط فضایی که واقعاً آزاد شده» را برمی گرداند.
+        /// پوشه های رهاشده را با حالت حذفِ انتخابی کاربر (تنظیمات → حالت حذف؛ پیش فرض:
+        /// سطل بازیافت) حذف می کند و نتیجه ی صادقانه ی دسته را برمی گرداند.
+        ///
+        /// چرا SafeDeleteService و نه Directory.Delete؟ چون پوشه ی «بازمانده» ممکن است
+        /// سِیو بازی یا تنظیمات شخصی کاربر باشد — حذف قطعیِ پوشه ی اشتباه داده
+        /// غیرقابل بازگردانی از بین می برد. با مسیر SafeDeleteService حتی اگر
+        /// تشخیص اشتباه بود، داده در سطل/قرنطینه باقی می ماند.
+        /// فقط فضای واقعاً آزاد شده (حالت Permanent) در FreedBytes برمی گردد؛
+        /// جابه جایی به سطل/قرنطینه در MovedBytes گزارش می شود.
         /// هر مسیر پیش از حذف دوباره بررسی ایمنی می شود.
         /// </summary>
-        public static long DeleteLeftoverFolders(IEnumerable<LeftoverFolderItem> items)
+        public static SafeDeleteBatchResult DeleteLeftoverFolders(IEnumerable<LeftoverFolderItem> items)
         {
-            if (items == null) return 0;
-            long freed = 0;
+            var batch = new SafeDeleteBatchResult();
+            if (items == null) return batch;
 
+            var safePaths = new List<string>();
             foreach (var item in items)
             {
                 if (item == null) continue;
@@ -569,20 +628,26 @@ namespace CleanC.Core.Services
                 {
                     if (!IsSafeToDelete(item.FullPath)) continue;
 
-                    // اندازه واقعی را همین الان بگیر، نه مقدار ذخیره شده از زمان اسکن
-                    long size = GetDirectorySizeSafe(item.FullPath);
-                    if (size <= 0) continue;
+                    // پوشه ی کاملاً خالی ارزش حرکت دادن به سطل ندارد؛ حذف قطعی بی خطر است
+                    if (!Directory.EnumerateFileSystemEntries(item.FullPath).Any())
+                    {
+                        Directory.Delete(item.FullPath, false);
+                        continue;
+                    }
 
-                    Directory.Delete(item.FullPath, true);
-                    if (!Directory.Exists(item.FullPath)) freed += size;
+                    safePaths.Add(item.FullPath);
                 }
-                catch
+                catch (Exception __ex)
                 {
-                    // پوشه خالی نیست/قفل است → چیزی گزارش نمی شود
+                    CcLog.Ignore(__ex, "LeftoverCleaner.DeleteLeftoverFolders");
                 }
             }
 
-            return freed;
+            if (safePaths.Count == 0) return batch;
+
+            // حالت حذفِ کاربر (پیش فرض RecycleBin) — پوشه ی اشتباهی هم به سطل می رود نه نابودی
+            var mode = SafeDeleteService.ParseMode(SettingsService.Load().DeleteMode);
+            return SafeDeleteService.DeleteDirectories(safePaths, mode);
         }
     }
 }

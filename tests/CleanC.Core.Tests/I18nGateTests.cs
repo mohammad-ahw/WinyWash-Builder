@@ -11,16 +11,17 @@ namespace CleanC.Core.Tests
 {
     public class I18nGateTests
     {
-        // ریشه ی ریپو از روی CleanC.sln پیدا می شود (تست ها از پوشه ی bin اجرا می شوند)
+        // ریشه ی ریپو از روی WinyWash.sln (نام جدید CleanC.sln) پیدا می شود
+        // (تست ها از پوشه ی bin اجرا می شوند)
         private static string FindRepoRoot()
         {
             var dir = new DirectoryInfo(AppContext.BaseDirectory);
             while (dir != null)
             {
-                if (File.Exists(Path.Combine(dir.FullName, "CleanC.sln"))) return dir.FullName;
+                if (File.Exists(Path.Combine(dir.FullName, "WinyWash.sln"))) return dir.FullName;
                 dir = dir.Parent;
             }
-            throw new InvalidOperationException("CleanC.sln در والدهای مسیر تست پیدا نشد: " + AppContext.BaseDirectory);
+            throw new InvalidOperationException("WinyWash.sln در والدهای مسیر تست پیدا نشد: " + AppContext.BaseDirectory);
         }
 
         private static string StringsRoot => Path.Combine(FindRepoRoot(), "src", "CleanC.UI", "Resources", "Strings");

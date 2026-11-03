@@ -20,8 +20,15 @@ namespace CleanC.Core.Services
         string Country,
         string Admin1,
         double Latitude,
-        double Longitude)
+        double Longitude,
+        string CountryCode)
     {
+        /// <summary>
+        /// پرچم کشور برای نمایش خوانا در لیست پیشنهادها (مثل «🇮🇷»).
+        /// منبع: کد دو حرفی ISO که Open-Meteo در فیلد country_code برمی‌گرداند.
+        /// </summary>
+        public string FlagEmoji => InternetSpeedTestService.GetCountryFlagEmoji(CountryCode);
+
         /// <summary>برچسب خوانا برای لیست پیشنهادها؛ بخش‌های تکراری حذف می‌شوند.</summary>
         public string DisplayName
         {
@@ -227,7 +234,8 @@ namespace CleanC.Core.Services
                         ReadString(item, "country").Trim(),
                         ReadString(item, "admin1").Trim(),
                         lat,
-                        lon));
+                        lon,
+                        ReadString(item, "country_code").Trim()));
                 }
             }
             catch

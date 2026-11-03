@@ -28,7 +28,11 @@ namespace CleanC.Core.Services
         public long SizeBytes { get; set; }
         // صادقانه بودن آمار: اندازه تخمینی (هاردکد) هرگز نباید به «آزاد شده واقعی» اضافه شود
         public bool SizeIsEstimate { get; set; }
-        public string FormattedSize => SystemStats.FormatBytes(SizeBytes);
+
+        /// <summary>نمایش صادقانه ی حجم: برای مقادیر تخمینی علامت «≈» می گیرد تا ۲۵۰/۸۵ مگابایتِ هاردکد، واقعی جلوه نکند.</summary>
+        public string FormattedSize => SizeIsEstimate
+            ? "≈ " + SystemStats.FormatBytes(SizeBytes)
+            : SystemStats.FormatBytes(SizeBytes);
         public AppCategoryType CategoryType { get; set; }
         public string CategoryLabel { get; set; } = "Bloatware";
         public string Description { get; set; } = string.Empty;
@@ -324,13 +328,17 @@ namespace CleanC.Core.Services
                                 Id = subName,
                                 DisplayName = displayName,
                                 UninstallString = uninstallString ?? string.Empty,
+                                // حجم دقیق برنامه های تریال معمولاً در رجیستری نیست؛ ۲۵۰ مگابایت
+                                // فقط تخمین است و با «≈» نمایش داده می شود (FormattedSize).
                                 SizeBytes = 250 * 1024 * 1024,
                                 SizeIsEstimate = true,
                                 CategoryType = AppCategoryType.OemTrial,
                                 CategoryLabel = LocalizationService.Get("نرم افزار لپ تاپ / تریال"),
                                 Description = LocalizationService.Get("نرم افزار تبلیغاتی یا آزمایشی سازنده سیستم"),
                                 IsPackagedApp = false,
-                                IsSelected = true
+                                // هرگز به صورت پیش فرض تیک نخورده — حذف McAfee/Norton باید
+                                // انتخاب آگاهانه ی خود کاربر باشد نه جریان خودکارِ یک کلیک
+                                IsSelected = false
                             });
                             continue;
                         }
@@ -543,6 +551,27 @@ namespace CleanC.Core.Services
                     CcLog.Ignore(ex);
                 }
 
+                // 4. نرم افزارهای تریال سازنده ی سیستم (McAfee/Norton/Dell SupportAssist...)
+                // اینجا می آیند نه در حذف خودکار — حذف آنتی ویروس باید انتخاب آگاهانه ی
+                // خود کاربر باشد؛ این لیست در دیالوگ بازبینی مرزی به او نشان داده می شود.
+                try
+                {
+                    var allCandidates = ScanCandidateAppsAsync().GetAwaiter().GetResult();
+                    var oemTrials = allCandidates.Where(c => c.CategoryType == AppCategoryType.OemTrial).ToList();
+                    foreach (var item in oemTrials)
+                    {
+                        if (!list.Any(x => x.DisplayName.Equals(item.DisplayName, StringComparison.OrdinalIgnoreCase)))
+                        {
+                            item.IsSelected = false; // بدون تیک پیش فرض — تصمیم با کاربر است
+                            list.Add(item);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex);
+                }
+
                 return list;
             });
         }
@@ -550,8 +579,13 @@ namespace CleanC.Core.Services
         public static async Task<(int RemovedCount, long FreedBytes)> CleanAutomaticBloatwareAsync()
         {
             var candidates = await ScanCandidateAppsAsync();
+            // فقط Bloatware واقعی (Candy Crush و مانند آن) به صورت خودکار حذف می شود.
+            // نرم افزارهای تریال سازنده (McAfee/Norton/Dell SupportAssist) حذفِ خودکار
+            // ندارند — آنتی ویروسِ خودکار حذف شده می تواند سیستم را بدون محافظت بگذارد؛
+            // اینها در بازبینی مرزی (ScanBorderlineReviewAppsAsync) با انتخاب آگاهانه ی
+            // کاربر پیشنهاد می شوند.
             var autoTargets = candidates
-                .Where(c => c.CategoryType == AppCategoryType.Bloatware || c.CategoryType == AppCategoryType.OemTrial)
+                .Where(c => c.CategoryType == AppCategoryType.Bloatware)
                 .ToList();
 
             int removed = 0;
@@ -629,19 +663,58 @@ namespace CleanC.Core.Services
         {
             try
             {
-                var match = Regex.Match(uninstallString.Trim(), "^\"([^\"]+)\"(.*)$");
-                string file = match.Success ? match.Groups[1].Value : uninstallString;
-                string args = match.Success ? match.Groups[2].Value.Trim() : string.Empty;
+                string trimmed = uninstallString.Trim();
+                string file, args;
+
+                var match = Regex.Match(trimmed, "^\"([^\"]+)\"(.*)$");
+                if (match.Success)
+                {
+                    // حالت استاندارد: "C:\path\uninst.exe" /args
+                    file = match.Groups[1].Value;
+                    args = match.Groups[2].Value.Trim();
+                }
+                else
+                {
+                    // حالت بدون کوتیشن: اگر مسیر فاصله داشته باشد (C:\Program Files\...)
+                    // کل رشته به عنوان مسیر فایل شکست می خورد؛ تا انتهای پسوند
+                    // اجرایی (.exe/.msi/...) را مسیر فایل و باقی را آرگومان می گیریم.
+                    int cut = -1;
+                    foreach (var ext in new[] { ".exe", ".msi", ".bat", ".cmd" })
+                    {
+                        int idx = trimmed.IndexOf(ext, StringComparison.OrdinalIgnoreCase);
+                        if (idx >= 0 && idx + ext.Length > cut) cut = idx + ext.Length;
+                    }
+                    if (cut > 0)
+                    {
+                        file = trimmed.Substring(0, cut);
+                        args = trimmed.Substring(cut).Trim();
+                    }
+                    else
+                    {
+                        file = trimmed;
+                        args = string.Empty;
+                    }
+                }
 
                 var psi = new ProcessStartInfo(file, args)
                 {
                     UseShellExecute = true
                 };
-                Process.Start(psi);
-                return true;
+                using var p = Process.Start(psi);
+                if (p == null) return false;
+
+                // گزارش صادقانه: Start موفق یعنی نصاب «باز شد»، نه اینکه «حذف شد».
+                // اگر فرایند تا ۲ ثانیه تمام شود و کد خروجش ناصفر باشد، شروعِ
+                // حذف شکست خورده → false برمی گردد.
+                if (p.WaitForExit(2000))
+                {
+                    return p.ExitCode == 0;
+                }
+                return true; // فرایند در جریان است (پنجره ی حذف باز مانده)
             }
-            catch
+            catch (Exception ex)
             {
+                CcLog.Ignore(ex, "Bloatware.Win32Uninstaller");
                 return false;
             }
         }

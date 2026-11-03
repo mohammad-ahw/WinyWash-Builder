@@ -1,11 +1,11 @@
-// src/CleanC.Core/Services/LockRegistryService.cs
+﻿// src/CleanC.Core/Services/LockRegistryService.cs
 // رجیستری قفلِ مسیرها — منبع واحدِ «دست نزن» برای همه ی دیتکتورهای اسکن/پاکسازی.
 //
 // دو نوع قفل:
 //   ۱) قفل های پیش فرض (کامپایل شده): لیست های حاردکد قبلیِ LeftoverCleanerService
 //      (حفاظت نام ها) + ریشه های سیستمی (Windows / Program Files). این ها همیشه فعالند
 //      و از فایل json قابل حذف نیستند (حذف فایل هم آن ها را از بین نمی برد).
-//   ۲) قفل های کاربر (فایل %LOCALAPPDATA%\CleanC\locks.json): از UI اضافه/حذف می شوند.
+//   ۲) قفل های کاربر (فایل %LOCALAPPDATA%\WinyWash\locks.json): از UI اضافه/حذف می شوند.
 //
 // دو سطح بررسی:
 //   IsLockedPath      → پیش فرض + کاربر؛ برای «پیشنهاد ندادن» در اسکن ها
@@ -69,9 +69,7 @@ namespace CleanC.Core.Services
             }
         }
 
-        private static string BuildDefaultPath() => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CleanC", "locks.json");
+        private static string BuildDefaultPath() => AppPaths.LocksFile;
 
         // ── قفل های پیش فرض (کامپایل شده) ─────────────────────────────────
 
@@ -84,7 +82,8 @@ namespace CleanC.Core.Services
             // سازنده ها و پوشه های سیستمی / برنامه ها
             "Microsoft", "Windows", "WindowsApps", "Packages", "Common Files", "Internet Explorer",
             "NVIDIA Corporation", "NVIDIA", "AMD", "Intel", "Realtek", "Synaptics", "Google",
-            "Mozilla", "CleanC", "Git", "dotnet", "Adobe", "Steam", "Epic Games", "Discord",
+            "Mozilla", "CleanC", "WinyWash", "CleanC.UI", "WinyWash.exe.WebView2", "CleanC.exe.WebView2", "EBWebView",
+            "Git", "dotnet", "Adobe", "Steam", "Epic Games", "Discord",
             "Telegram Desktop", "Spotify", "Temp", "CrashDumps", "USOShared", "NhNotifSys",
             "Programs", "System",
             "Downloaded Installations", "Package Cache", "OEM", "ASUS", "Lenovo", "Dell", "HP", "MSI",
@@ -93,12 +92,22 @@ namespace CleanC.Core.Services
             "Kingston", "Samsung", "Crucial", "Western Digital", "Seagate", "Oracle", "Java",
             "Android", "JetBrains", "Unity", "EpicGamesLauncher",
 
+            // اکوسیستم و استودیوهای بازی‌سازی و لانچرها (حفاظت خط قرمز از سیو و دیتای بازی)
+            "Ubisoft", "Ubisoft Game Launcher", "Electronic Arts", "EA Games", "EA Desktop", "Origin",
+            "Battle.net", "Blizzard", "Blizzard Entertainment", "Riot Games", "GOG.com", "GOG Galaxy",
+            "FromSoftware", "Larian Studios", "CD Projekt Red", "Bethesda", "Bethesda.net",
+            "Rockstar Games", "Capcom", "Bandai Namco", "Bandai Namco Entertainment", "SEGA",
+            "Square Enix", "Konami", "2K Games", "Paradox Interactive", "Team Cherry",
+            "IronGate", "Klei", "Ludeon Studios", "miHoYo", "GenshinImpact", "Roblox", "Mojang",
+            "Minecraft", "Valve", "DarkSouls", "EldenRing", "BaldursGate3", "Cyberpunk 2077",
+            "The Witcher 3", "Euro Truck Simulator 2", "American Truck Simulator",
+
             // نام های ریشه ی درایو (برای دیتکتور D10 و اسکن های سطح درایو)
             "Users", "ProgramData", "Recovery", "$Recycle.Bin", "System Volume Information",
 
-            // پوشه های شخصیِ پروفایل کاربر
+            // پوشه های شخصیِ پروفایل کاربر و محل‌های ذخیره سیو بازی‌ها
             "Desktop", "Documents", "Downloads", "Pictures", "Music", "Videos",
-            "Favorites", "Links", "Contacts", "Searches", "Saved Games", "3D Objects",
+            "Favorites", "Links", "Contacts", "Searches", "Saved Games", "My Games", "GameSaves", "SaveGames", "Saves", "3D Objects",
             "OneDrive", "AppData", "Cookies", "NetHood", "PrintHood", "Recent", "SendTo",
             "Start Menu", "Templates", "Application Data", "Local Settings", "My Documents",
             "Projects", "Source", "Repos", "Workspace", "Development", "Codes", "Code",
@@ -164,6 +173,47 @@ namespace CleanC.Core.Services
             Add(Environment.SpecialFolder.Windows);
             Add(Environment.SpecialFolder.ProgramFiles);
             Add(Environment.SpecialFolder.ProgramFilesX86);
+
+            // خط قرمز: پوشه های سیو بازی ها و دایرکتوری های حیاتی کاربر
+            try
+            {
+                string userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                string myDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
+                string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+
+                if (!string.IsNullOrWhiteSpace(userProfile))
+                {
+                    list.Add(Path.Combine(userProfile, "Saved Games"));
+                    list.Add(Path.Combine(userProfile, @"AppData\LocalLow"));
+                }
+                if (!string.IsNullOrWhiteSpace(myDocs))
+                {
+                    list.Add(Path.Combine(myDocs, "My Games"));
+                }
+                if (!string.IsNullOrWhiteSpace(localApp))
+                {
+                    list.Add(Path.Combine(localApp, "WinyWash.exe.WebView2"));
+                    list.Add(Path.Combine(localApp, "CleanC.exe.WebView2"));
+                    list.Add(Path.Combine(localApp, "CleanC.UI.exe.WebView2"));
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex, "LockRegistry.DefaultFolders.GameSaves");
+            }
+
+            // فیکس «حذف دیتای خود برنامه»: ریشه های داده ی WinyWash (تنظیمات، قفل ها،
+            // قرنطینه، لاگ ها و بکاپ ها) و پوشه جاری اجرای برنامه باید همیشه قفل باشند.
+            try
+            {
+                if (!string.IsNullOrWhiteSpace(AppPaths.LocalRoot)) list.Add(AppPaths.LocalRoot);
+                if (!string.IsNullOrWhiteSpace(AppPaths.CommonRoot)) list.Add(AppPaths.CommonRoot);
+                if (!string.IsNullOrWhiteSpace(AppContext.BaseDirectory)) list.Add(AppContext.BaseDirectory);
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex, "LockRegistry.DefaultFolders.AppPaths");
+            }
             return list;
         }
 
@@ -222,12 +272,29 @@ namespace CleanC.Core.Services
         {
             if (string.IsNullOrWhiteSpace(name)) return false;
 
-            if (DefaultProtectedNames.Contains(name.Trim())) return true;
+            string trimmed = name.Trim();
+
+            // خط قرمز: دیتای خود برنامه، WebView2 و پوشه های مشخص سیو
+            if (trimmed.EndsWith(".WebView2", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "WinyWash", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "CleanC", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "CleanC.UI", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("WinyWash.", StringComparison.OrdinalIgnoreCase) ||
+                trimmed.StartsWith("CleanC.", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "EBWebView", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "Saved Games", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "My Games", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(trimmed, "LocalLow", StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (DefaultProtectedNames.Contains(trimmed)) return true;
 
             foreach (var entry in GetUserEntries())
             {
                 if (!string.Equals(entry.LockType, LockTypes.Name, StringComparison.OrdinalIgnoreCase)) continue;
-                if (string.Equals(entry.Path.Trim(), name.Trim(), StringComparison.OrdinalIgnoreCase)) return true;
+                if (string.Equals(entry.Path.Trim(), trimmed, StringComparison.OrdinalIgnoreCase)) return true;
             }
             return false;
         }

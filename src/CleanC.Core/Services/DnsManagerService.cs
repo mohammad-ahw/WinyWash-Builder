@@ -252,14 +252,39 @@ namespace CleanC.Core.Services
         {
             try
             {
-                using var searcher = new ManagementObjectSearcher(
+                // مرحلهٔ ۱: Index کارت را از Win32_NetworkAdapter می گیریم.
+                // NetConnectionID (نام دوستانه ای که در تنظیمات ویندوز دیده می شود) فقط روی
+                // همین کلاس است؛ Win32_NetworkAdapterConfiguration این خاصیت را ندارد و
+                // کوئریِ قدیمی همیشه ناموفق بود — DNS عملاً هیچ وقت اعمال نمی شد.
+                int? adapterIndex = null;
+                using (var adapterSearcher = new ManagementObjectSearcher(
                     @"root\cimv2",
-                    "SELECT NetConnectionID FROM Win32_NetworkAdapterConfiguration WHERE IPEnabled = TRUE");
-                foreach (ManagementObject mo in searcher.Get())
+                    "SELECT Index, NetConnectionID FROM Win32_NetworkAdapter WHERE NetConnectionID IS NOT NULL"))
+                {
+                    foreach (ManagementObject adapter in adapterSearcher.Get())
+                    {
+                        using var _adapter = adapter;
+                        string netId = adapter["NetConnectionID"]?.ToString() ?? "";
+                        if (string.Equals(netId, adapterName, StringComparison.OrdinalIgnoreCase))
+                        {
+                            adapterIndex = Convert.ToInt32(adapter["Index"]);
+                            break;
+                        }
+                    }
+                }
+
+                if (adapterIndex == null) return (false, LocalizationService.Get("کارت شبکه در WMI پیدا نشد"));
+
+                // مرحلهٔ ۲: روی همان Index در کلاس تنظیمات، DNS اعمال می شود
+                // (Index دو کلاس با هم یکی است — روی سیستم واقعی تأیید شده).
+                using var configSearcher = new ManagementObjectSearcher(
+                    @"root\cimv2",
+                    $"SELECT Index, IPEnabled FROM Win32_NetworkAdapterConfiguration WHERE Index = {adapterIndex.Value}");
+                foreach (ManagementObject mo in configSearcher.Get())
                 {
                     using var _mo = mo;
-                    string netId = mo["NetConnectionID"]?.ToString() ?? "";
-                    if (!string.Equals(netId, adapterName, StringComparison.OrdinalIgnoreCase)) continue;
+                    bool ipEnabled = mo["IPEnabled"] != null && (bool)mo["IPEnabled"];
+                    if (!ipEnabled) continue;
 
                     using var inParams = mo.GetMethodParameters("SetDNSServerSearchOrder");
                     inParams["DNSServerSearchOrder"] = dnsServers; // null = برگشت به DNS خودکار
@@ -269,6 +294,7 @@ namespace CleanC.Core.Services
                     if (code == 0 || code == 1) return (true, "");
                     return (false, string.Format(LocalizationService.Get("کد خطای WMI: {0}"), code));
                 }
+
                 return (false, LocalizationService.Get("کارت شبکه در WMI پیدا نشد"));
             }
             catch (Exception ex)

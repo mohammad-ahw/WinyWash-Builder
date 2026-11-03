@@ -232,9 +232,9 @@ namespace CleanC.Core.Services
 
         public static string GetGlassConfigPath()
         {
-            string dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC");
+            string dir = AppPaths.LocalRoot;
             Directory.CreateDirectory(dir);
-            return Path.Combine(dir, "glass_config.ini");
+            return AppPaths.GlassConfigFile;
         }
 
         public static GlassPresetConfig LoadGlassConfig()

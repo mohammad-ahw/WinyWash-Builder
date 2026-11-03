@@ -12,18 +12,16 @@ namespace CleanC.Core.Services
         private const string FlagFileName = "tweaks_applied_flag.json";
 
         /// <summary>
-        /// مسیر اصلی (جدید): %ProgramData%\CleanC\Backups
+        /// مسیر اصلی (جدید): %ProgramData%\WinyWash\Backups
         /// دلیل جابجایی: %LOCALAPPDATA% داخل مسیر اسکن پاک سازهاست؛
-        /// نگه داشتن پرچم و بکاپ ها آنجا یعنی ممکن است توسط خود CleanC پاک شوند
+        /// نگه داشتن پرچم و بکاپ ها آنجا یعنی ممکن است توسط خود برنامه پاک شوند
         /// و «بازگردانی تغییرات» از کار بیفتد. ProgramData سراسری است و
         /// عمری برابر با نصب نرم افزار دارد.
         /// </summary>
-        private static readonly string PreferredBackupDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "CleanC", "Backups");
+        private static readonly string PreferredBackupDir = AppPaths.CommonBackupsDir;
 
         /// <summary>مسیر قدیمی — فقط برای مهاجرت و پشتیبانی خواندن رکوردهای موجود.</summary>
-        private static readonly string LegacyBackupDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC", "Backups");
+        private static readonly string LegacyBackupDir = AppPaths.LocalBackupsDir;
 
         private static string? _resolvedBackupDir;
 

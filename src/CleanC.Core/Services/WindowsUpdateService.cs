@@ -373,9 +373,9 @@ namespace CleanC.Core.Services
 
                 if (string.IsNullOrEmpty(desc))
                 {
-                    desc = !string.IsNullOrEmpty(buildFlightVer)
-                        ? string.Format(LocalizationService.Get("ارتقای رسمی به نسخه نسل جدید ویندوز ۱۱ (نسخه {0} - بیلد {1}) شامل قابلیت های هوش مصنوعی و بهینه سازی های عمیق هسته سیستم عامل"), title, buildFlightVer)
-                        : string.Format(LocalizationService.Get("ارتقای رسمی به نسخه جدید ویندوز ۱۱ ({0})"), title);
+                    // صادقانه: توضیح تبلیغاتیِ جعلی (قابلیت هوش مصنوعی و...) نمی سازیم؛
+                    // اگر مایکروسافت توضیحی نفرستد، همان را می گوییم.
+                    desc = LocalizationService.Get("توضیح رسمی از مایکروسافت منتشر نشده است");
                 }
 
                 string kbId = !string.IsNullOrEmpty(buildFlightId) ? string.Format(LocalizationService.Get("نسل بعد ({0})"), buildFlightId) : LocalizationService.Get("نسل جدید اختیاری");

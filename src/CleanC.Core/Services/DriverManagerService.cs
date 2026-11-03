@@ -29,6 +29,12 @@ namespace CleanC.Core.Services
         // (سخت افزار مربوطه دیگر روی سیستم حاضر نیست یا بسته تکراری/قدیمی است)
         public bool IsOrphanNoHardware { get; set; }
         public string Evidence { get; set; } = string.Empty;
+
+        /// <summary>
+        /// شناسه ی سخت افزاری واقعی (مثل PCI\VEN_8086&DEV_...) برای دستگاه های خطادار.
+        /// pnputil /remove-device /deviceid همین را می خواهد؛ نام دوستانه (Name) را نمی پذیرد.
+        /// </summary>
+        public string DeviceId { get; set; } = string.Empty;
     }
 
     public class DriverSummaryStats
@@ -175,12 +181,13 @@ namespace CleanC.Core.Services
                 try
                 {
                     using var searcher = new ManagementObjectSearcher(
-                        "SELECT Name, ConfigManagerErrorCode, Status FROM Win32_PNPEntity WHERE ConfigManagerErrorCode <> 0"
+                        "SELECT Name, DeviceID, ConfigManagerErrorCode, Status FROM Win32_PNPEntity WHERE ConfigManagerErrorCode <> 0"
                     );
 
                     foreach (var mo in searcher.Get())
                     {
                         string devName = mo["Name"]?.ToString() ?? LocalizationService.Get("دستگاه نامشخص");
+                        string deviceId = mo["DeviceID"]?.ToString() ?? "";
                         int errCode = mo["ConfigManagerErrorCode"] != null ? Convert.ToInt32(mo["ConfigManagerErrorCode"]) : 0;
                         string status = mo["Status"]?.ToString() ?? "Error";
 
@@ -196,6 +203,7 @@ namespace CleanC.Core.Services
                             DriverDate = DateTime.Now.ToString("yyyy.MM.dd"),
                             HasError = true,
                             ErrorCode = errCode,
+                            DeviceId = deviceId,
                             StatusDescription = GetErrorCodeDescription(errCode)
                         });
                     }
@@ -217,7 +225,7 @@ namespace CleanC.Core.Services
             });
         }
 
-        public static async Task<(bool success, string message)> DeleteDriverPackageAsync(string publishedName, bool isErrorDevice = false, string deviceName = "")
+        public static async Task<(bool success, string message)> DeleteDriverPackageAsync(string publishedName, bool isErrorDevice = false, string deviceName = "", string deviceId = "")
         {
             return await Task.Run(() =>
             {
@@ -227,8 +235,19 @@ namespace CleanC.Core.Services
                     // i18n-logic: این متن با دادهی خارجی مقایسه/تطبیق داده میشود (مقدار نگهبان سخت افزار معیوب)
                     if (isErrorDevice || publishedName == "سخت افزار معیوب" || !publishedName.EndsWith(".inf", StringComparison.OrdinalIgnoreCase))
                     {
-                        string target = !string.IsNullOrEmpty(deviceName) ? deviceName : publishedName;
-                        var psiDev = new ProcessStartInfo("pnputil.exe", $"/remove-device /deviceid \"{target.Trim()}\" /force")
+                        // pnputil /deviceid «شناسه ی سخت افزاری» می خواهد (مثل PCI\VEN_8086&DEV_...)؛
+                        // نام دوستانه ی دستگاه را نمی پذیرد — بدون DeviceID اصلاً تلاش نمی کنیم
+                        // چون قبلتر با نام صدا زده می شد و همیشه بی صدا شکست می خورد.
+                        string target = !string.IsNullOrWhiteSpace(deviceId) ? deviceId.Trim() : (!string.IsNullOrEmpty(deviceName) ? deviceName.Trim() : publishedName);
+
+                        if (string.IsNullOrWhiteSpace(deviceId))
+                        {
+                            return (false, string.Format(
+                                LocalizationService.Get("شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه."),
+                                string.IsNullOrEmpty(deviceName) ? publishedName : deviceName));
+                        }
+
+                        var psiDev = new ProcessStartInfo("pnputil.exe", $"/remove-device /deviceid \"{target}\" /force")
                         {
                             RedirectStandardOutput = true,
                             RedirectStandardError = true,
@@ -236,12 +255,23 @@ namespace CleanC.Core.Services
                             CreateNoWindow = true
                         };
                         using var pDev = Process.Start(psiDev);
-                        if (pDev != null)
+                        if (pDev == null) return (false, LocalizationService.Get("عدم توانایی در اجرای ابزار جداسازی سخت افزار."));
+
+                        string devOut = pDev.StandardOutput.ReadToEnd();
+                        string devErr = pDev.StandardError.ReadToEnd();
+                        pDev.WaitForExit(8000);
+
+                        // گزارش صادقانه: خروجی pnputil باید صفر باشد؛ متن موفقیت فقط با موفقیت واقعی
+                        if (pDev.ExitCode == 0)
                         {
-                            pDev.WaitForExit(8000);
-                            return (true, string.Format(LocalizationService.Get("دستگاه معیوب '{0}' با موفقیت از سیستم حذف و جدا شد."), target));
+                            return (true, string.Format(LocalizationService.Get("دستگاه معیوب '{0}' با موفقیت از سیستم حذف و جدا شد."),
+                                string.IsNullOrEmpty(deviceName) ? deviceId : deviceName));
                         }
-                        return (false, LocalizationService.Get("عدم توانایی در اجرای ابزار جداسازی سخت افزار."));
+
+                        string devError = string.IsNullOrWhiteSpace(devErr) ? devOut : devErr;
+                        return (false, string.Format(LocalizationService.Get("جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}"),
+                            string.IsNullOrEmpty(deviceName) ? deviceId : deviceName,
+                            string.IsNullOrWhiteSpace(devError) ? $"exit code {pDev.ExitCode}" : devError.Trim()));
                     }
 
                     string infName = publishedName.Trim();

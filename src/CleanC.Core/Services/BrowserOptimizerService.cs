@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -493,24 +493,32 @@ namespace CleanC.Core.Services
             int count = 0;
             long freed = 0;
             string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string backupDir = Path.Combine(localApp, @"CleanC\ExtensionsBackup");
+            string backupDir = Path.Combine(AppPaths.LocalRoot, "ExtensionsBackup");
             if (!Directory.Exists(backupDir)) Directory.CreateDirectory(backupDir);
 
             var targets = new HashSet<string>(extensionIds, StringComparer.OrdinalIgnoreCase);
+            if (targets.Count == 0) return (0, 0);
 
-            // 1. اعمال پالیسی رجیستری برای حذف بومی و رسمی توسط خود مرورگر و جلوگیری از بازگشت توسط Sync
-            ApplyExtensionBlocklistPolicies(targets);
+            // رفع باگ: پاکسازی هرگونه پالیسی بلاک‌لیست قبلی تا افزونه در کروم غیرفعال/مسدود ادمین نماند
+            RemoveExtensionBlocklistPolicies();
 
-            var browserBases = new (string Name, string Path)[]
+            var browserBases = new (string Name, string Path, string ProcessName)[]
             {
-                ("Google Chrome", Path.Combine(localApp, @"Google\Chrome\User Data")),
-                ("Microsoft Edge", Path.Combine(localApp, @"Microsoft\Edge\User Data")),
-                ("Brave", Path.Combine(localApp, @"BraveSoftware\Brave-Browser\User Data"))
+                ("Google Chrome", Path.Combine(localApp, @"Google\Chrome\User Data"), "chrome"),
+                ("Microsoft Edge", Path.Combine(localApp, @"Microsoft\Edge\User Data"), "msedge"),
+                ("Brave", Path.Combine(localApp, @"BraveSoftware\Brave-Browser\User Data"), "brave")
             };
 
-            foreach (var (_, basePath) in browserBases)
+            foreach (var (_, basePath, procName) in browserBases)
             {
                 if (!Directory.Exists(basePath)) continue;
+
+                // اگر مرورگر باز باشد، تغییر فایل Preferences ذخیره نمی شود و ممکن است کروم آن را overwrite کند
+                if (IsBrowserRunning(procName))
+                {
+                    // Browser is running, skip modifying its files
+                    continue;
+                }
 
                 var profileDirs = Directory.GetDirectories(basePath, "Default")
                     .Concat(Directory.GetDirectories(basePath, "Profile *"));
@@ -519,16 +527,22 @@ namespace CleanC.Core.Services
                 {
                     string profName = Path.GetFileName(profPath);
 
+                    // حذف تمیز افزونه از فایل Preferences مرورگر
+                    CleanExtensionFromPreferences(profPath, targets);
+
                     foreach (var id in targets)
                     {
-                        // هرگز لیست محافظت شده پاک نشود
                         if (ProtectedExtensionIds.Contains(id)) continue;
 
                         var checkPaths = new[]
                         {
                             Path.Combine(profPath, "Extensions", id),
                             Path.Combine(profPath, "Local Extension Settings", id),
-                            Path.Combine(profPath, "Sync Extension Settings", id)
+                            Path.Combine(profPath, "Sync Extension Settings", id),
+                            Path.Combine(profPath, "Extension State", id),
+                            Path.Combine(profPath, "Extension Rules", id),
+                            Path.Combine(profPath, "IndexedDB", $"chrome-extension_{id}_0.indexeddb.leveldb"),
+                            Path.Combine(profPath, "IndexedDB", $"chrome-extension_{id}_0.indexeddb.blob")
                         };
 
                         foreach (var targetFolder in checkPaths)
@@ -540,7 +554,6 @@ namespace CleanC.Core.Services
 
                                 try
                                 {
-                                    // تهیه بک‌آپ ایمن قبل از پاک‌سازی
                                     string destBackup = Path.Combine(backupDir, $"{profName}-{id}");
                                     if (!Directory.Exists(destBackup))
                                     {
@@ -556,6 +569,20 @@ namespace CleanC.Core.Services
                                     CcLog.Ignore(ex);
                                 }
                             }
+                            else if (File.Exists(targetFolder))
+                            {
+                                try
+                                {
+                                    long flen = new FileInfo(targetFolder).Length;
+                                    File.Delete(targetFolder);
+                                    freed += flen;
+                                    count++;
+                                }
+                                catch (Exception ex)
+                                {
+                                    CcLog.Ignore(ex);
+                                }
+                            }
                         }
                     }
                 }
@@ -564,17 +591,73 @@ namespace CleanC.Core.Services
             return (count, freed);
         }
 
-        public static void ApplyExtensionBlocklistPolicies(IEnumerable<string> extensionIds)
+        private static void CleanExtensionFromPreferences(string profPath, HashSet<string> targets)
         {
             try
             {
-                var idsToBlock = extensionIds
-                    .Where(id => !ProtectedExtensionIds.Contains(id))
-                    .Distinct(StringComparer.OrdinalIgnoreCase)
-                    .ToList();
+                string prefPath = Path.Combine(profPath, "Preferences");
+                if (File.Exists(prefPath))
+                {
+                    string raw = File.ReadAllText(prefPath);
+                    var root = JsonNode.Parse(raw);
+                    if (root != null)
+                    {
+                        bool modified = false;
 
-                if (idsToBlock.Count == 0) return;
+                        // 1. Remove from extensions.settings
+                        if (root["extensions"]?["settings"] is JsonObject settings)
+                        {
+                            foreach (var id in targets)
+                            {
+                                if (settings.Remove(id)) modified = true;
+                            }
+                        }
 
+                        // 2. Remove from extensions.pinned_extensions
+                        if (root["extensions"]?["pinned_extensions"] is JsonArray pinned)
+                        {
+                            for (int i = pinned.Count - 1; i >= 0; i--)
+                            {
+                                string? id = pinned[i]?.GetValue<string>();
+                                if (!string.IsNullOrEmpty(id) && targets.Contains(id))
+                                {
+                                    pinned.RemoveAt(i);
+                                    modified = true;
+                                }
+                            }
+                        }
+
+                        // 3. Remove from extensions.toolbar
+                        if (root["extensions"]?["toolbar"] is JsonArray toolbar)
+                        {
+                            for (int i = toolbar.Count - 1; i >= 0; i--)
+                            {
+                                string? id = toolbar[i]?.GetValue<string>();
+                                if (!string.IsNullOrEmpty(id) && targets.Contains(id))
+                                {
+                                    toolbar.RemoveAt(i);
+                                    modified = true;
+                                }
+                            }
+                        }
+
+                        if (modified)
+                        {
+                            File.WriteAllText(prefPath, root.ToJsonString());
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "CleanExtensionFromPreferences");
+            }
+        }
+
+        public static void RemoveExtensionBlocklistPolicies()
+        {
+            try
+            {
                 var policies = new[]
                 {
                     @"Software\Policies\Google\Chrome\ExtensionInstallBlocklist",
@@ -583,30 +666,21 @@ namespace CleanC.Core.Services
 
                 foreach (var subKeyPath in policies)
                 {
-                    using var key = Registry.CurrentUser.CreateSubKey(subKeyPath);
+                    using var key = Registry.CurrentUser.OpenSubKey(subKeyPath, true);
                     if (key != null)
                     {
-                        var existingValues = key.GetValueNames()
-                            .Select(n => key.GetValue(n)?.ToString())
-                            .Where(v => !string.IsNullOrEmpty(v))
-                            .ToHashSet(StringComparer.OrdinalIgnoreCase);
-
-                        // بیشترین ایندکس عددی موجود + ۱ — ValueCount ساده در صورت وجود
-                        // حفره در ایندکس ها یا مقادیر غیرعددی، روی مقدار موجود overwrite می کرد
-                        int maxIndex = 0;
+                        var namesToDelete = new List<string>();
                         foreach (var name in key.GetValueNames())
                         {
-                            if (int.TryParse(name, out int n) && n > maxIndex) maxIndex = n;
-                        }
-
-                        int index = maxIndex + 1;
-                        foreach (var id in idsToBlock)
-                        {
-                            if (!existingValues.Contains(id))
+                            var val = key.GetValue(name)?.ToString();
+                            if (!string.IsNullOrEmpty(val) && (KnownDeadExtensionIds.Contains(val) || int.TryParse(name, out _)))
                             {
-                                key.SetValue(index.ToString(), id, RegistryValueKind.String);
-                                index++;
+                                namesToDelete.Add(name);
                             }
+                        }
+                        foreach (var name in namesToDelete)
+                        {
+                            try { key.DeleteValue(name, false); } catch { }
                         }
                     }
                 }
@@ -617,6 +691,10 @@ namespace CleanC.Core.Services
             }
         }
 
+        public static void ApplyExtensionBlocklistPolicies(IEnumerable<string> extensionIds)
+        {
+            // منسوخ شد: رجیستری پالیسی کروم افزونه را به جای حذف، به حالت قفل ادمین درمی آورد
+        }
         public static bool IsBrowserRunning(string processName = "chrome")
         {
             try

@@ -1,8 +1,8 @@
 <div align="center">
 
-  <img src="assets/logo.png" alt="CleanC Logo" width="160" />
+  <img src="assets/logo.png" alt="WinyWash Logo" width="160" />
 
-  # CleanC
+  # WinyWash
 
   ### Next-Generation Native Windows 11 PC Optimizer & Deep Cleaner
   **بهینه‌ساز و پاک‌کننده هوشمند نسل جدید ویندوز ۱۱ با طراحی مات شیشه‌ای (Desktop Acrylic)**
@@ -29,9 +29,9 @@
 
 ### Overview
 
-**CleanC** is a modern, ultra-fast, and privacy-respecting system cleaner and performance optimizer tailored for **Windows 11 and Windows 10**. Built natively with **.NET 10** and **WinUI 3 (Windows App SDK 2.5)**, CleanC ditches legacy bloatware practices—no background daemon services, no aggressive telemetry, and no advertisements.
+**WinyWash** is a modern, ultra-fast, and privacy-respecting system cleaner and performance optimizer tailored for **Windows 11 and Windows 10**. Built natively with **.NET 10** and **WinUI 3 (Windows App SDK 2.5)**, WinyWash ditches legacy bloatware practices—no background daemon services, no aggressive telemetry, and no advertisements.
 
-Featuring a signature **Desktop Acrylic glassmorphism interface**, CleanC blends seamlessly into your Windows desktop while delivering low-level memory defragmentation, safe multi-layer junk scanning, and network DNS optimization.
+Featuring a signature **Desktop Acrylic glassmorphism interface**, WinyWash blends seamlessly into your Windows desktop while delivering low-level memory defragmentation, safe multi-layer junk scanning, and network DNS optimization.
 
 ---
 
@@ -63,13 +63,13 @@ Featuring a signature **Desktop Acrylic glassmorphism interface**, CleanC blends
 <div align="center">
 
 #### Dark Mode with Translucent Desktop Acrylic & Fluent Controls
-![CleanC Dark Acrylic](assets/screenshots/acrylic-dark.png)
+![WinyWash Dark Acrylic](assets/screenshots/acrylic-dark.png)
 
 #### Light Mode with Wallpaper-Adaptive Contrast
-![CleanC Light Mode](assets/screenshots/acrylic-light.png)
+![WinyWash Light Mode](assets/screenshots/acrylic-light.png)
 
 #### Itemized Safe Scan & Advanced Clean Preferences
-![CleanC Scan View](assets/screenshots/scan-expanded.png)
+![WinyWash Scan View](assets/screenshots/scan-expanded.png)
 
 </div>
 
@@ -78,12 +78,12 @@ Featuring a signature **Desktop Acrylic glassmorphism interface**, CleanC blends
 ### 🚀 Download & Getting Started
 
 1. Head to the **[Releases](https://github.com/mohammad-ahw/CleanC/releases/tag/v1.0.0)** page.
-2. Download the latest `CleanC-v1.0.0-win-x64.zip`.
-3. Extract the archive anywhere on your machine (e.g., `C:\Tools\CleanC` or your Desktop).
-4. Run `CleanC.UI.exe` (or run `CreateShortcut.bat` to place an icon on your desktop).
+2. Download the latest `WinyWash-Release-win-x64.zip`.
+3. Extract the archive anywhere on your machine (e.g., `C:\Tools\WinyWash` or your Desktop).
+4. Run `WinyWash.exe` (or run `CreateShortcut.bat` to place an icon on your desktop).
 
 > [!NOTE]
-> CleanC requests administrator privileges (`requireAdministrator`) in order to clean system-level temp directories (`C:\Windows\Temp`) and perform memory working set compaction across all processes.
+> WinyWash requests administrator privileges (`requireAdministrator`) in order to clean system-level temp directories (`C:\Windows\Temp`) and perform memory working set compaction across all processes.
 
 ---
 
@@ -93,9 +93,10 @@ Requirements: **.NET 10 SDK** + **Windows 11 SDK (10.0.26100)** + **Visual Studi
 
 ```powershell
 # 1. Restore & build (the solution contains only CleanC.Core + CleanC.UI)
-dotnet build CleanC.sln -c Release
+dotnet build WinyWash.sln -c Release
 
 # 2. Publish a self-contained, portable win-x64 build
+#    Output: publish\WinyWash\WinyWash.exe
 .\publish.ps1
 
 # 3. (optional) create a desktop shortcut pointing at the build
@@ -111,9 +112,9 @@ dotnet build CleanC.sln -c Release
 
 ---
 
-### 📊 CleanC vs Traditional Cleaners
+### 📊 WinyWash vs Traditional Cleaners
 
-| Feature | CleanC | Legacy Cleaners (CCleaner, etc.) |
+| Feature | WinyWash | Legacy Cleaners (CCleaner, etc.) |
 | :--- | :---: | :---: |
 | **Privacy & Security** | 🛡️ **100% Private (Zero Telemetry)** | ⚠️ Trackers & Data Collection |
 | **UI Design** | 💎 **WinUI 3 Fluent + Acrylic Glass** | 🪟 Outdated Win32 / Electron |
@@ -132,7 +133,7 @@ dotnet build CleanC.sln -c Release
 
 ### معرفی نرم‌افزار
 
-**کلین‌سی (CleanC)** یک ابزار بهینه‌ساز، پاک‌کننده فایل‌های زائد و تقویت‌کننده عملکرد سیستم برای **ویندوز ۱۱ و ۱۰** است که با معماری مدرن **.NET 10** و **WinUI 3 (Windows App SDK 2.5)** توسعه یافته است. بر خلاف نرم‌افزارهای تجاری رایج که سرشار از تبلیغات آزاردهنده، سرویس‌های مخفی در پس‌زمینه و ردیاب‌ها هستند، CleanC کاملاً **سبک، امن، حفظ‌کننده حریم خصوصی و بدون هیچ‌گونه سربار اضافی** است.
+**وینی‌وش (WinyWash)** یک ابزار بهینه‌ساز، پاک‌کننده فایل‌های زائد و تقویت‌کننده عملکرد سیستم برای **ویندوز ۱۱ و ۱۰** است که با معماری مدرن **.NET 10** و **WinUI 3 (Windows App SDK 2.5)** توسعه یافته است. بر خلاف نرم‌افزارهای تجاری رایج که سرشار از تبلیغات آزاردهنده، سرویس‌های مخفی در پس‌زمینه و ردیاب‌ها هستند، WinyWash کاملاً **سبک، امن، حفظ‌کننده حریم خصوصی و بدون هیچ‌گونه سربار اضافی** است.
 
 این نرم‌افزار با بهره‌گیری از فناوری بومی **Desktop Acrylic** پنجره‌ای شیشه‌ای و چشم‌نواز ایجاد می‌کند که پس‌زمینه دسکتاپ شما را به زیباترین شکل با بلور ملایم به نمایش می‌گذارد.
 
@@ -164,9 +165,9 @@ dotnet build CleanC.sln -c Release
 ### 📥 راهنمای دریافت و اجرا
 
 1. به بخش **[Releases](https://github.com/mohammad-ahw/CleanC/releases/tag/v1.0.0)** مراجعه کنید.
-2. نسخه `CleanC-v1.0.0-win-x64.zip` را دانلود کنید.
-3. فایل فشرده را در محل مورد نظر خود (مانند `C:\Tools\CleanC` یا دسکتاپ) استخراج کنید.
-4. فایل `CleanC.UI.exe` را اجرا کنید (یا با اجرای `CreateShortcut.bat` آیکون میانبر آن را به دسکتاپ خود اضافه کنید).
+2. نسخه `WinyWash-Release-win-x64.zip` را دانلود کنید.
+3. فایل فشرده را در محل مورد نظر خود (مانند `C:\Tools\WinyWash` یا دسکتاپ) استخراج کنید.
+4. فایل `WinyWash.exe` را اجرا کنید (یا با اجرای `CreateShortcut.bat` آیکون میانبر آن را به دسکتاپ خود اضافه کنید).
 
 > [!NOTE]
 > نرم‌افزار برای پاکسازی دایرکتوری‌های سیستمی ویندوز و بهینه‌سازی حافظه رم پروسه‌های سیستمی، نیازمند دسترسی ادمین (`Run as Administrator`) می‌باشد که به صورت خودکار از کاربر درخواست می‌شود.
@@ -179,9 +180,10 @@ dotnet build CleanC.sln -c Release
 
 ```powershell
 # ۱. بازیابی و build کامل (راه‌حل فقط شامل CleanC.Core و CleanC.UI است)
-dotnet build CleanC.sln -c Release
+dotnet build WinyWash.sln -c Release
 
 # ۲. ساخت نسخه نهایی قابل حمل و self-contained برای win-x64
+#    خروجی: publish\WinyWash\WinyWash.exe
 .\publish.ps1
 
 # ۳. (اختیاری) ساخت میانبر دسکتاپ روی همین خروجی

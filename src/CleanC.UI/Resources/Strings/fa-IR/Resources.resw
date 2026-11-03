@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='utf-8'?>
 <root>
-  <data name="AppTitle" xml:space="preserve"><value>CleanC</value></data>
+  <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>اجرا با دسترسی مدیر</value></data>
   <data name="RestoreCenter" xml:space="preserve"><value>مرکز بازیابی و بازگشت تغییرات</value></data>
   <data name="RefreshStatus" xml:space="preserve"><value>به‌روزرسانی وضعیت سیستم</value></data>
@@ -28,7 +28,8 @@
   <data name="SettingsTitle" xml:space="preserve"><value>تنظیمات برنامه</value></data>
   <data name="SettingsSub" xml:space="preserve"><value>ظاهر، زبان برنامه، رفتار در پس زمینه و خروجی گزارش</value></data>
   <data name="LanguageTitle" xml:space="preserve"><value>زبان برنامه</value></data>
-  <data name="LanguageSub" xml:space="preserve"><value>جهت چیدمان راست به چپ (RTL) و چپ به راست (LTR) به همراه قلم متناسب با هر زبان تغییر می کند.</value></data>
+  <data name="LanguageSub" xml:space="preserve"><value>زبان برنامه را انتخاب کنید (لیست به مرور کامل‌تر می‌شود)</value></data>
+  <data name="رفیق" xml:space="preserve"><value>رفیق</value></data>
   <data name="ThemeTitle" xml:space="preserve"><value>تم برنامه</value></data>
   <data name="ThemeSub" xml:space="preserve"><value>«سیستم» از تم ویندوز پیروی می کند؛ دو حالت دیگر تم را ثابت نگه می دارند.</value></data>
   <data name="ThemeSystem" xml:space="preserve"><value>سیستم</value></data>
@@ -39,11 +40,11 @@
   <data name="CloseToTray" xml:space="preserve"><value>با بستن پنجره، برنامه در پس زمینه اجرا شود</value></data>
   <data name="MinimizeToTray" xml:space="preserve"><value>هنگام کوچک کردن، به بخش اعلان های نوار وظیفه منتقل شود</value></data>
   <data name="AutoStartTitle" xml:space="preserve"><value>شروع همراه با ویندوز</value></data>
-  <data name="AutoStartSub" xml:space="preserve"><value>اجرای خودکار CleanC همزمان با ورود به حساب کاربری ویندوز.</value></data>
+  <data name="AutoStartSub" xml:space="preserve"><value>اجرای خودکار WinyWash همزمان با ورود به حساب کاربری ویندوز.</value></data>
   <data name="DeleteBehaviorTitle" xml:space="preserve"><value>رفتار حذف فایل های شخصی</value></data>
   <data name="DeleteBehaviorSub" xml:space="preserve"><value>برای حذف تکراری ها، فایل های حجیم و سازماندهی دانلودها. کش و زباله ها همیشه قطعی حذف می شوند.</value></data>
   <data name="DeleteModeRecycle" xml:space="preserve"><value>انتقال به سطل بازیافت ویندوز (پیش فرض)</value></data>
-  <data name="DeleteModeQuarantine" xml:space="preserve"><value>قرنطینه CleanC — نگهداری امن در پوشه برنامه با قابلیت بازگردانی</value></data>
+  <data name="DeleteModeQuarantine" xml:space="preserve"><value>قرنطینه WinyWash — نگهداری امن در پوشه برنامه با قابلیت بازگردانی</value></data>
   <data name="DeleteModePermanent" xml:space="preserve"><value>حذف قطعی — آزادسازی فوری و غیرقابل بازگردانی</value></data>
   <data name="AutoStateRestoreTitle" xml:space="preserve"><value>بازیابی خودکار وضعیت</value></data>
   <data name="AutoStateRestoreSub" xml:space="preserve"><value>ذخیره فوری تغییرات و بازیابی در اجرای بعدی برنامه.</value></data>
@@ -59,7 +60,7 @@
   <data name="ExportReportSub" xml:space="preserve"><value>تهیه گزارش تحلیلی برای هوش مصنوعی و مشخصات دقیق سخت افزاری به سبک ابزارهای حرفه ای.</value></data>
   <data name="ExportAiReport" xml:space="preserve"><value>گزارش کامل برای هوش مصنوعی (.md)</value></data>
   <data name="ExportSpecsReport" xml:space="preserve"><value>مشخصات جامع سخت افزار (.txt)</value></data>
-  <data name="AboutTitle" xml:space="preserve"><value>درباره CleanC</value></data>
+  <data name="AboutTitle" xml:space="preserve"><value>درباره WinyWash</value></data>
   <data name="AboutSub" xml:space="preserve"><value>ابزار مدرن بهینه سازی، پاکسازی و مدیریت سخت افزار در ویندوز ۱۱.</value></data>
   <data name="CheckUpdates" xml:space="preserve"><value>بررسی به‌روزرسانی</value></data>
   <data name="ProjectPage" xml:space="preserve"><value>صفحه پروژه در گیت هاب</value></data>
@@ -394,7 +395,7 @@
     <value>سطل بازیافت</value>
   </data>
     <data name="AutoStartDesc" xml:space="preserve">
-    <value>با ورود به حساب کاربری، CleanC به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود.</value>
+    <value>با ورود به حساب کاربری، WinyWash به صورت خودکار اجرا شود. همان آیتمی که در Task Manager › Startup دیده می شود.</value>
   </data>
     <data name="AppDataSettingsLabel" xml:space="preserve">
     <value>تنظیمات:</value>

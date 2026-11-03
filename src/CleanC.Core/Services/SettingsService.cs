@@ -154,9 +154,7 @@ namespace CleanC.Core.Services
             set => _filePath = string.IsNullOrWhiteSpace(value) ? BuildDefaultPath() : value;
         }
 
-        private static string BuildDefaultPath() => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "CleanC", "settings.json");
+        private static string BuildDefaultPath() => AppPaths.SettingsFile;
 
         public static AppSettings Load()
         {

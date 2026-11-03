@@ -63,8 +63,7 @@ namespace CleanC.Core.Services
             public string? ValueName;     // null = کلیدِ کامل، مقدار = حذف یک value (MuiCache)
         }
 
-        private static string DataDir => Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "CleanC", "exped");
+        private static string DataDir => AppPaths.ExpedDir;
 
         // ================================================================
         // SCAN
@@ -229,7 +228,8 @@ namespace CleanC.Core.Services
                 var f = SplitCsv(line);
                 if (f.Count >= 3 && f[0].StartsWith("\\") && !f[0].StartsWith("\\Microsoft", StringComparison.OrdinalIgnoreCase))
                 {
-                    if (f[0].Contains("CleanC", StringComparison.OrdinalIgnoreCase)) continue;
+                    if (f[0].Contains("WinyWash", StringComparison.OrdinalIgnoreCase) ||
+                        f[0].Contains("CleanC", StringComparison.OrdinalIgnoreCase)) continue;
                     parsed.Add((f[0], f[1], f[2]));
                 }
                 if (parsed.Count >= 24) break;

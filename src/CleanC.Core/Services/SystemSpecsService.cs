@@ -24,10 +24,12 @@ namespace CleanC.Core.Services
     public class DiskItemInfo
     {
         public string Model { get; set; } = string.Empty;
-        public string DiskType { get; set; } = "SSD";
-        public string BusType { get; set; } = "NVMe / SATA";
+        public string DiskType { get; set; } = string.Empty;
+        public string BusType { get; set; } = string.Empty;
         public string SizeFormatted { get; set; } = string.Empty;
-        public string HealthStatus { get; set; } = LocalizationService.Get("سالم (Healthy)");
+
+        /// <summary>خالی یعنی داده ی SMART/WMI در دسترس نیست — بدون ادعای سلامت.</summary>
+        public string HealthStatus { get; set; } = string.Empty;
         public string TemperatureFormatted { get; set; } = LocalizationService.Get("در دسترس نیست");
         public string WearFormatted { get; set; } = LocalizationService.Get("در دسترس نیست");
         public string PowerOnHoursFormatted { get; set; } = LocalizationService.Get("در دسترس نیست");
@@ -76,7 +78,9 @@ namespace CleanC.Core.Services
         public string TotalRamFormatted { get; set; } = string.Empty;
         public int RamSlotsUsed { get; set; }
         public int RamSpeedMhz { get; set; }
-        public string RamType { get; set; } = "DDR4 / DDR5";
+
+        /// <summary>نوع رم (DDR4/DDR5/...)؛ خالی یعنی WMI هنوز پاسخ نداده → UI «نامشخص» می نشانید.</summary>
+        public string RamType { get; set; } = string.Empty;
         public string RamManufacturer { get; set; } = string.Empty;
 
         // OS
@@ -172,13 +176,11 @@ namespace CleanC.Core.Services
                 if (cpRoot != null)
                 {
                     int threadCount = cpRoot.GetSubKeyNames().Length;
-                    // Usually 2 logical threads per physical core with HyperThreading
-                    specs.CpuCores = Math.Max(1, threadCount / 2);
+                    // شمارش هسته ی فیزیکی با فرض «۲ رشته در هر هسته» تقلبی است (CPUهای
+                    // بدون هایپرتریدینگ یا با E-core/P-core ناهمگون اشتباه می شوند).
+                    // تا وقتی WMI (NumberOfCores) پاسخ دهد، ناشناخته می ماند.
+                    specs.CpuCores = 0;
                     if (specs.CpuThreads <= 0) specs.CpuThreads = threadCount;
-                }
-                else
-                {
-                    specs.CpuCores = Math.Max(1, Environment.ProcessorCount / 2);
                 }
             }
             catch (Exception __ex)
@@ -218,9 +220,12 @@ namespace CleanC.Core.Services
                 if (CleanC.Core.Native.Win32.GlobalMemoryStatusEx(memStatus))
                 {
                     specs.TotalRamFormatted = Models.SystemStats.FormatBytes((long)memStatus.ullTotalPhys);
-                    specs.RamSlotsUsed = 2; // Default typical dual-channel
-                    specs.RamSpeedMhz = 3200; // Common DDR4/DDR5 baseline
-                    specs.RamType = "DDR4 / DDR5";
+                    // نوع/فرکانس/تعداد اسلات را از GlobalMemoryStatusEx نمی دانیم —
+                    // مقادیر تقلبی («DDR4 / DDR5»، «3200»، «۲ اسلات») نمایش داده نمی شوند؛
+                    // WMI (Win32_PhysicalMemory) واقعیِ آنها را می فرستد.
+                    specs.RamSlotsUsed = 0;
+                    specs.RamSpeedMhz = 0;
+                    specs.RamType = string.Empty;
                 }
             }
             catch (Exception __ex)
@@ -396,10 +401,10 @@ namespace CleanC.Core.Services
                 specs.Disks.Add(new DiskItemInfo
                 {
                     Model = string.Format(LocalizationService.Get("درایو محلی ({0})"), d.Name.TrimEnd('\\')),
-                    DiskType = "SSD / HDD",
+                    DiskType = string.Empty, // بدون ادعا — WMI (MSFT_PhysicalDisk) نوع واقعی را می فرستد
                     BusType = d.DriveFormat,
                     SizeFormatted = string.Format(LocalizationService.Get("{0} ({1} آزاد)"), Models.SystemStats.FormatBytes(d.TotalSize), Models.SystemStats.FormatBytes(d.AvailableFreeSpace)),
-                    HealthStatus = LocalizationService.Get("سالم و فعال")
+                    HealthStatus = string.Empty // بدون داده ی SMART، ادعای «سالم» نمی کنیم
                 });
             }
         }
@@ -853,15 +858,18 @@ namespace CleanC.Core.Services
 
             sb.AppendLine(LocalizationService.Get("[پردازنده مرکزی - CPU]"));
             sb.AppendLine(string.Format(LocalizationService.Get("  مدل: {0}"), specs.CpuName));
-            sb.AppendLine(string.Format(LocalizationService.Get("  مشخصات: {0} هسته فیزیکی | {1} رشته منطقی"), specs.CpuCores, specs.CpuThreads));
-            sb.AppendLine(string.Format(LocalizationService.Get("  فرکانس: {0} MHz"), specs.CpuClockMhz));
+            sb.AppendLine(string.Format(LocalizationService.Get("  مشخصات: {0} هسته فیزیکی | {1} رشته منطقی"),
+                specs.CpuCores > 0 ? (object)specs.CpuCores : LocalizationService.Get("نامشخص"), specs.CpuThreads));
+            sb.AppendLine(string.Format(LocalizationService.Get("  فرکانس: {0} MHz"),
+                specs.CpuClockMhz > 0 ? (object)specs.CpuClockMhz : (object)LocalizationService.Get("نامشخص")));
             if (specs.CpuL3CacheKb > 0) sb.AppendLine(string.Format(LocalizationService.Get("  حافظه کش L3: {0} KB"), specs.CpuL3CacheKb));
             sb.AppendLine();
 
             sb.AppendLine(LocalizationService.Get("[حافظه رم - RAM]"));
-            sb.AppendLine(string.Format(LocalizationService.Get("  ظرفیت کل: {0} ({1})"), specs.TotalRamFormatted, specs.RamType));
-            sb.AppendLine(string.Format(LocalizationService.Get("  اسلات های فعال: {0}"), specs.RamSlotsUsed));
-            sb.AppendLine(string.Format(LocalizationService.Get("  سرعت باس: {0} MHz"), specs.RamSpeedMhz));
+            sb.AppendLine(string.Format(LocalizationService.Get("  ظرفیت کل: {0}"), specs.TotalRamFormatted));
+            if (!string.IsNullOrEmpty(specs.RamType)) sb.AppendLine(string.Format(LocalizationService.Get("  نوع حافظه: {0}"), specs.RamType));
+            if (specs.RamSlotsUsed > 0) sb.AppendLine(string.Format(LocalizationService.Get("  اسلات های فعال: {0}"), specs.RamSlotsUsed));
+            if (specs.RamSpeedMhz > 0) sb.AppendLine(string.Format(LocalizationService.Get("  سرعت باس: {0} MHz"), specs.RamSpeedMhz));
             if (!string.IsNullOrEmpty(specs.RamManufacturer)) sb.AppendLine(string.Format(LocalizationService.Get("  سازنده: {0}"), specs.RamManufacturer));
             sb.AppendLine();
 
@@ -892,7 +900,9 @@ namespace CleanC.Core.Services
             foreach (var disk in specs.Disks)
             {
                 sb.AppendLine($"  - {disk.Model} ({disk.DiskType} {disk.BusType}) - {disk.SizeFormatted}");
-                sb.AppendLine(string.Format(LocalizationService.Get("    وضعیت: {0} | دما: {1} | کارکرد: {2}"), disk.HealthStatus, disk.TemperatureFormatted, disk.PowerOnHoursFormatted));
+                sb.AppendLine(string.Format(LocalizationService.Get("    وضعیت: {0} | دما: {1} | کارکرد: {2}"),
+                    string.IsNullOrEmpty(disk.HealthStatus) ? LocalizationService.Get("نامشخص") : disk.HealthStatus,
+                    disk.TemperatureFormatted, disk.PowerOnHoursFormatted));
             }
             sb.AppendLine();
 

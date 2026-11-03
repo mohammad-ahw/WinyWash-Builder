@@ -1,7 +1,7 @@
 ﻿<#
     publish.ps1
     ---------------------------------------------------------------------------
-    اسکریپت build و publish رسمی CleanC برای توزیع نهایی.
+    اسکریپت build و publish رسمی WinyWash برای توزیع نهایی.
 
     چرا این اسکریپت لازم است؟
       `dotnet publish` بدون مشخص کردن Runtime، کل گراف RID (لینوکس، مک،
@@ -9,6 +9,11 @@
       در حالی که فقط پوشه win-x64 حدود 40MB آن لازم است.
       این اسکریپت publish را به win-x64 محدود می کند و پوشه های بی استفاده
       را پاک می کند.
+
+    ساختار خروجی:
+      publish\
+        WinyWash\        ← تمام فایل های اجرایی؛ WinyWash.exe همین جا است
+        (ZIP در ریشه ریپو ساخته می شود)
 
     نمونه استفاده:
         .\publish.ps1
@@ -45,6 +50,9 @@ Set-StrictMode -Version Latest
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $proj = Join-Path $root 'src\CleanC.UI\CleanC.UI.csproj'
 $outDir = if ([System.IO.Path]::IsPathRooted($Output)) { $Output } else { Join-Path $root $Output }
+# فایل های اپ داخل یک زیرپوشه ی تمیز می نشینند تا پیدا کردن WinyWash.exe بین
+# صدها فایل runtime سخت نباشد.
+$appDir = Join-Path $outDir 'WinyWash'
 
 if (-not (Test-Path -LiteralPath $proj)) {
     throw "پروژه پیدا نشد: $proj"
@@ -54,7 +62,7 @@ Write-Host "==> WinyWash publish" -ForegroundColor Cyan
 Write-Host "    Configuration : $Configuration"
 Write-Host "    Runtime       : $Runtime"
 Write-Host "    SelfContained : $SelfContained"
-Write-Host "    Output        : $outDir"
+Write-Host "    Output        : $appDir"
 
 # خروجی قبلی کاملاً حذف می شود تا فایل های RID قدیمی باقی نمانند
 if (Test-Path -LiteralPath $outDir) {
@@ -67,7 +75,7 @@ $publishArgs = @(
     '-c', $Configuration,
     '-r', $Runtime,
     '--self-contained', "$SelfContained",
-    '-o', $outDir,
+    '-o', $appDir,
     '-p:Platform=x64',
     '-p:ErrorOnDuplicatePublishOutputFiles=false',
     '--nologo'
@@ -92,7 +100,7 @@ $targetNative = switch ($Runtime) {
     'win-arm64' { @('win', 'win-arm64') }
 }
 
-$runtimeRoot = Join-Path $outDir 'runtimes'
+$runtimeRoot = Join-Path $appDir 'runtimes'
 if (Test-Path -LiteralPath $runtimeRoot) {
     Get-ChildItem -LiteralPath $runtimeRoot -Directory | ForEach-Object {
         if ($targetNative -notcontains $_.Name) {
@@ -109,23 +117,23 @@ if (Test-Path -LiteralPath $runtimeRoot) {
 
 # فایل های pdb فقط با -Symbols نگه داشته می شوند
 if (-not $Symbols) {
-    Get-ChildItem -LiteralPath $outDir -Filter '*.pdb' -File -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $appDir -Filter '*.pdb' -File -ErrorAction SilentlyContinue |
         Remove-Item -Force
 }
 
-# کپی والپیپرهای CleanC در صورت وجود
+# کپی والپیپرهای WinyWash در صورت وجود
 $wallpaperSrc = Join-Path $root 'wallpaper'
 if (Test-Path -LiteralPath $wallpaperSrc) {
-    Write-Host "==> کپی والپیپرهای CleanC..." -ForegroundColor DarkGray
-    $wpDest = Join-Path $outDir 'wallpaper'
+    Write-Host "==> کپی والپیپرهای WinyWash..." -ForegroundColor DarkGray
+    $wpDest = Join-Path $appDir 'wallpaper'
     if (Test-Path -LiteralPath $wpDest) { Remove-Item -LiteralPath $wpDest -Recurse -Force }
-    Copy-Item -Path $wallpaperSrc -Destination $outDir -Recurse -Force
+    Copy-Item -Path $wallpaperSrc -Destination $appDir -Recurse -Force
 }
 
 # ---------------------------------------------------------------------------
 # گزارش حجم نهایی
 # ---------------------------------------------------------------------------
-$files = Get-ChildItem -LiteralPath $outDir -Recurse -File
+$files = Get-ChildItem -LiteralPath $appDir -Recurse -File
 $sizeMb = ($files | Measure-Object -Property Length -Sum).Sum / 1MB
 
 Write-Host ""
@@ -133,13 +141,13 @@ Write-Host "==> publish کامل شد" -ForegroundColor Green
 Write-Host ("    فایل ها : {0}" -f $files.Count)
 $sizeMbStr = $sizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "    حجم    : $sizeMbStr MB"
-Write-Host ("    اجرا    : {0}" -f (Join-Path $outDir 'WinyWash.exe')) -ForegroundColor Green
+Write-Host ("    اجرا    : {0}" -f (Join-Path $appDir 'WinyWash.exe')) -ForegroundColor Green
 
 # ایجاد آرشیو فشرده ZIP برای تحویل
 $zipPath = Join-Path $root "WinyWash-Release-win-x64.zip"
 Write-Host "==> فشرده سازی خروجی به $zipPath ..." -ForegroundColor Cyan
 if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
-Compress-Archive -Path "$outDir\*" -DestinationPath $zipPath -Force
+Compress-Archive -Path "$appDir\*" -DestinationPath $zipPath -Force
 $zipSizeMb = (Get-Item -LiteralPath $zipPath).Length / 1MB
 $zipSizeMbStr = $zipSizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "==> آرشیو نهایی ایجاد شد: $zipPath ($zipSizeMbStr MB)" -ForegroundColor Green
