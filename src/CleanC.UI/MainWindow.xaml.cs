@@ -1,4 +1,4 @@
-using System.Runtime.CompilerServices;
+﻿using System.Runtime.CompilerServices;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -3756,8 +3756,8 @@ namespace CleanC.UI
         // ====================================================================
 
         /// <summary>مخزن پروژه — از remote واقعی git گرفته می شود، نه مقدار حدسی.</summary>
-        private const string ProjectPageUrl = "https://github.com/mohammad-ahw/CleanC";
-        private const string ReleasesApiUrl = "https://api.github.com/repos/mohammad-ahw/CleanC/releases/latest";
+        private const string ProjectPageUrl = "https://github.com/mohammad-ahw/WinyWash";
+        private const string ReleasesApiUrl = "https://api.github.com/repos/mohammad-ahw/WinyWash/releases/latest";
 
         private void OpenProjectPageBtn_Click(object sender, RoutedEventArgs e)
         {

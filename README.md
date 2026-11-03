@@ -1,4 +1,4 @@
-<div align="center">
+﻿<div align="center">
 
   <img src="assets/logo.png" alt="WinyWash Logo" width="160" />
 
@@ -8,7 +8,7 @@
   **بهینه‌ساز و پاک‌کننده هوشمند نسل جدید ویندوز ۱۱ با طراحی مات شیشه‌ای (Desktop Acrylic)**
 
   <p align="center">
-    <a href="https://github.com/mohammad-ahw/CleanC/releases/tag/v1.0.0">
+    <a href="https://github.com/mohammad-ahw/WinyWash/releases/tag/v1.0.0">
       <img src="https://img.shields.io/badge/Release-v1.0.0-0078D4?style=for-the-badge&logo=github&logoColor=white" alt="Release v1.0.0" />
     </a>
     <img src="https://img.shields.io/badge/Platform-Windows%2010%20%7C%2011%20(x64)-0078D4?style=for-the-badge&logo=windows11&logoColor=white" alt="Platform Windows" />
@@ -77,7 +77,7 @@ Featuring a signature **Desktop Acrylic glassmorphism interface**, WinyWash blen
 
 ### 🚀 Download & Getting Started
 
-1. Head to the **[Releases](https://github.com/mohammad-ahw/CleanC/releases/tag/v1.0.0)** page.
+1. Head to the **[Releases](https://github.com/mohammad-ahw/WinyWash/releases/tag/v1.0.0)** page.
 2. Download the latest `WinyWash-Release-win-x64.zip`.
 3. Extract the archive anywhere on your machine (e.g., `C:\Tools\WinyWash` or your Desktop).
 4. Run `WinyWash.exe` (or run `CreateShortcut.bat` to place an icon on your desktop).
@@ -164,7 +164,7 @@ dotnet build WinyWash.sln -c Release
 
 ### 📥 راهنمای دریافت و اجرا
 
-1. به بخش **[Releases](https://github.com/mohammad-ahw/CleanC/releases/tag/v1.0.0)** مراجعه کنید.
+1. به بخش **[Releases](https://github.com/mohammad-ahw/WinyWash/releases/tag/v1.0.0)** مراجعه کنید.
 2. نسخه `WinyWash-Release-win-x64.zip` را دانلود کنید.
 3. فایل فشرده را در محل مورد نظر خود (مانند `C:\Tools\WinyWash` یا دسکتاپ) استخراج کنید.
 4. فایل `WinyWash.exe` را اجرا کنید (یا با اجرای `CreateShortcut.bat` آیکون میانبر آن را به دسکتاپ خود اضافه کنید).
