@@ -26,6 +26,167 @@ namespace CleanC.UI
         private bool _newsWebReady = false;
         private double _savedDashboardScroll = 0.0;
 
+        private const string ReaderModeScript = """
+            (function() {
+                function applyReaderMode() {
+                    var styleId = 'winywash-reader-style';
+                    if (!document.getElementById(styleId)) {
+                        var style = document.createElement('style');
+                        style.id = styleId;
+                        style.textContent = `
+                            /* Universal Distraction Cleanup: Headers, Footers, Sidebars, Ads & Promos */
+                            header:not([class*="ArticleHeader"]),
+                            footer,
+                            aside,
+                            [class*="sidebar"]:not([class*="content"]),
+                            [class*="__sidebar"],
+                            [class*="header-module__"]:not([class*="title"]),
+                            [class*="footer-module__"],
+                            [class*="StickySidebar"],
+                            [class*="SidebarWrapper"],
+                            .site-header,
+                            .site-footer,
+                            .breadcrumbAndAds,
+                            .digiBannerArea,
+                            .nativeSuggestions,
+                            .digiatoSuggestions,
+                            .registerWidget,
+                            .videoWidget,
+                            [class*="related_news_container"],
+                            [class*="selected_videos_container"],
+                            [class*="related_videos_container"],
+                            [id*="pos-article-"],
+                            [id*="ad-"],
+                            [class*="advertising"],
+                            [class*="baleBanner"],
+                            [class*="telegramBanner"],
+                            [class*="download-module"],
+                            [id*="div_eRasaneh"],
+                            [class*="floating-banner"],
+                            [class*="app-banner"],
+                            [id*="sticky-banner"] {
+                                display: none !important;
+                                visibility: hidden !important;
+                                height: 0 !important;
+                                max-height: 0 !important;
+                                overflow: hidden !important;
+                                opacity: 0 !important;
+                                pointer-events: none !important;
+                            }
+
+                            /* Akharin Khabar Layout Expansion & Centering */
+                            [class*="news_detail-module"][class*="__section"] {
+                                display: block !important;
+                                width: 100% !important;
+                                max-width: 960px !important;
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                                padding-left: 16px !important;
+                                padding-right: 16px !important;
+                            }
+                            [class*="news_detail-module"][class*="__main"] {
+                                grid-column: 1 / -1 !important;
+                                width: 100% !important;
+                                max-width: 100% !important;
+                                display: block !important;
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                            }
+
+                            /* Digiato Layout Expansion & Centering */
+                            .articleNewsPosts__content {
+                                max-width: 960px !important;
+                                width: 100% !important;
+                                flex: 1 1 100% !important;
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                                padding-left: 16px !important;
+                                padding-right: 16px !important;
+                            }
+                            .articleNewsPosts__content .postTools,
+                            .articleNewsPosts__content .postRelated,
+                            .articleNewsPosts__content .postComments {
+                                padding-left: 0 !important;
+                                padding-right: 0 !important;
+                            }
+
+                            /* Zoomit Layout Expansion & Centering */
+                            div[class*="lg:grid-cols-"],
+                            div[class*="xxl:grid-cols-"] {
+                                grid-template-columns: 100% !important;
+                                max-width: 960px !important;
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                                padding-left: 16px !important;
+                                padding-right: 16px !important;
+                            }
+                            article {
+                                width: 100% !important;
+                                max-width: 100% !important;
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                            }
+
+                            /* Viewport Polish */
+                            html, body {
+                                overflow-x: hidden !important;
+                            }
+                        `;
+                        (document.head || document.documentElement).appendChild(style);
+                    }
+
+                    // Direct element overrides for reactive single-page apps
+                    var sidebars = document.querySelectorAll('[class*="sidebar"], [class*="__sidebar"], aside');
+                    for (var i = 0; i < sidebars.length; i++) {
+                        if (!sidebars[i].className.includes('content')) {
+                            sidebars[i].style.setProperty('display', 'none', 'important');
+                        }
+                    }
+
+                    var akSections = document.querySelectorAll('[class*="news_detail-module"][class*="__section"]');
+                    for (var i = 0; i < akSections.length; i++) {
+                        akSections[i].style.setProperty('display', 'block', 'important');
+                        akSections[i].style.setProperty('width', '100%', 'important');
+                        akSections[i].style.setProperty('max-width', '960px', 'important');
+                        akSections[i].style.setProperty('margin-left', 'auto', 'important');
+                        akSections[i].style.setProperty('margin-right', 'auto', 'important');
+                    }
+
+                    var akMains = document.querySelectorAll('[class*="news_detail-module"][class*="__main"]');
+                    for (var i = 0; i < akMains.length; i++) {
+                        akMains[i].style.setProperty('grid-column', '1 / -1', 'important');
+                        akMains[i].style.setProperty('width', '100%', 'important');
+                        akMains[i].style.setProperty('max-width', '100%', 'important');
+                        akMains[i].style.setProperty('display', 'block', 'important');
+                    }
+
+                    var digiatoContents = document.querySelectorAll('.articleNewsPosts__content');
+                    for (var i = 0; i < digiatoContents.length; i++) {
+                        digiatoContents[i].style.setProperty('max-width', '960px', 'important');
+                        digiatoContents[i].style.setProperty('width', '100%', 'important');
+                        digiatoContents[i].style.setProperty('flex', '1 1 100%', 'important');
+                        digiatoContents[i].style.setProperty('margin-left', 'auto', 'important');
+                        digiatoContents[i].style.setProperty('margin-right', 'auto', 'important');
+                    }
+                }
+
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', applyReaderMode);
+                } else {
+                    applyReaderMode();
+                }
+
+                try {
+                    var observer = new MutationObserver(function() {
+                        applyReaderMode();
+                    });
+                    if (document.documentElement) {
+                        observer.observe(document.documentElement, { childList: true, subtree: true });
+                    }
+                } catch (e) {}
+            })();
+            """;
+
         private void InitializeNewsFeature()
         {
             if (LatestNewsCard == null) return;
@@ -279,6 +440,16 @@ namespace CleanC.UI
                     NewsWebView.CoreWebView2.Settings.IsStatusBarEnabled = false;
                     NewsWebView.CoreWebView2.Settings.AreDevToolsEnabled = false;
 
+                    // تزریق اسکریپت حالت مطالعه پیش از اجرای اسکریپت‌های صفحه
+                    try
+                    {
+                        await NewsWebView.CoreWebView2.AddScriptToExecuteOnDocumentCreatedAsync(ReaderModeScript);
+                    }
+                    catch (Exception exScript)
+                    {
+                        CcLog.Ignore(exScript, "AddScriptToExecuteOnDocumentCreatedAsync");
+                    }
+
                     NewsWebView.CoreWebView2.NavigationStarting += (s, e) =>
                     {
                         DispatcherQueue.TryEnqueue(() =>
@@ -295,9 +466,10 @@ namespace CleanC.UI
                             if (NewsReaderProgressBar != null)
                                 NewsReaderProgressBar.Visibility = Visibility.Collapsed;
 
-                            // جلوگیری از اسکرول خودکار صفحه وب به پایین
+                            // اعمال مجدد حالت مطالعه و جلوگیری از اسکرول خودکار صفحه وب به پایین
                             try
                             {
+                                await NewsWebView.CoreWebView2.ExecuteScriptAsync(ReaderModeScript);
                                 await NewsWebView.CoreWebView2.ExecuteScriptAsync("window.scrollTo(0, 0);");
                             }
                             catch
