@@ -38,12 +38,16 @@ namespace CleanC.UI
                             header:not([class*="ArticleHeader"]),
                             footer,
                             aside,
-                            [class*="sidebar"]:not([class*="content"]),
+                            div[class*="sidebar"]:not(.no-sidebar):not([class*="content"]),
+                            section[class*="sidebar"],
+                            .articleNewsPosts__sidebar,
                             [class*="__sidebar"],
                             [class*="header-module__"]:not([class*="title"]),
                             [class*="footer-module__"],
                             [class*="StickySidebar"],
                             [class*="SidebarWrapper"],
+                            [class*="socials-module__"],
+                            [class*="social_container"],
                             .site-header,
                             .site-footer,
                             .breadcrumbAndAds,
@@ -52,6 +56,13 @@ namespace CleanC.UI
                             .digiatoSuggestions,
                             .registerWidget,
                             .videoWidget,
+                            .stickyDownSingle,
+                            .postTools,
+                            .postRelated,
+                            .postComments,
+                            [class*="ad_"],
+                            [class*="yn-"],
+                            [id*="ynpos"],
                             [class*="related_news_container"],
                             [class*="selected_videos_container"],
                             [class*="related_videos_container"],
@@ -74,15 +85,15 @@ namespace CleanC.UI
                                 pointer-events: none !important;
                             }
 
-                            /* Akharin Khabar Layout Expansion & Centering */
+                            /* Akharin Khabar: Full Width & Centering */
                             [class*="news_detail-module"][class*="__section"] {
                                 display: block !important;
                                 width: 100% !important;
-                                max-width: 960px !important;
+                                max-width: 1120px !important;
                                 margin-left: auto !important;
                                 margin-right: auto !important;
-                                padding-left: 16px !important;
-                                padding-right: 16px !important;
+                                padding-left: 20px !important;
+                                padding-right: 20px !important;
                             }
                             [class*="news_detail-module"][class*="__main"] {
                                 grid-column: 1 / -1 !important;
@@ -93,32 +104,34 @@ namespace CleanC.UI
                                 margin-right: auto !important;
                             }
 
-                            /* Digiato Layout Expansion & Centering */
+                            /* Digiato: Full Width & Centering */
                             .articleNewsPosts__content {
-                                max-width: 960px !important;
+                                max-width: 1120px !important;
                                 width: 100% !important;
                                 flex: 1 1 100% !important;
                                 margin-left: auto !important;
                                 margin-right: auto !important;
-                                padding-left: 16px !important;
-                                padding-right: 16px !important;
-                            }
-                            .articleNewsPosts__content .postTools,
-                            .articleNewsPosts__content .postRelated,
-                            .articleNewsPosts__content .postComments {
-                                padding-left: 0 !important;
-                                padding-right: 0 !important;
+                                padding-left: 20px !important;
+                                padding-right: 20px !important;
                             }
 
-                            /* Zoomit Layout Expansion & Centering */
+                            /* Zoomit: Spacious Width & Border Removal */
+                            div[class*="grid-rows-[auto_auto_auto_1fr]"],
                             div[class*="lg:grid-cols-"],
                             div[class*="xxl:grid-cols-"] {
                                 grid-template-columns: 100% !important;
-                                max-width: 960px !important;
+                                max-width: 1120px !important;
                                 margin-left: auto !important;
                                 margin-right: auto !important;
-                                padding-left: 16px !important;
-                                padding-right: 16px !important;
+                                padding-left: 20px !important;
+                                padding-right: 20px !important;
+                                border: none !important;
+                                box-shadow: none !important;
+                            }
+                            div[class*="grid-rows-[auto_auto_auto_1fr]"] ~ div,
+                            div[class*="row-start-3"],
+                            div[class*="scroll-mt-10"] {
+                                display: none !important;
                             }
                             article {
                                 width: 100% !important;
@@ -127,7 +140,7 @@ namespace CleanC.UI
                                 margin-right: auto !important;
                             }
 
-                            /* Viewport Polish */
+                            /* Universal Polish */
                             html, body {
                                 overflow-x: hidden !important;
                             }
@@ -136,37 +149,55 @@ namespace CleanC.UI
                     }
 
                     // Direct element overrides for reactive single-page apps
-                    var sidebars = document.querySelectorAll('[class*="sidebar"], [class*="__sidebar"], aside');
+                    var sidebars = document.querySelectorAll('aside, div[class*="sidebar"], section[class*="sidebar"], [class*="__sidebar"], .articleNewsPosts__sidebar');
                     for (var i = 0; i < sidebars.length; i++) {
-                        if (!sidebars[i].className.includes('content')) {
-                            sidebars[i].style.setProperty('display', 'none', 'important');
+                        var sb = sidebars[i];
+                        if (sb.tagName === 'BODY' || sb.tagName === 'HTML' || sb.classList.contains('no-sidebar') || sb.className.includes('content')) {
+                            continue;
+                        }
+                        sb.style.setProperty('display', 'none', 'important');
+                    }
+
+                    // i18n
+                    // Akharin Khabar: clean promo follow paragraph at end of text
+                    var akParas = document.querySelectorAll('article p, [class*="body-card-module"] p');
+                    for (var i = 0; i < akParas.length; i++) {
+                        var pTxt = (akParas[i].textContent || '').trim();
+                        if ((pTxt.includes('ما را در') || pTxt.includes('آخرین خبر را در') || pTxt.includes('کانال تلگرامی')) && pTxt.includes('دنبال کنید')) {
+                            akParas[i].style.setProperty('display', 'none', 'important');
                         }
                     }
 
-                    var akSections = document.querySelectorAll('[class*="news_detail-module"][class*="__section"]');
-                    for (var i = 0; i < akSections.length; i++) {
-                        akSections[i].style.setProperty('display', 'block', 'important');
-                        akSections[i].style.setProperty('width', '100%', 'important');
-                        akSections[i].style.setProperty('max-width', '960px', 'important');
-                        akSections[i].style.setProperty('margin-left', 'auto', 'important');
-                        akSections[i].style.setProperty('margin-right', 'auto', 'important');
+                    // i18n
+                    // Zoomit: remove "از دست ندهید" and everything below it
+                    var zoomitHeadings = document.querySelectorAll('h2, h3, h4, span, div, p');
+                    for (var i = 0; i < zoomitHeadings.length; i++) {
+                        var hTxt = (zoomitHeadings[i].textContent || '').trim();
+                        if (hTxt === 'از دست ندهید' || hTxt.startsWith('از دست ندهید') || hTxt.includes('از دست ندهید')) {
+                            var el = zoomitHeadings[i];
+                            while (el && el.parentElement && el.parentElement.tagName !== 'ARTICLE' && el.parentElement.tagName !== 'MAIN' && el.parentElement !== document.body) {
+                                el = el.parentElement;
+                            }
+                            if (el) {
+                                var sib = el;
+                                while (sib) {
+                                    var nextSib = sib.nextElementSibling;
+                                    sib.style.setProperty('display', 'none', 'important');
+                                    sib = nextSib;
+                                }
+                            }
+                            break;
+                        }
                     }
 
-                    var akMains = document.querySelectorAll('[class*="news_detail-module"][class*="__main"]');
-                    for (var i = 0; i < akMains.length; i++) {
-                        akMains[i].style.setProperty('grid-column', '1 / -1', 'important');
-                        akMains[i].style.setProperty('width', '100%', 'important');
-                        akMains[i].style.setProperty('max-width', '100%', 'important');
-                        akMains[i].style.setProperty('display', 'block', 'important');
-                    }
-
-                    var digiatoContents = document.querySelectorAll('.articleNewsPosts__content');
-                    for (var i = 0; i < digiatoContents.length; i++) {
-                        digiatoContents[i].style.setProperty('max-width', '960px', 'important');
-                        digiatoContents[i].style.setProperty('width', '100%', 'important');
-                        digiatoContents[i].style.setProperty('flex', '1 1 100%', 'important');
-                        digiatoContents[i].style.setProperty('margin-left', 'auto', 'important');
-                        digiatoContents[i].style.setProperty('margin-right', 'auto', 'important');
+                    // Digiato: remove everything after .articlePost
+                    var digiatoPost = document.querySelector('.articlePost');
+                    if (digiatoPost) {
+                        var digNext = digiatoPost.nextElementSibling;
+                        while (digNext) {
+                            digNext.style.setProperty('display', 'none', 'important');
+                            digNext = digNext.nextElementSibling;
+                        }
                     }
                 }
 
