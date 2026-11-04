@@ -763,4 +763,39 @@
   <data name="در حال شناسایی..." xml:space="preserve">
     <value>در حال شناسایی...</value>
   </data>
+
+  <data name="StartupCatAiDev" xml:space="preserve">
+    <value>ابزار هوش مصنوعی و توسعه (اختیاری)</value>
+  </data>
+  <data name="MessCatDevTools" xml:space="preserve">
+    <value>کش محیط‌های برنامه‌نویسی و کانتینرها (npm, Docker, pip)</value>
+  </data>
+  <data name="EvDevToolsCache" xml:space="preserve">
+    <value>کش و پکیج‌های محیط توسعه و کانتینر — حذف فقط با تأیید صریح و انتقال امن به قرنطینه انجام می‌شود</value>
+  </data>
+  <data name="DevQuarantineTitle" xml:space="preserve">
+    <value>انتقال امن پکیج‌های برنامه‌نویسی به قرنطینه</value>
+  </data>
+  <data name="DevQuarantineDesc" xml:space="preserve">
+    <value>موارد انتخاب‌شده شامل پکیج‌ها و کش ابزارهای برنامه‌نویسی (مانند npm، Docker، pip و ...) است. این موارد به «قرنطینه» منتقل می‌شوند و هر زمان نیاز داشتید می‌توانید آن‌ها را از بخش «مرکز بازیابی» به‌راحتی بازگردانی کنید.</value>
+  </data>
+  <data name="DevQuarantineSuccessNotice" xml:space="preserve">
+    <value>(موارد محیط برنامه‌نویسی به قرنطینه منتقل شدند و هر زمان نیاز داشتید از مرکز بازیابی قابل بازگردانی هستند)</value>
+  </data>
+
+  <data name="OptReviewDialogTitle" xml:space="preserve">
+    <value>تأیید بهینه‌سازی ابزارها و برنامه‌های پس‌زمینه</value>
+  </data>
+  <data name="OptReviewDialogDesc" xml:space="preserve">
+    <value>برنامه‌های زیر در استارتاپ سیستم یا مرورگر فعال هستند. برای افزایش سرعت بوت و سبک‌سازی سیستم، مواردی که مایل به غیرفعال‌سازی آن‌ها هستید را تأیید کنید (تمامی موارد به‌صورت امن ذخیره می‌شوند و هر زمان از مدیریت استارتاپ قابل فعال‌سازی مجدد هستند):</value>
+  </data>
+  <data name="OptReviewDialogConfirm" xml:space="preserve">
+    <value>غیرفعال‌سازی موارد انتخاب‌شده</value>
+  </data>
+  <data name="OptReviewDialogCancel" xml:space="preserve">
+    <value>صرف‌نظر و ادامه</value>
+  </data>
+  <data name="OptReviewExtBadge" xml:space="preserve">
+    <value>افزونه کروم</value>
+  </data>
 </root>

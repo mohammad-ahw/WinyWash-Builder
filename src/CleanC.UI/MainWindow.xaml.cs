@@ -236,6 +236,13 @@ namespace CleanC.UI
                     if (e.Key == Windows.System.VirtualKey.Escape)
                     {
                         // بازی اکسپدیشن روی هر چیز دیگری ارجحیت دارد؛ ESC اول آن را می‌بندد
+                        if (NewsReaderOverlay != null && NewsReaderOverlay.Visibility == Visibility.Visible)
+                        {
+                            CloseNewsReader();
+                            e.Handled = true;
+                            return;
+                        }
+
                         if (ExpeditionOverlay != null && ExpeditionOverlay.Visibility == Visibility.Visible)
                         {
                             CloseExpedition();
@@ -378,6 +385,7 @@ namespace CleanC.UI
             _driversSearchDebounce.Tick += (s, e) =>
             {
                 _driversSearchDebounce.Stop();
+                _newsTimer?.Stop();
                 if (_cachedDrivers != null) RenderDrivers(_cachedDrivers);
             };
 
@@ -397,6 +405,7 @@ namespace CleanC.UI
             InitHeroAccentSync();
             InitHeroHost();
             InitSparklines();
+            InitializeNewsFeature();
 
             // اسکن پس زمینه برای پر کردن چیپ «قابل آزادسازی» با داده واقعی
             ScheduleHeroCleanableRefresh();
@@ -633,6 +642,7 @@ namespace CleanC.UI
                 _infoBarAutoDismissTimer.Stop();
                 _uninstallerSearchDebounce.Stop();
                 _driversSearchDebounce.Stop();
+                _newsTimer?.Stop();
             }
             catch (Exception __ex)
             {

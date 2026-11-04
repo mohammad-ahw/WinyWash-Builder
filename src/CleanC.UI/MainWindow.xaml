@@ -1,4 +1,4 @@
-﻿<Window
+<Window
     x:Class="CleanC.UI.MainWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -209,37 +209,96 @@
                                                VerticalAlignment="Stretch" />
                             </Border>
 
+                                                        <!-- ================================================================= -->
+                            <!-- LATEST NEWS CARD — نوار تک‌سطری آخرین اخبار امروز (جایگزین اکسپدیشن) -->
+                            <!-- اگر اینترنت قطع باشد این بخش کاملاً Collapsed می شود و فضایی اشغال نمی کند -->
                             <!-- ================================================================= -->
-                            <!-- EXPEDITION CTA — کارت ورود به «اکسپدیشن وینی»                      -->
-                            <!-- ================================================================= -->
-                            <Button x:Name="ExpeditionEntryBtn"
-                                    Click="ExpeditionEntryBtn_Click"
+                            <Border x:Name="LatestNewsCard"
+                                    Visibility="Collapsed"
                                     HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Stretch"
-                                    Padding="0"
-                                    CornerRadius="14"
+                                    CornerRadius="12"
                                     Background="{ThemeResource AppCardBackgroundBrush}"
                                     BorderBrush="{ThemeResource AppCardBorderBrush}"
                                     BorderThickness="1"
+                                    Padding="14,8"
+                                    MinHeight="46"
                                     Translation="0,0,16"
                                     Shadow="{StaticResource SharedCardShadow}">
-                                <Grid ColumnDefinitions="Auto,*,Auto" Margin="18,14" ColumnSpacing="14">
-                                    <Border Grid.Column="0" Width="30" Height="30" CornerRadius="9"
-                                            Background="{ThemeResource AccentFillColorDefaultBrush}" Opacity="0.14">
-                                        <FontIcon Glyph="&#xE7EF;" FontSize="14" Foreground="{ThemeResource AccentFillColorDefaultBrush}"
-                                                  HorizontalAlignment="Center" VerticalAlignment="Center" />
-                                    </Border>
-                                    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
-                                        <TextBlock Text="اکسپدیشن وینی" FontSize="13.5" FontWeight="SemiBold" />
-                                        <TextBlock Text="گشتی در Downloads خودت — پرونده‌های زائد را پیدا کن، دست بگیر، و یک‌جا اجراش کن"
-                                                   FontSize="11" Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                                   TextWrapping="Wrap" />
+                                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="10" VerticalAlignment="Center" HorizontalAlignment="Stretch">
+                                    <!-- ۱. آیکون هماهنگ با اکسنت برنامه + خط پیشرفت دایره‌ای دور آیکون -->
+                                    <Grid Grid.Column="0" Width="30" Height="30" VerticalAlignment="Center">
+                                        <Ellipse Width="26" Height="26" Stroke="{ThemeResource AccentFillColorDefaultBrush}" StrokeThickness="2" Opacity="0.18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                        <Canvas Width="30" Height="30" HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Path x:Name="NewsIconProgressArc" Stroke="{ThemeResource AccentFillColorDefaultBrush}" StrokeThickness="2.2" StrokeStartLineCap="Round" StrokeEndLineCap="Round" />
+                                        </Canvas>
+                                        <Path Data="M16.1135 3.35225C17.0658 3.09831 18 3.81605 18 4.8016V15.1126C18 16.1364 16.997 16.8594 16.0257 16.5356L11.2709 14.9507C10.7932 16.1513 9.62112 17 8.25 17C6.45507 17 5 15.5449 5 13.75V12.8604L3.02566 12.2023C2.41315 11.9981 2 11.4249 2 10.7792V8.26827C2 7.58869 2.45688 6.99402 3.11351 6.81891L16.1135 3.35225ZM6 13.1937V13.75C6 14.9926 7.00736 16 8.25 16C9.17866 16 9.97657 15.437 10.32 14.6337L6 13.1937Z"
+                                              Fill="{ThemeResource AccentFillColorDefaultBrush}"
+                                              Width="13" Height="13"
+                                              Stretch="Uniform"
+                                              RenderTransformOrigin="0.5,0.5"
+                                              HorizontalAlignment="Center" VerticalAlignment="Center">
+                                            <Path.RenderTransform>
+                                                <ScaleTransform ScaleX="-1" />
+                                            </Path.RenderTransform>
+                                        </Path>
+                                    </Grid>
+
+                                    <!-- ۲. عنوان ثابت: آخرین اخبار امروز • -->
+                                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                                        <TextBlock Text="آخرین اخبار امروز" FontSize="12" FontWeight="SemiBold" Foreground="{ThemeResource TextFillColorPrimaryBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="•" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" Opacity="0.6" />
                                     </StackPanel>
-                                    <FontIcon Grid.Column="2" Glyph="&#xE76C;" FontSize="14"
-                                              Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                              VerticalAlignment="Center" />
+
+                                    <!-- ۳. ناحیه کلیک و تیتر خبر (دکمه کاملاً شفاف بدون نوار روشن، تغییر وزن قلم در هاور) -->
+                                    <Button x:Name="NewsHeadlineClickArea"
+                                            Grid.Column="2"
+                                            Click="NewsHeadlineClickArea_Click"
+                                            PointerEntered="NewsHeadlineClickArea_PointerEntered"
+                                            PointerExited="NewsHeadlineClickArea_PointerExited"
+                                            Background="Transparent"
+                                            BorderThickness="0"
+                                            Padding="4,2"
+                                            CornerRadius="6"
+                                            HorizontalAlignment="Stretch"
+                                            HorizontalContentAlignment="Stretch"
+                                            AllowFocusOnInteraction="False"
+                                            IsTabStop="False">
+                                        <Button.Resources>
+                                            <SolidColorBrush x:Key="ButtonBackground" Color="Transparent" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPointerOver" Color="Transparent" />
+                                            <SolidColorBrush x:Key="ButtonBackgroundPressed" Color="Transparent" />
+                                            <SolidColorBrush x:Key="ButtonBorderBrush" Color="Transparent" />
+                                            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="Transparent" />
+                                            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="Transparent" />
+                                        </Button.Resources>
+                                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                                            <TextBlock x:Name="NewsHeadlineText"
+                                                       Grid.Column="0"
+                                                       Text="در حال دریافت آخرین خبرها..."
+                                                       FontSize="12"
+                                                       FontWeight="Normal"
+                                                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                                       TextTrimming="CharacterEllipsis"
+                                                       MaxLines="1"
+                                                       VerticalAlignment="Center" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="5" VerticalAlignment="Center">
+                                                <TextBlock x:Name="NewsActionText" Text="مشاهده خبر" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
+                                                <FontIcon x:Name="NewsActionIcon" Glyph="&#xE8A7;" FontSize="10" Foreground="{ThemeResource TextFillColorTertiaryBrush}" VerticalAlignment="Center" />
+                                            </StackPanel>
+                                        </Grid>
+                                    </Button>
+
+                                    <!-- ۴. دکمه‌های اسلاید دستی در انتها -->
+                                    <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+                                        <Button x:Name="NewsPrevBtn" Click="NewsPrevBtn_Click" Width="26" Height="26" Padding="0" CornerRadius="5" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="خبر قبلی" AllowFocusOnInteraction="False" IsTabStop="False">
+                                            <FontIcon Glyph="&#xE76C;" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </Button>
+                                        <Button x:Name="NewsNextBtn" Click="NewsNextBtn_Click" Width="26" Height="26" Padding="0" CornerRadius="5" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="خبر بعدی" AllowFocusOnInteraction="False" IsTabStop="False">
+                                            <FontIcon Glyph="&#xE76B;" FontSize="10.5" Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                                        </Button>
+                                    </StackPanel>
                                 </Grid>
-                            </Button>
+                            </Border>
 
                             <!-- ================================================================= -->
                             <!-- LIVE CLEANUP CARD & REPORT CARD (Preserved with exact contracts)  -->
@@ -2143,6 +2202,71 @@
             <!-- =============================================================== -->
             <Grid x:Name="ExpeditionOverlay" Grid.Row="1" Visibility="Collapsed">
                 <Expedition:ExpeditionHost x:Name="ExpeditionHostXaml" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+            </Grid>
+
+            <!-- =============================================================== -->
+            <!-- NEWS READER OVERLAY — مرورگر درون‌برنامه‌ای خبرها با دکمه بازگشت -->
+            <!-- =============================================================== -->
+            <Grid x:Name="NewsReaderOverlay" Grid.Row="1" Visibility="Collapsed" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
+                <!-- نوار بالای مرورگر خبر -->
+                <Border Grid.Row="0"
+                        Background="{ThemeResource AppCardBackgroundBrush}"
+                        BorderBrush="{ThemeResource AppCardBorderBrush}"
+                        BorderThickness="0,0,0,1"
+                        Padding="16,8">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12" VerticalAlignment="Center">
+                        <!-- دکمه بازگشت به برنامه -->
+                        <Button x:Name="NewsReaderBackBtn"
+                                Click="NewsReaderBackBtn_Click"
+                                Style="{ThemeResource DefaultButtonStyle}"
+                                CornerRadius="8"
+                                Padding="12,6">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <FontIcon Glyph="&#xE72A;" FontSize="12" />
+                                <TextBlock Text="بازگشت به برنامه" FontSize="12" FontWeight="SemiBold" />
+                            </StackPanel>
+                        </Button>
+
+                        <!-- تیتر خبر در هدر -->
+                        <TextBlock x:Name="NewsReaderHeaderTitle"
+                                   Grid.Column="1"
+                                   Text="آخرین خبر"
+                                   FontSize="12.5"
+                                   FontWeight="SemiBold"
+                                   Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                   TextTrimming="CharacterEllipsis"
+                                   VerticalAlignment="Center"
+                                   HorizontalAlignment="Center" />
+
+                        <!-- دکمه‌های کمکی: رفرش و باز کردن در مرورگر سیستم -->
+                        <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                            <Button x:Name="NewsReaderRefreshBtn" Click="NewsReaderRefreshBtn_Click" Width="30" Height="30" Padding="0" CornerRadius="6" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="تازه‌سازی">
+                                <FontIcon Glyph="&#xE72C;" FontSize="12" />
+                            </Button>
+                            <Button x:Name="NewsReaderExternalBtn" Click="NewsReaderExternalBtn_Click" Width="30" Height="30" Padding="0" CornerRadius="6" Background="Transparent" BorderThickness="0" ToolTipService.ToolTip="باز کردن در مرورگر ویندوز">
+                                <FontIcon Glyph="&#xE774;" FontSize="12" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- نوار پیشرفت لودینگ صفحه وب -->
+                <ProgressBar x:Name="NewsReaderProgressBar"
+                             Grid.Row="0"
+                             VerticalAlignment="Bottom"
+                             IsIndeterminate="True"
+                             Height="2"
+                             Visibility="Collapsed" />
+
+                <!-- نمایشگر صفحه خبر -->
+                <Grid Grid.Row="1">
+                    <WebView2 x:Name="NewsWebView" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+                </Grid>
             </Grid>
         </Grid>
     </Grid>

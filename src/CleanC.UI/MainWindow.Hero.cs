@@ -919,6 +919,8 @@ namespace CleanC.UI
             try
             {
                 s.DisabledStartups = await StartupOptimizerService.OptimizeStartupAppsAsync();
+                int userConfirmed = await PromptUserForOptionalOptimizationsAsync();
+                s.DisabledStartups += userConfirmed;
             }
             catch (Exception ex)
             {
@@ -1586,6 +1588,171 @@ namespace CleanC.UI
             }
 
             return new { chips };
+        }
+
+        private async Task<int> PromptUserForOptionalOptimizationsAsync()
+        {
+            try
+            {
+                var reviewableStartups = StartupOptimizerService.GetReviewableStartupItems();
+                var reviewableExts = BrowserOptimizerService.GetReviewableDeadExtensions();
+
+                if (reviewableStartups.Count == 0 && reviewableExts.Count == 0)
+                    return 0;
+
+                var root = new StackPanel { Spacing = 12 };
+
+                var desc = new TextBlock
+                {
+                    Text = LocalizationService.Get("OptReviewDialogDesc", "برنامه‌های زیر در استارتاپ سیستم یا مرورگر فعال هستند. برای افزایش سرعت بوت و سبک‌سازی سیستم، مواردی که مایل به غیرفعال‌سازی آن‌ها هستید را تأیید کنید (تمامی موارد به‌صورت امن ذخیره می‌شوند و هر زمان از مدیریت استارتاپ قابل فعال‌سازی مجدد هستند):"),
+                    FontSize = 12,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 18,
+                    Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
+                };
+                root.Children.Add(desc);
+
+                var listStack = new StackPanel { Spacing = 6 };
+                var startupBoxes = new List<(CheckBox Box, StartupItem Item)>();
+                var extBoxes = new List<(CheckBox Box, string ExtId)>();
+
+                // ۱. استارتاپ‌ها (Gemini, AutoClaw, Docker, Telegram, VPNs, ...)
+                foreach (var item in reviewableStartups)
+                {
+                    var card = new Border
+                    {
+                        Background = GetThemeBrush("AppCardSecondaryBrush"),
+                        BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(7),
+                        Padding = new Thickness(10, 6, 10, 6)
+                    };
+
+                    var row = new Grid();
+                    row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                    var chk = new CheckBox
+                    {
+                        IsChecked = false,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 0, 8, 0)
+                    };
+                    Grid.SetColumn(chk, 0);
+                    row.Children.Add(chk);
+
+                    var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
+                    info.Children.Add(new TextBlock { Text = item.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12 });
+                    info.Children.Add(new TextBlock { Text = item.Command, FontSize = 10, Foreground = GetThemeBrush("TextFillColorTertiaryBrush"), TextTrimming = TextTrimming.CharacterEllipsis, MaxLines = 1 });
+                    Grid.SetColumn(info, 1);
+                    row.Children.Add(info);
+
+                    var badge = new Border
+                    {
+                        Background = GetThemeBrush("AppCardBackgroundBrush"),
+                        CornerRadius = new CornerRadius(4),
+                        Padding = new Thickness(6, 2, 6, 2),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Child = new TextBlock { Text = item.Category, FontSize = 10, Foreground = GetThemeBrush("AccentFillColorDefaultBrush") }
+                    };
+                    Grid.SetColumn(badge, 2);
+                    row.Children.Add(badge);
+
+                    card.Child = row;
+                    listStack.Children.Add(card);
+                    startupBoxes.Add((chk, item));
+                }
+
+                // ۲. افزونه‌های کروم
+                foreach (var ext in reviewableExts)
+                {
+                    var card = new Border
+                    {
+                        Background = GetThemeBrush("AppCardSecondaryBrush"),
+                        BorderBrush = GetThemeBrush("AppCardBorderBrush"),
+                        BorderThickness = new Thickness(1),
+                        CornerRadius = new CornerRadius(7),
+                        Padding = new Thickness(10, 6, 10, 6)
+                    };
+
+                    var row = new Grid();
+                    row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+                    row.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
+                    row.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
+
+                    var chk = new CheckBox
+                    {
+                        IsChecked = false,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Margin = new Thickness(0, 0, 8, 0)
+                    };
+                    Grid.SetColumn(chk, 0);
+                    row.Children.Add(chk);
+
+                    var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center, Spacing = 1 };
+                    info.Children.Add(new TextBlock { Text = ext.Name, FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12 });
+                    info.Children.Add(new TextBlock { Text = ext.Reason, FontSize = 10, Foreground = GetThemeBrush("TextFillColorTertiaryBrush") });
+                    Grid.SetColumn(info, 1);
+                    row.Children.Add(info);
+
+                    var badge = new Border
+                    {
+                        Background = GetThemeBrush("AppCardBackgroundBrush"),
+                        CornerRadius = new CornerRadius(4),
+                        Padding = new Thickness(6, 2, 6, 2),
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Child = new TextBlock { Text = LocalizationService.Get("OptReviewExtBadge", "افزونه کروم"), FontSize = 10, Foreground = GetThemeBrush("SystemFillColorCautionBrush") }
+                    };
+                    Grid.SetColumn(badge, 2);
+                    row.Children.Add(badge);
+
+                    card.Child = row;
+                    listStack.Children.Add(card);
+                    extBoxes.Add((chk, ext.Id));
+                }
+
+                var scroll = new ScrollViewer { MaxHeight = 300, Content = listStack };
+                root.Children.Add(scroll);
+
+                var dialog = new ContentDialog
+                {
+                    XamlRoot = Content.XamlRoot,
+                    Title = LocalizationService.Get("OptReviewDialogTitle", "تأیید بهینه‌سازی ابزارها و برنامه‌های پس‌زمینه"),
+                    Content = root,
+                    PrimaryButtonText = LocalizationService.Get("OptReviewDialogConfirm", "غیرفعال‌سازی موارد انتخاب‌شده"),
+                    CloseButtonText = LocalizationService.Get("OptReviewDialogCancel", "صرف‌نظر و ادامه"),
+                    DefaultButton = ContentDialogButton.Primary,
+                    FlowDirection = LocalizationService.IsRtl ? FlowDirection.RightToLeft : FlowDirection.LeftToRight
+                };
+
+                var res = await dialog.ShowAsync();
+                if (res != ContentDialogResult.Primary) return 0;
+
+                int disabled = 0;
+                foreach (var (box, item) in startupBoxes)
+                {
+                    if (box.IsChecked == true)
+                    {
+                        if (StartupOptimizerService.DisableStartupItem(item))
+                            disabled++;
+                    }
+                }
+
+                var extsToClean = extBoxes.Where(b => b.Box.IsChecked == true).Select(b => b.ExtId).ToHashSet();
+                if (extsToClean.Count > 0)
+                {
+                    BrowserOptimizerService.CleanSpecificExtensions(extsToClean);
+                    disabled += extsToClean.Count;
+                }
+
+                return disabled;
+            }
+            catch (Exception ex)
+            {
+                CcLog.Report("PromptUserForOptionalOptimizationsAsync", ex);
+                return 0;
+            }
         }
     }
 }

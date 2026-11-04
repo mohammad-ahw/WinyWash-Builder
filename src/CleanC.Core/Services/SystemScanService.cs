@@ -391,23 +391,9 @@ namespace CleanC.Core.Services
                     IconGlyph = "\uE71D"
                 };
 
-                // Node.js npm cache
-                string npmPath = Path.Combine(localApp, "npm-cache");
-                long npmBytes = SafeGetDirectorySize(npmPath);
-                if (npmBytes > 0)
-                {
-                    grpApps.Items.Add(new JunkCategory
-                    {
-                        Id = "nodejsCache",
-                        GroupId = "apps",
-                        Title = LocalizationService.Get("کش پکیج های Node.js (npm)"),
-                        Description = LocalizationService.Get("بسته های موقت دانلودشده npm در سیستم"),
-                        Path = npmPath,
-                        TargetPaths = new List<string> { npmPath },
-                        Bytes = npmBytes,
-                        IconGlyph = "\uE71D"
-                    });
-                }
+                // توجه: کش‌های محیط‌های برنامه‌نویسی و کانتینرها (Node.js npm, Python pip, VS Code, Docker)
+                // عمداً از پویش زباله عمومی و پاک‌سازی خودکار سیستمی خارج شده‌اند تا فایل‌های توسعه‌دهنده به خطر نیفتند.
+                // این موارد منحصراً در بخش «پویش عمیق دیسک» (Deep Analysis) با تأیید صریح و انتقال به قرنطینه مدیریت می‌شوند.
 
                 // NVIDIA Cache
                 var nvPaths = new List<string>
@@ -451,47 +437,9 @@ namespace CleanC.Core.Services
                     });
                 }
 
-                // Pip Cache
-                string pipPath = Path.Combine(localApp, @"pip\cache");
-                long pipBytes = SafeGetDirectorySize(pipPath);
-                if (pipBytes > 0)
-                {
-                    grpApps.Items.Add(new JunkCategory
-                    {
-                        Id = "pipCache",
-                        GroupId = "apps",
-                        Title = LocalizationService.Get("کش پکیج های پایتون (Pip)"),
-                        Description = LocalizationService.Get("بسته های دانلودشده مخزن پایتون"),
-                        Path = pipPath,
-                        TargetPaths = new List<string> { pipPath },
-                        Bytes = pipBytes,
-                        IconGlyph = "\uE71D"
-                    });
-                }
+                
 
-                // VS Code Cache
-                var vscPaths = new List<string>
-                {
-                    Path.Combine(appData, @"Code\Cache"),
-                    Path.Combine(appData, @"Code\CachedData"),
-                    Path.Combine(appData, @"Code\CachedExtensions"),
-                    Path.Combine(appData, @"Code\logs")
-                };
-                long vscBytes = SafeGetPathsSize(vscPaths);
-                if (vscBytes > 0)
-                {
-                    grpApps.Items.Add(new JunkCategory
-                    {
-                        Id = "vscodeCache",
-                        GroupId = "apps",
-                        Title = LocalizationService.Get("کش محیط برنامه نویسی VS Code"),
-                        Description = LocalizationService.Get("فایل های کش و داده های موقت ویرایشگر کد"),
-                        Path = vscPaths[0],
-                        TargetPaths = vscPaths,
-                        Bytes = vscBytes,
-                        IconGlyph = "\uE756"
-                    });
-                }
+                
 
                 // Discord Cache
                 var discordPaths = new List<string>

@@ -1517,7 +1517,9 @@ namespace CleanC.UI
             };
             openFolderBtn.Click += (s, e) =>
             {
-                string dir = Path.Combine(Directory.GetCurrentDirectory(), "wallpaper");
+                string dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "wallpaper");
+                if (!Directory.Exists(dir)) dir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "wallpaper");
+                if (!Directory.Exists(dir)) dir = Path.Combine(Directory.GetCurrentDirectory(), "wallpaper");
                 if (!Directory.Exists(dir)) dir = @"C:\Users\moham\Pictures\Wallpaper";
                 OpenFolder(dir);
             };

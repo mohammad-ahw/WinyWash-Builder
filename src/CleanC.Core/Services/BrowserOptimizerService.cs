@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -788,7 +788,28 @@ namespace CleanC.Core.Services
             return (count, freed);
         }
 
-        public static long CleanInactiveChromeExtensions()
+                public static List<(string Id, string Name, string Reason)> GetReviewableDeadExtensions()
+        {
+            var list = new List<(string Id, string Name, string Reason)>();
+            try
+            {
+                var scanned = ScanExtensions();
+                foreach (var ext in scanned)
+                {
+                    if (ext.Category == ExtensionRiskCategory.SafeToClean || KnownDeadExtensionIds.Contains(ext.Id) || !ext.IsEnabled)
+                    {
+                        list.Add((ext.Id, ext.Name, ext.Reason));
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex);
+            }
+            return list;
+        }
+
+public static long CleanInactiveChromeExtensions()
         {
             var (_, freedBytes) = CleanSpecificExtensions(KnownDeadExtensionIds);
             var (_, idbFreed) = CleanOrphanedExtensionStorage();

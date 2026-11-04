@@ -356,12 +356,17 @@ namespace CleanC.Core.Services
                 string wpDir = Path.Combine(baseDir, "wallpaper");
                 if (!Directory.Exists(wpDir) || Directory.GetFiles(wpDir).Length == 0)
                 {
-                    string rootWp = Path.Combine(Directory.GetCurrentDirectory(), "wallpaper");
-                    if (Directory.Exists(rootWp) && Directory.GetFiles(rootWp).Length > 0) wpDir = rootWp;
+                    string parentWp = Path.Combine(baseDir, "..", "wallpaper");
+                    if (Directory.Exists(parentWp) && Directory.GetFiles(parentWp).Length > 0) wpDir = parentWp;
                     else
                     {
-                        string picWp = @"C:\Users\moham\Pictures\Wallpaper";
-                        if (Directory.Exists(picWp)) wpDir = picWp;
+                        string rootWp = Path.Combine(Directory.GetCurrentDirectory(), "wallpaper");
+                        if (Directory.Exists(rootWp) && Directory.GetFiles(rootWp).Length > 0) wpDir = rootWp;
+                        else
+                        {
+                            string picWp = @"C:\Users\moham\Pictures\Wallpaper";
+                            if (Directory.Exists(picWp)) wpDir = picWp;
+                        }
                     }
                 }
 

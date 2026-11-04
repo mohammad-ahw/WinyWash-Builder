@@ -276,6 +276,27 @@ namespace CleanC.Core.Services
             });
         }
 
+        /// <summary>
+        /// آیتم‌های استارتاپی که برای بهبود سرعت بوت کاندید هستند اما باید فقط با تأیید صریح کاربر غیرفعال شوند
+        /// (ابزارهای هوش مصنوعی و توسعه، فیلترشکن‌ها، پیام‌رسان‌ها و برنامه‌های کاربردی اختیاری).
+        /// </summary>
+        public static List<StartupItem> GetReviewableStartupItems()
+        {
+            var all = GetStartupItems(includeExtraSources: true);
+            var reviewable = new List<StartupItem>();
+
+            foreach (var item in all)
+            {
+                if (item.IsDisabled || item.TargetMissing) continue;
+                if (IsWhitelisted(item.Name, item.Command)) continue;
+                if (IsSafeToAutoDisable(item.Name, item.Command)) continue;
+
+                reviewable.Add(item);
+            }
+
+            return reviewable;
+        }
+
         public static bool DisableStartupItem(StartupItem item)
         {
             if (item == null) return false;
@@ -866,6 +887,11 @@ namespace CleanC.Core.Services
                 lower.Contains("origin") || lower.Contains("battle.net") || lower.Contains("uplay") || lower.Contains("galaxy"))
                 return "لانچر بازی و گیمینگ (اختیاری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
+            if (lower.Contains("gemini") || lower.Contains("autoclaw") || lower.Contains("opencode") ||
+                lower.Contains("claude") || lower.Contains("chatgpt") || lower.Contains("ollama") ||
+                lower.Contains("docker") || lower.Contains("vscode") || lower.Contains("code.exe"))
+                return LocalizationService.Get("StartupCatAiDev", "ابزار هوش مصنوعی و توسعه (اختیاری)"); // i18n-logic: ابزارهای هوش مصنوعی و محیط توسعه
+
             if (lower.Contains("update") || lower.Contains("updater") || lower.Contains("helper") || lower.Contains("jusched"))
                 return "آپدیتر پس زمینه (غیرضروری)"; // i18n-logic: این متن با داده‌ی خارجی مقایسه/تطبیق داده م‌یشود
 
@@ -919,7 +945,17 @@ namespace CleanC.Core.Services
 
             // مسیر exe در حال اجرا؛ در unit-test این testhost است، پس fallback دارد
             string exe = Environment.ProcessPath ?? string.Empty;
-            if (!string.IsNullOrEmpty(exe)) return exe;
+            if (!string.IsNullOrEmpty(exe))
+            {
+                string? dir = Path.GetDirectoryName(exe);
+                if (!string.IsNullOrEmpty(dir))
+                {
+                    string parent = Path.GetDirectoryName(dir) ?? "";
+                    string rootLauncher = Path.Combine(parent, "WinyWash.exe");
+                    if (File.Exists(rootLauncher)) return rootLauncher;
+                }
+                return exe;
+            }
 
             return Path.Combine(AppContext.BaseDirectory, "WinyWash.exe");
         }

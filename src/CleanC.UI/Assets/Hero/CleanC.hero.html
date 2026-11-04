@@ -727,7 +727,42 @@ const isEnglish=()=>!!(window.CC_I18N&&!CC_I18N.isFa());
 const fill=s=>s.replace(/\{u\}/g,ST.uName||(isEnglish()?'friend':'رفیق')).replace(/\{c\}/g,ST.cName||'Winy').replace(/\{t\}/g,W.t).replace(/\{city\}/g,W.city||(isEnglish()?'here':'اینجا'));
 function pickLine(pool){if(!pool)return null;const all=(pool[TI()]||'').split('|').map(fill).filter(Boolean);if(!all.length)return null;let c=all.filter(s=>!used.includes(s));if(!c.length)c=all;const s=c[Math.random()*c.length|0];used.push(s);if(used.length>60)used.shift();return s}
 /* صف دیالوگ: کلیک‌های سریع نباید جملهٔ در حال نمایش را قطع یا گم کنند. */
-function bubble(t,o){if(!t)return;if(isEnglish()&&window.CC_I18N)t=CC_I18N.translate(t);queueBubble(t,!!(o&&o.urgent))}
+function clearBubble(){
+ clearTimeout(bubT);
+ sayQ=[];
+ sayBusy=false;
+ sayCurrent='';
+ const b=$('bub');
+ if(b)b.classList.remove('on');
+}
+function showBubbleNow(t){
+ if(!t)return;
+ if(isEnglish()&&window.CC_I18N)t=CC_I18N.translate(t);
+ clearTimeout(bubT);
+ sayQ=[];
+ sayBusy=true;
+ sayCurrent=t;
+ lastSayAt=T();
+ const b=$('bub');
+ if(b){
+  b.classList.remove('on');
+  void b.offsetWidth;
+  b.textContent=t;
+  b.classList.add('on');
+ }
+ const dur=Math.min(3600,Math.max(1700,1400+t.length*40));
+ bubT=setTimeout(()=>{
+  if(b)b.classList.remove('on');
+  sayBusy=false;
+  sayCurrent='';
+ },dur);
+}
+function bubble(t,o){
+ if(!t)return;
+ if(o&&o.override){showBubbleNow(t);return}
+ if(isEnglish()&&window.CC_I18N)t=CC_I18N.translate(t);
+ queueBubble(t,!!(o&&o.urgent));
+}
 function queueBubble(t,urgent){
  if(!t||t===sayCurrent||sayQ.some(q=>q.t===t))return;
  if(urgent)sayQ.unshift({t,urgent:true});else sayQ.push({t,urgent:false});
@@ -749,7 +784,7 @@ function pumpBubble(){
  const dur=sayQ.length?Math.min(2600,Math.max(1500,1200+t.length*35)):Math.min(3800,Math.max(1700,1400+t.length*42));
  bubT=setTimeout(()=>{b.classList.remove('on');sayBusy=false;sayCurrent='';setTimeout(pumpBubble,180)},dur);
 }
-function say(id,o){if(run)return;if(ST.calm&&!(o&&o.data))return;const fa=!window.CC_I18N||CC_I18N.isFa();const s=(fa?pickLine(L[id]):pickLine(L_EN[id]||L_EN.any))||pickLine(fa?L.any:L_EN.any);if(s)bubble(s,{urgent:!!(o&&o.urgent)})}
+function say(id,o){if(run)return;if(ST.calm&&!(o&&o.data))return;const fa=!window.CC_I18N||CC_I18N.isFa();const s=(fa?pickLine(L[id]):pickLine(L_EN[id]||L_EN.any))||pickLine(fa?L.any:L_EN.any);if(s)bubble(s,{urgent:!!(o&&o.urgent),override:(o&&o.override!==undefined)?o.override:true})}
 
 /* ---- varied healthy-state headline: new pick on every open, avoids the last 10 shown ---- */
 let hl={head:(!window.CC_I18N||CC_I18N.isFa())?SER[0]:SER_EN[0],sub:(!window.CC_I18N||CC_I18N.isFa())?SUBS[0]:SUBS_EN[0],mood:'excellent'};
@@ -838,7 +873,7 @@ function pickR(g){const pool=R.filter(r=>r.g==g),w={0:70,1:25,2:4,3:1},av=[...ne
 const rxOK=()=>!run&&!(cur&&(cur.fast||cur.crit)),calmTier=()=>cur&&!cur.fast&&!cur.warn&&!cur.crit&&cur.id!='sleep'&&cur.id!='drowsy'&&!MR();
 function start(r,o){o=o||{};if(typeof r=='string')r=RI[r];if(!r||run)return;if(ST.calm&&r.g!='data'&&!o.force)return;
  RX=Object.assign({},r,{t0:T(),ei:0,u:0,v:Math.random()<.5});recent.push(r.id);if(recent.length>3)recent.shift();found(r.id);
- if(o.say||r.g=='data'||Math.random()<(r.sy??.5))say(o.sayId||r.id,{data:r.g=='data'||o.force,urgent:!!o.urgent})}
+ if(o.say||r.g=='data'||Math.random()<(r.sy??.5))say(o.sayId||r.id,{data:r.g=='data'||o.force,urgent:!!o.urgent,override:o.override!==undefined?o.override:true})}
 /* hooks called from the frame loop */
 function RXstep(k,pose){rxO={rot:0,s:1,hide:0,wink:0,cross:0,col:null,look:null,sq:0,dy:0};
  if(pdn&&pdn.moved)stch-=Math.min(.09,Math.hypot(sp.dx.v,sp.dy.v)/300);
@@ -863,13 +898,13 @@ addEventListener('pointerup',()=>{if(!pdn)return;const p=pdn,c0=chg,t=T();pdn=nu
  if(p.moved){sp.dx.t=0;sp.dy.t=0;found('drag');if(!ST.calm&&rxOK())say('drag');return}
  if(c0>.12){release(c0);return}
  if(t-p.t<.35&&p.z)clickR()});
-cv.addEventListener('dblclick',e=>{if(!ST.calm&&rxOK()&&dz(e))start('selfie',{say:1,urgent:1})});
+cv.addEventListener('dblclick',e=>{if(!ST.calm&&rxOK()&&dz(e)){clearBubble();ckt=[];start('selfie',{say:1,urgent:1,override:true})}});
 document.documentElement.addEventListener('mouseleave',()=>{if(!ST.calm&&rxOK()&&calmTier()&&!RX)start('search')});
 function release(c){found('charge');sp.sq.w-=4*c;const n=1+Math.floor(c*3);for(let i=0;i<n;i++)add({t:'rg',x:0,y:0,d:.5-i*.06,c:i%2?hx('#ffffff'):col});if(!ST.calm)say('release')}
 function clickR(){const t=T();if(ckt.length&&t-ckt[ckt.length-1]>.9)ckt=[];ckt.push(t);lastClick=t;const n=ckt.length;
  if(ST.calm||!rxOK())return;
- if(n==10){ckt=[];start('angry',{say:1,urgent:1})}else if(n==7)start('disco',{say:1});else if(n==5)start('dizzy',{say:1});else if(n==4){const gm=['gmStar','gmBub','gmSeek','gmRps','gmBall'];start(gm[Math.random()*gm.length|0],{say:1,force:1});}else if(n==3)start('tickle',{say:1});
- else if(Math.random()<1/200)start('golden',{say:1});else start(pickR('click'))}
+ if(n==10){ckt=[];start('angry',{say:1,urgent:1,override:true})}else if(n==7)start('disco',{say:1,override:true});else if(n==5)start('dizzy',{say:1,override:true});else if(n==4){const gm=['gmStar','gmBub','gmSeek','gmRps','gmBall'];start(gm[Math.random()*gm.length|0],{say:1,force:1,override:true});}else if(n==3)start('tickle',{say:1,override:true});
+ else if(Math.random()<1/200)start('golden',{say:1,override:true});else start(pickR('click'),{override:true})}
 function mouseWatch(){pvs*=.5;if(ST.calm||RX||!rxOK()||!calmTier())return;const r=cv.getBoundingClientRect(),d=Math.hypot(mx-(r.left+r.width/2),my-(r.top+r.height/2)),t=T();
  if(d<150){if(!nearSince)nearSince=t}else nearSince=0;
  if(d<70&&t-lastMove>1&&t>(cool.cross||0)){cool.cross=t+20;start('cross');return}

@@ -57,7 +57,9 @@ namespace CleanC.Core.Models
         // D16 — بازمانده ی انتقال دستگاه ها (CrossDevice) و پوشه ی موقت OneDrive
         SyncDeviceLeftover,
         // فایل قفل موقت آفیس (~$name.docx) — بازمانده ی کرش Word/Excel
-        OfficeLockFile
+        OfficeLockFile,
+        // کش و پکیج‌های محیط توسعه و کانتینرها (npm, Docker, pip, NuGet, Gradle, Cargo)
+        DevToolsCache
     }
 
     public class StorageMessItem
@@ -83,6 +85,7 @@ namespace CleanC.Core.Models
             StorageMessCategory.UpdaterLeftover => LocalizationService.Get("MessCatUpdater", "بازمانده ی آپدیتر (Electron / Squirrel)"),
             StorageMessCategory.SyncDeviceLeftover => LocalizationService.Get("MessCatSyncDevice", "بازمانده ی انتقال دستگاه / تمپ OneDrive"),
             StorageMessCategory.OfficeLockFile => LocalizationService.Get("MessCatOfficeLock", "فایل قفل موقت آفیس (~$)"),
+            StorageMessCategory.DevToolsCache => LocalizationService.Get("MessCatDevTools", "کش ابزارهای برنامه‌نویسی و کانتینرها (npm, Docker, pip)"),
             _ => LocalizationService.Get("MessCatOther", "سایر")
         };
         public string CategoryTitle => CategoryName;

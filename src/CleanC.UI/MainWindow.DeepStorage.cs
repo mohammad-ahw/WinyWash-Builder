@@ -794,6 +794,37 @@ namespace CleanC.UI
                 LineHeight = 18,
                 Foreground = GetThemeBrush("TextFillColorSecondaryBrush")
             });
+            bool hasDevItems = _deepStorageActiveTab == "mess" && _deepScanResult != null &&
+                _deepScanResult.MessItems.Any(m => m.IsSelected && (m.Category == StorageMessCategory.DevToolsCache || DeepStorageCleanService.IsDevPath(m.FilePath)));
+
+            if (hasDevItems)
+            {
+                var devWarnBorder = new Border
+                {
+                    Background = (Brush)Application.Current.Resources["AppCardSecondaryBrush"],
+                    BorderBrush = (Brush)Application.Current.Resources["SystemFillColorCautionBrush"],
+                    BorderThickness = new Thickness(1),
+                    CornerRadius = new CornerRadius(8),
+                    Padding = new Thickness(12, 10, 12, 10),
+                    Margin = new Thickness(0, 4, 0, 4)
+                };
+                var devWarnStack = new StackPanel { Spacing = 6 };
+                var devWarnHeader = new StackPanel { Orientation = Orientation.Horizontal, Spacing = 8 };
+                devWarnHeader.Children.Add(new FontIcon { Glyph = "\uE7BA", FontSize = 14, Foreground = (Brush)Application.Current.Resources["SystemFillColorCautionBrush"] });
+                devWarnHeader.Children.Add(new TextBlock { Text = LocalizationService.Get("DevQuarantineTitle", "انتقال امن پکیج‌های برنامه‌نویسی به قرنطینه"), FontWeight = Microsoft.UI.Text.FontWeights.SemiBold, FontSize = 12 });
+                devWarnStack.Children.Add(devWarnHeader);
+                devWarnStack.Children.Add(new TextBlock
+                {
+                    Text = LocalizationService.Get("DevQuarantineDesc", "موارد انتخاب‌شده شامل پکیج‌ها و کش ابزارهای برنامه‌نویسی (مانند npm، Docker، pip و ...) است. این موارد به «قرنطینه» منتقل می‌شوند و هر زمان نیاز داشتید می‌توانید آن‌ها را از بخش «مرکز بازیابی» به‌راحتی بازگردانی کنید."),
+                    FontSize = 11.5,
+                    TextWrapping = TextWrapping.Wrap,
+                    LineHeight = 18,
+                    Foreground = (Brush)Application.Current.Resources["TextFillColorSecondaryBrush"]
+                });
+                devWarnBorder.Child = devWarnStack;
+                content.Children.Add(devWarnBorder);
+            }
+
             content.Children.Add(recycleCheck);
 
             var dialog = new ContentDialog
@@ -913,6 +944,10 @@ namespace CleanC.UI
                     string detail = SafeDeleteService.DescribeBatch(batch);
                     bool canUndo = batch.RecycledCount + batch.QuarantinedCount > 0;
                     if (canUndo) detail += LocalizationService.Get(" — از «مرکز بازیابی» قابل بازگردانی است.");
+                    if (batch.QuarantinedCount > 0)
+                    {
+                        detail += " " + LocalizationService.Get("DevQuarantineSuccessNotice", "(موارد محیط برنامه‌نویسی به قرنطینه منتقل شدند و هر زمان نیاز داشتید از مرکز بازیابی قابل بازگردانی هستند)");
+                    }
 
                     var severity = batch.FailedCount > 0 ? InfoBarSeverity.Warning : InfoBarSeverity.Success;
                     ShowInfoBar(LocalizationService.Get("پاکسازی عمیق دیسک"), detail + ".", severity);

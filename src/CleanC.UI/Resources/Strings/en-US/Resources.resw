@@ -4302,4 +4302,39 @@ To download and install, go to the 'Windows Update' section.</value>
   <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
     <value>No official description released by Microsoft</value>
   </data>
+
+  <data name="StartupCatAiDev" xml:space="preserve">
+    <value>AI &amp; Developer Tool (Optional)</value>
+  </data>
+  <data name="MessCatDevTools" xml:space="preserve">
+    <value>Developer &amp; Container Caches (npm, Docker, pip)</value>
+  </data>
+  <data name="EvDevToolsCache" xml:space="preserve">
+    <value>Development and container caches — deletion requires confirmation and moves safely to quarantine</value>
+  </data>
+  <data name="DevQuarantineTitle" xml:space="preserve">
+    <value>Safe Quarantine for Developer Packages</value>
+  </data>
+  <data name="DevQuarantineDesc" xml:space="preserve">
+    <value>Selected items include development packages and container caches (e.g., npm, Docker, pip). They will be moved to Quarantine and can be restored easily from the Undo Center at any time.</value>
+  </data>
+  <data name="DevQuarantineSuccessNotice" xml:space="preserve">
+    <value>(Developer items were moved to quarantine and can be restored from the Undo Center)</value>
+  </data>
+
+  <data name="OptReviewDialogTitle" xml:space="preserve">
+    <value>Confirm Optimization of Background Apps &amp; Tools</value>
+  </data>
+  <data name="OptReviewDialogDesc" xml:space="preserve">
+    <value>The following tools and apps were detected in startup or browser. To boost boot speed, select any items you wish to disable (they are backed up safely and can be re-enabled anytime from Startup Manager):</value>
+  </data>
+  <data name="OptReviewDialogConfirm" xml:space="preserve">
+    <value>Disable Selected Items</value>
+  </data>
+  <data name="OptReviewDialogCancel" xml:space="preserve">
+    <value>Skip and Continue</value>
+  </data>
+  <data name="OptReviewExtBadge" xml:space="preserve">
+    <value>Chrome Extension</value>
+  </data>
 </root>

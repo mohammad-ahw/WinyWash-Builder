@@ -419,7 +419,9 @@ namespace CleanC.Core.Services
                                     DirectoryPath = Path.GetDirectoryName(cPath) ?? cPath,
                                     SizeBytes = dirSize,
                                     LastModified = di.LastWriteTime,
-                                    Category = StorageMessCategory.TempJunk
+                                    Category = StorageMessCategory.DevToolsCache,
+                                    IsSelected = false,
+                                    Evidence = LocalizationService.Get("EvDevToolsCache", "کش و پکیج‌های محیط توسعه و کانتینر — حذف فقط با تأیید صریح و انتقال امن به قرنطینه انجام می‌شود") // i18n-logic
                                 });
                             }
                         }
@@ -1255,24 +1257,32 @@ namespace CleanC.Core.Services
             {
                 var junkFiles = new List<string>();
                 var junkDirs = new List<string>();
+                var devFiles = new List<string>();
+                var devDirs = new List<string>();
                 var userFiles = new List<string>();
                 var userDirs = new List<string>();
 
                 foreach (var p in paths)
                 {
-                    bool junk = IsJunkPath(p);
+                    bool isDev = IsDevPath(p);
+                    bool junk = !isDev && IsJunkPath(p);
+
                     if (Directory.Exists(p))
                     {
-                        if (junk) junkDirs.Add(p); else userDirs.Add(p);
+                        if (isDev) devDirs.Add(p);
+                        else if (junk) junkDirs.Add(p);
+                        else userDirs.Add(p);
                     }
                     else if (File.Exists(p))
                     {
-                        if (junk) junkFiles.Add(p); else userFiles.Add(p);
+                        if (isDev) devFiles.Add(p);
+                        else if (junk) junkFiles.Add(p);
+                        else userFiles.Add(p);
                     }
                 }
 
                 var result = new SafeDeleteBatchResult();
-                int total = junkFiles.Count + junkDirs.Count + userFiles.Count + userDirs.Count;
+                int total = junkFiles.Count + junkDirs.Count + devFiles.Count + devDirs.Count + userFiles.Count + userDirs.Count;
                 int start = 0;
 
                 Action<int, int>? Sub(int count)
@@ -1283,9 +1293,15 @@ namespace CleanC.Core.Services
                     return (done, _) => progress(offset + done, total);
                 }
 
-                // کش/تمپ همیشه قطعی؛ سطل بازیافت برای این‌ها فقط فضا را معطل می کند
+                // ۱. ابزارهای برنامه‌نویسی و کانتینرها (npm, Docker, pip, ...) حتماً به قرنطینه منتقل می‌شوند تا هر زمان قابل بازگردانی باشند
+                MergeBatch(result, SafeDeleteService.DeleteDirectories(devDirs, SafeDeleteMode.Quarantine, Sub(devDirs.Count)));
+                MergeBatch(result, SafeDeleteService.DeleteFiles(devFiles, SafeDeleteMode.Quarantine, Sub(devFiles.Count)));
+
+                // ۲. کش/تمپ های موقت ویندوز همیشه قطعی
                 MergeBatch(result, SafeDeleteService.DeleteFiles(junkFiles, SafeDeleteMode.Permanent, Sub(junkFiles.Count)));
                 MergeBatch(result, SafeDeleteService.DeleteDirectories(junkDirs, SafeDeleteMode.Permanent, Sub(junkDirs.Count)));
+
+                // ۳. فایل‌های کاربر بر اساس حالت انتخابی
                 MergeBatch(result, SafeDeleteService.DeleteFiles(userFiles, mode ?? SafeDeleteMode.Permanent, Sub(userFiles.Count)));
                 MergeBatch(result, SafeDeleteService.DeleteDirectories(userDirs, mode ?? SafeDeleteMode.Permanent, Sub(userDirs.Count)));
                 return result;
@@ -1314,19 +1330,29 @@ namespace CleanC.Core.Services
         }
 
         private static readonly string[] s_junkRoots = BuildJunkRoots();
+        private static readonly string[] s_devRoots = BuildDevRoots();
 
         private static string[] BuildJunkRoots()
         {
-            string user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
             string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
             string windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
 
             return new[]
             {
                 Path.Combine(local, "Temp"),
                 Path.Combine(windows, "Temp"),
-                Path.Combine(local, "CrashDumps"),
+                Path.Combine(local, "CrashDumps")
+            };
+        }
+
+        private static string[] BuildDevRoots()
+        {
+            string user = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+            string roaming = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+
+            return new[]
+            {
                 Path.Combine(local, "npm-cache"),
                 Path.Combine(roaming, "npm-cache"),
                 Path.Combine(user, ".nuget", "packages"),
@@ -1342,6 +1368,29 @@ namespace CleanC.Core.Services
                 Path.Combine(user, ".ollama", "models"),
                 Path.Combine(user, ".cache", "huggingface", "hub")
             };
+        }
+
+        public static bool IsDevPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return false;
+            try
+            {
+                string full = Path.GetFullPath(path);
+                foreach (string root in s_devRoots)
+                {
+                    string trimmed = root.TrimEnd(Path.DirectorySeparatorChar);
+                    if (full.Equals(trimmed, StringComparison.OrdinalIgnoreCase) ||
+                        full.StartsWith(trimmed + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))
+                    {
+                        return true;
+                    }
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex);
+            }
+            return false;
         }
 
         /// <summary>

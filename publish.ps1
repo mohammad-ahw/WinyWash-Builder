@@ -50,9 +50,9 @@ Set-StrictMode -Version Latest
 $root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $proj = Join-Path $root 'src\CleanC.UI\CleanC.UI.csproj'
 $outDir = if ([System.IO.Path]::IsPathRooted($Output)) { $Output } else { Join-Path $root $Output }
-# فایل های اپ داخل یک زیرپوشه ی تمیز می نشینند تا پیدا کردن WinyWash.exe بین
-# صدها فایل runtime سخت نباشد.
-$appDir = Join-Path $outDir 'WinyWash'
+# ساختار تمیز: پوشه WinyWash شامل لانچر WinyWash.exe و پوشه هسته app و والپیپرهاست
+$winyWashDir = Join-Path $outDir 'WinyWash'
+$engineDir = Join-Path $winyWashDir 'app'
 
 if (-not (Test-Path -LiteralPath $proj)) {
     throw "پروژه پیدا نشد: $proj"
@@ -62,7 +62,8 @@ Write-Host "==> WinyWash publish" -ForegroundColor Cyan
 Write-Host "    Configuration : $Configuration"
 Write-Host "    Runtime       : $Runtime"
 Write-Host "    SelfContained : $SelfContained"
-Write-Host "    Output        : $appDir"
+Write-Host "    Output        : $winyWashDir"
+Write-Host "    Engine Dir    : $engineDir"
 
 # خروجی قبلی کاملاً حذف می شود تا فایل های RID قدیمی باقی نمانند
 if (Test-Path -LiteralPath $outDir) {
@@ -75,7 +76,7 @@ $publishArgs = @(
     '-c', $Configuration,
     '-r', $Runtime,
     '--self-contained', "$SelfContained",
-    '-o', $appDir,
+    '-o', $engineDir,
     '-p:Platform=x64',
     '-p:ErrorOnDuplicatePublishOutputFiles=false',
     '--nologo'
@@ -100,7 +101,7 @@ $targetNative = switch ($Runtime) {
     'win-arm64' { @('win', 'win-arm64') }
 }
 
-$runtimeRoot = Join-Path $appDir 'runtimes'
+$runtimeRoot = Join-Path $engineDir 'runtimes'
 if (Test-Path -LiteralPath $runtimeRoot) {
     Get-ChildItem -LiteralPath $runtimeRoot -Directory | ForEach-Object {
         if ($targetNative -notcontains $_.Name) {
@@ -117,7 +118,7 @@ if (Test-Path -LiteralPath $runtimeRoot) {
 
 # فایل های pdb فقط با -Symbols نگه داشته می شوند
 if (-not $Symbols) {
-    Get-ChildItem -LiteralPath $appDir -Filter '*.pdb' -File -ErrorAction SilentlyContinue |
+    Get-ChildItem -LiteralPath $engineDir -Filter '*.pdb' -File -ErrorAction SilentlyContinue |
         Remove-Item -Force
 }
 
@@ -125,15 +126,40 @@ if (-not $Symbols) {
 $wallpaperSrc = Join-Path $root 'wallpaper'
 if (Test-Path -LiteralPath $wallpaperSrc) {
     Write-Host "==> کپی والپیپرهای WinyWash..." -ForegroundColor DarkGray
-    $wpDest = Join-Path $appDir 'wallpaper'
+    $wpDest = Join-Path $winyWashDir 'wallpaper'
     if (Test-Path -LiteralPath $wpDest) { Remove-Item -LiteralPath $wpDest -Recurse -Force }
-    Copy-Item -Path $wallpaperSrc -Destination $appDir -Recurse -Force
+    Copy-Item -Path $wallpaperSrc -Destination $winyWashDir -Recurse -Force
 }
+
+# ---------------------------------------------------------------------------
+# کامپایل لانچر رسمی ریشه WinyWash.exe
+# ---------------------------------------------------------------------------
+$launcherSrc = Join-Path $root 'src\CleanC.Launcher\Program.cs'
+$launcherExe = Join-Path $winyWashDir 'WinyWash.exe'
+$iconPath = Join-Path $root 'src\CleanC.UI\Assets\app.ico'
+$manifestPath = Join-Path $root 'src\CleanC.UI\app.manifest'
+$cscPath = 'C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe'
+
+Write-Host "==> کامپایل لانچر اصلی WinyWash.exe در ریشه..." -ForegroundColor Cyan
+& $cscPath /target:winexe /platform:x64 /optimize+ "/win32icon:$iconPath" "/win32manifest:$manifestPath" "/out:$launcherExe" "$launcherSrc"
+if ($LASTEXITCODE -ne 0) {
+    throw "کامپایل لانچر WinyWash.exe با خطا مواجه شد."
+}
+
+# ایجاد اسکریپت ساخت میانبر روی دسکتاپ
+$shortcutScript = Join-Path $winyWashDir 'ایجاد میانبر دسکتاپ.bat'
+@'
+@echo off
+chcp 65001 >nul
+powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut([System.IO.Path]::Combine([System.Environment]::GetFolderPath('Desktop'), 'WinyWash.lnk'));$s.TargetPath='%~dp0WinyWash.exe';$s.WorkingDirectory='%~dp0';$s.Save()"
+echo میانبر WinyWash روی دسکتاپ ایجاد شد.
+pause
+'@ | Set-Content -LiteralPath $shortcutScript -Encoding UTF8
 
 # ---------------------------------------------------------------------------
 # گزارش حجم نهایی
 # ---------------------------------------------------------------------------
-$files = Get-ChildItem -LiteralPath $appDir -Recurse -File
+$files = Get-ChildItem -LiteralPath $winyWashDir -Recurse -File
 $sizeMb = ($files | Measure-Object -Property Length -Sum).Sum / 1MB
 
 Write-Host ""
@@ -141,13 +167,13 @@ Write-Host "==> publish کامل شد" -ForegroundColor Green
 Write-Host ("    فایل ها : {0}" -f $files.Count)
 $sizeMbStr = $sizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "    حجم    : $sizeMbStr MB"
-Write-Host ("    اجرا    : {0}" -f (Join-Path $appDir 'WinyWash.exe')) -ForegroundColor Green
+Write-Host ("    اجرا    : {0}" -f ($launcherExe)) -ForegroundColor Green
 
 # ایجاد آرشیو فشرده ZIP برای تحویل
 $zipPath = Join-Path $root "WinyWash-Release-win-x64.zip"
 Write-Host "==> فشرده سازی خروجی به $zipPath ..." -ForegroundColor Cyan
 if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
-Compress-Archive -Path "$appDir\*" -DestinationPath $zipPath -Force
+Compress-Archive -Path "$winyWashDir\*" -DestinationPath $zipPath -Force
 $zipSizeMb = (Get-Item -LiteralPath $zipPath).Length / 1MB
 $zipSizeMbStr = $zipSizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "==> آرشیو نهایی ایجاد شد: $zipPath ($zipSizeMbStr MB)" -ForegroundColor Green
