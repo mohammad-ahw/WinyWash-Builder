@@ -29,6 +29,7 @@ namespace CleanC.UI
         private const string ReaderModeScript = """
             (function() {
                 function applyReaderMode() {
+                    var host = (window.location && window.location.hostname) ? window.location.hostname.toLowerCase() : '';
                     var styleId = 'winywash-reader-style';
                     if (!document.getElementById(styleId)) {
                         var style = document.createElement('style');
@@ -90,7 +91,8 @@ namespace CleanC.UI
                             div[class*="scroll-mt-10"],
                             a[href*="rubika.ir"],
                             a[href*="eitaa.com"],
-                            a[href*="ble.ir"] {
+                            a[href*="ble.ir"],
+                            a[href*="bale.ai"] {
                                 display: none !important;
                                 visibility: hidden !important;
                                 height: 0 !important;
@@ -104,7 +106,7 @@ namespace CleanC.UI
                             [class*="news_detail-module"][class*="__section"] {
                                 display: block !important;
                                 width: 100% !important;
-                                max-width: 1120px !important;
+                                max-width: 1150px !important;
                                 margin-left: auto !important;
                                 margin-right: auto !important;
                                 padding-left: 20px !important;
@@ -121,7 +123,7 @@ namespace CleanC.UI
 
                             /* Digiato: Full Width & Centering */
                             .articleNewsPosts__content {
-                                max-width: 1120px !important;
+                                max-width: 1150px !important;
                                 width: 100% !important;
                                 flex: 1 1 100% !important;
                                 margin-left: auto !important;
@@ -130,23 +132,36 @@ namespace CleanC.UI
                                 padding-right: 20px !important;
                             }
 
-                            /* Zoomit: Spacious Width & Border Removal */
+                            /* Zoomit: Spacious Wide Layout & Container Unlocking */
+                            main#main-content > div:first-child,
+                            div[class*="grid-rows-[auto_auto_auto_1fr]"],
                             div[class*="lg:grid-cols-"],
                             div[class*="xxl:grid-cols-"] {
                                 grid-template-columns: 100% !important;
-                                max-width: 1120px !important;
+                                max-width: 1150px !important;
+                                width: 100% !important;
                                 margin-left: auto !important;
                                 margin-right: auto !important;
-                                padding-left: 20px !important;
-                                padding-right: 20px !important;
+                                padding-left: 24px !important;
+                                padding-right: 24px !important;
                                 border: none !important;
                                 box-shadow: none !important;
                             }
-                            article {
+                            [class*="BlockContainer__Root"] {
+                                margin-left: 0 !important;
+                                margin-right: 0 !important;
+                                padding-left: 0 !important;
+                                padding-right: 0 !important;
                                 width: 100% !important;
                                 max-width: 100% !important;
-                                margin-left: auto !important;
-                                margin-right: auto !important;
+                                --margin-left: 0px !important;
+                                --margin-right: 0px !important;
+                            }
+                            [class*="BlockContainer__InnerArticleContainer"],
+                            .long-form,
+                            article {
+                                max-width: 100% !important;
+                                width: 100% !important;
                             }
 
                             /* Universal Polish */
@@ -157,58 +172,107 @@ namespace CleanC.UI
                         (document.head || document.documentElement).appendChild(style);
                     }
 
-                    // Direct element overrides for reactive single-page apps
-                    var sidebars = document.querySelectorAll('aside, div[class*="sidebar"], section[class*="sidebar"], [class*="__sidebar"], .articleNewsPosts__sidebar');
-                    for (var i = 0; i < sidebars.length; i++) {
-                        var sb = sidebars[i];
-                        if (sb.tagName === 'BODY' || sb.tagName === 'HTML' || sb.classList.contains('no-sidebar') || sb.className.includes('content')) {
-                            continue;
+                    // --- 1. AKHARIN KHABAR ISOLATED LOGIC ---
+                    if (host.includes('akharinkhabar')) {
+                        var akSections = document.querySelectorAll('[class*="news_detail-module"][class*="__section"]');
+                        for (var i = 0; i < akSections.length; i++) {
+                            akSections[i].style.setProperty('display', 'block', 'important');
+                            akSections[i].style.setProperty('width', '100%', 'important');
+                            akSections[i].style.setProperty('max-width', '1150px', 'important');
+                            akSections[i].style.setProperty('margin-left', 'auto', 'important');
+                            akSections[i].style.setProperty('margin-right', 'auto', 'important');
                         }
-                        sb.style.setProperty('display', 'none', 'important');
-                    }
 
-                    // Akharin Khabar: clean promo follow links and paragraphs
-                    var promoLinks = document.querySelectorAll('a[href*="rubika.ir"], a[href*="eitaa.com"], a[href*="ble.ir"], a[href*="t.me/akharinkhabar"]');
-                    for (var i = 0; i < promoLinks.length; i++) {
-                        var pBox = promoLinks[i].closest('p, div[class*="tags-module"], div[class*="social"]');
-                        if (pBox && !pBox.className.includes('main') && pBox.tagName !== 'ARTICLE') {
-                            pBox.style.setProperty('display', 'none', 'important');
-                        } else {
-                            promoLinks[i].style.setProperty('display', 'none', 'important');
+                        var akMains = document.querySelectorAll('[class*="news_detail-module"][class*="__main"]');
+                        for (var i = 0; i < akMains.length; i++) {
+                            akMains[i].style.setProperty('grid-column', '1 / -1', 'important');
+                            akMains[i].style.setProperty('width', '100%', 'important');
+                            akMains[i].style.setProperty('max-width', '100%', 'important');
+                            akMains[i].style.setProperty('display', 'block', 'important');
                         }
-                    }
 
-                    // Zoomit: keep only main article container, clean top ads/headers and bottom clutter
-                    var zoomitMain = document.getElementById('main-content') || document.querySelector('main');
-                    if (zoomitMain) {
-                        // Clean preceding headers & top ad before main
-                        var prev = zoomitMain.previousElementSibling;
-                        while (prev) {
-                            prev.style.setProperty('display', 'none', 'important');
-                            prev = prev.previousElementSibling;
+                        var akSidebars = document.querySelectorAll('[class*="news_detail-module"][class*="sidebar"], [class*="__sidebar"], aside');
+                        for (var i = 0; i < akSidebars.length; i++) {
+                            akSidebars[i].style.setProperty('display', 'none', 'important');
                         }
-                        // Clean siblings after article grid (comments, study lists, related stories, ads)
-                        if (zoomitMain.firstElementChild) {
-                            var afterGrid = zoomitMain.firstElementChild.nextElementSibling;
-                            while (afterGrid) {
-                                afterGrid.style.setProperty('display', 'none', 'important');
-                                afterGrid = afterGrid.nextElementSibling;
+
+                        // Hide messenger links and their parent paragraphs
+                        var promoLinks = document.querySelectorAll('a[href*="rubika.ir"], a[href*="eitaa.com"], a[href*="ble.ir"], a[href*="bale.ai"], a[href*="t.me/akharinkhabar"]');
+                        for (var i = 0; i < promoLinks.length; i++) {
+                            var pBox = promoLinks[i].closest('p');
+                            if (pBox) {
+                                pBox.style.setProperty('display', 'none', 'important');
+                            } else {
+                                promoLinks[i].style.setProperty('display', 'none', 'important');
                             }
                         }
-                    }
 
-                    // Digiato: remove everything after .articlePost, clean feedback and back to top
-                    var digiatoPost = document.querySelector('.articlePost');
-                    if (digiatoPost) {
-                        var digNext = digiatoPost.nextElementSibling;
-                        while (digNext) {
-                            digNext.style.setProperty('display', 'none', 'important');
-                            digNext = digNext.nextElementSibling;
+                        // Hide search tags
+                        var akTags = document.querySelectorAll('[class*="tags-module"], a[href*="/search/"]');
+                        for (var i = 0; i < akTags.length; i++) {
+                            akTags[i].style.setProperty('display', 'none', 'important');
                         }
                     }
-                    var digPoll = document.querySelectorAll('.pollDigiato, .backtotop, .main-navigation');
-                    for (var i = 0; i < digPoll.length; i++) {
-                        digPoll[i].style.setProperty('display', 'none', 'important');
+
+                    // --- 2. ZOOMIT ISOLATED LOGIC ---
+                    if (host.includes('zoomit')) {
+                        var zoomitMain = document.getElementById('main-content');
+                        if (zoomitMain) {
+                            // Clean preceding headers & top ads before main
+                            var prev = zoomitMain.previousElementSibling;
+                            while (prev) {
+                                prev.style.setProperty('display', 'none', 'important');
+                                prev = prev.previousElementSibling;
+                            }
+                            // Clean siblings after article grid (comments, study lists, related stories, ads)
+                            if (zoomitMain.firstElementChild) {
+                                var afterGrid = zoomitMain.firstElementChild.nextElementSibling;
+                                while (afterGrid) {
+                                    afterGrid.style.setProperty('display', 'none', 'important');
+                                    afterGrid = afterGrid.nextElementSibling;
+                                }
+                            }
+                        }
+
+                        // Unlock wide layout on Zoomit inner blocks
+                        var rootBlocks = document.querySelectorAll('[class*="BlockContainer__Root"]');
+                        for (var i = 0; i < rootBlocks.length; i++) {
+                            rootBlocks[i].style.setProperty('margin-left', '0px', 'important');
+                            rootBlocks[i].style.setProperty('margin-right', '0px', 'important');
+                            rootBlocks[i].style.setProperty('width', '100%', 'important');
+                            rootBlocks[i].style.setProperty('max-width', '100%', 'important');
+                        }
+                        var innerBlocks = document.querySelectorAll('[class*="BlockContainer__InnerArticleContainer"], .long-form');
+                        for (var i = 0; i < innerBlocks.length; i++) {
+                            innerBlocks[i].style.setProperty('max-width', '100%', 'important');
+                            innerBlocks[i].style.setProperty('width', '100%', 'important');
+                        }
+                    }
+
+                    // --- 3. DIGIATO ISOLATED LOGIC ---
+                    if (host.includes('digiato')) {
+                        var digiatoSidebar = document.querySelector('.articleNewsPosts__sidebar');
+                        if (digiatoSidebar) {
+                            digiatoSidebar.style.setProperty('display', 'none', 'important');
+                        }
+                        var digContent = document.querySelector('.articleNewsPosts__content');
+                        if (digContent) {
+                            digContent.style.setProperty('max-width', '1150px', 'important');
+                            digContent.style.setProperty('width', '100%', 'important');
+                            digContent.style.setProperty('flex', '1 1 100%', 'important');
+                        }
+                        var digiatoPost = document.querySelector('.articlePost');
+                        if (digiatoPost) {
+                            var digNext = digiatoPost.nextElementSibling;
+                            while (digNext) {
+                                digNext.style.setProperty('display', 'none', 'important');
+                                digNext = digNext.nextElementSibling;
+                            }
+                        }
+                        var digPoll = document.querySelectorAll('.pollDigiato, .backtotop, .main-navigation');
+                        for (var i = 0; i < digPoll.length; i++) {
+                            digPoll[i].style.setProperty('display', 'none', 'important');
+                        }
                     }
                 }
 
