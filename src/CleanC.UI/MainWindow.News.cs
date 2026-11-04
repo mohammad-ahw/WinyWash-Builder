@@ -48,8 +48,16 @@ namespace CleanC.UI
                             [class*="SidebarWrapper"],
                             [class*="socials-module__"],
                             [class*="social_container"],
+                            [class*="tags-module__"],
+                            [class*="__tags"],
                             .site-header,
                             .site-footer,
+                            .main-navigation,
+                            #site-navigation,
+                            .navigation,
+                            .megaMenu,
+                            .pollDigiato,
+                            .backtotop,
                             .breadcrumbAndAds,
                             .digiBannerArea,
                             .nativeSuggestions,
@@ -75,7 +83,14 @@ namespace CleanC.UI
                             [id*="div_eRasaneh"],
                             [class*="floating-banner"],
                             [class*="app-banner"],
-                            [id*="sticky-banner"] {
+                            [id*="sticky-banner"],
+                            div[class*="top-0"][class*="sticky"],
+                            header.bg-black1,
+                            div[class*="row-start-3"],
+                            div[class*="scroll-mt-10"],
+                            a[href*="rubika.ir"],
+                            a[href*="eitaa.com"],
+                            a[href*="ble.ir"] {
                                 display: none !important;
                                 visibility: hidden !important;
                                 height: 0 !important;
@@ -116,7 +131,6 @@ namespace CleanC.UI
                             }
 
                             /* Zoomit: Spacious Width & Border Removal */
-                            div[class*="grid-rows-[auto_auto_auto_1fr]"],
                             div[class*="lg:grid-cols-"],
                             div[class*="xxl:grid-cols-"] {
                                 grid-template-columns: 100% !important;
@@ -127,11 +141,6 @@ namespace CleanC.UI
                                 padding-right: 20px !important;
                                 border: none !important;
                                 box-shadow: none !important;
-                            }
-                            div[class*="grid-rows-[auto_auto_auto_1fr]"] ~ div,
-                            div[class*="row-start-3"],
-                            div[class*="scroll-mt-10"] {
-                                display: none !important;
                             }
                             article {
                                 width: 100% !important;
@@ -158,39 +167,37 @@ namespace CleanC.UI
                         sb.style.setProperty('display', 'none', 'important');
                     }
 
-                    // i18n
-                    // Akharin Khabar: clean promo follow paragraph at end of text
-                    var akParas = document.querySelectorAll('article p, [class*="body-card-module"] p');
-                    for (var i = 0; i < akParas.length; i++) {
-                        var pTxt = (akParas[i].textContent || '').trim();
-                        if ((pTxt.includes('ما را در') || pTxt.includes('آخرین خبر را در') || pTxt.includes('کانال تلگرامی')) && pTxt.includes('دنبال کنید')) {
-                            akParas[i].style.setProperty('display', 'none', 'important');
+                    // Akharin Khabar: clean promo follow links and paragraphs
+                    var promoLinks = document.querySelectorAll('a[href*="rubika.ir"], a[href*="eitaa.com"], a[href*="ble.ir"], a[href*="t.me/akharinkhabar"]');
+                    for (var i = 0; i < promoLinks.length; i++) {
+                        var pBox = promoLinks[i].closest('p, div[class*="tags-module"], div[class*="social"]');
+                        if (pBox && !pBox.className.includes('main') && pBox.tagName !== 'ARTICLE') {
+                            pBox.style.setProperty('display', 'none', 'important');
+                        } else {
+                            promoLinks[i].style.setProperty('display', 'none', 'important');
                         }
                     }
 
-                    // i18n
-                    // Zoomit: remove "از دست ندهید" and everything below it
-                    var zoomitHeadings = document.querySelectorAll('h2, h3, h4, span, div, p');
-                    for (var i = 0; i < zoomitHeadings.length; i++) {
-                        var hTxt = (zoomitHeadings[i].textContent || '').trim();
-                        if (hTxt === 'از دست ندهید' || hTxt.startsWith('از دست ندهید') || hTxt.includes('از دست ندهید')) {
-                            var el = zoomitHeadings[i];
-                            while (el && el.parentElement && el.parentElement.tagName !== 'ARTICLE' && el.parentElement.tagName !== 'MAIN' && el.parentElement !== document.body) {
-                                el = el.parentElement;
+                    // Zoomit: keep only main article container, clean top ads/headers and bottom clutter
+                    var zoomitMain = document.getElementById('main-content') || document.querySelector('main');
+                    if (zoomitMain) {
+                        // Clean preceding headers & top ad before main
+                        var prev = zoomitMain.previousElementSibling;
+                        while (prev) {
+                            prev.style.setProperty('display', 'none', 'important');
+                            prev = prev.previousElementSibling;
+                        }
+                        // Clean siblings after article grid (comments, study lists, related stories, ads)
+                        if (zoomitMain.firstElementChild) {
+                            var afterGrid = zoomitMain.firstElementChild.nextElementSibling;
+                            while (afterGrid) {
+                                afterGrid.style.setProperty('display', 'none', 'important');
+                                afterGrid = afterGrid.nextElementSibling;
                             }
-                            if (el) {
-                                var sib = el;
-                                while (sib) {
-                                    var nextSib = sib.nextElementSibling;
-                                    sib.style.setProperty('display', 'none', 'important');
-                                    sib = nextSib;
-                                }
-                            }
-                            break;
                         }
                     }
 
-                    // Digiato: remove everything after .articlePost
+                    // Digiato: remove everything after .articlePost, clean feedback and back to top
                     var digiatoPost = document.querySelector('.articlePost');
                     if (digiatoPost) {
                         var digNext = digiatoPost.nextElementSibling;
@@ -198,6 +205,10 @@ namespace CleanC.UI
                             digNext.style.setProperty('display', 'none', 'important');
                             digNext = digNext.nextElementSibling;
                         }
+                    }
+                    var digPoll = document.querySelectorAll('.pollDigiato, .backtotop, .main-navigation');
+                    for (var i = 0; i < digPoll.length; i++) {
+                        digPoll[i].style.setProperty('display', 'none', 'important');
                     }
                 }
 

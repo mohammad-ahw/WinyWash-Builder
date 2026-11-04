@@ -68,7 +68,9 @@ Write-Host "    Engine Dir    : $engineDir"
 # خروجی قبلی کاملاً حذف می شود تا فایل های RID قدیمی باقی نمانند
 if (Test-Path -LiteralPath $outDir) {
     Write-Host "==> حذف خروجی قبلی..." -ForegroundColor DarkGray
-    Remove-Item -LiteralPath $outDir -Recurse -Force
+    Get-ChildItem -LiteralPath $outDir -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '\.WebView2$' } | ForEach-Object {
+        Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
+    }
 }
 
 $publishArgs = @(
