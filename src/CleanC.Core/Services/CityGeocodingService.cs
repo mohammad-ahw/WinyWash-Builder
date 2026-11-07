@@ -145,9 +145,8 @@ namespace CleanC.Core.Services
         /// </summary>
         public static async Task<string?> DetectEnglishCityAsync(CancellationToken cancellationToken = default)
         {
+            // استفاده انحصاری و یکتا از ipwho.is برای جلوگیری از ارسال درخواست به سرویس‌های موازی متعدد
             string? city = await TryIpWhoIsAsync(cancellationToken).ConfigureAwait(false);
-            if (string.IsNullOrWhiteSpace(city))
-                city = await TryIpApiCoAsync(cancellationToken).ConfigureAwait(false);
             if (string.IsNullOrWhiteSpace(city)) return null;
 
             string trimmed = city.Trim();
@@ -170,26 +169,6 @@ namespace CleanC.Core.Services
                 if (root.TryGetProperty("success", out var success) && success.ValueKind == JsonValueKind.False)
                     return null;
                 return root.TryGetProperty("city", out var cityEl) ? cityEl.GetString() : null;
-            }
-            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-            {
-                throw;
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        private static async Task<string?> TryIpApiCoAsync(CancellationToken cancellationToken)
-        {
-            try
-            {
-                using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-                timeout.CancelAfter(TimeSpan.FromSeconds(4));
-                string json = await Http.GetStringAsync("https://ipapi.co/json/", timeout.Token).ConfigureAwait(false);
-                using var doc = JsonDocument.Parse(json);
-                return doc.RootElement.TryGetProperty("city", out var cityEl) ? cityEl.GetString() : null;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
             {

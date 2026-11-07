@@ -167,19 +167,8 @@ namespace CleanC.Core.Services
                 }
                 catch
                 {
-                    // Fallback 2: ipify
-                    try
-                    {
-                        using var ipifyCts = new CancellationTokenSource(TimeSpan.FromSeconds(1.5));
-                        result.ClientIp = await _httpClient.GetStringAsync("https://api.ipify.org", ipifyCts.Token);
-                        result.IspName = LocalizationService.Get("شبکه اینترنت");
-                        result.Country = LocalizationService.Get("جهانی");
-                    }
-                    catch
-                    {
-                        result.ClientIp = LocalizationService.Get("اتصال فعال");
-                        result.IspName = LocalizationService.Get("شبکه اینترنت");
-                    }
+                    result.ClientIp = LocalizationService.Get("اتصال فعال");
+                    result.IspName = LocalizationService.Get("شبکه اینترنت");
                 }
             }
 

@@ -2663,26 +2663,12 @@ namespace CleanC.UI
             if (_cityDefaultRequested || _isExiting || SettingsVm == null) return;
             _cityDefaultRequested = true;
 
-            string existing = (SettingsVm.CharacterCity ?? string.Empty).Trim();
+            string existing = (SettingsVm?.CharacterCity ?? string.Empty).Trim();
             if (existing.Length > 0)
             {
                 _lastValidCity = existing;
-                SyncCityBoxText();
-                return;
             }
-
-            try
-            {
-                string? detected = await CityGeocodingService.DetectEnglishCityAsync();
-                if (_isExiting || SettingsVm == null || string.IsNullOrWhiteSpace(detected)) return;
-                // کاربر ممکن است در همین فاصله خودش شهری وارد کرده باشد.
-                if (!string.IsNullOrWhiteSpace(SettingsVm.CharacterCity)) return;
-                CommitCity(detected, CharCityBox);
-            }
-            catch (Exception ex)
-            {
-                CcLog.Ignore(ex, "EnsureDefaultCity");
-            }
+            SyncCityBoxText();
         }
 
         private void CharCityBox_TextChanged(AutoSuggestBox sender, AutoSuggestBoxTextChangedEventArgs args)

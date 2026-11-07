@@ -386,7 +386,7 @@ function render(force){const v=pick();
  if(!parts.length)parts.push('وضعیت سیستم کاملاً پایدار و روان است');
  const meta=parts.join(' <span class="sep">·</span> ');
  const s=JSON.stringify(v)+tickI+meta+MR();if(!force&&s===sig)return;sig=s;
- document.documentElement.style.setProperty('--sc',v.st[1]);$('st').innerHTML=v.st[0]+(v.st[2]?' · <b>'+v.st[2]+'</b>':'');
+ document.documentElement.style.setProperty('--sc',v.st[1]);$('st').innerHTML=escHtml(v.st[0])+(v.st[2]?' · <b>'+escHtml(v.st[2])+'</b>':'');
  if($('h').textContent!==v.head){$('h').textContent=v.head;$('h').style.animation='none';$('h').offsetWidth;$('h').style.animation=''}
  if(v.sub!==lastSub){lastSub=v.sub;$('s').textContent=v.sub;$('s').style.animation='none';$('s').offsetWidth;$('s').style.animation=''}
  $('it').innerHTML=v.seg?`<div class="seg one"><div><b></b></div></div><span>${escHtml(v.lab)}</span>`:v.chips?v.chips.map(([t,k])=>`<button class="ch" data-c="${escHtml(k)}">${escHtml(t)}</button>`).join(''):v.list?issChips(v):v.items.length?v.items.map(([t,c])=>`<span class="${escHtml(c)}"><i></i>${escHtml(t)}</span>`).join(''):`<span>${meta}</span>`;
