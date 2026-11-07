@@ -65,12 +65,10 @@ Write-Host "    SelfContained : $SelfContained"
 Write-Host "    Output        : $winyWashDir"
 Write-Host "    Engine Dir    : $engineDir"
 
-# خروجی قبلی کاملاً حذف می شود تا فایل های RID قدیمی باقی نمانند
-if (Test-Path -LiteralPath $outDir) {
-    Write-Host "==> حذف خروجی قبلی..." -ForegroundColor DarkGray
-    Get-ChildItem -LiteralPath $outDir -Force -ErrorAction SilentlyContinue | Where-Object { $_.Name -notmatch '\.WebView2$' } | ForEach-Object {
-        Remove-Item -LiteralPath $_.FullName -Recurse -Force -ErrorAction SilentlyContinue
-    }
+# خروجی قبلی app کاملاً حذف می شود تا فایل های RID قدیمی باقی نمانند
+if (Test-Path -LiteralPath $engineDir) {
+    Write-Host "==> حذف خروجی قبلی app..." -ForegroundColor DarkGray
+    Remove-Item -LiteralPath $engineDir -Recurse -Force -ErrorAction SilentlyContinue
 }
 
 $publishArgs = @(
@@ -138,6 +136,18 @@ Write-Host "==> کامپایل لانچر اصلی WinyWash.exe در ریشه...
 if ($LASTEXITCODE -ne 0) {
     throw "کامپایل لانچر WinyWash.exe با خطا مواجه شد."
 }
+
+# ---------------------------------------------------------------------------
+# کپی دارایی های ظاهری و آیکون ها به پوشه توزیع
+# ---------------------------------------------------------------------------
+$assetsDir = Join-Path $winyWashDir 'assets'
+$screenshotsDir = Join-Path $assetsDir 'screenshots'
+if (-not (Test-Path $screenshotsDir)) { New-Item -ItemType Directory -Force -Path $screenshotsDir | Out-Null }
+Copy-Item (Join-Path $root 'src\CleanC.UI\Assetspp.ico') (Join-Path $assetsDir 'winywash.ico') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'src\CleanC.UI\Assetspp-icon.png') (Join-Path $assetsDir 'app-icon.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'assets\logo.png') (Join-Path $assetsDir 'logo.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'assets\screenshotscrylic-dark.png') (Join-Path $screenshotsDir 'acrylic-dark.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'assets\screenshotscrylic-light.png') (Join-Path $screenshotsDir 'acrylic-light.png') -Force -ErrorAction SilentlyContinue
 
 # ---------------------------------------------------------------------------
 # گزارش حجم نهایی
