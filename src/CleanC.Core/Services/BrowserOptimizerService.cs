@@ -549,12 +549,11 @@ namespace CleanC.Core.Services
                         {
                             if (Directory.Exists(targetFolder))
                             {
-                                long size = GetDirectorySize(targetFolder);
-                                freed += size;
-
                                 try
                                 {
-                                    string destBackup = Path.Combine(backupDir, $"{profName}-{id}");
+                                    long size = GetDirectorySize(targetFolder);
+                                    string rel = Path.GetRelativePath(profPath, targetFolder);
+                                    string destBackup = Path.Combine(backupDir, profName, rel);
                                     if (!Directory.Exists(destBackup))
                                     {
                                         Directory.CreateDirectory(destBackup);
@@ -562,11 +561,12 @@ namespace CleanC.Core.Services
                                     }
 
                                     Directory.Delete(targetFolder, true);
+                                    freed += size;
                                     count++;
                                 }
                                 catch (Exception ex)
                                 {
-                                    CcLog.Ignore(ex);
+                                    CcLog.Ignore(ex, "BrowserOptimizerService.CleanExtensionDir");
                                 }
                             }
                             else if (File.Exists(targetFolder))
@@ -574,13 +574,22 @@ namespace CleanC.Core.Services
                                 try
                                 {
                                     long flen = new FileInfo(targetFolder).Length;
+                                    string rel = Path.GetRelativePath(profPath, targetFolder);
+                                    string destBackup = Path.Combine(backupDir, profName, rel);
+                                    string? parentDir = Path.GetDirectoryName(destBackup);
+                                    if (!string.IsNullOrEmpty(parentDir) && !Directory.Exists(parentDir))
+                                    {
+                                        Directory.CreateDirectory(parentDir);
+                                    }
+                                    File.Copy(targetFolder, destBackup, true);
+
                                     File.Delete(targetFolder);
                                     freed += flen;
                                     count++;
                                 }
                                 catch (Exception ex)
                                 {
-                                    CcLog.Ignore(ex);
+                                    CcLog.Ignore(ex, "BrowserOptimizerService.CleanExtensionFile");
                                 }
                             }
                         }

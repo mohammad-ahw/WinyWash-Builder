@@ -1515,4 +1515,7 @@ Pour télécharger et installer, allez dans la section 'Windows Update'.</value>
   <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
     <value>L'identifiant matériel du périphérique '{0}' n'est pas disponible — annulé pour éviter une suppression incorrecte.</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>Ce chemin est protégé par Windows pour maintenir la stabilité du système</value>
+  </data>
 </root>

@@ -1516,4 +1516,7 @@ Para descargar e instalar, vaya a la sección 'Windows Update'.</value></data>
   <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
     <value>El ID de hardware para '{0}' no está disponible — cancelado para evitar una eliminación errónea.</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>Esta ruta está protegida por Windows para mantener la estabilidad del sistema</value>
+  </data>
 </root>

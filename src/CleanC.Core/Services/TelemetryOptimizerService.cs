@@ -252,6 +252,11 @@ namespace CleanC.Core.Services
                 {
                     if (key != null)
                     {
+                        var currentStart = key.GetValue("Start");
+                        if (currentStart != null && Convert.ToInt32(currentStart) != 4)
+                        {
+                            key.SetValue("WinyWash_OriginalStart", currentStart, RegistryValueKind.DWord);
+                        }
                         key.SetValue("Start", 4, RegistryValueKind.DWord); // 4 = Disabled
                         registryChanged = true;
                     }
@@ -294,7 +299,16 @@ namespace CleanC.Core.Services
                 {
                     if (key != null)
                     {
-                        key.SetValue("Start", 3, RegistryValueKind.DWord); // 3 = Manual
+                        // DiagTrack در ویندوز به صورت پیش‌فرض Automatic (2) است و dmwappushservice به صورت Manual (3)
+                        int targetStart = serviceName.Equals("dmwappushservice", StringComparison.OrdinalIgnoreCase) ? 3 : 2;
+                        var orig = key.GetValue("WinyWash_OriginalStart");
+                        if (orig != null && int.TryParse(orig.ToString(), out int parsed) && parsed is >= 1 and <= 3)
+                        {
+                            targetStart = parsed;
+                            try { key.DeleteValue("WinyWash_OriginalStart", false); } catch { }
+                        }
+
+                        key.SetValue("Start", targetStart, RegistryValueKind.DWord);
                         registryChanged = true;
                     }
                 }

@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 using CleanC.Core.Diagnostics;
 using Microsoft.Win32;
 
@@ -179,6 +180,35 @@ namespace CleanC.Core.Services
             return dead;
         }
 
+        private static void BackupUninstallKey(RegistryKey root, string parentPath, string subKeyName)
+        {
+            try
+            {
+                string rootPrefix = root.Name; // E.g., HKEY_CURRENT_USER or HKEY_LOCAL_MACHINE
+                string fullKeyPath = $@"{rootPrefix}\{parentPath}\{subKeyName}";
+
+                string backupDir = Path.Combine(AppPaths.CommonBackupsDir, "Registry");
+                Directory.CreateDirectory(backupDir);
+
+                string safeName = string.Join("_", subKeyName.Split(Path.GetInvalidFileNameChars()));
+                string fileName = $"Uninstall_{safeName}_{DateTime.UtcNow:yyyyMMdd_HHmmssfff}.reg";
+                string destFile = Path.Combine(backupDir, fileName);
+
+                var psi = new ProcessStartInfo("reg.exe", $"export \"{fullKeyPath}\" \"{destFile}\" /y")
+                {
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    WindowStyle = ProcessWindowStyle.Hidden
+                };
+                using var proc = Process.Start(psi);
+                proc?.WaitForExit(3000);
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "RegistryCleaner.BackupUninstallKey");
+            }
+        }
+
         private static int CleanDeadUninstallKeys(RegistryKey root, string path)
         {
             int cleaned = 0;
@@ -194,6 +224,9 @@ namespace CleanC.Core.Services
                 {
                     try
                     {
+                        // همیشه پیش از حذف دائم، از کلید رجیستری نسخه .reg پشتیبان تهیه شود
+                        BackupUninstallKey(root, path, subKey);
+
                         unKey.DeleteSubKeyTree(subKey, false);
                         // تأیید حذف واقعی پیش از شمارش
                         if (unKey.OpenSubKey(subKey, false) == null) cleaned++;

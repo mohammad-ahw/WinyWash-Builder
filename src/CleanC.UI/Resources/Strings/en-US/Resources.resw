@@ -4361,4 +4361,7 @@ To download and install, go to the 'Windows Update' section.</value>
   <data name="NewsCategorySports" xml:space="preserve">
     <value>Sports</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>This path is protected by Windows to maintain system stability</value>
+  </data>
 </root>

@@ -256,64 +256,7 @@ namespace CleanC.Core.Services
         /// مسیرهایی که هرگز نباید پاک شوند: ریشه درایوها، ویندوز، Program Files،
         /// ریشه پروفایل کاربر، پوشه Users و پوشه های شخصی (Documents/Desktop/...).
         /// </summary>
-        private static bool IsProtectedSystemPath(string path)
-        {
-            if (string.IsNullOrWhiteSpace(path)) return true;
-
-            // وتوی قفل کاربر — مسیری که کاربر قفل کرده حتی اگر زباله ی سیستمی باشد پاک نمی شود
-            if (LockRegistryService.IsUserLockedPath(path)) return true;
-
-            try
-            {
-                string full = Path.GetFullPath(path).TrimEnd('\\', '/');
-
-                // Disallow cleaning drive roots (e.g. C:, C:\, D:, D:\)
-                if (full.Length <= 3 && full.Contains(':')) return true;
-
-                // خط قرمز: پوشه های داده و نصب خود برنامه هرگز نباید پاک شوند
-                if (!string.IsNullOrEmpty(AppPaths.LocalRoot) && full.StartsWith(Path.GetFullPath(AppPaths.LocalRoot).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return true;
-                if (!string.IsNullOrEmpty(AppPaths.CommonRoot) && full.StartsWith(Path.GetFullPath(AppPaths.CommonRoot).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return true;
-                if (!string.IsNullOrEmpty(AppContext.BaseDirectory) && full.StartsWith(Path.GetFullPath(AppContext.BaseDirectory).TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase)) return true;
-
-                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var protectedExact = new List<string>
-                {
-                    Environment.GetFolderPath(Environment.SpecialFolder.Windows),
-                    Environment.SystemDirectory,
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
-                    userDir,
-                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                    Path.Combine(Path.GetPathRoot(userDir) ?? "C:\\", "Users"),
-                    // پوشه های شخصی: داخل اینها فایل کاربر است، نه زائد سیستم
-                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
-                    Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
-                    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
-                    Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
-                };
-                if (!string.IsNullOrEmpty(userDir))
-                {
-                    protectedExact.Add(Path.Combine(userDir, "Downloads"));
-                    protectedExact.Add(Path.Combine(userDir, "OneDrive"));
-                    protectedExact.Add(Path.Combine(userDir, "Desktop"));
-                }
-
-                foreach (var p in protectedExact)
-                {
-                    if (string.IsNullOrEmpty(p)) continue;
-                    if (string.Equals(full, p.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase))
-                        return true;
-                }
-            }
-            catch (Exception __ex)
-            {
-                CcLog.Ignore(__ex);
-            }
-            return false;
-        }
+        private static bool IsProtectedSystemPath(string path) => SafeDeleteService.IsProtectedSystemPath(path);
 
         /// <summary>
         /// جلوگیری از پیروی junction/symlink: اگر مسیر یک reparse point باشد،

@@ -1515,4 +1515,7 @@
   <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
     <value>معرف الجهاز لـ '{0}' غير متوفر — تم الإلغاء لتجنب الإزالة غير الصحيحة.</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>هذا المسار محمي بواسطة Windows للحفاظ على استقرار النظام</value>
+  </data>
 </root>

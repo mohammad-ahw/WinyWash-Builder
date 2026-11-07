@@ -362,7 +362,11 @@ namespace CleanC.Core.Services
                     if (!File.Exists(item.Command)) return false;
 
                     string disabledPath = item.Command + ".disabled";
-                    if (File.Exists(disabledPath)) File.Delete(disabledPath);
+                    if (File.Exists(disabledPath))
+                    {
+                        string conflictPath = $"{disabledPath}.conflict_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
+                        try { File.Move(disabledPath, conflictPath); } catch { }
+                    }
                     File.Move(item.Command, disabledPath);
                     disabled = File.Exists(disabledPath) && !File.Exists(item.Command);
                 }
@@ -586,7 +590,11 @@ namespace CleanC.Core.Services
                     string disabledPath = command + ".disabled";
                     if (File.Exists(disabledPath))
                     {
-                        if (File.Exists(command)) File.Delete(command);
+                        if (File.Exists(command))
+                        {
+                            string conflictPath = $"{command}.conflict_{DateTime.UtcNow:yyyyMMdd_HHmmss}";
+                            try { File.Move(command, conflictPath); } catch { }
+                        }
                         File.Move(disabledPath, command);
                     }
                 }

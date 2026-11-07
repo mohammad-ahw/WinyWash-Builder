@@ -1515,4 +1515,7 @@ Zum Herunterladen und Installieren gehen Sie zum Abschnitt 'Windows Update'.</va
   <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
     <value>Hardware-ID für Gerät '{0}' nicht verfügbar — abgebrochen, um fehlerhafte Entfernung zu verhindern.</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>Dieser Pfad ist von Windows geschützt, um die Systemstabilität zu gewährleisten</value>
+  </data>
 </root>

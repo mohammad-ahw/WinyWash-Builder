@@ -822,4 +822,7 @@
   <data name="NewsCategorySports" xml:space="preserve">
     <value>ورزشی</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>مسیر جزو محافظت‌شده‌های ویندوز است و برای حفظ پایداری سیستم قابل حذف نیست.</value>
+  </data>
 </root>

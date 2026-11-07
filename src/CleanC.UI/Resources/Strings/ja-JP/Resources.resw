@@ -1515,4 +1515,7 @@
   <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
     <value>デバイス '{0}' のハードウェア ID が見つかりません — 誤った削除を防ぐためキャンセルされました。</value>
   </data>
+  <data name="PathIsProtectedError" xml:space="preserve">
+    <value>このパスはシステムの安定性を維持するためにWindowsによって保護されています</value>
+  </data>
 </root>

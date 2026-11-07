@@ -259,6 +259,78 @@ namespace CleanC.Core.Services
             return batch;
         }
 
+        /// <summary>
+        /// مسیرهایی که هرگز نباید پاک شوند: ریشه درایوها، ویندوز، Program Files،
+        /// ریشه پروفایل کاربر، پوشه Users و پوشه های شخصی (Documents/Desktop/...).
+        /// </summary>
+        public static bool IsProtectedSystemPath(string path)
+        {
+            if (string.IsNullOrWhiteSpace(path)) return true;
+            if (LockRegistryService.IsUserLockedPath(path)) return true;
+
+            try
+            {
+                string full = Path.GetFullPath(path).TrimEnd('\\', '/');
+                if (full.Length <= 3 && full.Contains(':')) return true;
+
+                if (!string.IsNullOrEmpty(AppPaths.LocalRoot))
+                {
+                    string lr = Path.GetFullPath(AppPaths.LocalRoot).TrimEnd('\\', '/');
+                    if (string.Equals(full, lr, StringComparison.OrdinalIgnoreCase) ||
+                        full.StartsWith(lr + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
+                }
+                if (!string.IsNullOrEmpty(AppPaths.CommonRoot))
+                {
+                    string cr = Path.GetFullPath(AppPaths.CommonRoot).TrimEnd('\\', '/');
+                    if (string.Equals(full, cr, StringComparison.OrdinalIgnoreCase) ||
+                        full.StartsWith(cr + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
+                }
+                if (!string.IsNullOrEmpty(AppContext.BaseDirectory))
+                {
+                    string bd = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd('\\', '/');
+                    if (string.Equals(full, bd, StringComparison.OrdinalIgnoreCase) ||
+                        full.StartsWith(bd + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
+                }
+
+                var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+                var protectedExact = new List<string>
+                {
+                    Environment.GetFolderPath(Environment.SpecialFolder.Windows),
+                    Environment.SystemDirectory,
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
+                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                    userDir,
+                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+                    Path.Combine(Path.GetPathRoot(userDir) ?? "C:\\", "Users"),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                    Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyMusic),
+                    Environment.GetFolderPath(Environment.SpecialFolder.MyVideos),
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                };
+                if (!string.IsNullOrEmpty(userDir))
+                {
+                    protectedExact.Add(Path.Combine(userDir, "Downloads"));
+                    protectedExact.Add(Path.Combine(userDir, "OneDrive"));
+                    protectedExact.Add(Path.Combine(userDir, "Desktop"));
+                }
+
+                foreach (var p in protectedExact)
+                {
+                    if (string.IsNullOrEmpty(p)) continue;
+                    if (string.Equals(full, p.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase))
+                        return true;
+                }
+            }
+            catch (Exception __ex)
+            {
+                CcLog.Ignore(__ex, "SafeDeleteService.IsProtectedSystemPath");
+            }
+            return false;
+        }
+
         private static SafeDeleteResult DeleteCore(string path, SafeDeleteMode mode, bool isDirectory)
         {
             var result = new SafeDeleteResult { OriginalPath = path ?? string.Empty };
@@ -270,6 +342,14 @@ namespace CleanC.Core.Services
             {
                 result.Outcome = SafeDeleteOutcome.Failed;
                 result.Error = LocalizationService.Get("LockUserVetoError", "این مسیر توسط کاربر قفل شده است");
+                return result;
+            }
+
+            // گارد امنیتی مرکزی: مسیرهای حساس سیستمی تحت هیچ شرایطی پاک نمی شوند
+            if (IsProtectedSystemPath(path))
+            {
+                result.Outcome = SafeDeleteOutcome.Failed;
+                result.Error = LocalizationService.Get("PathIsProtectedError", "این مسیر محافظت شده است و قابل پاک‌سازی نیست");
                 return result;
             }
 
@@ -364,6 +444,30 @@ namespace CleanC.Core.Services
             error = string.Empty;
             try
             {
+                // بررسی درایو: سطل بازیافت روی درایوهای شبکه یا بدون ریشه وجود ندارد
+                string? root = Path.GetPathRoot(path);
+                if (!string.IsNullOrEmpty(root))
+                {
+                    try
+                    {
+                        var drive = new DriveInfo(root);
+                        if (drive.DriveType == DriveType.Network || drive.DriveType == DriveType.NoRootDirectory)
+                        {
+                            error = "Drive does not support Recycle Bin.";
+                            return false;
+                        }
+                    }
+                    catch { }
+                }
+
+                // بررسی حجم فایل: اگر بیش از حد بزرگ باشد، ویندوز بی صدا آن را حذف دائمی می کند
+                long size = Measure(path, isDirectory);
+                if (size > 2L * 1024 * 1024 * 1024) // > 2 GB
+                {
+                    error = "File too large for reliable Recycle Bin transfer.";
+                    return false;
+                }
+
                 ClearBlockingAttributes(path, isDirectory);
 
                 if (isDirectory)
@@ -472,16 +576,36 @@ namespace CleanC.Core.Services
             catch (IOException)
             {
                 // درایو متفاوت یا قفل موقت → کپی کامل و سپس حذف منبع
-                if (isDirectory) CopyDirectory(source, target);
-                else File.Copy(source, target, overwrite: false);
-
-                if (isDirectory) Directory.Delete(source, true);
+                if (isDirectory)
+                {
+                    CopyDirectory(source, target);
+                    try
+                    {
+                        Directory.Delete(source, true);
+                    }
+                    catch
+                    {
+                        // Rollback: اگر حذف منبع شکست خورد، کپی نیمه کاره در قرنطینه نماند
+                        try { if (Directory.Exists(target)) Directory.Delete(target, true); } catch { }
+                        throw;
+                    }
+                }
                 else
                 {
-                    var fi = new FileInfo(source);
-                    if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
-                        fi.Attributes = FileAttributes.Normal;
-                    fi.Delete();
+                    File.Copy(source, target, overwrite: false);
+                    try
+                    {
+                        var fi = new FileInfo(source);
+                        if ((fi.Attributes & (FileAttributes.ReadOnly | FileAttributes.Hidden | FileAttributes.System)) != 0)
+                            fi.Attributes = FileAttributes.Normal;
+                        fi.Delete();
+                    }
+                    catch
+                    {
+                        // Rollback: اگر حذف فایل منبع شکست خورد، کپی قرنطینه پاک شود
+                        try { if (File.Exists(target)) File.Delete(target); } catch { }
+                        throw;
+                    }
                 }
             }
         }
