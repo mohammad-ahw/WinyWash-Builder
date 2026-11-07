@@ -8,6 +8,7 @@ using Xunit;
 
 namespace CleanC.Core.Tests
 {
+    [Collection("SafeDeleteTests")]
     public class ReviewBugFixTests : IDisposable
     {
         private readonly string _testDir;
@@ -22,6 +23,11 @@ namespace CleanC.Core.Tests
         {
             try
             {
+                SafeDeleteService.ResetSessionForTesting();
+                SafeDeleteService.QuarantineRoot = null!;
+                RegistryCleanerService.CustomBackupDirForTesting = null;
+                TelemetryOptimizerService.ServicesRegistryRootForTesting = null;
+
                 if (Directory.Exists(_testDir))
                 {
                     Directory.Delete(_testDir, true);
@@ -31,12 +37,14 @@ namespace CleanC.Core.Tests
         }
 
         /// <summary>
-        /// باگ ۱: بکاپ چندپوشه‌ای افزونه‌ها باید ساختار زیرپوشه‌ها را کاملاً مجزا ذخیره کند و روی هم overwrite نکند.
+        /// باگ ۱: فراخوانی تابع تولیدی CleanSpecificExtensions روی پوشه تستی چند افزونه با چند زیرپوشه،
+        /// و تأیید اینکه هر زیرپوشه بکاپ کاملاً مجزا دارد و هیچ زیرپوشه‌ای نادیده گرفته یا overwrite نشده است.
         /// </summary>
         [Fact]
         public void Bug1_MultiFolderExtensionBackup_PreservesDistinctSubpaths()
         {
-            string profileDir = Path.Combine(_testDir, "Default");
+            string userDataDir = Path.Combine(_testDir, "UserData");
+            string profileDir = Path.Combine(userDataDir, "Default");
             string backupDir = Path.Combine(_testDir, "Backup");
             string extId = "test_extension_id";
 
@@ -52,40 +60,32 @@ namespace CleanC.Core.Tests
             File.WriteAllText(Path.Combine(settingsFolder, "settings.ldb"), "data-ldb");
             File.WriteAllText(Path.Combine(idbFolder, "000001.log"), "idb-log");
 
-            // بررسی شبیه‌سازی ساختار بکاپ جدید در BrowserOptimizerService
-            var targetFolders = new[]
-            {
-                Path.Combine(profileDir, "Extensions", extId),
-                settingsFolder,
-                idbFolder
-            };
+            // فراخوانی مستقیم تابع تولیدی CleanSpecificExtensions با ارسال مسیر تستی
+            var (cleanedCount, freedBytes) = BrowserOptimizerService.CleanSpecificExtensions(
+                new[] { extId },
+                customUserDataPath: userDataDir,
+                customBackupDir: backupDir);
 
-            foreach (var target in targetFolders)
-            {
-                string rel = Path.GetRelativePath(profileDir, target);
-                string dest = Path.Combine(backupDir, "Default", rel);
-                Directory.CreateDirectory(dest);
-                // کپی ساختار
-                foreach (var file in Directory.GetFiles(target, "*.*", SearchOption.AllDirectories))
-                {
-                    string fRel = Path.GetRelativePath(target, file);
-                    string fDest = Path.Combine(dest, fRel);
-                    Directory.CreateDirectory(Path.GetDirectoryName(fDest)!);
-                    File.Copy(file, fDest, true);
-                }
-            }
+            Assert.True(cleanedCount > 0, "باید دست‌کم یک بخش پاکسازی شده باشد.");
+            Assert.True(freedBytes > 0, "حجم آزاد شده باید مثبت باشد.");
 
-            // اطمینان از اینکه هر ۳ زیرپوشه بکاپ مجزا دارند و چیزی نادیده گرفته یا overwrite نشده است
+            // بررسی دقیق پوشه‌های بکاپ تولیدشده توسط متد اصلی
             string bkManifest = Path.Combine(backupDir, "Default", "Extensions", extId, "1.0.0", "manifest.json");
             string bkSettings = Path.Combine(backupDir, "Default", "Local Extension Settings", extId, "settings.ldb");
             string bkIdb = Path.Combine(backupDir, "Default", "IndexedDB", $"chrome-extension_{extId}_0.indexeddb.leveldb", "000001.log");
 
-            Assert.True(File.Exists(bkManifest), "فایل مانیفست افزونه باید بکاپ گرفته شده باشد.");
-            Assert.True(File.Exists(bkSettings), "پوشه تنظیمات افزونه باید بکاپ گرفته شده باشد.");
-            Assert.True(File.Exists(bkIdb), "دیتابیس IndexedDB افزونه باید به صورت مجزا بکاپ گرفته شده باشد.");
+            Assert.True(File.Exists(bkManifest), "فایل مانیفست افزونه باید در پوشه مجزای خود بکاپ گرفته شده باشد.");
+            Assert.True(File.Exists(bkSettings), "پوشه تنظیمات افزونه باید در زیرپوشه مجزای خود بکاپ گرفته شده باشد.");
+            Assert.True(File.Exists(bkIdb), "دیتابیس IndexedDB باید در زیرپوشه مجزای خود بکاپ گرفته شده باشد.");
+
             Assert.Equal("{\"name\":\"test\"}", File.ReadAllText(bkManifest));
             Assert.Equal("data-ldb", File.ReadAllText(bkSettings));
             Assert.Equal("idb-log", File.ReadAllText(bkIdb));
+
+            // تأیید اینکه پوشه‌های اصلی از پوشه مرورگر حذف شده‌اند
+            Assert.False(Directory.Exists(extFolder), "پوشه اصلی افزونه باید حذف شده باشد.");
+            Assert.False(Directory.Exists(settingsFolder), "پوشه تنظیمات اصلی باید حذف شده باشد.");
+            Assert.False(Directory.Exists(idbFolder), "پوشه IndexedDB اصلی باید حذف شده باشد.");
         }
 
         /// <summary>
@@ -119,123 +119,176 @@ namespace CleanC.Core.Tests
         }
 
         /// <summary>
-        /// باگ ۳: بکاپ رجیستری باید بدون رجوع به reg.exe و مستقیماً با API رجیستری فایل استاندارد .reg معتبر تولید کند،
-        /// و در صورت شکست بکاپ، از حذف کلید صرف‌نظر شود.
+        /// باگ ۳: فراخوانی مستقیم متد تولیدی CleanDeadUninstallKeys و اثبات اینکه اگر بکاپ به هر دلیلی
+        /// شکست بخورد، کلید رجیستری هرگز حذف نمی‌شود و در رجیستری دست‌نخورده باقی می‌ماند.
         /// </summary>
         [Fact]
-        public void Bug3_RegistryBackup_DirectRegFileExport_AndSkipOnFailure()
+        public void Bug3_RegistryCleaner_WhenBackupFails_DoesNotDeleteKey()
         {
-            string testSubKeyPath = @"Software\WinyWashTestKey_" + Guid.NewGuid().ToString("N");
-            string backupFile = Path.Combine(_testDir, "test_backup.reg");
+            string testParent = @"Software\WinyWashTestUninstall_" + Guid.NewGuid().ToString("N");
+            string deadKeyName = "DeadApp123";
 
-            // ایجاد کلید و مقادیر تستی در HKCU
-            using (var key = Registry.CurrentUser.CreateSubKey(testSubKeyPath))
+            // ایجاد کلید مرده در HKCU (اشاره به فایل غیرموجود uninstaller)
+            using (var parentKey = Registry.CurrentUser.CreateSubKey(testParent))
             {
-                Assert.NotNull(key);
-                key.SetValue("AppString", "TestValue123", RegistryValueKind.String);
-                key.SetValue("AppDWord", 42, RegistryValueKind.DWord);
-                key.SetValue("AppBinary", new byte[] { 0xAA, 0xBB, 0xCC }, RegistryValueKind.Binary);
-
-                using var sub = key.CreateSubKey("ChildKey");
-                sub.SetValue("ChildVal", "InnerValue");
+                Assert.NotNull(parentKey);
+                using var deadKey = parentKey.CreateSubKey(deadKeyName);
+                deadKey.SetValue("DisplayName", "Dead Test Application");
+                deadKey.SetValue("UninstallString", @"C:\NonExistentDirectory_X999\uninstall.exe");
             }
 
             try
             {
-                using (var readKey = Registry.CurrentUser.OpenSubKey(testSubKeyPath, false))
+                // مرحله اول: تعیین مسیر بکاپ نامعتبر/غیرقابل نوشتن برای شبیه‌سازی شکست بکاپ
+                RegistryCleanerService.CustomBackupDirForTesting = @"Z:\InvalidNonExistentDrive_X888\Registry";
+
+                // فراخوانی مستقیم تابع تولیدی
+                int cleaned = RegistryCleanerService.CleanDeadUninstallKeys(Registry.CurrentUser, testParent);
+
+                // باید صفر باشد چون بکاپ شکست خورده
+                Assert.Equal(0, cleaned);
+
+                // کلید رجیستری باید هنوز سر جایش باشد و حذف نشده باشد!
+                using (var checkParent = Registry.CurrentUser.OpenSubKey(testParent, false))
                 {
-                    Assert.NotNull(readKey);
-                    bool exportOk = RegistryCleanerService.ExportKeyToRegFile(readKey, $@"HKEY_CURRENT_USER\{testSubKeyPath}", backupFile);
-                    Assert.True(exportOk, "اکسپورت مستقیم رجیستری باید موفقیت‌آمیز باشد.");
+                    Assert.NotNull(checkParent);
+                    using var checkSub = checkParent.OpenSubKey(deadKeyName, false);
+                    Assert.NotNull(checkSub); // کلید با موفقیت محافظت شد و حذف نشد!
                 }
 
-                Assert.True(File.Exists(backupFile), "فایل .reg باید ساخته شده باشد.");
-                string regContent = File.ReadAllText(backupFile, System.Text.Encoding.Unicode);
+                // مرحله دوم: اکنون مسیر بکاپ معتبر می‌دهیم
+                RegistryCleanerService.CustomBackupDirForTesting = Path.Combine(_testDir, "ValidBackups");
 
-                Assert.StartsWith("Windows Registry Editor Version 5.00", regContent.Trim());
-                Assert.Contains($@"[HKEY_CURRENT_USER\{testSubKeyPath}]", regContent);
-                Assert.Contains("\"AppString\"=\"TestValue123\"", regContent);
-                Assert.Contains("\"AppDWord\"=dword:0000002a", regContent);
-                Assert.Contains("\"AppBinary\"=hex:aa,bb,cc", regContent);
-                Assert.Contains($@"[HKEY_CURRENT_USER\{testSubKeyPath}\ChildKey]", regContent);
+                int cleanedWithValidBackup = RegistryCleanerService.CleanDeadUninstallKeys(Registry.CurrentUser, testParent);
+                Assert.Equal(1, cleanedWithValidBackup);
 
-                // تست شکست بکاپ در مسیر غیرمجاز: باید false برگرداند و کرش نکند
-                using (var readKey = Registry.CurrentUser.OpenSubKey(testSubKeyPath, false))
+                // اکنون کلید حذف شده و بکاپ .reg در مسیر معتبر ایجاد شده است
+                using (var checkParent = Registry.CurrentUser.OpenSubKey(testParent, false))
                 {
-                    string invalidDest = "Z:\\NonExistentDrive_X929\\invalid.reg";
-                    bool failedExport = RegistryCleanerService.ExportKeyToRegFile(readKey!, "Test", invalidDest);
-                    Assert.False(failedExport, "در مسیر نامعتبر باید شکست بخورد و false برگرداند.");
+                    Assert.NotNull(checkParent);
+                    using var checkSub = checkParent.OpenSubKey(deadKeyName, false);
+                    Assert.Null(checkSub); // کلید حذف شد
                 }
+
+                var regFiles = Directory.GetFiles(Path.Combine(_testDir, "ValidBackups"), "*.reg");
+                Assert.NotEmpty(regFiles);
             }
             finally
             {
-                try { Registry.CurrentUser.DeleteSubKeyTree(testSubKeyPath, false); } catch { }
+                RegistryCleanerService.CustomBackupDirForTesting = null;
+                try { Registry.CurrentUser.DeleteSubKeyTree(testParent, false); } catch { }
             }
         }
 
         /// <summary>
-        /// باگ ۴: بازگردانی تلمتری در صورت عدم وجود یا خرابی مقدار اولیه باید به پیش‌فرض واقعی ویندوز برگردد و هرگز کرش نکند.
+        /// باگ ۴: فراخوانی تابع تولیدی EnableAndStartService با مقدار ذخیره‌شده خراب یا نامعتبر
+        /// و تأیید اینکه استارت‌تایپ نهایی سرویس در رجیستری دقیقاً به پیش‌فرض واقعی ویندوز برمی‌گردد.
         /// </summary>
         [Fact]
         public void Bug4_TelemetryOptimizer_GracefulDefaultsOnCorruptedState()
         {
-            // شبیه‌سازی تست پارس کردن مقدار ذخیره‌شده خراب یا غایب
-            string? corruptedVal = "Invalid_String_Not_A_Number";
-            int targetStartDiagTrack = 2; // ویندوز پیش‌فرض DiagTrack
-            int targetStartDmwap = 3;     // ویندوز پیش‌فرض dmwappushservice
+            string testRootPath = @"Software\WinyWashTestServices_" + Guid.NewGuid().ToString("N");
 
-            // اگر مقدار نامعتبر باشد
-            if (int.TryParse(corruptedVal, out int parsed) && parsed is >= 1 and <= 3)
+            using (var testServicesRoot = Registry.CurrentUser.CreateSubKey(testRootPath))
             {
-                targetStartDiagTrack = parsed;
+                Assert.NotNull(testServicesRoot);
+
+                // ۱. تست DiagTrack با مقدار خراب رشته‌ای
+                using (var diag = testServicesRoot.CreateSubKey("DiagTrack"))
+                {
+                    diag.SetValue("Start", 4, RegistryValueKind.DWord); // قبلاً غیرفعال بوده
+                    diag.SetValue("WinyWash_OriginalStart", "Corrupted_String_Not_An_Integer", RegistryValueKind.String);
+                }
+
+                // ۲. تست dmwappushservice با مقدار خارج از محدوده
+                using (var dmw = testServicesRoot.CreateSubKey("dmwappushservice"))
+                {
+                    dmw.SetValue("Start", 4, RegistryValueKind.DWord);
+                    dmw.SetValue("WinyWash_OriginalStart", 9999, RegistryValueKind.DWord);
+                }
+
+                // هدایت ریشه سرویس‌ها به کلید تستی
+                TelemetryOptimizerService.ServicesRegistryRootForTesting = testServicesRoot;
+
+                // فراخوانی مستقیم تابع تولیدی
+                bool diagResult = TelemetryOptimizerService.EnableAndStartService("DiagTrack");
+                bool dmwResult = TelemetryOptimizerService.EnableAndStartService("dmwappushservice");
+
+                Assert.True(diagResult);
+                Assert.True(dmwResult);
+
+                // تأیید استارت‌تایپ نهایی در رجیستری:
+                // برای DiagTrack باید ۲ (Automatic) باشد
+                using (var diagCheck = testServicesRoot.OpenSubKey("DiagTrack", false))
+                {
+                    Assert.NotNull(diagCheck);
+                    int diagStart = Convert.ToInt32(diagCheck.GetValue("Start"));
+                    Assert.Equal(2, diagStart);
+                }
+
+                // برای dmwappushservice باید ۳ (Manual) باشد
+                using (var dmwCheck = testServicesRoot.OpenSubKey("dmwappushservice", false))
+                {
+                    Assert.NotNull(dmwCheck);
+                    int dmwStart = Convert.ToInt32(dmwCheck.GetValue("Start"));
+                    Assert.Equal(3, dmwStart);
+                }
             }
 
-            Assert.Equal(2, targetStartDiagTrack);
-            Assert.Equal(3, targetStartDmwap);
-
-            // اطمینان از اینکه متدهای وضعیت تلمتری کرش نمی‌کنند
-            var exception = Record.Exception(() =>
-            {
-                _ = TelemetryOptimizerService.IsTelemetryDisabled();
-                _ = TelemetryOptimizerService.IsBingSearchDisabled();
-                _ = TelemetryOptimizerService.IsActivityHistoryDisabled();
-            });
-            Assert.Null(exception);
+            try { Registry.CurrentUser.DeleteSubKeyTree(testRootPath, false); } catch { }
         }
 
         /// <summary>
-        /// باگ ۵: رول‌بک نیمه‌کاره‌ی قرنطینه در صورت شکست حذف فایل مبدأ
+        /// باگ ۵: تست واقعی سناریوی شکست نیمه‌کاره قرنطینه با قفل کردن فایل با FileStream(FileShare.None).
+        /// تأیید اینکه کپی قرنطینه پاک نمی‌شود، فایل غیرقفل‌شده یا در مبدأ یا در قرنطینه در دست‌کم یکی از دو جا
+        /// موجود است و در manifest ثبت شده است.
         /// </summary>
         [Fact]
-        public void Bug5_QuarantineRollback_WhenSourceDeletionFails_RevertsQuarantinedCopy()
+        public void Bug5_QuarantineRollback_WhenSourceDeletionFails_PreservesQuarantineCopyAndManifest()
         {
+            string qRoot = Path.Combine(_testDir, "QuarantineRoot");
+            SafeDeleteService.QuarantineRoot = qRoot;
+            SafeDeleteService.ResetSessionForTesting();
+
             string sourceDir = Path.Combine(_testDir, "SourceFolder");
-            string qDir = Path.Combine(_testDir, "QuarantineFolder");
             Directory.CreateDirectory(sourceDir);
-            Directory.CreateDirectory(qDir);
 
-            string file1 = Path.Combine(sourceDir, "file1.txt");
-            File.WriteAllText(file1, "critical user data");
+            string unlockedFile = Path.Combine(sourceDir, "unlocked.txt");
+            string lockedFile = Path.Combine(sourceDir, "locked.txt");
 
-            string qDest = Path.Combine(qDir, "SourceFolder_Quarantined");
+            File.WriteAllText(unlockedFile, "unlocked content 123");
+            File.WriteAllText(lockedFile, "locked content 456");
 
-            // شبیه‌سازی تراکنش امن MoveWithFallback:
-            // ۱. داده به مقصد کپی می‌شود
-            Directory.CreateDirectory(qDest);
-            File.Copy(file1, Path.Combine(qDest, "file1.txt"), true);
-
-            // ۲. خطای شبیه‌سازی شده در حذف مبدأ (مثلاً دسترسی Denied یا فایل در حال استفاده)
-            bool sourceDeleteFailed = true;
-
-            if (sourceDeleteFailed)
+            // قفل کردن فایل locked.txt با انحصار کامل
+            using (var fs = new FileStream(lockedFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
             {
-                // رول‌بک تراکنشی: مقصد در قرنطینه پاک می‌شود تا دیتای یتیم ایجاد نشود
-                try { Directory.Delete(qDest, true); } catch { }
-            }
+                // فراخوانی متد اصلی حذف پوشه به قرنطینه
+                // چون locked.txt قفل است، Directory.Delete مبدأ با شکست مواجه می‌شود
+                var result = SafeDeleteService.DeleteDirectory(sourceDir, SafeDeleteMode.Quarantine);
 
-            // نتیجه: داده در مبدأ هنوز هست و مقصد قرنطینه پاکسازی شده است
-            Assert.True(File.Exists(file1), "فایل مبدأ نباید آسیب ببیند.");
-            Assert.False(Directory.Exists(qDest), "مقصد در قرنطینه باید با رول‌بک حذف شده باشد.");
+                // نتیجه باید Quarantined باشد چون کپی موفق بوده
+                Assert.Equal(SafeDeleteOutcome.Quarantined, result.Outcome);
+                Assert.NotNull(result.StoredPath);
+
+                // تأیید اینکه کپی قرنطینه پاک نشده و کپی کامل در قرنطینه باقی مانده است
+                Assert.True(Directory.Exists(result.StoredPath), "پوشه قرنطینه نباید با رول‌بک حذف شده باشد.");
+
+                string qUnlocked = Path.Combine(result.StoredPath, "unlocked.txt");
+                Assert.True(File.Exists(qUnlocked), "فایل غیرقفل‌شده باید در قرنطینه موجود باشد.");
+                Assert.Equal("unlocked content 123", File.ReadAllText(qUnlocked));
+
+                // تأیید اینکه فایل غیرقفل‌شده دست‌کم در یکی از دو جا (یا مبدأ یا قرنطینه) هست
+                bool inSourceOrQuarantine = File.Exists(unlockedFile) || File.Exists(qUnlocked);
+                Assert.True(inSourceOrQuarantine, "داده نباید از بین برود؛ باید دست‌کم در یکی از دو جا موجود باشد.");
+
+                // تأیید ثبت در manifest.json
+                var manifestFiles = Directory.GetFiles(qRoot, "manifest.json", SearchOption.AllDirectories);
+                Assert.NotEmpty(manifestFiles);
+
+                string manifestContent = File.ReadAllText(manifestFiles[0]);
+                Assert.Contains("SourceFolder", manifestContent);
+                Assert.Contains(result.StoredPath.Replace("\\", "\\\\"), manifestContent);
+            }
         }
 
         /// <summary>

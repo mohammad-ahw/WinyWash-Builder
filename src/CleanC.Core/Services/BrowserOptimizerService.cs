@@ -501,12 +501,15 @@ namespace CleanC.Core.Services
             }
         }
 
-        public static (int cleanedCount, long freedBytes) CleanSpecificExtensions(IEnumerable<string> extensionIds)
+        public static (int cleanedCount, long freedBytes) CleanSpecificExtensions(
+            IEnumerable<string> extensionIds,
+            string? customUserDataPath = null,
+            string? customBackupDir = null)
         {
             int count = 0;
             long freed = 0;
             string localApp = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            string backupDir = Path.Combine(AppPaths.LocalRoot, "ExtensionsBackup");
+            string backupDir = customBackupDir ?? Path.Combine(AppPaths.LocalRoot, "ExtensionsBackup");
             if (!Directory.Exists(backupDir)) Directory.CreateDirectory(backupDir);
 
             var targets = new HashSet<string>(extensionIds, StringComparer.OrdinalIgnoreCase);
@@ -515,12 +518,20 @@ namespace CleanC.Core.Services
             // رفع باگ: پاکسازی هرگونه پالیسی بلاک‌لیست قبلی تا افزونه در کروم غیرفعال/مسدود ادمین نماند
             RemoveExtensionBlocklistPolicies();
 
-            var browserBases = new (string Name, string Path, string ProcessName)[]
+            (string Name, string Path, string ProcessName)[] browserBases;
+            if (!string.IsNullOrEmpty(customUserDataPath))
             {
-                ("Google Chrome", Path.Combine(localApp, @"Google\Chrome\User Data"), "chrome"),
-                ("Microsoft Edge", Path.Combine(localApp, @"Microsoft\Edge\User Data"), "msedge"),
-                ("Brave", Path.Combine(localApp, @"BraveSoftware\Brave-Browser\User Data"), "brave")
-            };
+                browserBases = new[] { ("CustomBrowser", customUserDataPath, "dummy") };
+            }
+            else
+            {
+                browserBases = new (string Name, string Path, string ProcessName)[]
+                {
+                    ("Google Chrome", Path.Combine(localApp, @"Google\Chrome\User Data"), "chrome"),
+                    ("Microsoft Edge", Path.Combine(localApp, @"Microsoft\Edge\User Data"), "msedge"),
+                    ("Brave", Path.Combine(localApp, @"BraveSoftware\Brave-Browser\User Data"), "brave")
+                };
+            }
 
             foreach (var (_, basePath, procName) in browserBases)
             {

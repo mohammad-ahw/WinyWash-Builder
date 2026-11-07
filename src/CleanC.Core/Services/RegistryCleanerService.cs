@@ -184,6 +184,8 @@ namespace CleanC.Core.Services
         /// پشتیبان‌گیری مستقیم از کلیدهای رجیستری در قالب فایل استاندارد .reg با استفاده از APIهای داخلی دات‌نت
         /// (بدون اجرای reg.exe برای جلوگیری از حساسیت و هشدارهای غیرضروری آنتی‌ویروس‌ها).
         /// </summary>
+        public static string? CustomBackupDirForTesting { get; set; }
+
         public static bool ExportKeyToRegFile(RegistryKey key, string fullKeyPath, string destinationFile)
         {
             try
@@ -304,7 +306,7 @@ namespace CleanC.Core.Services
                 string rootPrefix = root.Name; // E.g., HKEY_CURRENT_USER or HKEY_LOCAL_MACHINE
                 string fullKeyPath = $@"{rootPrefix}\{parentPath}\{subKeyName}";
 
-                string backupDir = Path.Combine(AppPaths.CommonBackupsDir, "Registry");
+                string backupDir = CustomBackupDirForTesting ?? Path.Combine(AppPaths.CommonBackupsDir, "Registry");
                 string safeName = string.Join("_", subKeyName.Split(Path.GetInvalidFileNameChars()));
                 string fileName = $"Uninstall_{safeName}_{DateTime.UtcNow:yyyyMMdd_HHmmssfff}.reg";
                 string destFile = Path.Combine(backupDir, fileName);
@@ -321,7 +323,7 @@ namespace CleanC.Core.Services
             }
         }
 
-        private static int CleanDeadUninstallKeys(RegistryKey root, string path)
+        public static int CleanDeadUninstallKeys(RegistryKey root, string path)
         {
             int cleaned = 0;
             try

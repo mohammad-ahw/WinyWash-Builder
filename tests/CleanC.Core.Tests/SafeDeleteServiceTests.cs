@@ -5,9 +5,11 @@ using System;
 using System.IO;
 using System.Linq;
 using CleanC.Core.Services;
+using Xunit;
 
 namespace CleanC.Core.Tests
 {
+    [Collection("SafeDeleteTests")]
     public class SafeDeleteServiceTests : IDisposable
     {
         private readonly string _root;

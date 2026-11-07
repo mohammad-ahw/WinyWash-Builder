@@ -248,7 +248,9 @@ namespace CleanC.Core.Services
             bool registryChanged = false;
             try
             {
-                using (var key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", true))
+                using (var key = ServicesRegistryRootForTesting != null 
+                    ? ServicesRegistryRootForTesting.OpenSubKey(serviceName, true) 
+                    : Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", true))
                 {
                     if (key != null)
                     {
@@ -290,12 +292,16 @@ namespace CleanC.Core.Services
         /// <summary>
         /// بازگرداندن سرویس به حالت Manual (پیش فرض DiagTrack) و روشن کردن آن.
         /// </summary>
-        private static bool EnableAndStartService(string serviceName)
+        public static RegistryKey? ServicesRegistryRootForTesting { get; set; }
+
+        public static bool EnableAndStartService(string serviceName)
         {
             bool registryChanged = false;
             try
             {
-                using (var key = Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", true))
+                using (var key = ServicesRegistryRootForTesting != null 
+                    ? ServicesRegistryRootForTesting.OpenSubKey(serviceName, true) 
+                    : Registry.LocalMachine.OpenSubKey($@"SYSTEM\CurrentControlSet\Services\{serviceName}", true))
                 {
                     if (key != null)
                     {

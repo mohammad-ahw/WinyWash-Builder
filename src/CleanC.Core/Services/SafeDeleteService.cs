@@ -107,6 +107,40 @@ namespace CleanC.Core.Services
 
     public static class SafeDeleteService
     {
+        [StructLayout(LayoutKind.Sequential)]
+        private struct SHQUERYRBINFO
+        {
+            public int cbSize;
+            public long i64Size;
+            public long i64NumItems;
+        }
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode)]
+        private static extern int SHQueryRecycleBin(string pszRootPath, ref SHQUERYRBINFO pSHQueryRBInfo);
+
+        public static bool HasRecycleBinSupport(string path)
+        {
+            try
+            {
+                string? root = Path.GetPathRoot(path);
+                if (string.IsNullOrEmpty(root)) return false;
+
+                var drive = new DriveInfo(root);
+                if (drive.DriveType != DriveType.Fixed && drive.DriveType != DriveType.Removable)
+                {
+                    return false;
+                }
+
+                var info = new SHQUERYRBINFO { cbSize = Marshal.SizeOf(typeof(SHQUERYRBINFO)) };
+                int hr = SHQueryRecycleBin(root, ref info);
+                return hr == 0;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct SHFILEOPSTRUCT
         {
@@ -172,6 +206,15 @@ namespace CleanC.Core.Services
         /// مسیر ریشه ی قرنطینه — برای تست قابل تغییر است.
         /// عوض شدن ریشه یعنی نشستِ باز باید بسته شود تا ورودی ها در ریشه ی جدید ثبت شوند.
         /// </summary>
+        public static void ResetSessionForTesting()
+        {
+            lock (Sync)
+            {
+                _currentSessionId = null;
+                _currentManifest = null;
+            }
+        }
+
         public static string QuarantineRoot
         {
             get
@@ -495,9 +538,18 @@ namespace CleanC.Core.Services
             error = string.Empty;
             try
             {
+                string fullPath = Path.GetFullPath(path);
+
+                // ۱. بررسی پیشینی پشتیبانی درایو از سطل بازیافت با SHQueryRecycleBin و نوع درایو
+                // در درایوهای مجازی/شبکه/بدون سطل، ویندوز حتی با FOF_WANTNUKEWARNING به دلیل FOF_NOCONFIRMATION ممکن است دائم پاک کند
+                if (!HasRecycleBinSupport(fullPath))
+                {
+                    error = "Drive does not support Recycle Bin. Protected fallback to Quarantine.";
+                    return false;
+                }
+
                 ClearBlockingAttributes(path, isDirectory);
 
-                string fullPath = Path.GetFullPath(path);
                 // SHFileOperation نیازمند بافر با انتهای دابل نال (\0\0) است
                 string doubleNullPath = fullPath + "\0\0";
 
@@ -507,9 +559,6 @@ namespace CleanC.Core.Services
                     wFunc = FO_DELETE,
                     pFrom = doubleNullPath,
                     pTo = null!,
-                    // FOF_ALLOWUNDO: انتقال به سطل بازیافت
-                    // FOF_WANTNUKEWARNING: اگر فایل نتواند در سطل قرار گیرد و قرار بر حذف دائم باشد، لغو می‌شود
-                    // در ترکیب با FOF_NOCONFIRMATION و FOF_NOERRORUI، به جای حذف دائم، fAnyOperationsAborted فعال شده و فایل دست‌نخورده باقی می‌ماند
                     fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_WANTNUKEWARNING,
                     fAnyOperationsAborted = false,
                     hNameMappings = IntPtr.Zero,
@@ -518,7 +567,7 @@ namespace CleanC.Core.Services
 
                 int ret = SHFileOperation(ref shf);
 
-                // اگر ویندوز عملیات را رد یا لغو کرد (مثلاً درایو فاقد سطل بازیافت یا حجم فراتر از ظرفیت سطل)
+                // اگر ویندوز عملیات را رد یا لغو کرد (مثلاً حجم فراتر از سطل بازیافت)
                 if (ret != 0 || shf.fAnyOperationsAborted)
                 {
                     error = $"Recycle Bin transfer aborted (Code: {ret}, Aborted: {shf.fAnyOperationsAborted}). Protected fallback to Quarantine.";
@@ -634,11 +683,11 @@ namespace CleanC.Core.Services
                     {
                         Directory.Delete(source, true);
                     }
-                    catch
+                    catch (Exception delEx)
                     {
-                        // Rollback: اگر حذف منبع شکست خورد، کپی نیمه کاره در قرنطینه نماند
-                        try { if (Directory.Exists(target)) Directory.Delete(target, true); } catch { }
-                        throw;
+                        // اگر حذف منبع به دلیل قفل بودن فایلی شکست خورد، کپی کامل در قرنطینه نگه داشته شده
+                        // و در مانیفست ثبت می‌شود تا هیچ داده‌ای از دست نرود.
+                        CcLog.Ignore(delEx, "SafeDeleteService.DeleteSourceFailedAfterCopy");
                     }
                 }
                 else
@@ -651,11 +700,10 @@ namespace CleanC.Core.Services
                             fi.Attributes = FileAttributes.Normal;
                         fi.Delete();
                     }
-                    catch
+                    catch (Exception delEx)
                     {
-                        // Rollback: اگر حذف فایل منبع شکست خورد، کپی قرنطینه پاک شود
-                        try { if (File.Exists(target)) File.Delete(target); } catch { }
-                        throw;
+                        // در صورت قفل بودن فایل منبع، کپی قرنطینه حفظ شود
+                        CcLog.Ignore(delEx, "SafeDeleteService.DeleteSourceFileFailedAfterCopy");
                     }
                 }
             }
@@ -666,10 +714,29 @@ namespace CleanC.Core.Services
             Directory.CreateDirectory(dest);
 
             foreach (string file in Directory.EnumerateFiles(source))
-                File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), true);
+            {
+                try
+                {
+                    File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), true);
+                }
+                catch (Exception ex)
+                {
+                    // اگر فایلی توسط پروسه دیگری قفل است، سایر فایل‌های سالم کپی شوند
+                    CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.File");
+                }
+            }
 
             foreach (string sub in Directory.EnumerateDirectories(source))
-                CopyDirectory(sub, Path.Combine(dest, Path.GetFileName(sub)));
+            {
+                try
+                {
+                    CopyDirectory(sub, Path.Combine(dest, Path.GetFileName(sub)));
+                }
+                catch (Exception ex)
+                {
+                    CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.SubDir");
+                }
+            }
         }
 
         private static void EnsureSession()
