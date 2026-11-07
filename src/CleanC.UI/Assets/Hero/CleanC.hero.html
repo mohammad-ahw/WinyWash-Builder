@@ -52,6 +52,7 @@ h1{margin:6px 0 10px;font-size:clamp(19px,2.1vw,23px);line-height:1.35;font-weig
 let __ec=0;const __rep=o=>{try{window.chrome&&window.chrome.webview&&window.chrome.webview.postMessage(o)}catch(e){}};
 window.onerror=function(m,s,l,c){if(__ec++<8)__rep({type:'js.error',data:{m:String(m),s:String(s||''),l:l||0,c:c||0}})};
 const T18=s=>window.CC_I18N?window.CC_I18N.translate(s):s;
+const escHtml=s=>s==null?'':String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
 window.addEventListener('unhandledrejection',function(e){if(__ec++<8){var r=e&&e.reason;__rep({type:'js.error',data:{m:'REJ:'+String((r&&(r.message||r.stack))||r)}})}});
 const RM=matchMedia('(prefers-reduced-motion:reduce)').matches,$=i=>document.getElementById(i),cv=$('c'),x=cv.getContext('2d'),PI=Math.PI,K=3,U=.95*K;cv.width=290*K;cv.height=195*K;
 /* ناحیهٔ نزدیک کاراکتر: کلیک/لمس/کورسور فقط تا شعاع ~۱۰۰px از مرکز کاراکتر
@@ -388,7 +389,7 @@ function render(force){const v=pick();
  document.documentElement.style.setProperty('--sc',v.st[1]);$('st').innerHTML=v.st[0]+(v.st[2]?' · <b>'+v.st[2]+'</b>':'');
  if($('h').textContent!==v.head){$('h').textContent=v.head;$('h').style.animation='none';$('h').offsetWidth;$('h').style.animation=''}
  if(v.sub!==lastSub){lastSub=v.sub;$('s').textContent=v.sub;$('s').style.animation='none';$('s').offsetWidth;$('s').style.animation=''}
- $('it').innerHTML=v.seg?`<div class="seg one"><div><b></b></div></div><span>${v.lab}</span>`:v.chips?v.chips.map(([t,k])=>`<button class="ch" data-c="${k}">${t}</button>`).join(''):v.list?issChips(v):v.items.length?v.items.map(([t,c])=>`<span class="${c}"><i></i>${t}</span>`).join(''):`<span>${meta}</span>`;
+ $('it').innerHTML=v.seg?`<div class="seg one"><div><b></b></div></div><span>${escHtml(v.lab)}</span>`:v.chips?v.chips.map(([t,k])=>`<button class="ch" data-c="${escHtml(k)}">${escHtml(t)}</button>`).join(''):v.list?issChips(v):v.items.length?v.items.map(([t,c])=>`<span class="${escHtml(c)}"><i></i>${escHtml(t)}</span>`).join(''):`<span>${meta}</span>`;
  const b=$('go'),a=v.btn[2];b.className='btn '+v.btn[1];b.disabled=a=='dis';$('gl').textContent=v.btn[0];$('gi').innerHTML=a=='re'?RE:GO;b.style.display=a=='dis'?'none':'';{const L=v.list,p=L&&L.find(i=>i.id==v.pid),acts=L?new Set(L.map(i=>i.act).filter(Boolean)):[],g2=$('go2');if(p&&L.length>1&&acts.size>1){g2.hidden=false;g2.textContent='رفع همه · '+L.length+' مورد'}else g2.hidden=true;$('sn').hidden=!(p&&p.sev<3)}
  mi=M.findIndex(m=>m[0]==((MR()&&!v.warn&&!v.crit&&!['run','wait','think'].includes(v.id))?'mourn':v.mood))}
 
@@ -1264,10 +1265,12 @@ I('wnTrain','پنجره: ایستگاه',1,6,WF(()=>{x.beginPath();x.moveTo(66,-
 I('wnSpace','پنجره: ایستگاه فضایی',2,6,WF(()=>{for(let i=0;i<9;i++)dot(68+(i*29)%60,-102+(i*13)%46,.9);x.beginPath();x.arc(112,-80,8,0,7);x.stroke();x.beginPath();x.ellipse(112,-80,13,3,-.4,0,7);x.stroke();const a=66+((now*20)%80);x.beginPath();x.moveTo(a,-62);x.lineTo(a+8,-62);x.stroke()}));
 I('wnGarden','پنجره: باغچه',1,6,WF(()=>{for(let i=0;i<5;i++){x.beginPath();x.moveTo(72+i*11,-54);x.lineTo(72+i*11,-66-(i*5)%8);x.stroke();dot(72+i*11,-68-(i*5)%8,2.2)}for(let i=0;i<8;i++){const a=68+i*8,b=-104+((now*60+i*17)%50);x.beginPath();x.moveTo(a,b);x.lineTo(a-1,b+5);x.stroke()}}));
 /* more mini-games */
-const rp=document.createElement('div');rp.id='rps';rp.style.cssText='position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:none;gap:8px;z-index:9';rp.innerHTML=['سنگ','کاغذ','قیچی'].map((t,i)=>'<button class="ch" data-i="'+i+'">'+t+'</button>').join('');document.querySelector('.viz').appendChild(rp);
+const rp=document.createElement('div');rp.id='rps';rp.style.cssText='position:absolute;left:50%;bottom:6px;transform:translateX(-50%);display:none;gap:8px;z-index:9';
+const getRpsLabels=()=>isEnglish()?['Rock','Paper','Scissors']:['سنگ','کاغذ','قیچی'];
+rp.innerHTML=getRpsLabels().map((t,i)=>'<button class="ch" data-i="'+i+'">'+t+'</button>').join('');document.querySelector('.viz').appendChild(rp);
 let rpOn=0;const rpHide=()=>{rp.style.display='none';rpOn=0};
 rp.onclick=e=>{const i=e.target.dataset.i;if(i==null||!rpOn)return;const c=Math.random()*3|0,r=(+i-c+3)%3,en=isEnglish();const choice=(en?['Rock','Paper','Scissors']:['سنگ','کاغذ','قیچی'])[c];const outcome=r==0?(en?'Tie':'مساوی'):r==1?(en?'You win! 🎉':'بردی 🎉'):(en?'You lose':'باختی');bubble(choice+'! '+outcome);bump('pla',.05);rpHide()};
-I('gmRps','بازی: سنگ‌کاغذ‌قیچی',1,7,()=>{},{ev:[[0,()=>{rp.style.display='flex';rpOn=1}],[.97,rpHide]],sy:.9});
+I('gmRps',isEnglish()?'Mini-game: Rock Paper Scissors':'بازی: سنگ‌کاغذ‌قیچی',1,7,()=>{},{ev:[[0,()=>{rp.innerHTML=getRpsLabels().map((t,i)=>'<button class="ch" data-i="'+i+'">'+t+'</button>').join('');rp.style.display='flex';rpOn=1}],[.97,rpHide]],sy:.9});
 const _gd=gmDraw;
 gmDraw=function(u){const g=GM;if(g&&g.kind=='ball'){if(g.p===undefined){g.p=0;g.v=rnd(-25,25);g.s=0}const t=T(),dt=Math.min(.1,t-g.lt);g.lt=t;const b=cv.getBoundingClientRect(),bar=Math.max(-120,Math.min(120,((typeof mx=='number'?mx:b.left+b.width/2)-b.left)/b.width*300-150));g.v+=(g.p-bar)*2.2*dt;g.v*=.995;g.p+=g.v*dt;if(Math.abs(g.p-bar)<30&&Math.abs(g.p)<125)g.s+=dt;g.hit=Math.floor(g.s);g.tot=6;x.shadowBlur=0;x.beginPath();x.moveTo(bar-26,72);x.lineTo(bar+26,72);x.stroke();dot(g.p,64,6);return}_gd(u)};
 I('gmBall','بازی: تعادل توپ',2,7,u=>gmDraw(u),{ev:[[0,()=>gmStart('ball')],[.97,gmEnd]],sy:.9});
@@ -1306,7 +1309,7 @@ function issues(){const L=[],P=o=>L.push(o),rec=active.reduce((a,i)=>a+IT[i][5],
  L.sort((a,b)=>(b.sev-a.sev)||((b.act=='run')-(a.act=='run')));
  if(SNZ['hero_all']>Date.now())return L.filter(i=>i.sev>=3);
  return L.filter(i=>!(SNZ[i.id]>Date.now()&&i.sev<3))}
-const issChips=v=>{const L=v.list,sh=L.slice(0,4),more=L.length-sh.length;return sh.map(i=>`<button class="ch iss${i.id==v.pid?' ac':''}" data-iss="${i.id}" title="${i.title}"><i style="background:${SEVC[i.sev]}"></i><bdi>${i.name}</bdi>${i.val&&!i.id.startsWith('m_')?' · <bdi>'+i.val+'</bdi>':''}</button>`).join('')+(more>0?`<span class="more">+${more}</span>`:'')};
+const issChips=v=>{const L=v.list,sh=L.slice(0,4),more=L.length-sh.length;return sh.map(i=>`<button class="ch iss${i.id==v.pid?' ac':''}" data-iss="${escHtml(i.id)}" title="${escHtml(T18(i.title))}"><i style="background:${SEVC[i.sev]}"></i><bdi>${escHtml(T18(i.name))}</bdi>${i.val&&!i.id.startsWith('m_')?' · <bdi>'+escHtml(T18(i.val))+'</bdi>':''}</button>`).join('')+(more>0?`<span class="more">+${more}</span>`:'')};
 function quick(a){const M2={fixproxy:'در حال تنظیم اتصال و خاموش‌سازی پراکسی …',ram:'در حال آزادسازی و سبک‌سازی رم …',browser:'در حال سبک‌سازی و آزادسازی حافظهٔ مرورگر …',cpu:'در حال بررسی و مدیریت پردازه‌های سنگین …'};const OK2={fixproxy:'اتصال اینترنت با موفقیت اصلاح شد ✓',ram:'حافظه رم با موفقیت آزاد و سبک شد ✓',browser:'پردازه‌ها و تب‌های مرورگر با موفقیت سبک شدند ✓',cpu:'پردازه‌های سنگین سیستم بررسی و تعدیل شدند ✓'};busyMsg=M2[a]||'در حال انجام عملیات …';busyUntil=T()+2.0;if(a==='browser'){ST.browserMB=0;ST.tabs=0;SNZ['bheavy']=Date.now()+24*36e5;LS.s('cc_snz',SNZ)}else if(a==='ram'){ramHigh=false;SNZ['ram']=Date.now()+300000;LS.s('cc_snz',SNZ)}else if(a==='fixproxy'){ST.proxyDead=false;SNZ['proxy']=Date.now()+600000;LS.s('cc_snz',SNZ)}else if(a==='cpu'){hotSince=0;SNZ['cpu']=Date.now()+300000;LS.s('cc_snz',SNZ)}HOST.action(a);render(true);setTimeout(()=>{busyUntil=0;okUntil=now+2.5;sp.sq.w+=3;bubble(OK2[a]||'عملیات با موفقیت انجام شد ✓');live();sense();render(true)},1100)}
 async function fixAll(){if(run)return;const L=issues(),qs=[...new Set(L.map(i=>i.act).filter(a=>QA.includes(a)))];for(const a of qs){quick(a);await sleep(1900)}if(L.some(i=>i.act=='run'))runProcess()}
 /* pictures drawn on the character's screen for each problem (steady, no flashing) */

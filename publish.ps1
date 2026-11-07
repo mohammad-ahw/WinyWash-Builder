@@ -122,6 +122,13 @@ if (-not $Symbols) {
         Remove-Item -Force
 }
 
+# حذف createdump.exe جهت رفع حساسیت های بی مورد آنتی ویروس و کاهش حجم
+$dumpExe = Join-Path $engineDir 'createdump.exe'
+if (Test-Path -LiteralPath $dumpExe) {
+    Write-Host "==> حذف createdump.exe ..." -ForegroundColor DarkGray
+    Remove-Item -LiteralPath $dumpExe -Force -ErrorAction SilentlyContinue
+}
+
 # ---------------------------------------------------------------------------
 # کامپایل لانچر رسمی ریشه WinyWash.exe
 # ---------------------------------------------------------------------------
@@ -143,11 +150,11 @@ if ($LASTEXITCODE -ne 0) {
 $assetsDir = Join-Path $winyWashDir 'assets'
 $screenshotsDir = Join-Path $assetsDir 'screenshots'
 if (-not (Test-Path $screenshotsDir)) { New-Item -ItemType Directory -Force -Path $screenshotsDir | Out-Null }
-Copy-Item (Join-Path $root 'src\CleanC.UI\Assetspp.ico') (Join-Path $assetsDir 'winywash.ico') -Force -ErrorAction SilentlyContinue
-Copy-Item (Join-Path $root 'src\CleanC.UI\Assetspp-icon.png') (Join-Path $assetsDir 'app-icon.png') -Force -ErrorAction SilentlyContinue
-Copy-Item (Join-Path $root 'assets\logo.png') (Join-Path $assetsDir 'logo.png') -Force -ErrorAction SilentlyContinue
-Copy-Item (Join-Path $root 'assets\screenshotscrylic-dark.png') (Join-Path $screenshotsDir 'acrylic-dark.png') -Force -ErrorAction SilentlyContinue
-Copy-Item (Join-Path $root 'assets\screenshotscrylic-light.png') (Join-Path $screenshotsDir 'acrylic-light.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'src/CleanC.UI/Assets/app.ico') (Join-Path $assetsDir 'winywash.ico') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'src/CleanC.UI/Assets/app-icon.png') (Join-Path $assetsDir 'app-icon.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'assets/logo.png') (Join-Path $assetsDir 'logo.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'assets/screenshots/acrylic-dark.png') (Join-Path $screenshotsDir 'acrylic-dark.png') -Force -ErrorAction SilentlyContinue
+Copy-Item (Join-Path $root 'assets/screenshots/acrylic-light.png') (Join-Path $screenshotsDir 'acrylic-light.png') -Force -ErrorAction SilentlyContinue
 
 # ---------------------------------------------------------------------------
 # گزارش حجم نهایی
@@ -166,8 +173,29 @@ Write-Host ("    اجرا    : {0}" -f ($launcherExe)) -ForegroundColor Green
 $zipPath = Join-Path $root "WinyWash-Release-win-x64.zip"
 Write-Host "==> فشرده سازی خروجی به $zipPath ..." -ForegroundColor Cyan
 if (Test-Path -LiteralPath $zipPath) { Remove-Item -LiteralPath $zipPath -Force }
-Compress-Archive -Path "$winyWashDir\*" -DestinationPath $zipPath -Force
+$zipPy = Join-Path $root 'scratch_zip.py'
+$pyCode = @"
+import os, zipfile
+base_dir = r'$winyWashDir'
+zip_file = r'$zipPath'
+with zipfile.ZipFile(zip_file, 'w', zipfile.ZIP_DEFLATED) as z:
+    for foldername, subfolders, filenames in os.walk(base_dir):
+        if '.git' in subfolders: subfolders.remove('.git')
+        for filename in filenames:
+            file_path = os.path.join(foldername, filename)
+            arcname = os.path.relpath(file_path, base_dir).replace('\\', '/')
+            z.write(file_path, arcname)
+"@
+[System.IO.File]::WriteAllText($zipPy, $pyCode, [System.Text.Encoding]::UTF8)
+& python $zipPy
+Remove-Item -LiteralPath $zipPy -Force -ErrorAction SilentlyContinue
 $zipSizeMb = (Get-Item -LiteralPath $zipPath).Length / 1MB
 $zipSizeMbStr = $zipSizeMb.ToString("0.0", [System.Globalization.CultureInfo]::InvariantCulture)
 Write-Host "==> آرشیو نهایی ایجاد شد: $zipPath ($zipSizeMbStr MB)" -ForegroundColor Green
+
+# ایجاد فایل چکسام SHA256
+$hash = (Get-FileHash -Path $zipPath -Algorithm SHA256).Hash
+$hashPath = Join-Path $root "WinyWash-Release-win-x64.zip.sha256"
+Set-Content -Path $hashPath -Value "$hash *WinyWash-Release-win-x64.zip" -Encoding ASCII
+Write-Host "==> SHA256: $hash" -ForegroundColor Yellow
 

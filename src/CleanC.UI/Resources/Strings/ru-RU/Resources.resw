@@ -1497,4 +1497,22 @@
   <data name="NewsCategorySports" xml:space="preserve">
     <value>Спорт</value>
   </data>
+  <data name="  ظرفیت کل: {0}" xml:space="preserve">
+    <value>  Общая емкость: {0}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>  Тип памяти: {0}</value>
+  </data>
+  <data name="{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)" xml:space="preserve">
+    <value>{0} папок перемещено в корзину (место освободится после ее очистки)</value>
+  </data>
+  <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
+    <value>Официальное описание от Microsoft не опубликовано</value>
+  </data>
+  <data name="جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}" xml:space="preserve">
+    <value>Не удалось удалить неисправное устройство '{0}': {1}</value>
+  </data>
+  <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
+    <value>Идентификатор оборудования для '{0}' недоступен — отменено во избежание ошибочного удаления.</value>
+  </data>
 </root>

@@ -673,7 +673,7 @@ namespace CleanC.Core.Services
                         foreach (var name in key.GetValueNames())
                         {
                             var val = key.GetValue(name)?.ToString();
-                            if (!string.IsNullOrEmpty(val) && (KnownDeadExtensionIds.Contains(val) || int.TryParse(name, out _)))
+                            if (!string.IsNullOrEmpty(val) && KnownDeadExtensionIds.Contains(val))
                             {
                                 namesToDelete.Add(name);
                             }

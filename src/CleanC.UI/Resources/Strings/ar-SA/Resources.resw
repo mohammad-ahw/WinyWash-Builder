@@ -1497,4 +1497,22 @@
   <data name="NewsCategorySports" xml:space="preserve">
     <value>رياضة</value>
   </data>
+  <data name="  ظرفیت کل: {0}" xml:space="preserve">
+    <value>  السعة الإجمالية: {0}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>  نوع الذاكرة: {0}</value>
+  </data>
+  <data name="{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)" xml:space="preserve">
+    <value>تم نقل {0} مجلد إلى سلة المحذوفات (سيتم تحرير المساحة عند تفريغ السلة)</value>
+  </data>
+  <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
+    <value>لم تصدر مايكروسوفت أي وصف رسمي</value>
+  </data>
+  <data name="جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}" xml:space="preserve">
+    <value>فشلت إزالة الجهاز المعيب '{0}': {1}</value>
+  </data>
+  <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
+    <value>معرف الجهاز لـ '{0}' غير متوفر — تم الإلغاء لتجنب الإزالة غير الصحيحة.</value>
+  </data>
 </root>

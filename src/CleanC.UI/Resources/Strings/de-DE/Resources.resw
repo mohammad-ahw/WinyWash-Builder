@@ -1497,4 +1497,22 @@ Zum Herunterladen und Installieren gehen Sie zum Abschnitt 'Windows Update'.</va
   <data name="NewsCategorySports" xml:space="preserve">
     <value>Sport</value>
   </data>
+  <data name="  ظرفیت کل: {0}" xml:space="preserve">
+    <value>  Gesamtkapazität: {0}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>  Speichertyp: {0}</value>
+  </data>
+  <data name="{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)" xml:space="preserve">
+    <value>{0} Ordner in den Papierkorb verschoben (Speicherplatz wird beim Leeren freigegeben)</value>
+  </data>
+  <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
+    <value>Keine offizielle Beschreibung von Microsoft veröffentlicht</value>
+  </data>
+  <data name="جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}" xml:space="preserve">
+    <value>Entfernen des fehlerhaften Geräts '{0}' fehlgeschlagen: {1}</value>
+  </data>
+  <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
+    <value>Hardware-ID für Gerät '{0}' nicht verfügbar — abgebrochen, um fehlerhafte Entfernung zu verhindern.</value>
+  </data>
 </root>

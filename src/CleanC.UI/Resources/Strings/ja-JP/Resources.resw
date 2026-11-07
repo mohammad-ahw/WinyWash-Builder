@@ -1497,4 +1497,22 @@
   <data name="NewsCategorySports" xml:space="preserve">
     <value>スポーツ</value>
   </data>
+  <data name="  ظرفیت کل: {0}" xml:space="preserve">
+    <value>  総容量: {0}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>  メモリの種類: {0}</value>
+  </data>
+  <data name="{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)" xml:space="preserve">
+    <value>{0} 個のフォルダーをごみ箱に移動しました（ごみ箱を空にすると空き容量が増えます）</value>
+  </data>
+  <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
+    <value>Microsoft からの公式な説明は公開されていません</value>
+  </data>
+  <data name="جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}" xml:space="preserve">
+    <value>問題のあるデバイス '{0}' の削除に失敗しました: {1}</value>
+  </data>
+  <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
+    <value>デバイス '{0}' のハードウェア ID が見つかりません — 誤った削除を防ぐためキャンセルされました。</value>
+  </data>
 </root>

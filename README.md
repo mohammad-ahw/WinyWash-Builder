@@ -209,3 +209,22 @@ dotnet build WinyWash.sln -c Release
 Copyright © 2026 **[Mohammad (mohammad-ahw)](https://github.com/mohammad-ahw)**. All Rights Reserved.
 
 </div>
+
+
+---
+
+## 🔒 Privacy & Network Transparency
+
+WinyWash values your privacy above all else. **The application contains zero telemetry, zero analytics tracking, and zero personal data collection.**
+
+For complete transparency, here is the full list of external network endpoints used exclusively for optional, user-facing features:
+
+| Endpoint / Domain | Purpose | Data Transmitted |
+| :--- | :--- | :--- |
+| `open-meteo.com` | Fetches local temperature and weather condition codes for the desk companion | Latitude & longitude coordinates only (no personal data) |
+| `ipwho.is` / `ipapi.co` | Automatic city detection (only used if you don't specify a city manually) | IP address strictly for city name lookup |
+| News RSS Feeds (`theverge.com`, `techcrunch.com`, `wired.com`, `arstechnica.com`, `yahoo.com`, `akharinkhabar.ir`, `digiato.com`, `zoomit.ir`) | Retrieves public headlines and reader mode articles | None (standard anonymous HTTP GET) |
+| `speed.cloudflare.com` / `cachefly` | Measures network download latency and bandwidth (only when you explicitly click "Run Speed Test") | Anonymous byte download for throughput calculation |
+
+> [!IMPORTANT]
+> All core cleaning, system scanning, RAM optimization, startup management, and registry checks run **100% locally and offline** on your machine.

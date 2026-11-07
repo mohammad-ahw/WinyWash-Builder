@@ -1500,4 +1500,22 @@
   <data name="NewsCategorySports" xml:space="preserve">
     <value>스포츠</value>
   </data>
+  <data name="  ظرفیت کل: {0}" xml:space="preserve">
+    <value>  총 용량: {0}</value>
+  </data>
+  <data name="  نوع حافظه: {0}" xml:space="preserve">
+    <value>  메모리 유형: {0}</value>
+  </data>
+  <data name="{0} پوشه به سطل بازیافت منتقل شد (با خالی کردن سطل فضا آزاد می شود)" xml:space="preserve">
+    <value>{0}개 폴더가 휴지통으로 이동되었습니다 (휴지통을 비우면 공간이 확보됩니다)</value>
+  </data>
+  <data name="توضیح رسمی از مایکروسافت منتشر نشده است" xml:space="preserve">
+    <value>Microsoft의 공식 설명이 제공되지 않았습니다</value>
+  </data>
+  <data name="جداسازی دستگاه معیوب '{0}' ناموفق بود: {1}" xml:space="preserve">
+    <value>결함이 있는 장치 '{0}' 제거 실패: {1}</value>
+  </data>
+  <data name="شناسه ی سخت افزاری دستگاه '{0}' در دسترس نیست — لغو برای جلوگیری از حذف اشتباه." xml:space="preserve">
+    <value>장치 '{0}'의 하드웨어 ID를 사용할 수 없음 — 잘못된 제거를 방지하기 위해 취소되었습니다.</value>
+  </data>
 </root>
