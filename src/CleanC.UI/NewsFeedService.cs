@@ -249,34 +249,53 @@ namespace CleanC.UI
                 await Task.WhenAll(viewTask, commentTask, digiatoTask, zoomitTask, techTask, sportTask).ConfigureAwait(false);
 
                 var viewItems = await viewTask.ConfigureAwait(false);
-                var commentItem = await commentTask.ConfigureAwait(false);
-                var digiatoItem = await digiatoTask.ConfigureAwait(false);
-                var zoomitItem = await zoomitTask.ConfigureAwait(false);
+                var commentItems = await commentTask.ConfigureAwait(false);
+                var digiatoItems = await digiatoTask.ConfigureAwait(false);
+                var zoomitItems = await zoomitTask.ConfigureAwait(false);
                 var techItems = await techTask.ConfigureAwait(false);
-                var sportItem = await sportTask.ConfigureAwait(false);
+                var sportItems = await sportTask.ConfigureAwait(false);
 
-                // ۱. اولویت اول: ۳ خبر از https://akharinkhabar.ir/?type=view
-                list.AddRange(viewItems.Take(3));
+                var addedUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                void TryAdd(NewsItem? item)
+                {
+                    if (item != null && !string.IsNullOrWhiteSpace(item.Url) && addedUrls.Add(item.Url))
+                    {
+                        list.Add(item);
+                    }
+                }
+
+                // ۱. اولویت اول: ۳ خبر از https://akharinkhabar.ir/?type=view (پربازدیدترین‌ها)
+                foreach (var it in viewItems.Take(3))
+                    TryAdd(it);
 
                 // ۲. اولویت دوم: ۱ خبر از https://akharinkhabar.ir/?type=comment (پربحث‌ترین روز)
-                if (commentItem != null)
-                    list.Add(commentItem);
+                TryAdd(commentItems.FirstOrDefault(c => !addedUrls.Contains(c.Url)));
 
                 // ۳. اولویت سوم: خبر داغ دیجیاتو
-                if (digiatoItem != null)
-                    list.Add(digiatoItem);
+                TryAdd(digiatoItems.FirstOrDefault());
 
                 // ۴. اولویت چهارم: هیرو مقاله هوش مصنوعی زومیت
-                if (zoomitItem != null)
-                    list.Add(zoomitItem);
+                TryAdd(zoomitItems.FirstOrDefault());
 
-                // ۵. اولویت پنجم: ۱ خبر از https://akharinkhabar.ir/tech
-                if (techItems.Count > 0)
-                    list.Add(techItems[0]);
+                // ۵. اولویت پنجم: ۱ خبر از https://akharinkhabar.ir/tech (فناوری و هوش مصنوعی)
+                TryAdd(techItems.FirstOrDefault(t => !addedUrls.Contains(t.Url)));
 
-                // ۶. اولویت ششم (خبر آخر): هیرو کارت از https://akharinkhabar.ir/sport
-                if (sportItem != null)
-                    list.Add(sportItem);
+                // ۶. اولویت ششم: هیرو کارت ورزشی از https://akharinkhabar.ir/sport
+                TryAdd(sportItems.FirstOrDefault());
+
+                // پشتیبان و پر کردن خودکار در صورت قطعی هر کدام از منابع تا سقف ۷ خبر
+                var pool = new[] { viewItems, commentItems, digiatoItems, zoomitItems, techItems, sportItems };
+                for (int round = 1; list.Count < 6 && round < 6; round++)
+                {
+                    foreach (var feed in pool)
+                    {
+                        if (feed.Count > round)
+                        {
+                            TryAdd(feed[round]);
+                            if (list.Count >= 7) break;
+                        }
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -290,7 +309,7 @@ namespace CleanC.UI
             try
             {
                 var viewHtml = await _httpClient.GetStringAsync("https://akharinkhabar.ir/?type=view", ct).ConfigureAwait(false);
-                return ParseViewNews(viewHtml);
+                return ParseAkharinKhabarLinks(viewHtml, "اخبار برگزیده");
             }
             catch (Exception ex)
             {
@@ -299,25 +318,21 @@ namespace CleanC.UI
             }
         }
 
-        private static async Task<NewsItem?> FetchCommentNewsAsync(CancellationToken ct)
+        private static async Task<List<NewsItem>> FetchCommentNewsAsync(CancellationToken ct)
         {
             try
             {
                 var commentHtml = await _httpClient.GetStringAsync("https://akharinkhabar.ir/?type=comment", ct).ConfigureAwait(false);
-                var items = ParseViewNews(commentHtml);
-                if (items.Count > 0)
-                {
-                    return items[0] with { Category = "پربحث‌ترین روز", Source = "آخرین خبر" };
-                }
+                return ParseAkharinKhabarLinks(commentHtml, "پربحث‌ترین روز");
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "NewsFeedService.FetchComment");
+                return new List<NewsItem>();
             }
-            return null;
         }
 
-        private static async Task<NewsItem?> FetchDigiatoHotNewsAsync(CancellationToken ct)
+        private static async Task<List<NewsItem>> FetchDigiatoHotNewsAsync(CancellationToken ct)
         {
             try
             {
@@ -327,22 +342,22 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "NewsFeedService.FetchDigiatoHotNews");
+                return new List<NewsItem>();
             }
-            return null;
         }
 
-        private static async Task<NewsItem?> FetchZoomitAiNewsAsync(CancellationToken ct)
+        private static async Task<List<NewsItem>> FetchZoomitAiNewsAsync(CancellationToken ct)
         {
             try
             {
                 var zoomitHtml = await _httpClient.GetStringAsync("https://www.zoomit.ir/ai-articles/", ct).ConfigureAwait(false);
-                return ParseZoomitAiHero(zoomitHtml);
+                return ParseZoomitAiNews(zoomitHtml);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "NewsFeedService.FetchZoomitAiNews");
+                return new List<NewsItem>();
             }
-            return null;
         }
 
         private static async Task<List<NewsItem>> FetchTechNewsAsync(CancellationToken ct)
@@ -350,7 +365,7 @@ namespace CleanC.UI
             try
             {
                 var techHtml = await _httpClient.GetStringAsync("https://akharinkhabar.ir/tech", ct).ConfigureAwait(false);
-                return ParseTechNews(techHtml);
+                return ParseAkharinKhabarLinks(techHtml, "فناوری و هوش مصنوعی", "/tech/");
             }
             catch (Exception ex)
             {
@@ -359,7 +374,7 @@ namespace CleanC.UI
             }
         }
 
-        private static async Task<NewsItem?> FetchSportHeroNewsAsync(CancellationToken ct)
+        private static async Task<List<NewsItem>> FetchSportHeroNewsAsync(CancellationToken ct)
         {
             try
             {
@@ -369,164 +384,182 @@ namespace CleanC.UI
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "NewsFeedService.FetchSportHeroNews");
+                return new List<NewsItem>();
             }
-            return null;
         }
 
-        private static List<NewsItem> ParseViewNews(string html)
+        internal static List<NewsItem> ParseAkharinKhabarLinks(string html, string category, string pathFilter = "")
         {
             var items = new List<NewsItem>();
             if (string.IsNullOrEmpty(html)) return items;
 
             try
             {
-                var matches = Regex.Matches(html, @"<a\s+[^>]*href=""([^""]+)""[^>]*>\s*<h2[^>]*>([^<]+)</h2>");
+                var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                // ۱. تطابق لینک‌های استاندارد جدید آخرین خبر با الگوی /category/id/slug
+                var matches = Regex.Matches(html, @"<a\s+[^>]*href=""(/[^""]+/\d+/[^""]*)""[^>]*>([\s\S]*?)</a>");
                 foreach (Match match in matches)
                 {
                     if (match.Groups.Count >= 3)
                     {
                         string href = match.Groups[1].Value.Trim();
-                        string title = CleanTitle(match.Groups[2].Value);
+                        if (!string.IsNullOrEmpty(pathFilter) && !href.Contains(pathFilter, StringComparison.OrdinalIgnoreCase))
+                            continue;
 
-                        if (!string.IsNullOrWhiteSpace(title) && !title.Contains("آخرین خبر") && title.Length > 8)
+                        string rawInner = match.Groups[2].Value;
+                        string title = ExtractCleanNewsText(rawInner);
+
+                        if (IsValidPersianTitle(title))
                         {
                             if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
                                 href = "https://akharinkhabar.ir" + href;
 
-                            items.Add(new NewsItem(title, href, "اخبار برگزیده", "آخرین خبر"));
-                            if (items.Count >= 4) break;
+                            if (seenUrls.Add(href))
+                            {
+                                items.Add(new NewsItem(title, href, category, "آخرین خبر"));
+                                if (items.Count >= 6) break;
+                            }
+                        }
+                    }
+                }
+
+                // ۲. الگوی پشتیبان سنتی (h2 درون a)
+                if (items.Count == 0)
+                {
+                    var oldMatches = Regex.Matches(html, @"<a\s+[^>]*href=""([^""]+)""[^>]*>\s*<h2[^>]*>([^<]+)</h2>");
+                    foreach (Match m in oldMatches)
+                    {
+                        string href = m.Groups[1].Value.Trim();
+                        if (!string.IsNullOrEmpty(pathFilter) && !href.Contains(pathFilter, StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        string title = CleanTitle(m.Groups[2].Value);
+                        if (IsValidPersianTitle(title))
+                        {
+                            if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                href = "https://akharinkhabar.ir" + href;
+
+                            if (seenUrls.Add(href))
+                            {
+                                items.Add(new NewsItem(title, href, category, "آخرین خبر"));
+                                if (items.Count >= 6) break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "NewsFeedService.ParseAkharinKhabarLinks");
+            }
+
+            return items;
+        }
+
+        internal static List<NewsItem> ParseZoomitAiNews(string html)
+        {
+            var items = new List<NewsItem>();
+            if (string.IsNullOrEmpty(html)) return items;
+
+            try
+            {
+                var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                // ۱. تطابق لینک‌های مقالات هوش مصنوعی زومیت با ساختار روز
+                var matches = Regex.Matches(html, @"<a\s+[^>]*href=""([^""]*ai-articles/\d+-[^""]*)""[^>]*>([\s\S]*?)</a>");
+                foreach (Match match in matches)
+                {
+                    if (match.Groups.Count >= 3)
+                    {
+                        string href = match.Groups[1].Value.Trim();
+                        string rawInner = match.Groups[2].Value;
+                        string title = ExtractCleanNewsText(rawInner);
+
+                        if (IsValidPersianTitle(title))
+                        {
+                            if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                href = "https://www.zoomit.ir" + (href.StartsWith("/") ? href : "/" + href);
+
+                            if (seenUrls.Add(href))
+                            {
+                                items.Add(new NewsItem(title, href, "هوش مصنوعی", "زومیت"));
+                                if (items.Count >= 4) break;
+                            }
+                        }
+                    }
+                }
+
+                // ۲. الگوی پشتیبان زومیت با تگ عنوان
+                if (items.Count == 0)
+                {
+                    var fallbackMatches = Regex.Matches(html, @"<a\s+[^>]*href=""([^""]*ai-articles/\d+-[^""]*)""[^>]*title=""([^""]+)""");
+                    foreach (Match m in fallbackMatches)
+                    {
+                        string href = m.Groups[1].Value.Trim();
+                        string title = CleanTitle(m.Groups[2].Value);
+                        if (IsValidPersianTitle(title))
+                        {
+                            if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                href = "https://www.zoomit.ir" + (href.StartsWith("/") ? href : "/" + href);
+
+                            if (seenUrls.Add(href))
+                            {
+                                items.Add(new NewsItem(title, href, "هوش مصنوعی", "زومیت"));
+                                if (items.Count >= 4) break;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "NewsFeedService.ParseZoomitAiNews");
+            }
+
+            return items;
+        }
+
+        internal static List<NewsItem> ParseDigiatoHotNews(string html)
+        {
+            var items = new List<NewsItem>();
+            if (string.IsNullOrEmpty(html)) return items;
+
+            try
+            {
+                int footerIdx = html.IndexOf("id=\"homeCardsFooter\"", StringComparison.OrdinalIgnoreCase);
+                string searchArea = footerIdx >= 0 ? html.Substring(footerIdx, Math.Min(6000, html.Length - footerIdx)) : html;
+                var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+                var matches = Regex.Matches(searchArea, @"<a\s+[^>]*href=""([^""]+)""\s+class=""miniCard__title"">\s*([^<]+)\s*</a>");
+                foreach (Match m in matches)
+                {
+                    string url = m.Groups[1].Value.Trim();
+                    string title = CleanTitle(m.Groups[2].Value);
+                    if (IsValidPersianTitle(title) && !string.IsNullOrWhiteSpace(url))
+                    {
+                        if (seenUrls.Add(url))
+                        {
+                            items.Add(new NewsItem(title, url, "داغ‌ترین‌های روز", "دیجیاتو"));
+                            if (items.Count >= 3) break;
                         }
                     }
                 }
 
                 if (items.Count == 0)
                 {
-                    var fallbackMatches = Regex.Matches(html, @"<a\s+[^>]*href=""(/[^""]+)""[^>]*class=""[^""]*title[^""]*""[^>]*>([^<]+)</a>");
-                    foreach (Match m in fallbackMatches)
+                    var matches2 = Regex.Matches(searchArea, @"<a\s+[^>]*href=""([^""]+)""\s+class=""miniCard__picture""\s+aria-label=""([^""]+)""");
+                    foreach (Match m in matches2)
                     {
-                        string href = "https://akharinkhabar.ir" + m.Groups[1].Value.Trim();
+                        string url = m.Groups[1].Value.Trim();
                         string title = CleanTitle(m.Groups[2].Value);
-                        if (!string.IsNullOrWhiteSpace(title) && title.Length > 8)
+                        if (IsValidPersianTitle(title) && !string.IsNullOrWhiteSpace(url))
                         {
-                            items.Add(new NewsItem(title, href, "اخبار برگزیده", "آخرین خبر"));
-                            if (items.Count >= 4) break;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                CcLog.Ignore(ex, "NewsFeedService.ParseViewNews");
-            }
-
-            return items;
-        }
-
-        private static List<NewsItem> ParseTechNews(string html)
-        {
-            var items = new List<NewsItem>();
-            if (string.IsNullOrEmpty(html)) return items;
-
-            try
-            {
-                var matches = Regex.Matches(html, @"<a\s+[^>]*href=""([^""]+)""[^>]*>\s*<h2[^>]*>([^<]+)</h2>");
-                foreach (Match match in matches)
-                {
-                    if (match.Groups.Count >= 3)
-                    {
-                        string href = match.Groups[1].Value.Trim();
-                        string title = CleanTitle(match.Groups[2].Value);
-
-                        if (!string.IsNullOrWhiteSpace(title) && !title.Contains("آخرین خبر") && title.Length > 8)
-                        {
-                            if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                                href = "https://akharinkhabar.ir" + href;
-
-                            items.Add(new NewsItem(title, href, "فناوری و هوش مصنوعی", "آخرین خبر"));
-                            if (items.Count >= 3) break;
-                        }
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                CcLog.Ignore(ex, "NewsFeedService.ParseTechNews");
-            }
-
-            return items;
-        }
-
-        private static NewsItem? ParseZoomitAiHero(string html)
-        {
-            if (string.IsNullOrEmpty(html)) return null;
-
-            try
-            {
-                var match = Regex.Match(html, @"<a\s+[^>]*href=""(/ai-articles/\d+-[^""]+)""[^>]*>\s*<span\s+class=""typography__Root[^""]*"">([^<]+)</span>");
-                if (match.Success)
-                {
-                    string href = "https://www.zoomit.ir" + match.Groups[1].Value.Trim();
-                    string title = CleanTitle(match.Groups[2].Value);
-                    if (!string.IsNullOrWhiteSpace(title))
-                    {
-                        return new NewsItem(title, href, "هوش مصنوعی", "زومیت");
-                    }
-                }
-
-                var fallbackMatch = Regex.Match(html, @"<a\s+[^>]*href=""(https://www\.zoomit\.ir/ai-articles/\d+-[^""]+)""[^>]*title=""([^""]+)""");
-                if (fallbackMatch.Success)
-                {
-                    string href = fallbackMatch.Groups[1].Value.Trim();
-                    string title = CleanTitle(fallbackMatch.Groups[2].Value);
-                    if (!string.IsNullOrWhiteSpace(title))
-                    {
-                        return new NewsItem(title, href, "هوش مصنوعی", "زومیت");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                CcLog.Ignore(ex, "NewsFeedService.ParseZoomitAiHero");
-            }
-
-            return null;
-        }
-
-        private static NewsItem? ParseDigiatoHotNews(string html)
-        {
-            if (string.IsNullOrEmpty(html)) return null;
-
-            try
-            {
-                int footerIdx = html.IndexOf("id=\"homeCardsFooter\"", StringComparison.OrdinalIgnoreCase);
-                string searchArea = footerIdx >= 0 ? html.Substring(footerIdx, Math.Min(4000, html.Length - footerIdx)) : html;
-
-                var match = Regex.Match(searchArea, @"<a\s+[^>]*href=""([^""]+)""\s+class=""miniCard__title"">\s*([^<]+)\s*</a>");
-                if (!match.Success)
-                {
-                    match = Regex.Match(searchArea, @"<a\s+[^>]*href=""([^""]+)""\s+class=""miniCard__picture""\s+aria-label=""([^""]+)""");
-                }
-
-                if (match.Success)
-                {
-                    string url = match.Groups[1].Value.Trim();
-                    string title = CleanTitle(match.Groups[2].Value);
-                    if (!string.IsNullOrWhiteSpace(title) && !string.IsNullOrWhiteSpace(url))
-                    {
-                        return new NewsItem(title, url, "داغ‌ترین‌های روز", "دیجیاتو");
-                    }
-                }
-
-                if (footerIdx >= 0)
-                {
-                    var fallbackMatch = Regex.Match(searchArea, @"href=""(https://digiato\.com/[^""]+)""[^>]*class=""[^""]*title[^""]*"">\s*([^<]{10,120})\s*</a>");
-                    if (fallbackMatch.Success)
-                    {
-                        string url = fallbackMatch.Groups[1].Value.Trim();
-                        string title = CleanTitle(fallbackMatch.Groups[2].Value);
-                        if (!string.IsNullOrWhiteSpace(title))
-                        {
-                            return new NewsItem(title, url, "داغ‌ترین‌های روز", "دیجیاتو");
+                            if (seenUrls.Add(url))
+                            {
+                                items.Add(new NewsItem(title, url, "داغ‌ترین‌های روز", "دیجیاتو"));
+                                if (items.Count >= 3) break;
+                            }
                         }
                     }
                 }
@@ -536,40 +569,55 @@ namespace CleanC.UI
                 CcLog.Ignore(ex, "NewsFeedService.ParseDigiatoHotNews");
             }
 
-            return null;
+            return items;
         }
 
-        private static NewsItem? ParseSportHeroNews(string html)
+        internal static List<NewsItem> ParseSportHeroNews(string html)
         {
-            if (string.IsNullOrEmpty(html)) return null;
+            var items = new List<NewsItem>();
+            if (string.IsNullOrEmpty(html)) return items;
 
             try
             {
-                var match = Regex.Match(html, @"class=""[^""]*main-module[^""]*__title""[^>]*>\s*<a\s+href=""([^""]+)""[^>]*>([^<]+)</a>");
-                if (match.Success)
-                {
-                    string href = match.Groups[1].Value.Trim();
-                    string title = CleanTitle(match.Groups[2].Value);
-                    if (!string.IsNullOrWhiteSpace(title))
-                    {
-                        if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                            href = "https://akharinkhabar.ir" + href;
+                var seenUrls = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                        return new NewsItem(title, href, "هیرو ورزشی", "آخرین خبر");
+                var matches = Regex.Matches(html, @"<a\s+[^>]*href=""(/sport/\d+/[^""]*)""[^>]*>([\s\S]*?)</a>");
+                foreach (Match match in matches)
+                {
+                    if (match.Groups.Count >= 3)
+                    {
+                        string href = match.Groups[1].Value.Trim();
+                        string rawInner = match.Groups[2].Value;
+                        string title = ExtractCleanNewsText(rawInner);
+
+                        if (IsValidPersianTitle(title))
+                        {
+                            if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                href = "https://akharinkhabar.ir" + href;
+
+                            if (seenUrls.Add(href))
+                            {
+                                items.Add(new NewsItem(title, href, "هیرو ورزشی", "آخرین خبر"));
+                                if (items.Count >= 3) break;
+                            }
+                        }
                     }
                 }
 
-                var fallbackMatch = Regex.Match(html, @"<div\s+class=""[^""]*title[^""]*"">\s*<a\s+href=""(/sport/\d+/[^""]+)""[^>]*>([^<]+)</a>");
-                if (fallbackMatch.Success)
+                if (items.Count == 0)
                 {
-                    string href = fallbackMatch.Groups[1].Value.Trim();
-                    string title = CleanTitle(fallbackMatch.Groups[2].Value);
-                    if (!string.IsNullOrWhiteSpace(title))
+                    var match = Regex.Match(html, @"class=""[^""]*main-module[^""]*__title""[^>]*>\s*<a\s+href=""([^""]+)""[^>]*>([^<]+)</a>");
+                    if (match.Success)
                     {
-                        if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
-                            href = "https://akharinkhabar.ir" + href;
+                        string href = match.Groups[1].Value.Trim();
+                        string title = CleanTitle(match.Groups[2].Value);
+                        if (IsValidPersianTitle(title))
+                        {
+                            if (!href.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                href = "https://akharinkhabar.ir" + href;
 
-                        return new NewsItem(title, href, "هیرو ورزشی", "آخرین خبر");
+                            items.Add(new NewsItem(title, href, "هیرو ورزشی", "آخرین خبر"));
+                        }
                     }
                 }
             }
@@ -578,14 +626,56 @@ namespace CleanC.UI
                 CcLog.Ignore(ex, "NewsFeedService.ParseSportHeroNews");
             }
 
-            return null;
+            return items;
+        }
+
+        private static string ExtractCleanNewsText(string innerHtml)
+        {
+            if (string.IsNullOrWhiteSpace(innerHtml)) return string.Empty;
+
+            // ۱. جستجو در کلاس‌های مشخص عنوان
+            var mTitle = Regex.Match(innerHtml, @"class=""[^""]*title[^""]*""[^>]*>([^<]+)<", RegexOptions.IgnoreCase);
+            if (mTitle.Success && mTitle.Groups[1].Value.Trim().Length > 8)
+            {
+                return CleanTitle(mTitle.Groups[1].Value);
+            }
+
+            // ۲. تگ‌های سرتیتر h1-h5
+            var mH = Regex.Match(innerHtml, @"<h[1-5][^>]*>([^<]+)</h[1-5]>", RegexOptions.IgnoreCase);
+            if (mH.Success && mH.Groups[1].Value.Trim().Length > 8)
+            {
+                return CleanTitle(mH.Groups[1].Value);
+            }
+
+            // ۳. متن جایگزین تصویر (Alt)
+            var mAlt = Regex.Match(innerHtml, @"<img[^>]+alt=""([^""]+)""", RegexOptions.IgnoreCase);
+            if (mAlt.Success && mAlt.Groups[1].Value.Trim().Length > 8)
+            {
+                return CleanTitle(mAlt.Groups[1].Value);
+            }
+
+            // ۴. پاکسازی کامل تگ‌های HTML، کامنت‌ها و علامت‌های نگارشی تکراری
+            string stripped = Regex.Replace(innerHtml, @"<!--.*?-->", string.Empty);
+            stripped = Regex.Replace(stripped, @"<[^>]+>", " ");
+            stripped = stripped.Replace("•", " ");
+            return CleanTitle(stripped);
+        }
+
+        private static bool IsValidPersianTitle(string title)
+        {
+            if (string.IsNullOrWhiteSpace(title)) return false;
+            if (title.Length < 10) return false;
+            if (title.StartsWith("مشاهده", StringComparison.OrdinalIgnoreCase)) return false;
+            if (title.Equals("آخرین خبر", StringComparison.OrdinalIgnoreCase)) return false;
+            return true;
         }
 
         private static string CleanTitle(string raw)
         {
             if (string.IsNullOrWhiteSpace(raw)) return string.Empty;
             string decoded = WebUtility.HtmlDecode(raw).Trim();
-            return Regex.Replace(decoded, @"\s+", " ");
+            decoded = decoded.Replace("•", " ");
+            return Regex.Replace(decoded, @"\s+", " ").Trim();
         }
     }
 }
