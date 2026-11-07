@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -106,6 +107,33 @@ namespace CleanC.Core.Services
 
     public static class SafeDeleteService
     {
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct SHFILEOPSTRUCT
+        {
+            public IntPtr hwnd;
+            public uint wFunc;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string pFrom;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string pTo;
+            public ushort fFlags;
+            [MarshalAs(UnmanagedType.Bool)]
+            public bool fAnyOperationsAborted;
+            public IntPtr hNameMappings;
+            [MarshalAs(UnmanagedType.LPWStr)]
+            public string lpszProgressTitle;
+        }
+
+        private const uint FO_DELETE = 0x0003;
+        private const ushort FOF_SILENT = 0x0004;
+        private const ushort FOF_NOCONFIRMATION = 0x0010;
+        private const ushort FOF_ALLOWUNDO = 0x0040;
+        private const ushort FOF_NOERRORUI = 0x0400;
+        private const ushort FOF_WANTNUKEWARNING = 0x4000;
+
+        [DllImport("shell32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+        private static extern int SHFileOperation(ref SHFILEOPSTRUCT lpFileOp);
+
         private static readonly object Sync = new();
         private static readonly JsonSerializerOptions JsonOptions = new() { WriteIndented = true };
 
@@ -271,37 +299,50 @@ namespace CleanC.Core.Services
             try
             {
                 string full = Path.GetFullPath(path).TrimEnd('\\', '/');
-                if (full.Length <= 3 && full.Contains(':')) return true;
+                if (full.Length <= 3 && full.Contains(':')) return true; // ریشه درایوها (C:, C:\, D:\)
 
+                char sep = Path.DirectorySeparatorChar;
+
+                // محافظت از ریشه‌ها و پوشه‌های خود برنامه
                 if (!string.IsNullOrEmpty(AppPaths.LocalRoot))
                 {
                     string lr = Path.GetFullPath(AppPaths.LocalRoot).TrimEnd('\\', '/');
                     if (string.Equals(full, lr, StringComparison.OrdinalIgnoreCase) ||
-                        full.StartsWith(lr + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
+                        full.StartsWith(lr + sep, StringComparison.OrdinalIgnoreCase) ||
+                        lr.StartsWith(full + sep, StringComparison.OrdinalIgnoreCase)) return true;
                 }
                 if (!string.IsNullOrEmpty(AppPaths.CommonRoot))
                 {
                     string cr = Path.GetFullPath(AppPaths.CommonRoot).TrimEnd('\\', '/');
                     if (string.Equals(full, cr, StringComparison.OrdinalIgnoreCase) ||
-                        full.StartsWith(cr + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
+                        full.StartsWith(cr + sep, StringComparison.OrdinalIgnoreCase) ||
+                        cr.StartsWith(full + sep, StringComparison.OrdinalIgnoreCase)) return true;
                 }
                 if (!string.IsNullOrEmpty(AppContext.BaseDirectory))
                 {
                     string bd = Path.GetFullPath(AppContext.BaseDirectory).TrimEnd('\\', '/');
                     if (string.Equals(full, bd, StringComparison.OrdinalIgnoreCase) ||
-                        full.StartsWith(bd + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)) return true;
+                        full.StartsWith(bd + sep, StringComparison.OrdinalIgnoreCase) ||
+                        bd.StartsWith(full + sep, StringComparison.OrdinalIgnoreCase)) return true;
                 }
 
                 var userDir = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-                var protectedExact = new List<string>
+                var windowsDir = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+                var systemDir = Environment.SystemDirectory;
+                var progFiles = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
+                var progFilesX86 = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86);
+                var progData = Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData);
+                var usersFolder = Path.Combine(Path.GetPathRoot(userDir) ?? "C:\\", "Users");
+
+                var protectedTargets = new List<string>
                 {
-                    Environment.GetFolderPath(Environment.SpecialFolder.Windows),
-                    Environment.SystemDirectory,
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),
-                    Environment.GetFolderPath(Environment.SpecialFolder.ProgramFilesX86),
+                    windowsDir,
+                    systemDir,
+                    progFiles,
+                    progFilesX86,
+                    usersFolder,
                     userDir,
-                    Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-                    Path.Combine(Path.GetPathRoot(userDir) ?? "C:\\", "Users"),
+                    progData,
                     Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                     Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory),
                     Environment.GetFolderPath(Environment.SpecialFolder.MyPictures),
@@ -310,23 +351,33 @@ namespace CleanC.Core.Services
                     Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                     Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 };
+
                 if (!string.IsNullOrEmpty(userDir))
                 {
-                    protectedExact.Add(Path.Combine(userDir, "Downloads"));
-                    protectedExact.Add(Path.Combine(userDir, "OneDrive"));
-                    protectedExact.Add(Path.Combine(userDir, "Desktop"));
+                    protectedTargets.Add(Path.Combine(userDir, "Downloads"));
+                    protectedTargets.Add(Path.Combine(userDir, "OneDrive"));
+                    protectedTargets.Add(Path.Combine(userDir, "Desktop"));
                 }
 
-                foreach (var p in protectedExact)
+                foreach (var p in protectedTargets)
                 {
                     if (string.IsNullOrEmpty(p)) continue;
-                    if (string.Equals(full, p.TrimEnd('\\', '/'), StringComparison.OrdinalIgnoreCase))
+                    string prot = Path.GetFullPath(p).TrimEnd('\\', '/');
+
+                    // ۱. تطابق دقیق (Exact Match)
+                    if (string.Equals(full, prot, StringComparison.OrdinalIgnoreCase))
+                        return true;
+
+                    // ۲. اجداد مسیرهای محافظت‌شده (Ancestors)
+                    // اگر مسیر مورد بررسی، والد یا جد یک مسیر محافظت‌شده باشد (مثلاً انتخاب C:\Users یا C:\Windows)
+                    if (prot.StartsWith(full + sep, StringComparison.OrdinalIgnoreCase))
                         return true;
                 }
             }
             catch (Exception __ex)
             {
                 CcLog.Ignore(__ex, "SafeDeleteService.IsProtectedSystemPath");
+                return true; // در صورت بروز هرگونه استثنا، حذف به عنوان اقدام احتیاطی رد شود
             }
             return false;
         }
@@ -444,38 +495,38 @@ namespace CleanC.Core.Services
             error = string.Empty;
             try
             {
-                // بررسی درایو: سطل بازیافت روی درایوهای شبکه یا بدون ریشه وجود ندارد
-                string? root = Path.GetPathRoot(path);
-                if (!string.IsNullOrEmpty(root))
-                {
-                    try
-                    {
-                        var drive = new DriveInfo(root);
-                        if (drive.DriveType == DriveType.Network || drive.DriveType == DriveType.NoRootDirectory)
-                        {
-                            error = "Drive does not support Recycle Bin.";
-                            return false;
-                        }
-                    }
-                    catch { }
-                }
+                ClearBlockingAttributes(path, isDirectory);
 
-                // بررسی حجم فایل: اگر بیش از حد بزرگ باشد، ویندوز بی صدا آن را حذف دائمی می کند
-                long size = Measure(path, isDirectory);
-                if (size > 2L * 1024 * 1024 * 1024) // > 2 GB
+                string fullPath = Path.GetFullPath(path);
+                // SHFileOperation نیازمند بافر با انتهای دابل نال (\0\0) است
+                string doubleNullPath = fullPath + "\0\0";
+
+                var shf = new SHFILEOPSTRUCT
                 {
-                    error = "File too large for reliable Recycle Bin transfer.";
+                    hwnd = IntPtr.Zero,
+                    wFunc = FO_DELETE,
+                    pFrom = doubleNullPath,
+                    pTo = null!,
+                    // FOF_ALLOWUNDO: انتقال به سطل بازیافت
+                    // FOF_WANTNUKEWARNING: اگر فایل نتواند در سطل قرار گیرد و قرار بر حذف دائم باشد، لغو می‌شود
+                    // در ترکیب با FOF_NOCONFIRMATION و FOF_NOERRORUI، به جای حذف دائم، fAnyOperationsAborted فعال شده و فایل دست‌نخورده باقی می‌ماند
+                    fFlags = FOF_ALLOWUNDO | FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT | FOF_WANTNUKEWARNING,
+                    fAnyOperationsAborted = false,
+                    hNameMappings = IntPtr.Zero,
+                    lpszProgressTitle = null!
+                };
+
+                int ret = SHFileOperation(ref shf);
+
+                // اگر ویندوز عملیات را رد یا لغو کرد (مثلاً درایو فاقد سطل بازیافت یا حجم فراتر از ظرفیت سطل)
+                if (ret != 0 || shf.fAnyOperationsAborted)
+                {
+                    error = $"Recycle Bin transfer aborted (Code: {ret}, Aborted: {shf.fAnyOperationsAborted}). Protected fallback to Quarantine.";
                     return false;
                 }
 
-                ClearBlockingAttributes(path, isDirectory);
-
-                if (isDirectory)
-                    FileSystem.DeleteDirectory(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-                else
-                    FileSystem.DeleteFile(path, UIOption.OnlyErrorDialogs, RecycleOption.SendToRecycleBin);
-
-                return !Exists(path, isDirectory);
+                // بازیافت تنها در صورتی موفق اعلام می‌شود که واقعاً فایل از مبدأ رفته باشد
+                return !Exists(fullPath, isDirectory);
             }
             catch (Exception ex)
             {

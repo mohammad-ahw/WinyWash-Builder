@@ -1518,4 +1518,7 @@
   <data name="PathIsProtectedError" xml:space="preserve">
     <value>Этот путь защищен Windows для поддержания стабильности системы</value>
   </data>
+  <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
+    <value>Расширение требует проверки пользователем (активный инструмент или VPN)</value>
+  </data>
 </root>

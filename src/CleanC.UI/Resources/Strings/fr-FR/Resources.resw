@@ -1518,4 +1518,7 @@ Pour télécharger et installer, allez dans la section 'Windows Update'.</value>
   <data name="PathIsProtectedError" xml:space="preserve">
     <value>Ce chemin est protégé par Windows pour maintenir la stabilité du système</value>
   </data>
+  <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
+    <value>L'extension nécessite un examen par l'utilisateur (outil actif ou VPN)</value>
+  </data>
 </root>

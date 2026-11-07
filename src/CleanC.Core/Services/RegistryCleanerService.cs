@@ -180,7 +180,124 @@ namespace CleanC.Core.Services
             return dead;
         }
 
-        private static void BackupUninstallKey(RegistryKey root, string parentPath, string subKeyName)
+        /// <summary>
+        /// پشتیبان‌گیری مستقیم از کلیدهای رجیستری در قالب فایل استاندارد .reg با استفاده از APIهای داخلی دات‌نت
+        /// (بدون اجرای reg.exe برای جلوگیری از حساسیت و هشدارهای غیرضروری آنتی‌ویروس‌ها).
+        /// </summary>
+        public static bool ExportKeyToRegFile(RegistryKey key, string fullKeyPath, string destinationFile)
+        {
+            try
+            {
+                string? dir = Path.GetDirectoryName(destinationFile);
+                if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+
+                using var sw = new StreamWriter(destinationFile, false, System.Text.Encoding.Unicode);
+                sw.WriteLine("Windows Registry Editor Version 5.00");
+                ExportRegistryTreeRecursive(key, fullKeyPath, sw);
+                sw.Flush();
+
+                return File.Exists(destinationFile) && new FileInfo(destinationFile).Length > 0;
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "RegistryCleaner.ExportKeyToRegFile");
+                return false;
+            }
+        }
+
+        private static void ExportRegistryTreeRecursive(RegistryKey key, string fullKeyPath, StreamWriter writer)
+        {
+            writer.WriteLine();
+            writer.WriteLine($"[{fullKeyPath}]");
+
+            foreach (var valueName in key.GetValueNames())
+            {
+                try
+                {
+                    var kind = key.GetValueKind(valueName);
+                    var val = key.GetValue(valueName, null, RegistryValueOptions.DoNotExpandEnvironmentNames);
+                    string nameFormatted = string.IsNullOrEmpty(valueName) ? "@" : $"\"{EscapeRegString(valueName)}\"";
+
+                    switch (kind)
+                    {
+                        case RegistryValueKind.String:
+                            writer.WriteLine($"{nameFormatted}=\"{EscapeRegString(val?.ToString() ?? "")}\"");
+                            break;
+
+                        case RegistryValueKind.DWord:
+                            uint dw = val is int i ? (uint)i : Convert.ToUInt32(val);
+                            writer.WriteLine($"{nameFormatted}=dword:{dw:x8}");
+                            break;
+
+                        case RegistryValueKind.QWord:
+                            ulong qw = val is long l ? (ulong)l : Convert.ToUInt64(val);
+                            byte[] qwBytes = BitConverter.GetBytes(qw);
+                            writer.WriteLine($"{nameFormatted}=hex(b):{FormatHexBytes(qwBytes)}");
+                            break;
+
+                        case RegistryValueKind.Binary:
+                            byte[] b = (byte[])(val ?? Array.Empty<byte>());
+                            writer.WriteLine($"{nameFormatted}=hex:{FormatHexBytes(b)}");
+                            break;
+
+                        case RegistryValueKind.ExpandString:
+                            byte[] expBytes = System.Text.Encoding.Unicode.GetBytes((val?.ToString() ?? "") + "\0");
+                            writer.WriteLine($"{nameFormatted}=hex(2):{FormatHexBytes(expBytes)}");
+                            break;
+
+                        case RegistryValueKind.MultiString:
+                            string[] parts = (string[])(val ?? Array.Empty<string>());
+                            var msBytes = new List<byte>();
+                            foreach (var s in parts)
+                            {
+                                msBytes.AddRange(System.Text.Encoding.Unicode.GetBytes(s + "\0"));
+                            }
+                            msBytes.AddRange(System.Text.Encoding.Unicode.GetBytes("\0"));
+                            writer.WriteLine($"{nameFormatted}=hex(7):{FormatHexBytes(msBytes.ToArray())}");
+                            break;
+
+                        default:
+                            if (val != null)
+                                writer.WriteLine($"{nameFormatted}=\"{EscapeRegString(val.ToString() ?? "")}\"");
+                            break;
+                    }
+                }
+                catch { }
+            }
+
+            foreach (var subKeyName in key.GetSubKeyNames())
+            {
+                try
+                {
+                    using var subKey = key.OpenSubKey(subKeyName, false);
+                    if (subKey != null)
+                    {
+                        ExportRegistryTreeRecursive(subKey, $@"{fullKeyPath}\{subKeyName}", writer);
+                    }
+                }
+                catch { }
+            }
+        }
+
+        private static string EscapeRegString(string s)
+        {
+            if (string.IsNullOrEmpty(s)) return "";
+            return s.Replace("\\", "\\\\").Replace("\"", "\\\"");
+        }
+
+        private static string FormatHexBytes(byte[] bytes)
+        {
+            if (bytes == null || bytes.Length == 0) return "";
+            var sb = new System.Text.StringBuilder(bytes.Length * 3);
+            for (int i = 0; i < bytes.Length; i++)
+            {
+                if (i > 0) sb.Append(',');
+                sb.Append(bytes[i].ToString("x2"));
+            }
+            return sb.ToString();
+        }
+
+        private static bool BackupUninstallKey(RegistryKey root, string parentPath, string subKeyName)
         {
             try
             {
@@ -188,24 +305,19 @@ namespace CleanC.Core.Services
                 string fullKeyPath = $@"{rootPrefix}\{parentPath}\{subKeyName}";
 
                 string backupDir = Path.Combine(AppPaths.CommonBackupsDir, "Registry");
-                Directory.CreateDirectory(backupDir);
-
                 string safeName = string.Join("_", subKeyName.Split(Path.GetInvalidFileNameChars()));
                 string fileName = $"Uninstall_{safeName}_{DateTime.UtcNow:yyyyMMdd_HHmmssfff}.reg";
                 string destFile = Path.Combine(backupDir, fileName);
 
-                var psi = new ProcessStartInfo("reg.exe", $"export \"{fullKeyPath}\" \"{destFile}\" /y")
-                {
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    WindowStyle = ProcessWindowStyle.Hidden
-                };
-                using var proc = Process.Start(psi);
-                proc?.WaitForExit(3000);
+                using var subKey = root.OpenSubKey($@"{parentPath}\{subKeyName}", false);
+                if (subKey == null) return false;
+
+                return ExportKeyToRegFile(subKey, fullKeyPath, destFile);
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "RegistryCleaner.BackupUninstallKey");
+                return false;
             }
         }
 
@@ -224,8 +336,11 @@ namespace CleanC.Core.Services
                 {
                     try
                     {
-                        // همیشه پیش از حذف دائم، از کلید رجیستری نسخه .reg پشتیبان تهیه شود
-                        BackupUninstallKey(root, path, subKey);
+                        // شرط حیاتی: اگر پشتیبان‌گیری به هر دلیل ناموفق بود، حذف آن کلید انجام نشود
+                        if (!BackupUninstallKey(root, path, subKey))
+                        {
+                            continue;
+                        }
 
                         unKey.DeleteSubKeyTree(subKey, false);
                         // تأیید حذف واقعی پیش از شمارش

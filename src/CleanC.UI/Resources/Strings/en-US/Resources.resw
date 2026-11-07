@@ -4364,4 +4364,7 @@ To download and install, go to the 'Windows Update' section.</value>
   <data name="PathIsProtectedError" xml:space="preserve">
     <value>This path is protected by Windows to maintain system stability</value>
   </data>
+  <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
+    <value>Extension requires user review (active tool or VPN)</value>
+  </data>
 </root>

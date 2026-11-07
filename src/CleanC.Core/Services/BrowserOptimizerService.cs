@@ -57,11 +57,6 @@ namespace CleanC.Core.Services
             "cconfdckijkfakepljihmbmfjpafmjij", // Highlight Links
             "jdocbkpgdakpekjlhemmfcncgdjeiika", // Absolute Enable Right Click
             "ljglajjnnkapghbckkcmodicjhacbfhk", // Power Automate (corrupted error 8192)
-            "hoklmmgfnpapgjgcpechhaamimifchmp", // Similarweb (inactive/redundant)
-            "fdcgdnkidjaadafnichfpabhfomcebme", // ZenMate
-            "nbcojefnccbanplpoffopkoepjmhgdgh", // Hoxx VPN Proxy
-            "oofgbpoabipfcfjapgnbbjjaenockbdp", // SetupVPN
-            "jajilbjjinjmgcibalaakngmkilboobh", // Astar VPN
             "haafibkemckmbknhfkiiniobjpgkebko", // Panda New Tab
             "nmmhkkegccagdldgiimedpiccmgmieda", // Chrome Web Store Payments (deprecated by Google)
             "nkeimhogjdpnpccoofpliimaahmaaome", // Google Hangouts (deprecated by Google)
@@ -72,6 +67,19 @@ namespace CleanC.Core.Services
             "gppongmhjkpfnbhagpmjfkannfbllamg", // Wappalyzer (heavy DOM observer)
             "chdafcbnfkfenoeejpaeenpdamhmalhe", // Share Extensions (bloat)
             "ghbmnnjooekpmoecnnnilnnbdlolhkhi"  // Google Docs Offline (unused)
+        };
+
+        /// <summary>
+        /// افزونه‌های فعال، ابزارهای تحلیلی یا فیلترشکن‌هایی که سالم هستند ولی ممکن است در صورت عدم نیاز با بازبینی صریح کاربر مدیریت شوند.
+        /// این افزونه‌ها هرگز در دسته‌ی SafeToClean قرار نمی‌گیرند و بدون تأیید صریح کاربر پاک نخواهند شد.
+        /// </summary>
+        public static readonly HashSet<string> ReviewExtensionIds = new(StringComparer.OrdinalIgnoreCase)
+        {
+            "hoklmmgfnpapgjgcpechhaamimifchmp", // Similarweb
+            "fdcgdnkidjaadafnichfpabhfomcebme", // ZenMate
+            "nbcojefnccbanplpoffopkoepjmhgdgh", // Hoxx VPN Proxy
+            "oofgbpoabipfcfjapgnbbjjaenockbdp", // SetupVPN
+            "jajilbjjinjmgcibalaakngmkilboobh", // Astar VPN
         };
 
         public static BrowserDetails GetDefaultBrowser()
@@ -445,6 +453,11 @@ namespace CleanC.Core.Services
             {
                 info.Category = ExtensionRiskCategory.ProtectedWhitelist;
                 info.Reason = LocalizationService.Get("افزونه کلیدی و حفاظت‌شده (دانلود منیجر، مترجم، AI RTL)");
+            }
+            else if (ReviewExtensionIds.Contains(extId))
+            {
+                info.Category = ExtensionRiskCategory.ReviewWarning;
+                info.Reason = LocalizationService.Get("افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)");
             }
             else if (KnownDeadExtensionIds.Contains(extId))
             {

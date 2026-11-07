@@ -1518,4 +1518,7 @@
   <data name="PathIsProtectedError" xml:space="preserve">
     <value>هذا المسار محمي بواسطة Windows للحفاظ على استقرار النظام</value>
   </data>
+  <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
+    <value>تتطلب الإضافة مراجعة المستخدم (أداة نشطة أو VPN)</value>
+  </data>
 </root>

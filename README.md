@@ -222,7 +222,8 @@ For complete transparency, here is the full list of external network endpoints u
 | Endpoint / Domain | Purpose | Data Transmitted |
 | :--- | :--- | :--- |
 | `open-meteo.com` | Fetches local temperature and weather condition codes for the desk companion | Latitude & longitude coordinates only (no personal data) |
-| `ipwho.is` / `ipapi.co` | Automatic city detection (only used if you don't specify a city manually) | IP address strictly for city name lookup |
+| `ipwho.is` / `ipapi.co` / `api.ipify.org` | Automatic city and country detection for companion weather (only queried if no custom city is configured) | IP address strictly for geographic location lookup |
+| `api.github.com` | Checks for official releases and updates on demand | None (standard anonymous HTTP GET) |
 | News RSS Feeds (`theverge.com`, `techcrunch.com`, `wired.com`, `arstechnica.com`, `yahoo.com`, `akharinkhabar.ir`, `digiato.com`, `zoomit.ir`) | Retrieves public headlines and reader mode articles | None (standard anonymous HTTP GET) |
 | `speed.cloudflare.com` / `cachefly` | Measures network download latency and bandwidth (only when you explicitly click "Run Speed Test") | Anonymous byte download for throughput calculation |
 

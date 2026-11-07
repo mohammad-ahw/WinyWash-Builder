@@ -299,14 +299,20 @@ namespace CleanC.Core.Services
                 {
                     if (key != null)
                     {
-                        // DiagTrack در ویندوز به صورت پیش‌فرض Automatic (2) است و dmwappushservice به صورت Manual (3)
+                        // مقادیر پیش‌فرض رسمی ویندوز: DiagTrack = 2 (Automatic)، dmwappushservice = 3 (Manual)
                         int targetStart = serviceName.Equals("dmwappushservice", StringComparison.OrdinalIgnoreCase) ? 3 : 2;
-                        var orig = key.GetValue("WinyWash_OriginalStart");
-                        if (orig != null && int.TryParse(orig.ToString(), out int parsed) && parsed is >= 1 and <= 3)
+
+                        try
                         {
-                            targetStart = parsed;
-                            try { key.DeleteValue("WinyWash_OriginalStart", false); } catch { }
+                            var orig = key.GetValue("WinyWash_OriginalStart");
+                            if (orig != null && int.TryParse(orig.ToString(), out int parsed) && parsed is >= 1 and <= 3)
+                            {
+                                targetStart = parsed;
+                            }
                         }
+                        catch { }
+
+                        try { key.DeleteValue("WinyWash_OriginalStart", false); } catch { }
 
                         key.SetValue("Start", targetStart, RegistryValueKind.DWord);
                         registryChanged = true;
