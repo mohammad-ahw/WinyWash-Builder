@@ -4337,4 +4337,28 @@ To download and install, go to the 'Windows Update' section.</value>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>Chrome Extension</value>
   </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>Open in default browser</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>AI</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>Tech</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>Read story</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>Latest News Today</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>Back to App</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>Sports</value>
+  </data>
 </root>

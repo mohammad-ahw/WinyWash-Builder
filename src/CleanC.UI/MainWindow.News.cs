@@ -1,3 +1,4 @@
+﻿using CleanC.Core.Services;
 // src/CleanC.UI/MainWindow.News.cs
 using System;
 using System.Collections.Generic;
@@ -164,6 +165,23 @@ namespace CleanC.UI
                                 width: 100% !important;
                             }
 
+                                                        /* International Tech/News Sites Polish */
+                            .duet--article--article-body-component,
+                            .article-content,
+                            .entry-content,
+                            .body__inner-container,
+                            .caas-body,
+                            .article-body {
+                                max-width: 1100px !important;
+                                width: 100% !important;
+                                margin-left: auto !important;
+                                margin-right: auto !important;
+                                padding-left: 20px !important;
+                                padding-right: 20px !important;
+                                font-size: 1.12rem !important;
+                                line-height: 1.7 !important;
+                            }
+
                             /* Universal Polish */
                             html, body {
                                 overflow-x: hidden !important;
@@ -293,6 +311,46 @@ namespace CleanC.UI
             })();
             """;
 
+        private string? _lastNewsLang = null;
+
+        public void ApplyNewsLanguage()
+        {
+            try
+            {
+                bool isRtl = LocalizationService.IsRtl;
+                if (LatestNewsTitleText != null)
+                    LatestNewsTitleText.Text = LocalizationService.Get("LatestNewsTitle", "آخرین اخبار امروز");
+
+                if (NewsActionText != null)
+                    NewsActionText.Text = LocalizationService.Get("NewsActionView", "مشاهده خبر");
+
+                if (NewsReaderBackBtnText != null)
+                    NewsReaderBackBtnText.Text = LocalizationService.Get("NewsReaderBack", "بازگشت به برنامه");
+
+                if (NewsReaderBackIcon != null)
+                    NewsReaderBackIcon.Glyph = isRtl ? "\uE72A" : "\uE72B";
+
+                if (NewsReaderRefreshBtn != null)
+                    ToolTipService.SetToolTip(NewsReaderRefreshBtn, LocalizationService.Get("NewsRefreshTooltip", "تازه‌سازی"));
+
+                if (NewsReaderExternalBtn != null)
+                    ToolTipService.SetToolTip(NewsReaderExternalBtn, LocalizationService.Get("NewsOpenExternalTooltip", "باز کردن در مرورگر ویندوز"));
+
+                string currentLang = LocalizationService.CurrentLanguage?.Code ?? "fa-IR";
+                bool langChanged = _lastNewsLang != null && !string.Equals(_lastNewsLang, currentLang, StringComparison.OrdinalIgnoreCase);
+                _lastNewsLang = currentLang;
+
+                if (langChanged)
+                {
+                    _ = LoadNewsAsync(forceRefresh: false);
+                }
+            }
+            catch (Exception ex)
+            {
+                CcLog.Ignore(ex, "MainWindow.ApplyNewsLanguage");
+            }
+        }
+
         private void InitializeNewsFeature()
         {
             if (LatestNewsCard == null) return;
@@ -305,6 +363,9 @@ namespace CleanC.UI
                 Interval = TimeSpan.FromMilliseconds(TimerIntervalMs)
             };
             _newsTimer.Tick += OnNewsTimerTick;
+
+            _lastNewsLang = LocalizationService.CurrentLanguage?.Code ?? "fa-IR";
+            ApplyNewsLanguage();
 
             _ = LoadNewsAsync();
         }
@@ -323,7 +384,8 @@ namespace CleanC.UI
                     return;
                 }
 
-                var items = await NewsFeedService.GetLatestNewsAsync(forceRefresh).ConfigureAwait(false);
+                bool isPersian = LocalizationService.IsRtl || string.Equals(LocalizationService.CurrentLanguage?.Code, "fa-IR", StringComparison.OrdinalIgnoreCase);
+                var items = await NewsFeedService.GetLatestNewsAsync(isPersian, forceRefresh).ConfigureAwait(false);
 
                 DispatcherQueue.TryEnqueue(() =>
                 {

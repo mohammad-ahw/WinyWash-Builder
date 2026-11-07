@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>管理者として実行中</value></data>
@@ -1472,5 +1472,29 @@
   </data>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>Chrome Extension</value>
+  </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>更新</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>既定のブラウザーで開く</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>AI</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>テクノロジー</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>記事を読む</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>今日の最新ニュース</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>アプリに戻る</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>スポーツ</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>以管理员身份运行</value></data>
@@ -1472,5 +1472,29 @@
   </data>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>Chrome Extension</value>
+  </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>刷新</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>在默认浏览器中打开</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>人工智能</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>科技</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>阅读资讯</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>今日最新资讯</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>返回应用</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>体育</value>
   </data>
 </root>

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>Ejecutando como administrador</value></data>
@@ -1473,5 +1473,29 @@ Para descargar e instalar, vaya a la sección 'Windows Update'.</value></data>
   </data>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>Chrome Extension</value>
+  </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>Actualizar</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>Abrir en el navegador predeterminado</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>IA</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>Tecnología</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>Leer noticia</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>Últimas noticias de hoy</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>Volver a la app</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>Deportes</value>
   </data>
 </root>

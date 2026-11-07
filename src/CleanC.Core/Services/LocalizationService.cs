@@ -1,4 +1,4 @@
-// src/CleanC.Core/Services/LocalizationService.cs
+﻿// src/CleanC.Core/Services/LocalizationService.cs
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -445,7 +445,16 @@ namespace CleanC.Core.Services
                 ["DriverDeleteOrphanTitle"] = "حذف بسته بدون سخت افزار {0}",
                 ["DriverDeleteOldTitle"] = "حذف درایور قدیمی {0}",
                 ["DriverDeleteOrphanBody"] = "بسته '{0}' متعلق به سخت افزاری است که دیگر به سیستم متصل نیست.\nآیا از حذف این بسته اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.",
-                ["DriverDeleteOldBody"] = "آیا از حذف بسته درایور قدیمی '{0}' ({1}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد."
+                ["DriverDeleteOldBody"] = "آیا از حذف بسته درایور قدیمی '{0}' ({1}) اطمینان دارید؟\nاین عملیات بدون سوئیچ اجباری انجام شده و در صورت استفاده سیستم متوقف خواهد شد.",
+                            // ── اخبار زنده و ریدر ──────────────────────────────────────────
+                ["LatestNewsTitle"] = "آخرین اخبار امروز",
+                ["NewsActionView"] = "مشاهده خبر",
+                ["NewsReaderBack"] = "بازگشت به برنامه",
+                ["NewsRefreshTooltip"] = "تازه‌سازی",
+                ["NewsOpenExternalTooltip"] = "باز کردن در مرورگر ویندوز",
+                ["NewsCategoryTech"] = "تکنولوژی",
+                ["NewsCategoryAi"] = "هوش مصنوعی",
+                ["NewsCategorySports"] = "ورزشی"
             };
 
             var enFallback = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
@@ -830,7 +839,16 @@ namespace CleanC.Core.Services
                 ["DriverDeleteOrphanTitle"] = "Remove no-hardware package {0}",
                 ["DriverDeleteOldTitle"] = "Remove old driver {0}",
                 ["DriverDeleteOrphanBody"] = "Package '{0}' belongs to hardware that is no longer connected to this system.\nDelete this package?\nThe operation runs without a force switch and will stop if the package is in use.",
-                ["DriverDeleteOldBody"] = "Delete the old driver package '{0}' ({1})?\nThe operation runs without a force switch and will stop if the package is in use."
+                ["DriverDeleteOldBody"] = "Delete the old driver package '{0}' ({1})?\nThe operation runs without a force switch and will stop if the package is in use.",
+                            // ── Live News & Reader ─────────────────────────────────────────
+                ["LatestNewsTitle"] = "Latest News Today",
+                ["NewsActionView"] = "Read story",
+                ["NewsReaderBack"] = "Back to App",
+                ["NewsRefreshTooltip"] = "Refresh",
+                ["NewsOpenExternalTooltip"] = "Open in default browser",
+                ["NewsCategoryTech"] = "Tech",
+                ["NewsCategoryAi"] = "AI",
+                ["NewsCategorySports"] = "Sports"
             };
 
             _catalogs["fa-IR"] = faFallback;

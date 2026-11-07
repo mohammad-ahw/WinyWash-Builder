@@ -124,15 +124,6 @@ if (-not $Symbols) {
         Remove-Item -Force
 }
 
-# کپی والپیپرهای WinyWash در صورت وجود
-$wallpaperSrc = Join-Path $root 'wallpaper'
-if (Test-Path -LiteralPath $wallpaperSrc) {
-    Write-Host "==> کپی والپیپرهای WinyWash..." -ForegroundColor DarkGray
-    $wpDest = Join-Path $winyWashDir 'wallpaper'
-    if (Test-Path -LiteralPath $wpDest) { Remove-Item -LiteralPath $wpDest -Recurse -Force }
-    Copy-Item -Path $wallpaperSrc -Destination $winyWashDir -Recurse -Force
-}
-
 # ---------------------------------------------------------------------------
 # کامپایل لانچر رسمی ریشه WinyWash.exe
 # ---------------------------------------------------------------------------
@@ -147,16 +138,6 @@ Write-Host "==> کامپایل لانچر اصلی WinyWash.exe در ریشه...
 if ($LASTEXITCODE -ne 0) {
     throw "کامپایل لانچر WinyWash.exe با خطا مواجه شد."
 }
-
-# ایجاد اسکریپت ساخت میانبر روی دسکتاپ
-$shortcutScript = Join-Path $winyWashDir 'ایجاد میانبر دسکتاپ.bat'
-@'
-@echo off
-chcp 65001 >nul
-powershell -NoProfile -Command "$s=(New-Object -COM WScript.Shell).CreateShortcut([System.IO.Path]::Combine([System.Environment]::GetFolderPath('Desktop'), 'WinyWash.lnk'));$s.TargetPath='%~dp0WinyWash.exe';$s.WorkingDirectory='%~dp0';$s.Save()"
-echo میانبر WinyWash روی دسکتاپ ایجاد شد.
-pause
-'@ | Set-Content -LiteralPath $shortcutScript -Encoding UTF8
 
 # ---------------------------------------------------------------------------
 # گزارش حجم نهایی

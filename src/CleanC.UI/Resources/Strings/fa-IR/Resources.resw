@@ -1,4 +1,4 @@
-<?xml version='1.0' encoding='utf-8'?>
+﻿<?xml version='1.0' encoding='utf-8'?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>اجرا با دسترسی مدیر</value></data>
@@ -797,5 +797,29 @@
   </data>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>افزونه کروم</value>
+  </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>تازه‌سازی</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>باز کردن در مرورگر ویندوز</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>هوش مصنوعی</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>تکنولوژی</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>مشاهده خبر</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>آخرین اخبار امروز</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>بازگشت به برنامه</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>ورزشی</value>
   </data>
 </root>

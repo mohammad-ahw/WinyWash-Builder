@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>관리자 권한으로 실행 중</value></data>
@@ -1475,5 +1475,29 @@
   </data>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>Chrome Extension</value>
+  </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>새로고침</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>기본 브라우저에서 열기</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>AI</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>테크</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>기사 보기</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>오늘의 최신 뉴스</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>앱으로 돌아가기</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>스포츠</value>
   </data>
 </root>

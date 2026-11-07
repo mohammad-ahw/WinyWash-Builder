@@ -340,6 +340,7 @@ namespace CleanC.UI
                 RefreshSystemStats();
                 // آمار زندهٔ هیروکارت داخل WebView2 — مستقل از داشبورد، چون هیرو همیشه دیده می شود
                 PushHeroState();
+                ApplyNewsLanguage();
             };
             _statsTimer.Start();
 
@@ -3251,6 +3252,7 @@ namespace CleanC.UI
                 // کاراکتر/دیالوگ‌ها در همان لحظه عوض شود، نه بعد از ری‌استارت.
                 PushHeroSettings();
                 PushHeroState();
+                ApplyNewsLanguage();
 
                 // Bento Cards
                 if (CardHealthTitle != null) CardHealthTitle.Text = LocalizationService.Get("HealthScoreTitle", "سلامت سیستم");
@@ -4246,6 +4248,7 @@ namespace CleanC.UI
         {
             _heroLastStateJson = null;
             PushHeroState();
+                ApplyNewsLanguage();
         }
 
         // ====================================================================
@@ -4376,6 +4379,7 @@ namespace CleanC.UI
             _lastScanCleanableBytes = Math.Max(0, cleanableBytes);
             RenderDiskBreakdown(_diskTotalGb, _diskFreeGb, _lastScanCleanableBytes);
             PushHeroState();
+                ApplyNewsLanguage();
         }
 
         /// <summary>

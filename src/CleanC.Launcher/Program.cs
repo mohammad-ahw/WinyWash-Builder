@@ -1,4 +1,4 @@
-// i18n-launcher: پیام‌های خطای استارتاپ لانچر مستقل WinyWash
+// i18n-launcher: Clean, international startup error messages for WinyWash launcher
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -21,9 +21,8 @@ namespace WinyWash.Launcher
 
                 if (!File.Exists(targetExe))
                 {
-                    // i18n
                     System.Windows.Forms.MessageBox.Show(
-                        "فایل‌های اصلی نرم‌افزار در پوشه app یافت نشدند.\nمسیر مورد انتظار:\n" + targetExe,
+                        "Core application files could not be found in the 'app' directory.\nExpected path:\n" + targetExe,
                         "WinyWash",
                         System.Windows.Forms.MessageBoxButtons.OK,
                         System.Windows.Forms.MessageBoxIcon.Error);
@@ -55,9 +54,8 @@ namespace WinyWash.Launcher
             }
             catch (Exception ex)
             {
-                // i18n
                 System.Windows.Forms.MessageBox.Show(
-                    "خطا در اجرای برنامه:\n" + ex.Message,
+                    "Error launching WinyWash:\n" + ex.Message,
                     "WinyWash",
                     System.Windows.Forms.MessageBoxButtons.OK,
                     System.Windows.Forms.MessageBoxIcon.Error);

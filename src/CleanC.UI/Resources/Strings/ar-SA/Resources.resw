@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
   <data name="AppTitle" xml:space="preserve"><value>WinyWash</value></data>
   <data name="RunningAsAdmin" xml:space="preserve"><value>تشغيل كمسؤول</value></data>
@@ -1472,5 +1472,29 @@
   </data>
   <data name="OptReviewExtBadge" xml:space="preserve">
     <value>Chrome Extension</value>
+  </data>
+  <data name="NewsRefreshTooltip" xml:space="preserve">
+    <value>تحديث</value>
+  </data>
+  <data name="NewsOpenExternalTooltip" xml:space="preserve">
+    <value>فتح في المتصفح الافتراضي</value>
+  </data>
+  <data name="NewsCategoryAi" xml:space="preserve">
+    <value>الذكاء الاصطناعي</value>
+  </data>
+  <data name="NewsCategoryTech" xml:space="preserve">
+    <value>تقنية</value>
+  </data>
+  <data name="NewsActionView" xml:space="preserve">
+    <value>قراءة الخبر</value>
+  </data>
+  <data name="LatestNewsTitle" xml:space="preserve">
+    <value>آخر الأخبار اليوم</value>
+  </data>
+  <data name="NewsReaderBack" xml:space="preserve">
+    <value>العودة للتطبيق</value>
+  </data>
+  <data name="NewsCategorySports" xml:space="preserve">
+    <value>رياضة</value>
   </data>
 </root>
