@@ -828,4 +828,7 @@
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>فایل در قرنطینه کپی شد اما به دلیل قفل بودن از مبدأ حذف نشد</value>
+  </data>
 </root>

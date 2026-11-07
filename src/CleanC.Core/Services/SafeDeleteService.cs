@@ -46,7 +46,9 @@ namespace CleanC.Core.Services
         Permanent,
         /// <summary>مسیر از اول وجود نداشت؛ نه موفق است نه شکست.</summary>
         NotFound,
-        Failed
+        Failed,
+        /// <summary>فایل کپی شد اما به دلیل قفل بودن از مبدأ حذف نشد؛ برای جلوگیری از گزارش اشتباه موفقیت.</summary>
+        QuarantinedSourceLocked
     }
 
     public sealed class SafeDeleteResult
@@ -317,6 +319,11 @@ namespace CleanC.Core.Services
                     case SafeDeleteOutcome.NotFound:
                         batch.NotFoundCount++;
                         break;
+                    case SafeDeleteOutcome.QuarantinedSourceLocked:
+                        batch.FailedCount++;
+                        batch.MovedBytes += result.SizeBytes;
+                        if (!string.IsNullOrWhiteSpace(result.Error)) batch.Errors.Add($"{path}: {result.Error}");
+                        break;
                     default:
                         batch.FailedCount++;
                         if (!string.IsNullOrWhiteSpace(result.Error)) batch.Errors.Add($"{path}: {result.Error}");
@@ -469,10 +476,18 @@ namespace CleanC.Core.Services
                         return result;
 
                     case SafeDeleteMode.Quarantine:
-                        if (TryQuarantine(path, isDirectory, out string storedPath, out string quarantineError))
+                        var qStatus = TryQuarantine(path, isDirectory, out string storedPath, out string quarantineError);
+                        if (qStatus == QuarantineResult.Success)
                         {
                             result.Outcome = SafeDeleteOutcome.Quarantined;
                             result.StoredPath = storedPath;
+                            return result;
+                        }
+                        if (qStatus == QuarantineResult.SourceLocked)
+                        {
+                            result.Outcome = SafeDeleteOutcome.QuarantinedSourceLocked;
+                            result.StoredPath = storedPath;
+                            result.Error = quarantineError;
                             return result;
                         }
                         // قرنطینه شکست خورد → آخرین شانس: سطل بازیافت
@@ -491,11 +506,19 @@ namespace CleanC.Core.Services
                             result.Outcome = SafeDeleteOutcome.Recycled;
                             return result;
                         }
-                        // سطل در دسترس نیست → قرنطینه تا داده از بین نرود
-                        if (TryQuarantine(path, isDirectory, out string stored, out string qError))
+                        // سطل در دسترس نیست یا فایل حجیم است → قرنطینه تا داده از بین نرود
+                        var qBinStatus = TryQuarantine(path, isDirectory, out string stored, out string qError);
+                        if (qBinStatus == QuarantineResult.Success)
                         {
                             result.Outcome = SafeDeleteOutcome.Quarantined;
                             result.StoredPath = stored;
+                            return result;
+                        }
+                        if (qBinStatus == QuarantineResult.SourceLocked)
+                        {
+                            result.Outcome = SafeDeleteOutcome.QuarantinedSourceLocked;
+                            result.StoredPath = stored;
+                            result.Error = qError;
                             return result;
                         }
                         result.Error = FirstNonEmpty(binError, qError);
@@ -533,6 +556,32 @@ namespace CleanC.Core.Services
             }
         }
 
+        public static long? MaxRecycleItemSizeForTesting { get; set; }
+
+        public static long GetRecycleBinMaxItemLimit(string path)
+        {
+            try
+            {
+                string? root = Path.GetPathRoot(path);
+                if (!string.IsNullOrEmpty(root))
+                {
+                    var drive = new DriveInfo(root);
+                    if (drive.IsReady && drive.TotalSize > 0)
+                    {
+                        // سطل زباله ویندوز معمولاً بین ۵٪ تا ۱۰٪ ظرفیت درایو است.
+                        // برای محافظت حداکثری در برابر حذف دائمی، ۵٪ ظرفیت را مبنا قرار می‌دهیم
+                        // و هرگز از ۲ گیگابایت بیشتر نمی‌رویم.
+                        long fivePercent = drive.TotalSize / 20;
+                        return Math.Min(fivePercent, 2L * 1024 * 1024 * 1024);
+                    }
+                }
+            }
+            catch
+            {
+            }
+            return 2L * 1024 * 1024 * 1024; // ۲ گیگابایت
+        }
+
         private static bool TryRecycleBin(string path, bool isDirectory, out string error)
         {
             error = string.Empty;
@@ -545,6 +594,15 @@ namespace CleanC.Core.Services
                 if (!HasRecycleBinSupport(fullPath))
                 {
                     error = "Drive does not support Recycle Bin. Protected fallback to Quarantine.";
+                    return false;
+                }
+
+                // ۲. بررسی اندازه آیتم: آیتم‌های بزرگ به دلیل بی‌اثر بودن تجربی FOF_WANTNUKEWARNING مستقیم به قرنطینه هدایت می‌شوند
+                long limit = MaxRecycleItemSizeForTesting ?? GetRecycleBinMaxItemLimit(fullPath);
+                long itemSize = Measure(fullPath, isDirectory);
+                if (itemSize > limit)
+                {
+                    error = $"Item size ({itemSize} bytes) exceeds safe Recycle Bin threshold ({limit} bytes). Protected fallback to Quarantine.";
                     return false;
                 }
 
@@ -622,7 +680,14 @@ namespace CleanC.Core.Services
 
         // ── قرنطینه ───────────────────────────────────────────────────────
 
-        private static bool TryQuarantine(string path, bool isDirectory, out string storedPath, out string error)
+        private enum QuarantineResult
+        {
+            Success,
+            SourceLocked,
+            Failed
+        }
+
+        private static QuarantineResult TryQuarantine(string path, bool isDirectory, out string storedPath, out string error)
         {
             storedPath = string.Empty;
             error = string.Empty;
@@ -642,7 +707,7 @@ namespace CleanC.Core.Services
                     string target = Path.Combine(dataDir, $"{index}_{safeName}");
 
                     Directory.CreateDirectory(dataDir);
-                    MoveWithFallback(path, target, isDirectory);
+                    MoveWithFallback(path, target, isDirectory, out bool sourceDeletionFailed);
                     storedPath = target;
 
                     _currentManifest.Entries.Add(new QuarantineEntry
@@ -655,19 +720,30 @@ namespace CleanC.Core.Services
                     });
 
                     WriteManifestLocked(_currentManifest);
-                    return true;
+
+                    if (!isDirectory && sourceDeletionFailed)
+                    {
+                        error = LocalizationService.Get("SourceLockedAfterQuarantineCopy", "فایل در قرنطینه کپی شد اما به دلیل قفل بودن از مبدأ حذف نشد");
+                        return QuarantineResult.SourceLocked;
+                    }
+
+                    return QuarantineResult.Success;
                 }
             }
             catch (Exception ex)
             {
                 CcLog.Ignore(ex, "SafeDeleteService.Quarantine");
                 error = FriendlyError(ex);
-                return false;
+                return QuarantineResult.Failed;
             }
         }
 
         private static void MoveWithFallback(string source, string target, bool isDirectory)
+            => MoveWithFallback(source, target, isDirectory, out _);
+
+        private static void MoveWithFallback(string source, string target, bool isDirectory, out bool sourceDeletionFailed)
         {
+            sourceDeletionFailed = false;
             try
             {
                 if (isDirectory) Directory.Move(source, target);
@@ -678,15 +754,29 @@ namespace CleanC.Core.Services
                 // درایو متفاوت یا قفل موقت → کپی کامل و سپس حذف منبع
                 if (isDirectory)
                 {
-                    CopyDirectory(source, target);
+                    bool copied = CopyDirectory(source, target);
+                    if (!copied)
+                    {
+                        // اگر کپی کامل نبود، کپی ناقص را پاک کن (مبدأ دست‌نخورده است) و خطا بده تا قرنطینه متوقف شود
+                        try
+                        {
+                            if (Directory.Exists(target)) Directory.Delete(target, true);
+                        }
+                        catch (Exception cleanEx)
+                        {
+                            CcLog.Ignore(cleanEx, "SafeDeleteService.CleanIncompleteTarget");
+                        }
+                        throw new IOException($"Failed to copy all files from '{source}' to quarantine target '{target}'. Source preserved.");
+                    }
+
+                    // فقط وقتی کپی کامل بود Directory.Delete(source) را صدا بزن و خطای قفل بودن را مدیریت کن
                     try
                     {
                         Directory.Delete(source, true);
                     }
                     catch (Exception delEx)
                     {
-                        // اگر حذف منبع به دلیل قفل بودن فایلی شکست خورد، کپی کامل در قرنطینه نگه داشته شده
-                        // و در مانیفست ثبت می‌شود تا هیچ داده‌ای از دست نرود.
+                        sourceDeletionFailed = true;
                         CcLog.Ignore(delEx, "SafeDeleteService.DeleteSourceFailedAfterCopy");
                     }
                 }
@@ -702,43 +792,57 @@ namespace CleanC.Core.Services
                     }
                     catch (Exception delEx)
                     {
-                        // در صورت قفل بودن فایل منبع، کپی قرنطینه حفظ شود
+                        sourceDeletionFailed = true;
                         CcLog.Ignore(delEx, "SafeDeleteService.DeleteSourceFileFailedAfterCopy");
                     }
                 }
             }
         }
 
-        private static void CopyDirectory(string source, string dest)
+        private static bool CopyDirectory(string source, string dest)
         {
-            Directory.CreateDirectory(dest);
-
-            foreach (string file in Directory.EnumerateFiles(source))
+            try
             {
-                try
+                Directory.CreateDirectory(dest);
+                bool allSuccess = true;
+
+                foreach (string file in Directory.EnumerateFiles(source))
                 {
-                    File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), true);
+                    try
+                    {
+                        File.Copy(file, Path.Combine(dest, Path.GetFileName(file)), true);
+                    }
+                    catch (Exception ex)
+                    {
+                        CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.File");
+                        allSuccess = false;
+                    }
                 }
-                catch (Exception ex)
+
+                foreach (string sub in Directory.EnumerateDirectories(source))
                 {
-                    // اگر فایلی توسط پروسه دیگری قفل است، سایر فایل‌های سالم کپی شوند
-                    CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.File");
+                    try
+                    {
+                        if (!CopyDirectory(sub, Path.Combine(dest, Path.GetFileName(sub))))
+                        {
+                            allSuccess = false;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.SubDir");
+                        allSuccess = false;
+                    }
                 }
+
+                return allSuccess;
             }
-
-            foreach (string sub in Directory.EnumerateDirectories(source))
+            catch (Exception ex)
             {
-                try
-                {
-                    CopyDirectory(sub, Path.Combine(dest, Path.GetFileName(sub)));
-                }
-                catch (Exception ex)
-                {
-                    CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.SubDir");
-                }
+                CcLog.Ignore(ex, "SafeDeleteService.CopyDirectory.Root");
+                return false;
             }
         }
-
         private static void EnsureSession()
         {
             if (_currentManifest != null && _currentSessionId != null) return;

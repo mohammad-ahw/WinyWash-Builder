@@ -4367,4 +4367,7 @@ To download and install, go to the 'Windows Update' section.</value>
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>Extension requires user review (active tool or VPN)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>File was copied to quarantine, but original could not be removed because it is locked.</value>
+  </data>
 </root>

@@ -1521,4 +1521,7 @@ Zum Herunterladen und Installieren gehen Sie zum Abschnitt 'Windows Update'.</va
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>Erweiterung erfordert Benutzerüberprüfung (aktives Tool oder VPN)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>Datei wurde in die Quarantäne kopiert, konnte jedoch nicht von der Quelle gelöscht werden, da sie gesperrt ist.</value>
+  </data>
 </root>

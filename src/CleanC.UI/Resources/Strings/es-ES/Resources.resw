@@ -1522,4 +1522,7 @@ Para descargar e instalar, vaya a la sección 'Windows Update'.</value></data>
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>La extensión requiere revisión del usuario (herramienta activa o VPN)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>El archivo se copió a la cuarentena, pero no se pudo eliminar del origen porque está bloqueado.</value>
+  </data>
 </root>

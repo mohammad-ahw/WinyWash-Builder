@@ -724,7 +724,20 @@ function applyTheme(t){
 const W={ok:0,t:0,code:0,day:1,wind:0,city:''};
 async function getLoc(){const nm=ST.city,c=LS.g('cc_loc2',null);if(c&&c.q==nm)return c;let r;
  if(nm){const j=await(await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&name='+encodeURIComponent(nm))).json(),g=j.results&&j.results[0];if(!g)throw 0;r={q:nm,lat:g.latitude,lon:g.longitude,name:g.name||nm}}
- else{const j=await(await fetch('https://ipwho.is/')).json();if(!j.success)throw 0;r={q:'',lat:j.latitude,lon:j.longitude,name:j.city}}
+ else{
+  let consent=LS.g('cc_ip_consent',null);
+  if(consent===null){
+   const isEn=isEnglish();
+   const msg=isEn
+    ?"Allow WinyWash to automatically detect your approximate location via IP lookup (ipwho.is) to show local weather in character dialogues?"
+    :"آیا مایلید WinyWash برای نمایش اطلاعات آب‌وهوا در دیالوگ‌ها، موقعیت تقریبی شما را از روی IP تشخیص دهد؟";
+   const ok=typeof window.confirm==='function'?window.confirm(msg):false;
+   consent=!!ok;
+   LS.s('cc_ip_consent',consent);
+  }
+  if(!consent)throw 0;
+  const j=await(await fetch('https://ipwho.is/')).json();if(!j.success)throw 0;r={q:'',lat:j.latitude,lon:j.longitude,name:j.city}
+ }
  LS.s('cc_loc2',r);return r}
 async function loadWeather(){if(ST.offline)return;try{const c=LS.g('cc_w',null);if(c&&Date.now()-c.at<18e5&&c.q==ST.city){Object.assign(W,c.w,{ok:1});newHL();return}
  const l=await getLoc(),j=await(await fetch('https://api.open-meteo.com/v1/forecast?latitude='+l.lat+'&longitude='+l.lon+'&current=temperature_2m,weather_code,is_day,wind_speed_10m')).json(),k=j.current;

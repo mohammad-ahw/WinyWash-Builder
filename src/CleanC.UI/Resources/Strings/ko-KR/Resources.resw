@@ -1524,4 +1524,7 @@
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>확장 프로그램에 대한 사용자 검토가 필요합니다 (활성 도구 또는 VPN)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>파일이 격리소로 복사되었지만 잠겨 있어 원본에서 삭제할 수 없습니다.</value>
+  </data>
 </root>

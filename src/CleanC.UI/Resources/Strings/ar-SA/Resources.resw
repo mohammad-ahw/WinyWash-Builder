@@ -1521,4 +1521,7 @@
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>تتطلب الإضافة مراجعة المستخدم (أداة نشطة أو VPN)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>تم نسخ الملف إلى الحجر الصحي ولكن تعذر حذفه من المصدر لأنه مقفل</value>
+  </data>
 </root>

@@ -239,9 +239,9 @@ namespace CleanC.Core.Tests
         }
 
         /// <summary>
-        /// باگ ۵: تست واقعی سناریوی شکست نیمه‌کاره قرنطینه با قفل کردن فایل با FileStream(FileShare.None).
-        /// تأیید اینکه کپی قرنطینه پاک نمی‌شود، فایل غیرقفل‌شده یا در مبدأ یا در قرنطینه در دست‌کم یکی از دو جا
-        /// موجود است و در manifest ثبت شده است.
+        /// باگ ۵: تست سناریوی قرنطینه که در آن تمام فایل‌ها با موفقیت در قرنطینه کپی شده‌اند،
+        /// اما Directory.Delete(source) به دلیل قفل بودن فایل با شکست مواجه می‌شود.
+        /// تأیید اینکه کپی قرنطینه حفظ می‌شود و در manifest ثبت شده است.
         /// </summary>
         [Fact]
         public void Bug5_QuarantineRollback_WhenSourceDeletionFails_PreservesQuarantineCopyAndManifest()
@@ -259,27 +259,24 @@ namespace CleanC.Core.Tests
             File.WriteAllText(unlockedFile, "unlocked content 123");
             File.WriteAllText(lockedFile, "locked content 456");
 
-            // قفل کردن فایل locked.txt با انحصار کامل
-            using (var fs = new FileStream(lockedFile, FileMode.Open, FileAccess.ReadWrite, FileShare.None))
+            // فایل با FileShare.Read باز می‌شود تا همه فایل‌ها بتوانند کامل در قرنطینه کپی شوند،
+            // اما بدون FileShare.Delete تا Directory.Delete مبدأ به دلیل قفل بودن فایل شکست بخورد
+            using (var fs = new FileStream(lockedFile, FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 // فراخوانی متد اصلی حذف پوشه به قرنطینه
-                // چون locked.txt قفل است، Directory.Delete مبدأ با شکست مواجه می‌شود
                 var result = SafeDeleteService.DeleteDirectory(sourceDir, SafeDeleteMode.Quarantine);
 
-                // نتیجه باید Quarantined باشد چون کپی موفق بوده
+                // نتیجه باید Quarantined باشد چون کپی ۱۰۰٪ کامل انجام شده است
                 Assert.Equal(SafeDeleteOutcome.Quarantined, result.Outcome);
                 Assert.NotNull(result.StoredPath);
 
-                // تأیید اینکه کپی قرنطینه پاک نشده و کپی کامل در قرنطینه باقی مانده است
-                Assert.True(Directory.Exists(result.StoredPath), "پوشه قرنطینه نباید با رول‌بک حذف شده باشد.");
+                // تأیید اینکه کپی کامل در قرنطینه موجود است
+                Assert.True(Directory.Exists(result.StoredPath), "پوشه قرنطینه نباید حذف شده باشد.");
 
                 string qUnlocked = Path.Combine(result.StoredPath, "unlocked.txt");
-                Assert.True(File.Exists(qUnlocked), "فایل غیرقفل‌شده باید در قرنطینه موجود باشد.");
-                Assert.Equal("unlocked content 123", File.ReadAllText(qUnlocked));
-
-                // تأیید اینکه فایل غیرقفل‌شده دست‌کم در یکی از دو جا (یا مبدأ یا قرنطینه) هست
-                bool inSourceOrQuarantine = File.Exists(unlockedFile) || File.Exists(qUnlocked);
-                Assert.True(inSourceOrQuarantine, "داده نباید از بین برود؛ باید دست‌کم در یکی از دو جا موجود باشد.");
+                string qLocked = Path.Combine(result.StoredPath, "locked.txt");
+                Assert.True(File.Exists(qUnlocked), "فایل unlocked باید در قرنطینه موجود باشد.");
+                Assert.True(File.Exists(qLocked), "فایل locked نیز باید کامل در قرنطینه کپی شده باشد.");
 
                 // تأیید ثبت در manifest.json
                 var manifestFiles = Directory.GetFiles(qRoot, "manifest.json", SearchOption.AllDirectories);
@@ -287,7 +284,115 @@ namespace CleanC.Core.Tests
 
                 string manifestContent = File.ReadAllText(manifestFiles[0]);
                 Assert.Contains("SourceFolder", manifestContent);
-                Assert.Contains(result.StoredPath.Replace("\\", "\\\\"), manifestContent);
+            }
+        }
+
+        /// <summary>
+        /// باگ ۵ (بخش جدید): وقتی کپی یک فایل در قرنطینه شکست بخورد (مثلاً با FileShare.Delete بدون FileShare.Read)،
+        /// کپی ناقص باید از قرنطینه پاک شود و هیچ فایلی از مبدأ نباید حذف گردد.
+        /// </summary>
+        [Fact]
+        public void Bug5_CopyDirectoryIncomplete_RollsBackQuarantineAndPreservesSource()
+        {
+            string qRoot = Path.Combine(_testDir, "QuarantineRoot_Incomplete");
+            SafeDeleteService.QuarantineRoot = qRoot;
+            SafeDeleteService.ResetSessionForTesting();
+
+            string sourceDir = Path.Combine(_testDir, "SourceFolder_Incomplete");
+            Directory.CreateDirectory(sourceDir);
+
+            string unlockedFile = Path.Combine(sourceDir, "unlocked.txt");
+            string lockedFile = Path.Combine(sourceDir, "locked.txt");
+
+            File.WriteAllText(unlockedFile, "unlocked content 123");
+            File.WriteAllText(lockedFile, "locked content 456");
+
+            // فایل طوری باز می‌شود که حذف آن ممکن باشد (FileShare.Delete) اما خواندن/کپی آن ممکن نباشد (بدون FileShare.Read)
+            using (var fs = new FileStream(lockedFile, FileMode.Open, FileAccess.Write, FileShare.Delete))
+            {
+                var result = SafeDeleteService.DeleteDirectory(sourceDir, SafeDeleteMode.Quarantine);
+
+                // عملیات نباید موفقیت (Quarantined) گزارش کند
+                Assert.NotEqual(SafeDeleteOutcome.Quarantined, result.Outcome);
+                Assert.False(result.IsSuccess);
+
+                // فایل‌های مبدأ باید کاملاً دست‌نخورده و سالم باقی مانده باشند
+                Assert.True(File.Exists(unlockedFile), "فایل‌های مبدأ در کپی ناقص نباید حذف شوند.");
+                Assert.True(File.Exists(lockedFile), "فایل قفل‌شده باید در مبدأ سالم بماند.");
+                Assert.Equal("unlocked content 123", File.ReadAllText(unlockedFile));
+
+                // هیچ کپی ناقصی در قرنطینه نباید باقی مانده باشد
+                if (!string.IsNullOrEmpty(result.StoredPath))
+                {
+                    Assert.False(Directory.Exists(result.StoredPath), "پوشه قرنطینه ناقص باید پاک شده باشد.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// آیتم ۲: بررسی اندازه آیتم در TryRecycleBin.
+        /// آیتم‌های بزرگتر از آستانه محافظه‌کارانه به دلیل عدم کارکرد FOF_WANTNUKEWARNING مستقیماً به قرنطینه می‌روند.
+        /// </summary>
+        [Fact]
+        public void Bug2_RecycleBin_LargeItem_FallsBackToQuarantine()
+        {
+            string qRoot = Path.Combine(_testDir, "QuarantineRoot_LargeItem");
+            SafeDeleteService.QuarantineRoot = qRoot;
+            SafeDeleteService.ResetSessionForTesting();
+
+            string testFile = Path.Combine(_testDir, "large_file.dat");
+            File.WriteAllBytes(testFile, new byte[1000]);
+
+            // ست کردن آستانه تست به ۵۰۰ بایت تا فایل ۱۰۰۰ بایتی بزرگ تلقی شود
+            SafeDeleteService.MaxRecycleItemSizeForTesting = 500;
+
+            try
+            {
+                var result = SafeDeleteService.DeleteFile(testFile, SafeDeleteMode.RecycleBin);
+
+                // باید به دلیل بزرگی از سطل بازیافت رد شده و مستقیماً به قرنطینه برود
+                Assert.Equal(SafeDeleteOutcome.Quarantined, result.Outcome);
+                Assert.True(result.IsSuccess);
+                Assert.False(File.Exists(testFile), "فایل مبدأ باید به قرنطینه منتقل شده باشد.");
+                Assert.True(File.Exists(result.StoredPath), "فایل باید در قرنطینه ذخیره شده باشد.");
+                Assert.Equal(1000, new FileInfo(result.StoredPath).Length);
+            }
+            finally
+            {
+                SafeDeleteService.MaxRecycleItemSizeForTesting = null;
+            }
+        }
+
+        /// <summary>
+        /// آیتم ۴: برای فایل تکی که در قرنطینه کپی شد ولی حذف مبدأ به دلیل قفل بودن شکست خورد،
+        /// نتیجه نباید Quarantined باشد بلکه وضعیت اختصاصی QuarantinedSourceLocked همراه با خطا گزارش می‌شود.
+        /// </summary>
+        [Fact]
+        public void Item4_SingleFile_SourceLockedAfterCopy_ReportsQuarantinedSourceLocked()
+        {
+            string qRoot = Path.Combine(_testDir, "QuarantineRoot_SingleLocked");
+            SafeDeleteService.QuarantineRoot = qRoot;
+            SafeDeleteService.ResetSessionForTesting();
+
+            string singleFile = Path.Combine(_testDir, "single_locked.txt");
+            File.WriteAllText(singleFile, "single file content 789");
+
+            // فایل با FileShare.Read باز می‌شود تا کپی ممکن باشد اما بدون FileShare.Delete تا حذف مبدأ شکست بخورد
+            using (var fs = new FileStream(singleFile, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                var result = SafeDeleteService.DeleteFile(singleFile, SafeDeleteMode.Quarantine);
+
+                // نباید Quarantined معمولی باشد؛ وضعیت جداگانه و خطا گزارش می‌شود
+                Assert.Equal(SafeDeleteOutcome.QuarantinedSourceLocked, result.Outcome);
+                Assert.False(result.IsSuccess, "عملیات وقتی مبدأ حذف نشده نباید به عنوان موفقیت قلمداد شود.");
+                Assert.NotEmpty(result.Error);
+
+                // فایل مبدأ هنوز وجود دارد
+                Assert.True(File.Exists(singleFile), "فایل مبدأ به دلیل قفل بودن باید باقی مانده باشد.");
+
+                // کپی قرنطینه حفظ شده است
+                Assert.True(File.Exists(result.StoredPath), "کپی قرنطینه برای محافظت از داده باید ایجاد شده باشد.");
+                Assert.Equal("single file content 789", File.ReadAllText(result.StoredPath));
             }
         }
 

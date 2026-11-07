@@ -1521,4 +1521,7 @@
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>拡張機能はユーザーによる確認が必要です（アクティブなツールまたはVPN）</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>ファイルは隔離場所にコピーされましたが、ロックされているため元の場所から削除できませんでした。</value>
+  </data>
 </root>

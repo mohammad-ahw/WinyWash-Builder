@@ -1521,4 +1521,7 @@ Pour télécharger et installer, allez dans la section 'Windows Update'.</value>
   <data name="افزونه نیازمند بررسی کاربر (ابزار کاربردی یا VPN فعال)" xml:space="preserve">
     <value>L'extension nécessite un examen par l'utilisateur (outil actif ou VPN)</value>
   </data>
+  <data name="SourceLockedAfterQuarantineCopy" xml:space="preserve">
+    <value>Le fichier a été copié en quarantaine, mais la source n'a pas pu être supprimée car elle est verrouillée.</value>
+  </data>
 </root>
