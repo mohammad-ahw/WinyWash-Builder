@@ -305,27 +305,36 @@ const HOST=HAS_HOST()?{
  action:a=>{if(a=='fixproxy')ST.proxyDead=false;else if(a=='ram'){if(ST.sim)ST.ram=Math.min(ST.ram,52);ST.topRam=''}else if(a=='browser'){ST.browserMB=0;ST.tabs=0}else if(a=='cpu'){if(ST.sim)ST.cpu=17;ST.topCpu=''}else console.log('action',a)}};
 window.CleanC={update(p){Object.assign(ST,p);ST.sim=false;if(p.totalFreedGb!=null)total=+p.totalFreedGb||0;if(p.lastClean!=null)lastTxt=p.lastClean;if(p.sizes)syncSizes(p.sizes);if(p.items)active=p.items.slice();live();sense();render(true)},host:h=>Object.assign(HOST,h),run:()=>runProcess(),state:()=>cur&&cur.id};
 
-const fmt=mb=>mb>=1024?(mb/1024).toFixed(2)+' گیگابایت':Math.round(mb)+' مگابایت';
+const isEn=()=>!!(window.CC_I18N&&!CC_I18N.isFa());
+const fmt=mb=>isEn()?(mb>=1024?(mb/1024).toFixed(2)+' GB':Math.round(mb)+' MB'):(mb>=1024?(mb/1024).toFixed(2)+' گیگابایت':Math.round(mb)+' مگابایت');
 /* سایز واقعی هر آیتم از هسته می‌آید (واحد: بایت). IT[key][5] همان چیزی است که چیپ‌ها،
    «قابل پاکسازی …» و جمعِ مشکل دیسک نشان می‌دهند؛ اعداد demo داخل IT فقط برای پیش‌نمایش
    بدون میزبان‌اند و در اپ واقعی همیشه با مقادیر هسته جایگزین می‌شوند. */
 function syncSizes(sz){
  if(!sz||typeof sz!=='object')return;
+ const en=isEn();
  Object.keys(sz).forEach(k=>{
   const it=IT[k];if(!it)return;
   const b=Math.max(0,Number(sz[k])||0);
   it[5]=Math.round(b/1048576);
   if(b>0){
-   if(k==='junk')it[1]=fmt(it[5])+' فایل زائد و کش آماده‌ی پاکسازی است';
-   else if(k==='browser')it[1]='حدود '+fmt(it[5])+' کش و حافظه مرورگرها';
-   else if(k==='reg')it[1]=fmt(it[5])+' ورودی نامعتبر در رجیستری';
-   else if(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت)/.test(it[1]))
-    it[1]=fmt(b/1048576)+it[1].replace(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت)\s*/,' ');
+   if(k==='junk')it[1]=en?(fmt(it[5])+' of junk and cache files ready to clean'):(fmt(it[5])+' فایل زائد و کش آماده‌ی پاکسازی است');
+   else if(k==='browser')it[1]=en?('About '+fmt(it[5])+' browser cache and memory'):('حدود '+fmt(it[5])+' کش و حافظه مرورگرها');
+   else if(k==='reg')it[1]=en?(it[5]+' invalid entries in registry'):(it[5]+' ورودی نامعتبر در رجیستری');
+   else if(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت|MB|GB|KB)/i.test(it[1]))
+    it[1]=fmt(b/1048576)+it[1].replace(/^\s*[\d.,]+\s*(مگابایت|گیگابایت|کیلوبایت|MB|GB|KB)\s*/i,' ');
   }
  });
 }
 const by=()=>[...active].sort((a,b)=>IT[b][2]-IT[a][2]);
-const V=(id,mood,head,sub,st,o)=>Object.assign({id,mood,head,sub,st,items:[]},o);
+const V=(id,mood,head,sub,st,o)=>{
+ const h=T18(head),s=T18(sub);
+ const status=Array.isArray(st)?[T18(st[0]),st[1],st[2]?T18(st[2]):'']:st;
+ const opt=Object.assign({},o);
+ if(opt.btn&&Array.isArray(opt.btn)){opt.btn=[T18(opt.btn[0]),opt.btn[1],opt.btn[2]]}
+ if(opt.lab)opt.lab=T18(opt.lab);
+ return Object.assign({id,mood,head:h,sub:s,st:status,items:[]},opt);
+};
 function view(){
  const n=active.length,sv=active.reduce((a,i)=>a+IT[i][2],0);
  /* transient states always win while they last */

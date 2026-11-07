@@ -214,7 +214,29 @@
   "قابل پاک‌سازی: ": "Cleanable: ",
   " گیگابایت": " GB",
   " مگابایت": " MB",
-  " کیلوبایت": " KB"
+  " کیلوبایت": " KB",
+  "گیگابایت": "GB",
+  "مگابایت": "MB",
+  "کیلوبایت": "KB",
+  "فایل زائد و کش آماده‌ی پاکسازی است": "junk and cache files ready to clean",
+  "فایل زائد و کش آمادهی پاکسازی است": "junk and cache files ready to clean",
+  "فایل‌های زائد و کش آماده‌ی پاکسازی است": "junk and cache files ready to clean",
+  "فایل‌های زائد و کش آمادهی پاکسازی است": "junk and cache files ready to clean",
+  "فایل‌های موقت و کش آمادهی پاکسازی است": "Temporary files and cache are ready to be cleaned",
+  "فایل‌های زائد آمادهی پاکسازی است": "Junk files are ready to be cleaned",
+  "کش و حافظه مرورگرها": "browser cache and memory",
+  "ورودی نامعتبر در رجیستری": "invalid entries in registry",
+  "ورودی‌های نامعتبر در رجیستری": "invalid registry entries",
+  "ورودیهای نامعتبر در رجیستری": "invalid registry entries",
+  "ورودی‌های نامعتبر رجیستری نیاز به پاک‌سازی دارند": "Invalid registry entries need cleaning",
+  "ورودیهای نامعتبر رجیستری نیاز به پاکسازی دارند": "Invalid registry entries need cleaning",
+  "پاک‌سازی است": "ready to clean",
+  "پاکسازی است": "ready to clean",
+  "همه بخش‌ها مرتب و سریع هستند": "All areas are clean and fast",
+  "همه بخشها مرتب و سریع هستند": "All areas are clean and fast",
+  "بخش با موفقیت بهینه‌سازی شد": "sections optimized successfully",
+  "بخش با موفقیت بهینه سازی شد": "sections optimized successfully",
+  "فضا و منابع بازیابی گردید": "of space and resources recovered"
 };
 
   var RTL_LANGS = { 'fa-IR': 1, 'ar-SA': 1 };
